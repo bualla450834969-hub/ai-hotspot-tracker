@@ -107,6 +107,49 @@ a.work-link:hover { text-decoration:underline; }
 
 .footer { text-align:center; padding:20px; color:#5c6370; font-size:11px; }
 .empty-state { text-align:center; padding:40px 20px; color:#5c6370; font-size:13px; }
+/* ============ 移动端适配 ============ */
+@media (max-width: 768px) {
+  body { padding:10px; }
+  .header { padding:16px; flex-direction:column; align-items:flex-start; gap:10px; }
+  .header h1 { font-size:18px; }
+  .filter-bar { width:100%; }
+  .filter-bar select { flex:1; font-size:14px; padding:8px 12px; }
+  .insights { padding:14px; }
+  .insights-grid { grid-template-columns:1fr; }
+  .insight-item { font-size:12px; padding:10px 12px; }
+  .stats-row { grid-template-columns:1fr 1fr; gap:10px; }
+  .stat-card { padding:14px; }
+  .stat-card .value { font-size:22px; }
+  .stat-card .label { font-size:11px; }
+  .grid-2, .grid-3 { grid-template-columns:1fr; gap:10px; }
+  .card { padding:14px; }
+  .card-title { font-size:13px; margin-bottom:10px; }
+  .chart { height:240px; }
+  .chart-sm { height:200px; }
+  table { font-size:11px; }
+  th, td { padding:6px 8px; }
+  .topic-board { grid-template-columns:1fr; }
+  .topic-card { padding:14px; }
+  .topic-card .topic-title { font-size:13px; padding-right:24px; }
+  .topic-card .topic-num { font-size:18px; }
+  .small-item { padding:8px 10px; }
+  .small-item .si-title { font-size:11.5px; }
+  .small-item .si-likes { font-size:12px; }
+  .formula-item { padding:10px 12px; }
+  .formula-item .f-name { font-size:12px; }
+  .kw-tag { font-size:11px; padding:3px 8px; }
+  .author-item { padding:6px 8px; }
+  .author-name { font-size:11.5px; }
+  #topicTracker { flex-direction:column; align-items:flex-start; gap:10px; }
+  #usageBar { width:100%; }
+}
+@media (max-width: 480px) {
+  .stats-row { grid-template-columns:1fr 1fr; }
+  .stat-card .value { font-size:20px; }
+  .chart { height:220px; }
+  .chart-sm { height:180px; }
+  .header h1 { font-size:16px; }
+}
 </style>
 </head>
 <body>
