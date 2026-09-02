@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tokrealm · Logo</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 100%; height: 100%;
+    background: #0a0a12;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  }
+  /* 背景渐变光斑 */
+  .bg-orb {
+    position: fixed; border-radius: 50%;
+    filter: blur(80px); opacity: 0.4;
+    pointer-events: none; z-index: 0;
+  }
+  .bg-orb-1 {
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(64,156,255,0.3), transparent 70%);
+    top: -100px; left: -100px;
+    animation: orbFloat1 20s ease-in-out infinite;
+  }
+  .bg-orb-2 {
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(175,82,222,0.25), transparent 70%);
+    bottom: -80px; right: -80px;
+    animation: orbFloat2 25s ease-in-out infinite;
+  }
+  .bg-orb-3 {
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(255,100,170,0.15), transparent 70%);
+    top: 40%; left: 60%;
+    animation: orbFloat3 18s ease-in-out infinite;
+  }
+  @keyframes orbFloat1 {
+    0%,100% { transform: translate(0,0); }
+    50% { transform: translate(80px, 60px); }
+  }
+  @keyframes orbFloat2 {
+    0%,100% { transform: translate(0,0); }
+    50% { transform: translate(-60px, -80px); }
+  }
+  @keyframes orbFloat3 {
+    0%,100% { transform: translate(0,0); }
+    50% { transform: translate(-40px, 50px); }
+  }
+
+  /* Logo 容器 */
+  .logo-wrap {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60vmin; height: 60vmin;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .logo-svg {
+    width: 100%; height: 100%;
+    overflow: visible;
+  }
+
+  /* 毛玻璃填充 */
+  .glass {
+    fill: rgba(255,255,255,0.05);
+    stroke: rgba(255,255,255,0.15);
+    stroke-width: 1.5;
+  }
+
+  /* 光晕 */
+  .glow {
+    opacity: 0.8;
+    transform-origin: center;
+    transition: opacity 0.4s ease;
+  }
+  .glow-main {
+    animation: glowHue 14s linear infinite, glowPulse 4s ease-in-out infinite;
+  }
+  .glow-sub {
+    animation: glowHueSub 14s linear infinite, glowPulse 4s ease-in-out infinite;
+  }
+  @keyframes glowHue {
+    0% { filter: hue-rotate(0deg) url(#blurM); }
+    100% { filter: hue-rotate(360deg) url(#blurM); }
+  }
+  @keyframes glowHueSub {
+    0% { filter: hue-rotate(0deg) url(#blurS); }
+    100% { filter: hue-rotate(360deg) url(#blurS); }
+  }
+  @keyframes glowPulse {
+    0%,100% { transform: scale(1); }
+    50% { transform: scale(1.04); }
+  }
+
+  /* 品牌文字 */
+  .brand {
+    position: fixed;
+    bottom: 8%;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .brand-name {
+    font-size: clamp(24px, 4vw, 42px);
+    font-weight: 200;
+    letter-spacing: 0.3em;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 8px;
+  }
+  .brand-tag {
+    font-size: clamp(11px, 1.5vw, 14px);
+    font-weight: 300;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.35);
+    text-transform: uppercase;
+  }
+
+  /* 移动端 */
+  @media (max-width: 768px) {
+    .logo-wrap { width: 75vmin; height: 75vmin; }
+    .brand { bottom: 10%; }
+  }
+  @media (max-width: 480px) {
+    .logo-wrap { width: 85vmin; height: 85vmin; }
+    .glow { opacity: 0.6; }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+
+<div class="logo-wrap">
+  <svg class="logo-svg" viewBox="0 0 800 550" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <!-- 主光晕渐变：蓝→紫 -->
+      <radialGradient id="mainGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(64,156,255,0.45)"/>
+        <stop offset="50%" stop-color="rgba(175,82,222,0.25)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+      <!-- 副光晕渐变：粉→青 -->
+      <radialGradient id="subGrad" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(255,100,170,0.25)"/>
+        <stop offset="50%" stop-color="rgba(100,210,255,0.12)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+      <!-- 模糊滤镜 -->
+      <filter id="blurM" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="12"/>
+      </filter>
+      <filter id="blurS" x="-50%" y="-50%" width="200%" height="200%">
+        <feGaussianBlur stdDeviation="8"/>
+      </filter>
+
+      <!-- 4个色块的clipPath（精确path） -->
+      <clipPath id="clip1">
+        <path d="M232.9 109.4 L414 109.4 L331.3 288.6 L150.2 288.6 Z"/>
+      </clipPath>
+      <clipPath id="clip2">
+        <path d="M299.7 288.6 L405.5 288.6 L352.6 357.3 L246.8 357.3 Z"/>
+      </clipPath>
+      <clipPath id="clip3">
+        <path d="M415.4 178.1 L596.5 178.1 L513.8 357.3 L332.7 357.3 Z"/>
+      </clipPath>
+      <clipPath id="clip4">
+        <path d="M423.9 109.4 L529.7 109.4 L476.8 178.1 L371 178.1 Z"/>
+      </clipPath>
+
+      <!-- 动态光晕（每个色块一个主光晕+一个副光晕） -->
+      <radialGradient id="rgMain1" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(64,156,255,0.45)"/>
+        <stop offset="50%" stop-color="rgba(175,82,222,0.25)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+      <radialGradient id="rgSub1" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(255,100,170,0.25)"/>
+        <stop offset="50%" stop-color="rgba(100,210,255,0.12)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+      <radialGradient id="rgMain2" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(64,156,255,0.45)"/>
+        <stop offset="50%" stop-color="rgba(175,82,222,0.25)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+      <radialGradient id="rgSub2" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(255,100,170,0.25)"/>
+        <stop offset="50%" stop-color="rgba(100,210,255,0.12)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+      <radialGradient id="rgMain3" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(64,156,255,0.45)"/>
+        <stop offset="50%" stop-color="rgba(175,82,222,0.25)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+      <radialGradient id="rgSub3" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(255,100,170,0.25)"/>
+        <stop offset="50%" stop-color="rgba(100,210,255,0.12)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+      <radialGradient id="rgMain4" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(64,156,255,0.45)"/>
+        <stop offset="50%" stop-color="rgba(175,82,222,0.25)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+      <radialGradient id="rgSub4" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="rgba(255,100,170,0.25)"/>
+        <stop offset="50%" stop-color="rgba(100,210,255,0.12)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </radialGradient>
+    </defs>
+
+    <!-- 色块1：左上大平行四边形 -->
+    <g clip-path="url(#clip1)">
+      <rect class="glow glow-main" x="0" y="0" width="800" height="550" fill="url(#rgMain1)"/>
+      <rect class="glow glow-sub" x="0" y="0" width="800" height="550" fill="url(#rgSub1)"/>
+      <path class="glass" d="M232.9 109.4 L414 109.4 L331.3 288.6 L150.2 288.6 Z"/>
+    </g>
+    <!-- 色块2：左下小菱形 -->
+    <g clip-path="url(#clip2)">
+      <rect class="glow glow-main" x="0" y="0" width="800" height="550" fill="url(#rgMain2)"/>
+      <rect class="glow glow-sub" x="0" y="0" width="800" height="550" fill="url(#rgSub2)"/>
+      <path class="glass" d="M299.7 288.6 L405.5 288.6 L352.6 357.3 L246.8 357.3 Z"/>
+    </g>
+    <!-- 色块3：右下大平行四边形 -->
+    <g clip-path="url(#clip3)">
+      <rect class="glow glow-main" x="0" y="0" width="800" height="550" fill="url(#rgMain3)"/>
+      <rect class="glow glow-sub" x="0" y="0" width="800" height="550" fill="url(#rgSub3)"/>
+      <path class="glass" d="M415.4 178.1 L596.5 178.1 L513.8 357.3 L332.7 357.3 Z"/>
+    </g>
+    <!-- 色块4：右上小菱形 -->
+    <g clip-path="url(#clip4)">
+      <rect class="glow glow-main" x="0" y="0" width="800" height="550" fill="url(#rgMain4)"/>
+      <rect class="glow glow-sub" x="0" y="0" width="800" height="550" fill="url(#rgSub4)"/>
+      <path class="glass" d="M423.9 109.4 L529.7 109.4 L476.8 178.1 L371 178.1 Z"/>
+    </g>
+  </svg>
+</div>
+
+<div class="brand">
+  <div class="brand-name">TOKREALM</div>
+  <div class="brand-tag">词元势界 · AI Intelligence</div>
+</div>
+
+<script>
+// 自动随机游走光晕（4色独立轨迹）
+(function() {
+  var rgMains = [];
+  var rgSubs = [];
+  for (var i = 1; i <= 4; i++) {
+    rgMains.push(document.getElementById('rgMain' + i));
+    rgSubs.push(document.getElementById('rgSub' + i));
+  }
+  var t = Math.random() * Math.PI * 2;
+  var seeds = [];
+  for (var i = 0; i < 4; i++) {
+    seeds.push({
+      fx: 0.3 + Math.random() * 0.5,
+      fy: 0.25 + Math.random() * 0.4,
+      fx2: 0.1 + Math.random() * 0.2,
+      fy2: 0.15 + Math.random() * 0.25,
+      phase: Math.random() * Math.PI * 2,
+      cx: 50, cy: 50
+    });
+  }
+
+  function animate() {
+    t += 0.012;
+    for (var i = 0; i < 4; i++) {
+      var s = seeds[i];
+      var targetX = 50 + Math.sin(t * s.fx + s.phase) * 20 + Math.sin(t * s.fx2 + s.phase * 2) * 8;
+      var targetY = 50 + Math.cos(t * s.fy + s.phase * 1.5) * 18 + Math.cos(t * s.fy2 + s.phase) * 6;
+      s.cx += (targetX - s.cx) * 0.04;
+      s.cy += (targetY - s.cy) * 0.04;
+
+      if (rgMains[i]) {
+        rgMains[i].setAttribute('cx', s.cx.toFixed(2) + '%');
+        rgMains[i].setAttribute('cy', s.cy.toFixed(2) + '%');
+      }
+      if (rgSubs[i]) {
+        rgSubs[i].setAttribute('cx', (s.cx + 5).toFixed(2) + '%');
+        rgSubs[i].setAttribute('cy', (s.cy - 3).toFixed(2) + '%');
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+</script>
+</body>
+</html>
