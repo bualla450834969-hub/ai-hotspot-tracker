@@ -2007,6 +2007,7 @@ function renderBreakdowns() {
       <div class="bd-row"><span class="bd-label">钩子</span><span class="bd-val">${b.hook}型</span></div>
       <div class="bd-row"><span class="bd-label">结构</span><span class="bd-val">${b.structure}</span></div>
       <div class="bd-row"><span class="bd-label">CTA</span><span class="bd-val">${b.cta}</span></div>
+      ${b.target_persona ? `<div class="bd-row"><span class="bd-label">人群</span><span class="bd-val"><span style="color:#22d3ee;font-weight:600">${b.target_persona.name}</span> · ${b.target_persona.age} · ${(b.target_persona.needs||[]).slice(0,2).join(' / ')}</span></div>` : ''}
       <div class="bd-meta">
         <span>${b.author} · ${b.duration}</span>
         <span>${b.interaction} · <a href="${b.work_url||'#'}" target="_blank" class="work-link">原视频</a></span>
