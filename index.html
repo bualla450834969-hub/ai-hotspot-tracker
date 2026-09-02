@@ -1113,7 +1113,8 @@ body { padding-top: 52px; }
 .login-screen {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh + 52px);
+  margin-top: -52px;
   overflow: hidden;
   background: #0a0a12;
   z-index: 100;
@@ -1148,8 +1149,8 @@ body { padding-top: 52px; }
 .login-screen .login-logo-wrap {
   position: absolute;
   top: 50%; left: 50%;
-  transform: translate(-50%, -56%);
-  width: 50vmin; height: 50vmin;
+  transform: translate(-50%, -55%);
+  width: 55vmin; height: 55vmin;
 }
 .login-screen .login-logo-svg {
   width: 100%; height: 100%;
@@ -3070,4 +3071,7 @@ initNavHide();
 </script>
 </body>
 </html>
+
+
+
 
