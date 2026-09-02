@@ -822,6 +822,7 @@ a.work-link:hover { opacity: 0.7; }
   .section-title { font-size: 18px; }
 }
 </style>
+<script src="data.js"></script>
 </head>
 <body>
 <div class="blob-3"></div>
@@ -1010,7 +1011,7 @@ a.work-link:hover { opacity: 0.7; }
 <div class="footer">AI 热点追踪工作台 · 数据来源 RedFox Hub · 每日 8:00 / 14:00 自动采集</div>
 
 <script>
-const DATA = {"last_update": "2026-09-02 11:46:16", "hotwords": [], "works": [], "topics": [], "summary": {"total_keywords": 0, "total_works": 0, "surging_count": 0, "new_hot_count": 0, "topics_count": 0}, "comment_keywords": [], "title_formulas": [], "publish_time_dist": [{"hour": 0, "count": 0, "pct": 0}, {"hour": 1, "count": 0, "pct": 0}, {"hour": 2, "count": 0, "pct": 0}, {"hour": 3, "count": 0, "pct": 0}, {"hour": 4, "count": 0, "pct": 0}, {"hour": 5, "count": 0, "pct": 0}, {"hour": 6, "count": 0, "pct": 0}, {"hour": 7, "count": 0, "pct": 0}, {"hour": 8, "count": 0, "pct": 0}, {"hour": 9, "count": 0, "pct": 0}, {"hour": 10, "count": 0, "pct": 0}, {"hour": 11, "count": 0, "pct": 0}, {"hour": 12, "count": 0, "pct": 0}, {"hour": 13, "count": 0, "pct": 0}, {"hour": 14, "count": 0, "pct": 0}, {"hour": 15, "count": 0, "pct": 0}, {"hour": 16, "count": 0, "pct": 0}, {"hour": 17, "count": 0, "pct": 0}, {"hour": 18, "count": 0, "pct": 0}, {"hour": 19, "count": 0, "pct": 0}, {"hour": 20, "count": 0, "pct": 0}, {"hour": 21, "count": 0, "pct": 0}, {"hour": 22, "count": 0, "pct": 0}, {"hour": 23, "count": 0, "pct": 0}], "duration_dist": [{"range": "0-15秒", "count": 0, "avg_likes": 0}, {"range": "15-30秒", "count": 0, "avg_likes": 0}, {"range": "30-60秒", "count": 0, "avg_likes": 0}, {"range": "1-3分钟", "count": 0, "avg_likes": 0}, {"range": "3分钟+", "count": 0, "avg_likes": 0}], "small_account_viral": [], "historical_trend": [{"hotwords": [{"keyword": "AI", "total": 1513421}, {"keyword": "AI工具", "total": 1815}, {"keyword": "AI做图", "total": 10}, {"keyword": "AI修图", "total": 143}, {"keyword": "AI绘画", "total": 432}, {"keyword": "AI视频", "total": 5740}, {"keyword": "AI数字人", "total": 184058}, {"keyword": "AI写作", "total": 111}, {"keyword": "AI办公", "total": 439}, {"keyword": "AI工作流", "total": 690}, {"keyword": "AI自动化", "total": 3143}, {"keyword": "AI编程", "total": 219}, {"keyword": "AI PPT", "total": 1514219}, {"keyword": "AI音乐", "total": 352}, {"keyword": "AI搜索", "total": 51}, {"keyword": "AI Agent", "total": 1513764}, {"keyword": "AI提示词", "total": 3869}, {"keyword": "扣子", "total": 952}, {"keyword": "Coze", "total": 49}, {"keyword": "WorkBuddy", "total": 150}, {"keyword": "n8n", "total": 2}, {"keyword": "Dify", "total": 5}, {"keyword": "即梦AI", "total": 20329}, {"keyword": "可灵AI", "total": 292}, {"keyword": "豆包AI", "total": 13364}], "date": "2026-09-01"}, {"date": "2026-09-02", "hotwords": []}], "saturation": [], "hot_breakdowns": [], "comment_demands": {"questions": [], "complaints": [], "needs": []}, "content_formats": [], "daily_actions": [{"type": "互动", "priority": "低", "content": "回复昨日视频评论区前10条", "detail": "提升账号互动率"}], "keyword_matrix": [], "anomalies": []};
+const DATA = window.DASHBOARD_DATA || {};
 let currentCategory = 'all';
 let sortDir = {};
 const charts = {};
