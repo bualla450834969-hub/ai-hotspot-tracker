@@ -996,18 +996,12 @@ body { padding-top: 52px; }
 <body>
 <div class="top-nav" id="topNav">
   <span class="nav-logo">AI热点追踪</span>
-  <a class="nav-link" data-target="hero">概览</a>
-  <a class="nav-link" data-target="hotwords">热词</a>
-  <a class="nav-link" data-target="works">爆款</a>
-  <a class="nav-link" data-target="topics">选题</a>
-  <a class="nav-link" data-target="insights">洞察</a>
-  <a class="nav-link" data-target="viralGenes">爆款基因</a>
-  <a class="nav-link" data-target="topicPerf">命中率</a>
-  <a class="nav-link" data-target="titleGen">标题生成</a>
-  <a class="nav-link" data-target="schedule">排期</a>
-  <a class="nav-link" data-target="commentScripts">评论话术</a>
-  <a class="nav-link" data-target="checklist">自检</a>
-  <a class="nav-link" data-target="audience">人群</a>
+  <a class="nav-link" data-target="hero">工作台</a>
+  <a class="nav-link" data-target="hotwords">热点</a>
+  <a class="nav-link" data-target="breakdown">爆款</a>
+  <a class="nav-link" data-target="topics">生产</a>
+  <a class="nav-link" data-target="topicPerf">运营</a>
+  <a class="nav-link" data-target="audience">受众</a>
 </div>
 <div class="scroll-progress" id="scrollProgress"></div>
 <div class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
@@ -1039,11 +1033,23 @@ body { padding-top: 52px; }
   <div class="hero-stats anim anim-d2" id="heroStats"></div>
 </div>
 
+<div class="section anim anim-d2">
+  <div id="hero" class="section-header">
+    <span class="section-num">01</span>
+    <span class="section-title">今日行动</span>
+    <span class="section-desc">每日待办 · 核心指标</span>
+  </div>
+  <div class="action-panel">
+    <div class="action-title">Action List</div>
+    <div class="action-list" id="actionList"></div>
+  </div>
+</div>
+
 <div class="section compare-section" id="compareSection">
   <div class="section-header">
-    <span class="section-num">00</span>
+    <span class="section-num"></span>
     <span class="section-title">双平台对比</span>
-    <span class="section-desc">抖音 vs 小红书 AI 赛道数据对比</span>
+    <span class="section-desc">抖音 vs 小红书数据对比</span>
   </div>
   <div class="compare-grid" id="compareSummary"></div>
   <div class="bento-card" style="margin-bottom:16px;">
@@ -1067,30 +1073,9 @@ body { padding-top: 52px; }
   </div>
 </div>
 
-<div class="section anim anim-d2">
-  <div id="hero" class="section-header">
-    <span class="section-num">01</span>
-    <span class="section-title">今日行动</span>
-    <span class="section-desc">基于数据的每日执行清单</span>
-  </div>
-  <div class="action-panel">
-    <div class="action-title">Action List</div>
-    <div class="action-list" id="actionList"></div>
-  </div>
-</div>
-
-<div class="section anim anim-d3">
-  <div id="hotwords" class="section-header">
-    <span class="section-num">02</span>
-    <span class="section-title">智能洞察</span>
-    <span class="section-desc">从数据中提取的关键信号</span>
-  </div>
-  <div class="insights-grid" id="insightsGrid"></div>
-</div>
-
 <div class="section anim anim-d3">
   <div id="works" class="section-header">
-    <span class="section-num">03</span>
+    <span class="section-num">02</span>
     <span class="section-title">热度分析</span>
     <span class="section-desc">什么在火 · 什么时候发 · 多长最好</span>
   </div>
@@ -1118,69 +1103,18 @@ body { padding-top: 52px; }
   </div>
 </div>
 
-<div class="section anim anim-d4">
-  <div id="topics" class="section-header">
-    <span class="section-num">04</span>
-    <span class="section-title">观众洞察</span>
-    <span class="section-desc">他们在问什么 · 收藏什么 · 需求在哪</span>
+<div class="section anim anim-d3">
+  <div id="hotwords" class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">智能洞察</span>
+    <span class="section-desc">从数据中提取的关键信号</span>
   </div>
-  <div class="bento">
-    <div class="bento-card">
-      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">评论高频词</span><span class="ch-tip">观众在问什么</span></div>
-      <div class="kw-cloud" id="commentKw"></div>
-    </div>
-    <div class="bento-card">
-      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">点赞 × 收藏</span></div>
-      <div class="chart-sm" id="chartScatter"></div>
-    </div>
-    <div class="bento-card">
-      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">收藏率排行</span><span class="ch-tip">价值型内容</span></div>
-      <div class="chart-sm" id="chartCollect"></div>
-    </div>
-    <div class="bento-card span-2">
-      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">评论区需求挖掘</span><span class="ch-tip">从评论找选题</span></div>
-      <div id="commentDemands"></div>
-    </div>
-    <div class="bento-card">
-      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">饱和度 & 生命周期</span><span class="ch-tip">值越低越蓝海</span></div>
-      <div class="sat-list" id="saturationList"></div>
-    </div>
-  </div>
-</div>
-
-<div class="section anim anim-d4">
-  <div id="insights" class="section-header">
-    <span class="section-num">05</span>
-    <span class="section-title">对标拆解</span>
-    <span class="section-desc">谁在做 · 怎么做的 · 可以抄什么</span>
-  </div>
-  <div class="bento">
-    <div class="bento-card">
-      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">小账号爆款</span><span class="ch-tip">粉丝&lt;5万 赞&gt;3千</span></div>
-      <div class="small-list" id="smallViral"></div>
-    </div>
-    <div class="bento-card">
-      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">标题公式</span><span class="ch-tip">可直接套用</span></div>
-      <div class="formula-list" id="formulaList"></div>
-    </div>
-    <div class="bento-card">
-      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">对标作者 TOP10</span></div>
-      <div class="author-list" id="authorList"></div>
-    </div>
-    <div class="bento-card span-3">
-      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">爆款结构化拆解 TOP10</span><span class="ch-tip">钩子 → 结构 → CTA</span></div>
-      <div class="breakdown-grid" id="breakdownGrid"></div>
-    </div>
-    <div class="bento-card span-3">
-      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">赛道覆盖矩阵</span><span class="ch-tip">找空白机会点</span></div>
-      <div class="matrix-grid" id="matrixGrid"></div>
-    </div>
-  </div>
+  <div class="insights-grid" id="insightsGrid"></div>
 </div>
 
 <div class="section anim anim-d5">
   <div id="history" class="section-header">
-    <span class="section-num">06</span>
+    <span class="section-num"></span>
     <span class="section-title">趋势与数据</span>
     <span class="section-desc">历史走势 · 完整明细</span>
   </div>
@@ -1212,9 +1146,9 @@ body { padding-top: 52px; }
 
 <div class="section anim anim-d6">
   <div id="breakdown" class="section-header">
-    <span class="section-num">07</span>
-    <span class="section-title">选题执行</span>
-    <span class="section-desc">今日选题 · 执行追踪</span>
+    <span class="section-num">03</span>
+    <span class="section-title">爆款结构拆解</span>
+    <span class="section-desc">钩子 → 结构 → CTA → 目标人群</span>
   </div>
   <div class="topic-board" id="topicsGrid" style="margin-bottom:16px;"></div>
   <div class="tracker-bar" id="topicTracker">
@@ -1231,32 +1165,80 @@ body { padding-top: 52px; }
 
 <div class="footer">AI 热点追踪工作台 · 数据来源 RedFox Hub · 每日 8:00 / 14:00 自动采集</div>
 
-
 <div class="section anim anim-d6">
 <div id="viralGenes" class="section-header">
-<span class="section-num">08</span>
+<span class="section-num"></span>
 <span class="section-title">爆款基因库</span>
-<span class="section-desc">从TOP爆款中提取可复用的钩子、结构和关键词</span>
+<span class="section-desc">钩子类型 · 标题公式 · 高频词</span>
 </div>
 <div id="viralGenesContent"></div>
 </div>
 
-<div class="section anim anim-d7">
-<div id="topicPerf" class="section-header">
-<span class="section-num">09</span>
-<span class="section-title">选题命中率</span>
-<span class="section-desc">发布后数据回填 · 自动统计哪些选题类型表现好</span>
-</div>
-<div id="topicPerfContent"></div>
+<div class="section anim anim-d4">
+  <div id="insights" class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">对标与评论</span>
+    <span class="section-desc">评论关键词 · 收藏率 · 需求挖掘 · 饱和度</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">小账号爆款</span><span class="ch-tip">粉丝&lt;5万 赞&gt;3千</span></div>
+      <div class="small-list" id="smallViral"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">标题公式</span><span class="ch-tip">可直接套用</span></div>
+      <div class="formula-list" id="formulaList"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">对标作者 TOP10</span></div>
+      <div class="author-list" id="authorList"></div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">爆款结构化拆解 TOP10</span><span class="ch-tip">钩子 → 结构 → CTA</span></div>
+      <div class="breakdown-grid" id="breakdownGrid"></div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">赛道覆盖矩阵</span><span class="ch-tip">找空白机会点</span></div>
+      <div class="matrix-grid" id="matrixGrid"></div>
+    </div>
+  </div>
 </div>
 
+<div class="section anim anim-d4">
+  <div id="topics" class="section-header">
+    <span class="section-num">04</span>
+    <span class="section-title">选题建议</span>
+    <span class="section-desc">带人群画像 · 综合评分 · 变现路径</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">评论高频词</span><span class="ch-tip">观众在问什么</span></div>
+      <div class="kw-cloud" id="commentKw"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">点赞 × 收藏</span></div>
+      <div class="chart-sm" id="chartScatter"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">收藏率排行</span><span class="ch-tip">价值型内容</span></div>
+      <div class="chart-sm" id="chartCollect"></div>
+    </div>
+    <div class="bento-card span-2">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">评论区需求挖掘</span><span class="ch-tip">从评论找选题</span></div>
+      <div id="commentDemands"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">饱和度 & 生命周期</span><span class="ch-tip">值越低越蓝海</span></div>
+      <div class="sat-list" id="saturationList"></div>
+    </div>
+  </div>
+</div>
 
-<div class="section anim anim-d7">
 <div class="section anim anim-d7">
 <div id="titleGen" class="section-header">
-<span class="section-num">10</span>
+<span class="section-num"></span>
 <span class="section-title">爆款标题生成器</span>
-<span class="section-desc">输入关键词，基于爆款基因自动生成标题+钩子</span>
+<span class="section-desc">输入关键词 → 5条标题+钩子</span>
 </div>
 <div style="display:flex;gap:12px;align-items:flex-end">
 <div style="flex:1">
@@ -1269,38 +1251,46 @@ body { padding-top: 52px; }
 
 <div class="section anim-d8">
 <div id="schedule" class="section-header">
-<span class="section-num">11</span>
-<span class="section-title">一周内容排期表</span>
-<span class="section-desc">基于选题和最佳发布时间自动生成7天排期</span>
+<span class="section-num"></span>
+<span class="section-title">一周内容排期</span>
+<span class="section-desc">抖音日更 · 小红书隔日更</span>
 </div>
 <div id="scheduleContent"></div>
 </div>
 
+<div class="section anim anim-d7">
+<div id="topicPerf" class="section-header">
+<span class="section-num">05</span>
+<span class="section-title">选题命中率</span>
+<span class="section-desc">发布后自动追踪效果</span>
+</div>
+<div id="topicPerfContent"></div>
+</div>
+
 <div class="section anim-d8">
 <div id="commentScripts" class="section-header">
-<span class="section-num">12</span>
-<span class="section-title">评论区运营话术库</span>
-<span class="section-desc">高赞回复模式 + 置顶引导话术 + 常见问题模板</span>
+<span class="section-num"></span>
+<span class="section-title">评论区话术库</span>
+<span class="section-desc">高赞回复 · 置顶引导 · 需求收集</span>
 </div>
 <div id="commentScriptsContent"></div>
 </div>
 
 <div class="section anim-d9">
 <div id="checklist" class="section-header">
-<span class="section-num">13</span>
-<span class="section-title">发布前自检清单</span>
-<span class="section-desc">每条视频发布前过一遍，打不完勾不发</span>
+<span class="section-num"></span>
+<span class="section-title">发布前自检</span>
+<span class="section-desc">6项检查 · 避免低级错误</span>
 </div>
 <div class="checklist-progress" id="checklistProgress">已完成 <b>0</b>/6 项</div>
 <div id="checklistContent"></div>
 </div>
 
-
 <div id="audience" class="section anim-d9">
 <div class="section-header">
-<span class="section-num">14</span>
+<span class="section-num">06</span>
 <span class="section-title">人群画像</span>
-<span class="section-desc">AI赛道核心受众分析：特征、需求、内容偏好、变现方式</span>
+<span class="section-desc">10类核心受众 · 特征 · 需求 · 变现</span>
 </div>
 <div class="audience-chart" id="audienceChart"></div>
 <div class="persona-grid" id="personaGrid"></div>
@@ -1314,6 +1304,7 @@ body { padding-top: 52px; }
 <div id="trendModalBody"><p style="color:var(--text-secondary)">加载中...</p></div>
 </div>
 </div>
+
 
 <script>
 const DATA = window.DASHBOARD_DATA || {};
