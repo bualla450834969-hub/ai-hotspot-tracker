@@ -1158,21 +1158,22 @@ function init() {
 }
 
 function applyFilter() { currentCategory = document.getElementById('categoryFilter').value; renderAll(); }
-function filteredHotwords() { return currentCategory==='all' ? DATA.hotwords : hotwords.filter(h=>h.category===currentCategory); }
+function filteredHotwords() { const p = filterByPlatform(DATA.hotwords||[]); return currentCategory==='all' ? p : p.filter(h=>h.category===currentCategory); }
 function filteredWorks() {
-  if (currentCategory==='all') return DATA.works||[];
+  const p = filterByPlatform(DATA.works||[]);
+  if (currentCategory==='all') return p;
   const kws = new Set(filteredHotwords().map(h=>h.keyword));
-  return (DATA.works||[]).filter(w=>kws.has(w._keyword));
+  return p.filter(w=>kws.has(w._keyword));
 }
 
+function filteredTopics() { return filterByPlatform(DATA.topics||[]); }
+
 function renderAll() {
-  const hotwords = filterByPlatform(DATA.hotwords);
-  const works = filterByPlatform(DATA.works);
-  const topics = filterByPlatform(DATA.topics);
   const summary = DATA.summary || {};
   const hw = filteredHotwords();
   const works = filteredWorks();
-  renderHeroStats(hw, works);
+  const topics = filteredTopics();
+  renderHeroStats(hw, works, topics);
   renderActions(); renderInsights(hw, works);
   renderRanking(hw); renderCategory(hw); renderPublishTime(works);
   renderDuration(works); renderHook(works); renderCommentKw(works);
@@ -1184,7 +1185,7 @@ function renderAll() {
   initCardGlow();
 }
 
-function renderHeroStats(hw, works) {
+function renderHeroStats(hw, works, topics) {
   const totalLikes = works.reduce((s,w)=>s+(w.likeCount||0),0);
   const surging = hw.filter(h=>h.trend==='飙升'||h.trend==='新热').length;
   const topSurging = hw.filter(h=>h.trend==='飙升').sort((a,b)=>b.total-a.total)[0];
@@ -1207,13 +1208,13 @@ function renderHeroStats(hw, works) {
     </div>
     <div class="hero-stat">
       <div class="hs-label">选题建议</div>
-      <div class="hs-value orange" id="heroTopicsVal">${(DATA.topics||[]).length}</div>
+      <div class="hs-value orange" id="heroTopicsVal">${topics.length}</div>
       <div class="hs-sub">标题 + 钩子 + 形式</div>
     </div>`;
   setTimeout(()=>{
     animateNumber(document.getElementById('heroWorksVal'), works.length);
     animateNumber(document.getElementById('heroSurgingVal'), surging);
-    animateNumber(document.getElementById('heroTopicsVal'), (DATA.topics||[]).length);
+    animateNumber(document.getElementById('heroTopicsVal'), topics.length);
   }, 300);
 }
 
@@ -1431,7 +1432,7 @@ function renderHistory() {
     return;
   }
   const dates = hist.map(h=>h.date.slice(5));
-  const topKws = [...DATA.hotwords].sort((a,b)=>b.total-a.total).slice(0,5).map(h=>h.keyword);
+  const topKws = [...hw].sort((a,b)=>b.total-a.total).slice(0,5).map(h=>h.keyword);
   const series = topKws.map((kw,i)=>({
     name:kw, type:'line', smooth:true, symbol:'circle', symbolSize:5,
     data: hist.map(h=>{const f=h.hotwords.find(x=>x.keyword===kw);return f?f.total:null;}),
@@ -1458,7 +1459,7 @@ function renderTopics() {
   const formats = DATA.content_formats || [];
   const fmtMap = {};
   formats.forEach(f=>fmtMap[f.title]=f);
-  const topics = DATA.topics || [];
+  const topics = filteredTopics();
   const status = getTopicStatus();
   document.getElementById('topicsGrid').innerHTML = topics.map((t,i)=>{
     const fmt = fmtMap[t.title] || {};
@@ -1530,9 +1531,9 @@ function getTopicStatus() { try { return JSON.parse(localStorage.getItem('ai_hot
 function resetTopicStatus() { localStorage.removeItem('ai_hotspot_status'); renderTopics(); }
 function updateTracker() {
   const status = getTopicStatus();
-  const total = (DATA.topics||[]).length;
+  const total = filteredTopics().length;
   let published=0, shooting=0, pending=0;
-  (DATA.topics||[]).forEach(t=>{
+  filteredTopics().forEach(t=>{
     const s = status[t.title] || 'pending';
     if (s==='published') published++;
     else if (s==='shooting') shooting++;
