@@ -1207,7 +1207,7 @@ body { padding-top: 52px; }
       <div id="barPublished" style="background:var(--accent-4);width:0%;"></div>
       <div id="barShooting" style="background:var(--accent-3);width:0%;"></div>
     </div>
-    <button onclick="resetTopicStatus()">重置状态</button>
+    <button onclick="resetKanbanStatus()">重置状态</button>
   </div>
 </div>
 
@@ -1397,11 +1397,11 @@ let currentPlatform = 'all';
 
 
 // ===== 选题看板 =====
-function getTopicStatus(topic) {
+function getKanbanStatus(topic) {
   const saved = localStorage.getItem('topic_status_' + String(topic.title).hashCode());
   return saved || 'pending';
 }
-function setTopicStatus(topic, status) {
+function setKanbanStatus(topic, status) {
   localStorage.setItem('topic_status_' + String(topic.title).hashCode(), status);
   renderKanban();
   renderTopics();
@@ -1412,7 +1412,7 @@ function renderKanban() {
   const topics = DATA.topics || [];
   const cols = { pending: [], shooting: [], published: [] };
   topics.forEach(function(t) {
-    const s = getTopicStatus(t);
+    const s = getKanbanStatus(t);
     if (!cols[s]) cols[s] = [];
     cols[s].push(t);
   });
@@ -1429,7 +1429,7 @@ function renderKanban() {
         '<div class="kanban-card-title">' + t.title + '</div>' +
         '<div class="kanban-card-meta"><span>' + pname + '</span><span>' + t.priority + '优先</span><span>' + plat + '</span></div>' +
         '<div class="kanban-card-actions">' +
-        '<button class="kanban-btn" onclick="cycleTopicStatus(\'' + t.title.replace(/'/g, "\\'") + '\')">切换状态</button>' +
+        '<button class="kanban-btn" onclick="cycleKanbanStatus(\'' + t.title.replace(/'/g, "\\'") + '\')">切换状态</button>' +
         '<button class="kanban-btn" onclick="generateScript(\'' + t.title.replace(/'/g, "\\'") + '\')">生成脚本</button>' +
         '</div></div>';
     }).join('');
@@ -1440,12 +1440,12 @@ function renderKanban() {
       '</div>';
   }).join('');
 }
-function cycleTopicStatus(title) {
+function cycleKanbanStatus(title) {
   const topic = DATA.topics.find(function(t) { return t.title === title; });
   if (!topic) return;
-  const current = getTopicStatus(topic);
+  const current = getKanbanStatus(topic);
   const next = { pending: 'shooting', shooting: 'published', published: 'pending' }[current];
-  setTopicStatus(topic, next);
+  setKanbanStatus(topic, next);
 }
 
 // ===== 脚本生成 =====
@@ -2050,6 +2050,8 @@ function renderAll() {
   renderHistory(hw); renderHotwordTable(hw); renderWorksTable(works); renderViralGenes(); renderTopicPerf(); generateSchedule(); renderCommentScripts(); renderChecklist(); renderAudience();
   renderTopics(); updateTracker();
   initCardGlow();
+  renderBreakdowns();
+
 }
 
 function renderHeroStats(hw, works, topics) {
@@ -2329,14 +2331,14 @@ function renderTopics() {
   const fmtMap = {};
   formats.forEach(f=>fmtMap[f.title]=f);
   const topics = filteredTopics();
-  const status = getTopicStatus();
+  const status = getKanbanStatus();
   document.getElementById('topicsGrid').innerHTML = topics.map((t,i)=>{
     const fmt = fmtMap[t.title] || {};
     const st = status[t.title] || 'pending';
     const score = calcTopicScore(t);
     const adapt = getPlatformAdaptation(t);
     const mon = getMonetization(t);
-    return `<div class="topic-card priority-${t.priority==='高'?'high':t.priority==='中'?'medium':'low'} status-${st}" id="topic-${i}" onclick="cycleTopicStatus(${i}, '${t.title.replace(/'/g,"\\'")}')">
+    return `<div class="topic-card priority-${t.priority==='高'?'high':t.priority==='中'?'medium':'low'} status-${st}" id="topic-${i}" onclick="cycleKanbanStatus(${i}, '${t.title.replace(/'/g,"\\'")}')">
       <div class="status-badge">${st==='pending'?'待拍摄':st==='shooting'?'拍摄中':'已发布'}</div>
       <div class="tc-num">${String(i+1).padStart(2,'0')}</div>
       <div class="tc-priority">${t.priority}优先</div>
@@ -2445,8 +2447,8 @@ function initCardGlow() {
   });
 }
 
-function cycleTopicStatus(i, title) {
-  const status = getTopicStatus();
+function cycleKanbanStatus(i, title) {
+  const status = getKanbanStatus();
   const cur = status[title] || 'pending';
   const next = cur==='pending'?'shooting':cur==='shooting'?'published':'pending';
   if (next==='pending') delete status[title]; else status[title]=next;
@@ -2456,10 +2458,10 @@ function cycleTopicStatus(i, title) {
   card.querySelector('.status-badge').textContent = next==='pending'?'待拍摄':next==='shooting'?'拍摄中':'已发布';
   updateTracker();
 }
-function getTopicStatus() { try { return JSON.parse(localStorage.getItem('ai_hotspot_status')||'{}'); } catch(e) { return {}; } }
-function resetTopicStatus() { localStorage.removeItem('ai_hotspot_status'); renderTopics(); }
+function getKanbanStatus() { try { return JSON.parse(localStorage.getItem('ai_hotspot_status')||'{}'); } catch(e) { return {}; } }
+function resetKanbanStatus() { localStorage.removeItem('ai_hotspot_status'); renderTopics(); }
 function updateTracker() {
-  const status = getTopicStatus();
+  const status = getKanbanStatus();
   const total = filteredTopics().length;
   let published=0, shooting=0, pending=0;
   filteredTopics().forEach(t=>{
