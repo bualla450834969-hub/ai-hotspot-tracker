@@ -895,6 +895,29 @@ a.work-link:hover { opacity: 0.7; }
 /* 跨平台适配 */
 .adapt-tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
 .adapt-tag { font-size: 10px; padding: 3px 8px; border-radius: 10px; background: rgba(255,255,255,0.06); color: var(--text-secondary); }
+
+/* 评论话术库 */
+.comment-tpl { padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #06b6d4; }
+.comment-tpl .ct-type { font-size: 11px; color: #22d3ee; font-weight: 600; margin-bottom: 4px; }
+.comment-tpl .ct-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+.pinned-comment { background: rgba(251,191,36,0.08); border-left-color: #fbbf24; margin-top: 12px; padding: 12px 14px; border-radius: 8px; }
+.pinned-comment .pc-label { font-size: 11px; color: #fbbf24; font-weight: 600; margin-bottom: 6px; }
+/* 变现标签 */
+.monetize-tag { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-right: 6px; }
+.monetize-affiliate { background: rgba(34,197,94,0.15); color: #4ade80; }
+.monetize-ad { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.monetize-private { background: rgba(168,85,247,0.15); color: #c084fc; }
+.monetize-course { background: rgba(236,72,153,0.15); color: #f472b6; }
+/* 自检清单 */
+.checklist-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 8px; margin-bottom: 6px; cursor: pointer; transition: background 0.2s; }
+.checklist-item:hover { background: rgba(255,255,255,0.08); }
+.checklist-item.checked { background: rgba(34,197,94,0.08); }
+.checklist-box { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.2); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; color: #4ade80; }
+.checklist-item.checked .checklist-box { background: rgba(34,197,94,0.2); border-color: #4ade80; }
+.checklist-text { font-size: 14px; color: var(--text); flex: 1; }
+.checklist-item.checked .checklist-text { text-decoration: line-through; opacity: 0.6; }
+.checklist-progress { text-align: center; margin: 12px 0; font-size: 14px; color: var(--text-secondary); }
+.checklist-progress b { color: #4ade80; font-size: 18px; }
 </style>
 <script src="data.js"></script>
 </head>
@@ -1162,6 +1185,26 @@ a.work-link:hover { opacity: 0.7; }
 <div id="scheduleContent"></div>
 </div>
 
+
+<div class="section anim-d8">
+<div class="section-header">
+<span class="section-num">12</span>
+<span class="section-title">评论区运营话术库</span>
+<span class="section-desc">高赞回复模式 + 置顶引导话术 + 常见问题模板</span>
+</div>
+<div id="commentScriptsContent"></div>
+</div>
+
+<div class="section anim-d9">
+<div class="section-header">
+<span class="section-num">13</span>
+<span class="section-title">发布前自检清单</span>
+<span class="section-desc">每条视频发布前过一遍，打不完勾不发</span>
+</div>
+<div class="checklist-progress" id="checklistProgress">已完成 <b>0</b>/6 项</div>
+<div id="checklistContent"></div>
+</div>
+
 <!-- 热词趋势弹窗 -->
 
 
@@ -1187,6 +1230,26 @@ a.work-link:hover { opacity: 0.7; }
 <span class="section-desc">基于选题和最佳发布时间自动生成7天排期</span>
 </div>
 <div id="scheduleContent"></div>
+</div>
+
+
+<div class="section anim-d8">
+<div class="section-header">
+<span class="section-num">12</span>
+<span class="section-title">评论区运营话术库</span>
+<span class="section-desc">高赞回复模式 + 置顶引导话术 + 常见问题模板</span>
+</div>
+<div id="commentScriptsContent"></div>
+</div>
+
+<div class="section anim-d9">
+<div class="section-header">
+<span class="section-num">13</span>
+<span class="section-title">发布前自检清单</span>
+<span class="section-desc">每条视频发布前过一遍，打不完勾不发</span>
+</div>
+<div class="checklist-progress" id="checklistProgress">已完成 <b>0</b>/6 项</div>
+<div id="checklistContent"></div>
 </div>
 
 <!-- 热词趋势弹窗 -->
@@ -1478,6 +1541,115 @@ function generateSchedule() {
 }
 
 
+
+// ========== 1. 评论区运营话术库 ==========
+function renderCommentScripts() {
+  const demands = DATA.comment_demands || [];
+  const topics = DATA.topics || [];
+  
+  // 高赞回复模式
+  const replyPatterns = [
+    { type: '补充干货型', text: '补充一个：用XX工具的XX功能效果更好，亲测有效！' },
+    { type: '提问互动型', text: '你们最想用AI解决什么问题？评论区告诉我，下期安排！' },
+    { type: '共鸣认同型', text: '说到点子上了，我也是踩了无数坑才总结出来的' },
+    { type: '反转惊喜型', text: '其实还有个隐藏功能，90%的人不知道，看我主页' },
+    { type: '福利引导型', text: '整理了全套资料，需要的评论区扣"想要"' },
+  ];
+  
+  let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+  html += '<div>';
+  html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">高赞回复模式（直接套用）</h4>';
+  replyPatterns.forEach(p => {
+    html += '<div class="comment-tpl"><div class="ct-type">' + p.type + '</div><div class="ct-text">' + p.text + '</div></div>';
+  });
+  html += '</div>';
+  
+  // 置顶评论话术（基于当前TOP选题）
+  html += '<div>';
+  html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">置顶评论引导话术</h4>';
+  const topTopics = topics.slice(0, 3);
+  topTopics.forEach(t => {
+    const kw = t.keyword || '';
+    html += '<div class="pinned-comment">';
+    html += '<div class="pc-label">选题：' + t.title.substring(0, 20) + '</div>';
+    html += '<div class="ct-text">想要' + kw + '全套教程的，评论区扣"1"，我整理好了发你！<br>觉得有用的点个赞，你的支持是我更新的动力</div>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+  
+  // 评论区需求洞察
+  if (demands.length) {
+    html += '<div style="margin-top:16px"><h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">评论区高频需求（下期选题参考）</h4>';
+    html += '<div class="kw-cloud">';
+    demands.slice(0, 10).forEach(d => {
+      html += '<span>' + (d.demand || d.keyword || d) + '</span>';
+    });
+    html += '</div></div>';
+  }
+  
+  document.getElementById('commentScriptsContent').innerHTML = html;
+}
+
+// ========== 2. 变现路径标注 ==========
+function getMonetization(topic) {
+  const kw = (topic.keyword || '').toLowerCase();
+  const cat = topic.keyword || '';
+  // 判断变现方式
+  let type, score, desc;
+  if (kw.includes('工具') || kw.includes('教程') || kw.includes('入门') || kw.includes('怎么做') || cat.includes('AI做图') || cat.includes('AI视频') || cat.includes('AI PPT')) {
+    type = 'affiliate'; score = 85; desc = '带货：AI工具会员/ affiliate 佣金';
+  } else if (kw.includes('资讯') || kw.includes('新闻') || kw.includes('发布') || cat.includes('AI大类') || cat.includes('AI Agent')) {
+    type = 'ad'; score = 70; desc = '广告：品牌合作、商单植入';
+  } else if (kw.includes('工作流') || kw.includes('自动化') || kw.includes('效率') || cat.includes('AI工作流') || cat.includes('AI自动化')) {
+    type = 'private'; score = 90; desc = '私域：引流微信，卖方案/咨询';
+  } else if (kw.includes('提示词') || kw.includes('prompt') || cat.includes('AI提示词')) {
+    type = 'course'; score = 75; desc = '知识付费：提示词课程/社群';
+  } else {
+    type = 'affiliate'; score = 60; desc = '带货：通用AI工具推荐';
+  }
+  const typeMap = { affiliate: { name: '带货', cls: 'monetize-affiliate' }, ad: { name: '广告', cls: 'monetize-ad' }, private: { name: '私域', cls: 'monetize-private' }, course: { name: '知识付费', cls: 'monetize-course' } };
+  return { type, score, desc, ...typeMap[type] };
+}
+
+// ========== 3. 发布前自检清单 ==========
+const CHECKLIST_ITEMS = [
+  { id: 'title', text: '标题有钩子：前3秒制造悬念/冲突/利益点' },
+  { id: 'cover', text: '封面达标：大字清晰、对比色强、主体突出' },
+  { id: 'tags', text: '标签完整：3-5个精准标签，含1个大词+2个长尾词' },
+  { id: 'cta', text: '有CTA：结尾引导关注/评论/收藏，话术自然' },
+  { id: 'duration', text: '时长合适：口播15-40秒，教程不超过3分钟' },
+  { id: 'time', text: '发布时间：在排期表建议时段内发布' },
+];
+
+function renderChecklist() {
+  const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+  let html = '';
+  CHECKLIST_ITEMS.forEach(item => {
+    const checked = saved[item.id] ? 'checked' : '';
+    const mark = saved[item.id] ? '✓' : '';
+    html += '<div class="checklist-item ' + checked + '" onclick="toggleCheck('' + item.id + '')">';
+    html += '<div class="checklist-box">' + mark + '</div>';
+    html += '<div class="checklist-text">' + item.text + '</div>';
+    html += '</div>';
+  });
+  document.getElementById('checklistContent').innerHTML = html;
+  updateChecklistProgress();
+}
+
+function toggleCheck(id) {
+  const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+  saved[id] = !saved[id];
+  localStorage.setItem('publishChecklist', JSON.stringify(saved));
+  renderChecklist();
+}
+
+function updateChecklistProgress() {
+  const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+  const done = Object.values(saved).filter(Boolean).length;
+  document.getElementById('checklistProgress').innerHTML = '已完成 <b>' + done + '</b>/' + CHECKLIST_ITEMS.length + ' 项' + (done === CHECKLIST_ITEMS.length ? ' 可以发布了！' : '');
+}
+
+
 function renderAll() {
   const summary = DATA.summary || {};
   const hw = filteredHotwords();
@@ -1490,7 +1662,7 @@ function renderAll() {
   renderScatter(works); renderCollect(hw); renderCommentDemands();
   renderSaturation(hw); renderSmallViral(works); renderFormulas();
   renderAuthors(works); renderBreakdowns(); renderMatrix();
-  renderHistory(hw); renderHotwordTable(hw); renderWorksTable(works); renderViralGenes(); renderTopicPerf(); generateSchedule();
+  renderHistory(hw); renderHotwordTable(hw); renderWorksTable(works); renderViralGenes(); renderTopicPerf(); generateSchedule(); renderCommentScripts(); renderChecklist();
   renderTopics(); updateTracker();
   initCardGlow();
 }
@@ -1776,6 +1948,7 @@ function renderTopics() {
     const st = status[t.title] || 'pending';
     const score = calcTopicScore(t);
     const adapt = getPlatformAdaptation(t);
+    const mon = getMonetization(t);
     return `<div class="topic-card priority-${t.priority==='高'?'high':t.priority==='中'?'medium':'low'} status-${st}" id="topic-${i}" onclick="cycleTopicStatus(${i}, '${t.title.replace(/'/g,"\\'")}')">
       <div class="status-badge">${st==='pending'?'待拍摄':st==='shooting'?'拍摄中':'已发布'}</div>
       <div class="tc-num">${String(i+1).padStart(2,'0')}</div>
@@ -1793,6 +1966,10 @@ function renderTopics() {
       <div class="adapt-tags">
         <span class="adapt-tag">抖音: ${adapt.dy.format}</span>
         <span class="adapt-tag">小红书: ${adapt.xhs.format}</span>
+      </div>
+      <div style="margin-top:6px">
+        <span class="monetize-tag ${mon.cls}">${mon.name}</span>
+        <span style="font-size:11px;color:var(--text-secondary)">变现潜力 ${mon.score}分 · ${mon.desc}</span>
       </div>
       ${fmt.format?`<div class="tc-format"><span>${fmt.format}</span><span>${fmt.suggested_duration||''}</span><span>${fmt.suggested_publish||''}</span></div>`:''}
       <div class="tc-meta"><span class="audience">${t.audience}</span><span style="color:var(--text-tertiary);">#${t.keyword}</span></div>
