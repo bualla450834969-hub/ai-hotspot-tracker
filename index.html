@@ -1402,7 +1402,7 @@ function getKanbanStatus(topic) {
   return saved || 'pending';
 }
 function setKanbanStatus(topic, status) {
-  localStorage.setItem('topic_status_' + String(topic.title).hashCode(), status);
+  localStorage.setItem('kb_status_' + String(topic.title).hashCode(), status);
   renderKanban();
   renderTopics();
 }
@@ -1412,7 +1412,8 @@ function renderKanban() {
   const topics = DATA.topics || [];
   const cols = { pending: [], shooting: [], published: [] };
   topics.forEach(function(t) {
-    const s = getKanbanStatus(t);
+    const key = 'kb_status_' + String(t.title).hashCode();
+    const s = localStorage.getItem(key) || 'pending';
     if (!cols[s]) cols[s] = [];
     cols[s].push(t);
   });
@@ -1443,9 +1444,12 @@ function renderKanban() {
 function cycleKanbanStatus(title) {
   const topic = DATA.topics.find(function(t) { return t.title === title; });
   if (!topic) return;
-  const current = getKanbanStatus(topic);
+  const key = 'kb_status_' + String(topic.title).hashCode();
+  const current = localStorage.getItem(key) || 'pending';
   const next = { pending: 'shooting', shooting: 'published', published: 'pending' }[current];
-  setKanbanStatus(topic, next);
+  localStorage.setItem(key, next);
+  renderKanban();
+  renderTopics();
 }
 
 // ===== 脚本生成 =====
