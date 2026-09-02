@@ -1245,10 +1245,48 @@ body { padding-top: 52px; }
   .login-screen .login-glow { opacity: 0.6; }
 }
 
+
+/* 滚动模糊渐显动效 */
+.hero, section {
+  transition: filter 0.15s linear, opacity 0.15s linear, transform 0.15s linear;
+  will-change: filter, opacity, transform;
+}
+body[data-reveal="0"] .hero,
+body[data-reveal="0"] section {
+  filter: blur(18px);
+  opacity: 0.25;
+  transform: translateY(50px);
+}
+
 </style>
 <script>
 
 // 登录页Logo动效（独立ID前缀lg-，避免与背景logo冲突）
+
+// 滚动模糊渐显动效
+function initScrollReveal() {
+  var vh = window.innerHeight;
+  function update() {
+    var scrollY = window.scrollY;
+    // 0 at top of login, 1 when scrolled past 80% of login screen
+    var reveal = Math.min(1, Math.max(0, (scrollY - vh * 0.15) / (vh * 0.65)));
+    document.body.setAttribute('data-reveal', reveal.toFixed(2));
+    // Apply gradual blur/opacity/transform to hero and sections
+    var blur = (18 * (1 - reveal)).toFixed(1);
+    var opacity = (0.25 + 0.75 * reveal).toFixed(2);
+    var translateY = (50 * (1 - reveal)).toFixed(1);
+    var els = document.querySelectorAll('.hero, section');
+    for (var i = 0; i < els.length; i++) {
+      els[i].style.filter = reveal >= 0.98 ? 'none' : 'blur(' + blur + 'px)';
+      els[i].style.opacity = opacity;
+      els[i].style.transform = reveal >= 0.98 ? 'none' : 'translateY(' + translateY + 'px)';
+    }
+  }
+  window.addEventListener('scroll', update, {passive: true});
+  window.addEventListener('resize', function() { vh = window.innerHeight; update(); });
+  update();
+}
+
 function initLoginLogo() {
   var svg = document.querySelector('.login-logo-svg');
   if (!svg) return;
@@ -3068,6 +3106,7 @@ function sortTable(col){ const tb=document.getElementById('hotwordTable');const 
 init();
 initLoginLogo();
 initNavHide();
+initScrollReveal();
 </script>
 </body>
 </html>
