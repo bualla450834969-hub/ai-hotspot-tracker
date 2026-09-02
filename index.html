@@ -1056,7 +1056,7 @@ a.work-link:hover { opacity: 0.7; }
       <div class="card-head"><span class="ch-bar"></span><span class="ch-title">热词详情</span><span class="ch-tip">点击表头排序</span></div>
       <div class="table-container">
         <table id="hotwordTable">
-          <thead><tr><th onclick="sortTable(0)">#</th><th onclick="sortTable(1)">关键词</th><th onclick="sortTable(2)">分类</th><th onclick="sortTable(3)">作品数</th><th onclick="sortTable(4)">最高赞</th><th onclick="sortTable(5)">收藏率</th><th onclick="sortTable(6)">趋势</th><th>生命周期</th></tr></thead>
+          <thead><tr><th onclick="sortTable(0)">#</th><th onclick="sortTable(1)">关键词</th><th onclick="sortTable(2)">分类</th><th onclick="sortTable(3)">作品数</th><th onclick="sortTable(4)">最高赞</th><th onclick="sortTable(5)">收藏率</th><th onclick="sortTable(6)">趋势</th><th>生命周期</th><th>效率</th></tr></thead>
           <tbody></tbody>
         </table>
       </div>
@@ -1094,6 +1094,35 @@ a.work-link:hover { opacity: 0.7; }
 
 <div class="footer">AI 热点追踪工作台 · 数据来源 RedFox Hub · 每日 8:00 / 14:00 自动采集</div>
 
+
+<div class="section anim anim-d6">
+<div class="section-header">
+<span class="section-num">08</span>
+<span class="section-title">爆款基因库</span>
+<span class="section-desc">从TOP爆款中提取可复用的钩子、结构和关键词</span>
+</div>
+<div id="viralGenesContent"></div>
+</div>
+
+<div class="section anim anim-d7">
+<div class="section-header">
+<span class="section-num">09</span>
+<span class="section-title">选题命中率</span>
+<span class="section-desc">发布后数据回填 · 自动统计哪些选题类型表现好</span>
+</div>
+<div id="topicPerfContent"></div>
+</div>
+
+<!-- 热词趋势弹窗 -->
+<div class="trend-modal" id="trendModal" onclick="if(event.target===this)this.classList.remove('active')">
+<div class="trend-modal-content">
+<span class="close-btn" onclick="document.getElementById('trendModal').classList.remove('active')">&times;</span>
+<h3 id="trendModalTitle">热词趋势</h3>
+<div id="trendModalBody"><p style="color:var(--text-secondary)">加载中...</p></div>
+</div>
+</div>
+
+<script>
 <script>
 const DATA = window.DASHBOARD_DATA || {};
 let currentPlatform = 'all';
@@ -1537,7 +1566,7 @@ function renderHotwordTable(hw) {
   const satMap = {};
   (DATA.saturation||[]).forEach(s=>satMap[s.keyword]=s.stage);
   document.querySelector('#hotwordTable tbody').innerHTML=sorted.map((h,i)=>`
-    <tr><td>${i+1}</td><td><b style="color:var(--text);cursor:pointer;text-decoration:underline dotted" onclick="showKeywordTrend('${h.keyword.replace(/'/g,"\\'")}')" title="点击查看趋势">${h.keyword}</b></td><td>${h.category}</td><td>${h.total.toLocaleString()}</td><td class="like-num">${h.max_like.toLocaleString()}</td><td class="collect-num">${h.collect_rate}%</td><td><span class="tag ${trendClass(h.trend)}">${h.trend||'稳定'}</span></td><td><span class="tag ${satMap[h.keyword]==='萌芽期'?'sprout':satMap[h.keyword]==='上升期'?'rise':satMap[h.keyword]==='爆发期'?'boom':'decline'}">${satMap[h.keyword]||'稳定期'}</span></td></tr>`).join('');
+    <tr><td>${i+1}</td><td><b style="color:var(--text);cursor:pointer;text-decoration:underline dotted" onclick="showKeywordTrend('${h.keyword.replace(/'/g,"\\'")}')" title="点击查看趋势">${h.keyword}</b></td><td>${h.category}</td><td>${h.total.toLocaleString()}</td><td class="like-num">${h.max_like.toLocaleString()}</td><td class="collect-num">${h.collect_rate}%</td><td><span class="tag ${trendClass(h.trend)}">${h.trend||'稳定'}</span></td><td><span class="tag ${satMap[h.keyword]==='萌芽期'?'sprout':satMap[h.keyword]==='上升期'?'rise':satMap[h.keyword]==='爆发期'?'boom':'decline'}">${satMap[h.keyword]||'稳定期'}</span></td><td><span class="tag ${h.efficiency_tag==='蓝海'?'blue-ocean':h.efficiency_tag==='红海'?'red-ocean':'medium'}">${h.efficiency_tag||'适中'}</span></td></tr>`).join('');
 }
 
 function renderWorksTable(works) {
