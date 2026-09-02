@@ -2010,7 +2010,7 @@ document.querySelectorAll('.nav-link').forEach(link => {
 });
 
 // 滚动监听：进度条 + 回到顶部 + 当前section高亮
-const sections = document.querySelectorAll('.section[id]');
+const sections = document.querySelectorAll('[id].section-header');
 const navLinks = document.querySelectorAll('.nav-link');
 window.addEventListener('scroll', function() {
   const scrolled = window.scrollY;
