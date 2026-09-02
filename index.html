@@ -851,12 +851,45 @@ a.work-link:hover { opacity: 0.7; }
   .chart-sm { height: 200px; }
   .chart-lg { height: 280px; }
   .tracker-bar { gap: 16px; padding: 16px; }
+  /* 背景logo移动端适配 */
+  .bg-logo { width: 85vmin; height: 85vmin; opacity: 0.3; }
+  /* 选题看板3列变1列 */
+  .kanban-board { grid-template-columns: 1fr; }
+  /* 人群画像卡片 */
+  .persona-grid { grid-template-columns: 1fr; }
+  /* 爆款基因网格 */
+  .gene-grid { grid-template-columns: 1fr 1fr; }
+  /* 内容形式分布 */
+  .format-grid { grid-template-columns: 1fr 1fr; }
+  /* 一周排期表横向滚动 */
+  .schedule-table { overflow-x: auto; display: block; }
+  /* 评论话术库 */
+  .script-grid { grid-template-columns: 1fr; }
+  /* 对标作者 */
+  .authors-grid { grid-template-columns: 1fr; }
+  /* 发布自检清单 */
+  .checklist-grid { grid-template-columns: 1fr; }
+  /* 标题生成器 */
+  .title-generator { flex-direction: column; }
+  /* 平台切换器换行 */
+  .platform-switch { flex-wrap: wrap; }
+  /* hero filter堆叠 */
+  .hero-filter { flex-direction: column; align-items: flex-start; }
+  .hero-filter select { width: 100%; }
 }
 @media (max-width: 480px) {
   .hero-title { font-size: 26px; }
   .hero-stats { grid-template-columns: 1fr; }
   .hero-stat:first-child { grid-column: span 1; }
   .section-title { font-size: 18px; }
+  .bg-logo { width: 90vmin; height: 90vmin; opacity: 0.25; }
+  .gene-grid { grid-template-columns: 1fr; }
+  .hero-stat .hs-value { font-size: 28px; }
+  .hero-stat:first-child .hs-value { font-size: 36px; }
+  .top-nav { padding: 0 12px; height: 48px; }
+  body { padding-top: 48px; }
+  .scroll-progress { top: 48px; }
+  .nav-link { font-size: 11px; padding: 4px 8px; }
 }
 
 /* Platform Switcher */
