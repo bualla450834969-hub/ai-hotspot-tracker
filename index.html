@@ -1039,7 +1039,7 @@ body { padding-top: 52px; }
 .format-bar-val { width:80px; font-size:11px; color:var(--text-secondary); flex-shrink:0; }
 
 </style>
-<script src="data.js?v=1788335414"></script>
+<script src="data.js?v=1788337537"></script>
 </head>
 <body>
 <div class="top-nav" id="topNav">
@@ -1385,6 +1385,186 @@ body { padding-top: 52px; }
 <script>
 const DATA = window.DASHBOARD_DATA || {};
 let currentPlatform = 'all';
+
+
+// ===== 选题看板 =====
+function getTopicStatus(topic) {
+  const saved = localStorage.getItem('topic_status_' + String(topic.title).hashCode());
+  return saved || 'pending';
+}
+function setTopicStatus(topic, status) {
+  localStorage.setItem('topic_status_' + String(topic.title).hashCode(), status);
+  renderKanban();
+  renderTopics();
+}
+function renderKanban() {
+  const board = document.getElementById('kanbanBoard');
+  if (!board) return;
+  const topics = DATA.topics || [];
+  const cols = { pending: [], shooting: [], published: [] };
+  topics.forEach(function(t) {
+    const s = getTopicStatus(t);
+    if (!cols[s]) cols[s] = [];
+    cols[s].push(t);
+  });
+  const colConfig = [
+    { key: 'pending', title: '待拍摄', color: '#f59e0b' },
+    { key: 'shooting', title: '拍摄中', color: '#3b82f6' },
+    { key: 'published', title: '已发布', color: '#10b981' }
+  ];
+  board.innerHTML = colConfig.map(function(c) {
+    const items = (cols[c.key] || []).map(function(t) {
+      const pname = (t.target_persona && t.target_persona.name) ? t.target_persona.name : '通用';
+      const plat = t.platform === 'douyin' ? '抖音' : '小红书';
+      return '<div class="kanban-card ' + c.key + '">' +
+        '<div class="kanban-card-title">' + t.title + '</div>' +
+        '<div class="kanban-card-meta"><span>' + pname + '</span><span>' + t.priority + '优先</span><span>' + plat + '</span></div>' +
+        '<div class="kanban-card-actions">' +
+        '<button class="kanban-btn" onclick="cycleTopicStatus(\'' + t.title.replace(/'/g, "\\'") + '\')">切换状态</button>' +
+        '<button class="kanban-btn" onclick="generateScript(\'' + t.title.replace(/'/g, "\\'") + '\')">生成脚本</button>' +
+        '</div></div>';
+    }).join('');
+    return '<div class="kanban-column">' +
+      '<div class="kanban-col-head"><span class="kanban-col-title" style="color:' + c.color + '">' + c.title + '</span>' +
+      '<span class="kanban-col-count">' + (cols[c.key] || []).length + '</span></div>' +
+      (items || '<div style="font-size:11px;color:var(--text-tertiary);text-align:center;padding:20px;">暂无</div>') +
+      '</div>';
+  }).join('');
+}
+function cycleTopicStatus(title) {
+  const topic = DATA.topics.find(function(t) { return t.title === title; });
+  if (!topic) return;
+  const current = getTopicStatus(topic);
+  const next = { pending: 'shooting', shooting: 'published', published: 'pending' }[current];
+  setTopicStatus(topic, next);
+}
+
+// ===== 脚本生成 =====
+function generateScript(title) {
+  const topic = DATA.topics.find(function(t) { return t.title === title; });
+  if (!topic) return;
+  const persona = topic.target_persona || {};
+  const needs = (persona.needs || []).slice(0, 2).join('、');
+  const script = {
+    opening: '【0-3秒】' + topic.hook + '\n画面：数字人正面出镜，背景用AI生成的' + topic.keyword + '相关场景\n字幕：大字突出关键词',
+    body: '【3-30秒】核心内容\n1. 痛点引入：' + (needs ? '你是不是也在为"' + needs + '"发愁？' : '很多人不知道这个技巧') + '\n2. 方法拆解：分3步讲清楚' + topic.keyword + '的核心用法\n3. 案例展示：用AI生成的实际效果画面佐证\n画面：数字人口播+AI素材混剪，每5秒切一次画面',
+    cta: '【最后5秒】引导行动\n"关注我，每天分享一个AI实用技巧"\n"评论区扣1，发你完整工具包"\n画面：数字人指向关注按钮+账号二维码',
+    subtitles: '字幕要点：' + topic.keyword + '、' + (needs || '实用技巧') + '、关注领取\nBGM：轻快科技感纯音乐，音量-15db',
+    seo: '标签：#AI #' + topic.keyword.replace(/\s/g, '') + ' #AI工具 #干货分享\n发布时间：' + (persona.active_time || '19:00-21:00')
+  };
+  const modal = document.getElementById('scriptModal');
+  document.getElementById('scriptModalTitle').textContent = '脚本：' + topic.title.slice(0, 20);
+  document.getElementById('scriptModalContent').innerHTML =
+    '<div class="script-section"><div class="script-section-label">钩子标题</div><div class="script-section-content">' + topic.hook + '</div></div>' +
+    '<div class="script-section"><div class="script-section-label">开头（0-3秒）</div><div class="script-section-content">' + script.opening + '</div></div>' +
+    '<div class="script-section"><div class="script-section-label">正文（3-30秒）</div><div class="script-section-content">' + script.body + '</div></div>' +
+    '<div class="script-section"><div class="script-section-label">结尾CTA</div><div class="script-section-content">' + script.cta + '</div></div>' +
+    '<div class="script-section"><div class="script-section-label">字幕/BGM</div><div class="script-section-content">' + script.subtitles + '</div></div>' +
+    '<div class="script-section"><div class="script-section-label">标签/发布</div><div class="script-section-content">' + script.seo + '</div></div>';
+  modal.classList.add('active');
+  window._currentScript = '【钩子】' + topic.hook + '\n\n【开头】' + script.opening + '\n\n【正文】' + script.body + '\n\n【结尾】' + script.cta + '\n\n【字幕/BGM】' + script.subtitles + '\n\n【标签/发布】' + script.seo;
+}
+function closeScriptModal() {
+  document.getElementById('scriptModal').classList.remove('active');
+}
+document.getElementById("scriptModal")?.addEventListener("click", function(e) { if (e.target === this) closeScriptModal(); });
+function copyScript() {
+  if (window._currentScript) {
+    navigator.clipboard.writeText(window._currentScript).then(function() { alert('脚本已复制到剪贴板'); });
+  }
+}
+
+// ===== 爆款收藏 =====
+function getFavorites() {
+  return JSON.parse(localStorage.getItem('viral_favorites') || '[]');
+}
+function isFavorite(i) {
+  const favs = getFavorites();
+  return favs.some(function(f) { return f.title === (DATA.hot_breakdowns[i] || {}).title; });
+}
+function toggleFavorite(index) {
+  const favs = getFavorites();
+  const work = DATA.hot_breakdowns[index];
+  const exists = favs.findIndex(function(f) { return f.title === work.title; });
+  if (exists >= 0) { favs.splice(exists, 1); } else { favs.push(work); }
+  localStorage.setItem('viral_favorites', JSON.stringify(favs));
+  renderBreakdowns();
+  renderFavorites();
+}
+function renderFavorites() {
+  const grid = document.getElementById('favoritesGrid');
+  if (!grid) return;
+  const favs = getFavorites();
+  if (!favs.length) {
+    grid.innerHTML = '<div class="empty-state">还没有收藏，点击爆款拆解卡片右上角的☆收藏</div>';
+    return;
+  }
+  grid.innerHTML = favs.map(function(b, i) {
+    const pname = (b.target_persona && b.target_persona.name) ? b.target_persona.name : '';
+    return '<div class="breakdown-card">' +
+      '<div class="bd-header"><div class="bd-title">' + (i+1) + '. ' + b.title + '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;">' +
+      '<button class="fav-btn active" onclick="removeFavorite(' + i + ')" title="取消收藏">⭐</button>' +
+      '<div class="bd-likes">' + (b.likes/10000).toFixed(1) + '万</div></div></div>' +
+      '<div class="bd-row"><span class="bd-label">钩子</span><span class="bd-val">' + b.hook + '型</span></div>' +
+      '<div class="bd-row"><span class="bd-label">结构</span><span class="bd-val">' + b.structure + '</span></div>' +
+      '<div class="bd-row"><span class="bd-label">CTA</span><span class="bd-val">' + b.cta + '</span></div>' +
+      (pname ? '<div class="bd-row"><span class="bd-label">人群</span><span class="bd-val"><span style="color:#22d3ee;font-weight:600">' + pname + '</span></span></div>' : '') +
+      '<div class="bd-meta"><span>' + b.author + '</span><span><a href="' + (b.work_url || '#') + '" target="_blank" class="work-link">原视频</a></span></div>' +
+      '</div>';
+  }).join('');
+}
+function removeFavorite(index) {
+  const favs = getFavorites();
+  favs.splice(index, 1);
+  localStorage.setItem('viral_favorites', JSON.stringify(favs));
+  renderFavorites();
+  renderBreakdowns();
+}
+
+// ===== 内容形式分布 =====
+function renderFormatDist() {
+  const container = document.getElementById('formatBars');
+  if (!container) return;
+  const formats = DATA.content_formats_dist || [];
+  if (!formats.length) { container.innerHTML = '<div class="empty-state">暂无数据</div>'; return; }
+  const colors = ['#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#6366f1', '#6b7280'];
+  container.innerHTML = formats.map(function(f, i) {
+    return '<div class="format-bar-row">' +
+      '<span class="format-bar-label">' + f.format + '</span>' +
+      '<div class="format-bar-track"><div class="format-bar-fill" style="width:' + Math.min(f.proportion * 2, 100) + '%;background:' + colors[i % colors.length] + '"></div></div>' +
+      '<span class="format-bar-val">' + f.count + '条 · ' + f.proportion + '% · 均赞' + f.avg_likes.toLocaleString() + '</span>' +
+      '</div>';
+  }).join('');
+}
+
+// ===== 数据新鲜度 =====
+function addFreshnessTags() {
+  const updateTime = new Date(DATA.last_update || Date.now());
+  const now = new Date();
+  const hours = (now - updateTime) / (1000 * 60 * 60);
+  let tagClass = 'fresh', tagText = '最新';
+  if (hours > 24) { tagClass = 'old'; tagText = Math.floor(hours/24) + '天前'; }
+  else if (hours > 6) { tagClass = 'stale'; tagText = Math.floor(hours) + '小时前'; }
+  else if (hours > 1) { tagText = Math.floor(hours) + '小时前'; }
+  const timeEl = document.getElementById('updateTime');
+  if (timeEl) {
+    timeEl.innerHTML = (timeEl.textContent || '') + ' <span class="freshness-tag ' + tagClass + '">' + tagText + '</span>';
+  }
+}
+
+// ===== hashCode helper =====
+if (!String.prototype.hashCode) {
+  String.prototype.hashCode = function() {
+    let hash = 0;
+    for (let i = 0; i < this.length; i++) {
+      const char = this.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash |= 0;
+    }
+    return hash;
+  };
+}
 
 function setPlatform(p) {
   currentPlatform = p;
@@ -1853,213 +2033,7 @@ function renderAll() {
   renderScatter(works); renderCollect(hw); renderCommentDemands();
   renderSaturation(hw); renderSmallViral(works); renderFormulas();
   renderAuthors(works); 
-// ===== 选题看板 =====
-function getTopicStatus(topic) {
-  const saved = localStorage.getItem('topic_status_' + topic.title.hashCode());
-  return saved || 'pending';
-}
-function setTopicStatus(topic, status) {
-  localStorage.setItem('topic_status_' + topic.title.hashCode(), status);
-  renderKanban();
-  renderTopics();
-}
-function renderKanban() {
-  const board = document.getElementById('kanbanBoard');
-  if (!board) return;
-  const topics = DATA.topics || [];
-  const cols = { pending: [], shooting: [], published: [] };
-  topics.forEach(t => {
-    const s = getTopicStatus(t);
-    cols[s] = cols[s] || [];
-    cols[s].push(t);
-  });
-  const colConfig = [
-    { key: 'pending', title: '待拍摄', color: '#f59e0b' },
-    { key: 'shooting', title: '拍摄中', color: '#3b82f6' },
-    { key: 'published', title: '已发布', color: '#10b981' },
-  ];
-  board.innerHTML = colConfig.map(c => `
-    <div class="kanban-column">
-      <div class="kanban-col-head">
-        <span class="kanban-col-title" style="color:${c.color}">${c.title}</span>
-        <span class="kanban-col-count">${cols[c.key].length}</span>
-      </div>
-      ${cols[c.key].map(t => `
-        <div class="kanban-card ${c.key}">
-          <div class="kanban-card-title">${t.title}</div>
-          <div class="kanban-card-meta">
-            <span>${t.target_persona?.name || '通用'}</span>
-            <span>${t.priority}优先</span>
-            <span>${t.platform === 'douyin' ? '抖音' : '小红书'}</span>
-          </div>
-          <div class="kanban-card-actions">
-            <button class="kanban-btn" onclick="cycleTopicStatus('${t.title.replace(/'/g, "\'")}')">切换状态</button>
-            <button class="kanban-btn" onclick="generateScript('${t.title.replace(/'/g, "\'")}')">生成脚本</button>
-          </div>
-        </div>
-      `).join('') || '<div style="font-size:11px;color:var(--text-tertiary);text-align:center;padding:20px;">暂无</div>'}
-    </div>
-  `).join('');
-}
-function cycleTopicStatus(title) {
-  const topic = DATA.topics.find(t => t.title === title);
-  if (!topic) return;
-  const current = getTopicStatus(topic);
-  const next = { pending: 'shooting', shooting: 'published', published: 'pending' }[current];
-  setTopicStatus(topic, next);
-}
 
-// ===== 脚本生成 =====
-function generateScript(title) {
-  const topic = DATA.topics.find(t => t.title === title);
-  if (!topic) return;
-  const persona = topic.target_persona || {};
-  const needs = (persona.needs || []).slice(0, 2).join('、');
-  const contentPref = persona.content_pref || '案例实战+干货输出';
-  
-  const script = {
-    title: topic.title,
-    hook: topic.hook,
-    opening: `【0-3秒】${topic.hook}\n画面：数字人正面出镜，背景用AI生成的${topic.keyword}相关场景\n字幕：大字突出关键词`,
-    body: `【3-30秒】核心内容\n1. 痛点引入：${needs ? '你是不是也在为"' + needs + '"发愁？' : '很多人不知道这个技巧'}\n2. 方法拆解：分3步讲清楚${topic.keyword}的核心用法\n3. 案例展示：用AI生成的实际效果画面佐证\n画面：数字人口播+AI素材混剪，每5秒切一次画面`,
-    cta: `【最后5秒】引导行动\n"关注我，每天分享一个AI实用技巧"\n"评论区扣1，发你完整工具包"\n画面：数字人指向关注按钮+账号二维码`,
-    subtitles: `字幕要点：${topic.keyword}、${needs || '实用技巧'}、关注领取\nBGM：轻快科技感纯音乐，音量-15db`,
-    seo: `标签：#AI #${topic.keyword.replace(/\s/g, '')} #AI工具 #干货分享\n发布时间：${persona.active_time || '19:00-21:00'}`,
-  };
-  
-  const modal = document.getElementById('scriptModal');
-  document.getElementById('scriptModalTitle').textContent = '脚本：' + topic.title.slice(0, 20);
-  document.getElementById('scriptModalContent').innerHTML = `
-    <div class="script-section"><div class="script-section-label">钩子标题</div><div class="script-section-content">${script.hook}</div></div>
-    <div class="script-section"><div class="script-section-label">开头（0-3秒）</div><div class="script-section-content">${script.opening}</div></div>
-    <div class="script-section"><div class="script-section-label">正文（3-30秒）</div><div class="script-section-content">${script.body}</div></div>
-    <div class="script-section"><div class="script-section-label">结尾CTA</div><div class="script-section-content">${script.cta}</div></div>
-    <div class="script-section"><div class="script-section-label">字幕/BGM</div><div class="script-section-content">${script.subtitles}</div></div>
-    <div class="script-section"><div class="script-section-label">标签/发布</div><div class="script-section-content">${script.seo}</div></div>
-  `;
-  modal.classList.add('active');
-  window._currentScript = `【钩子】${script.hook}\n\n【开头】${script.opening}\n\n【正文】${script.body}\n\n【结尾】${script.cta}\n\n【字幕/BGM】${script.subtitles}\n\n【标签/发布】${script.seo}`;
-}
-function closeScriptModal() {
-  document.getElementById('scriptModal').classList.remove('active');
-}
-function copyScript() {
-  if (window._currentScript) {
-    navigator.clipboard.writeText(window._currentScript).then(() => {
-      alert('脚本已复制到剪贴板');
-    });
-  }
-}
-document.getElementById('scriptModal')?.addEventListener('click', function(e) {
-  if (e.target === this) closeScriptModal();
-});
-
-// ===== 爆款收藏 =====
-function getFavorites() {
-  return JSON.parse(localStorage.getItem('viral_favorites') || '[]');
-}
-function toggleFavorite(index) {
-  const favs = getFavorites();
-  const work = DATA.hot_breakdowns[index];
-  const exists = favs.findIndex(f => f.title === work.title);
-  if (exists >= 0) {
-    favs.splice(exists, 1);
-  } else {
-    favs.push(work);
-  }
-  localStorage.setItem('viral_favorites', JSON.stringify(favs));
-  renderBreakdowns();
-  renderKanban();
-  renderFavorites();
-  renderFormatDist();
-  addFreshnessTags();
-  renderFavorites();
-}
-function renderFavorites() {
-  const grid = document.getElementById('favoritesGrid');
-  if (!grid) return;
-  const favs = getFavorites();
-  if (!favs.length) {
-    grid.innerHTML = '<div class="empty-state">还没有收藏，点击爆款拆解卡片右上角的⭐收藏</div>';
-    return;
-  }
-  grid.innerHTML = favs.map((b, i) => `
-    <div class="breakdown-card">
-      <div class="bd-header">
-        <div class="bd-title">${i+1}. ${b.title}</div>
-        <div style="display:flex;align-items:center;gap:8px;">
-          <button class="fav-btn active" onclick="removeFavorite(${i})" title="取消收藏">⭐</button>
-          <div style="display:flex;align-items:center;gap:6px;"><button class="fav-btn ${isFavorite(i) ? 'active' : ''}" onclick="toggleFavorite(${i})" title="收藏">${isFavorite(i) ? '⭐' : '☆'}</button><div class="bd-likes">${(b.likes/10000).toFixed(1)}万</div></div>
-        </div>
-      </div>
-      <div class="bd-row"><span class="bd-label">钩子</span><span class="bd-val">${b.hook}型</span></div>
-      <div class="bd-row"><span class="bd-label">结构</span><span class="bd-val">${b.structure}</span></div>
-      <div class="bd-row"><span class="bd-label">CTA</span><span class="bd-val">${b.cta}</span></div>
-      ${b.target_persona ? '<div class="bd-row"><span class="bd-label">人群</span><span class="bd-val"><span style="color:#22d3ee;font-weight:600">' + b.target_persona.name + '</span></span></div>' : ''}
-      <div class="bd-meta"><span>${b.author}</span><span><a href="${b.work_url||'#'}" target="_blank" class="work-link">原视频</a></span></div>
-    </div>
-  `).join('');
-}
-function removeFavorite(index) {
-  const favs = getFavorites();
-  favs.splice(index, 1);
-  localStorage.setItem('viral_favorites', JSON.stringify(favs));
-  renderFavorites();
-  renderBreakdowns();
-  renderKanban();
-  renderFavorites();
-  renderFormatDist();
-  addFreshnessTags();
-}
-
-// ===== 内容形式分布 =====
-function renderFormatDist() {
-  const container = document.getElementById('formatBars');
-  if (!container) return;
-  const formats = DATA.content_formats_dist || [];
-  if (!formats.length) { container.innerHTML = '<div class="empty-state">暂无数据</div>'; return; }
-  const colors = ['#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#6366f1', '#6b7280'];
-  container.innerHTML = formats.map((f, i) => `
-    <div class="format-bar-row">
-      <span class="format-bar-label">${f.format}</span>
-      <div class="format-bar-track">
-        <div class="format-bar-fill" style="width:${Math.min(f.proportion * 2, 100)}%;background:${colors[i % colors.length]}"></div>
-      </div>
-      <span class="format-bar-val">${f.count}条 · ${f.proportion}% · 均赞${f.avg_likes.toLocaleString()}</span>
-    </div>
-  `).join('');
-}
-
-// ===== 数据新鲜度 =====
-function addFreshnessTags() {
-  const updateTime = new Date(DATA.last_update || Date.now());
-  const now = new Date();
-  const hours = (now - updateTime) / (1000 * 60 * 60);
-  let tagClass = 'fresh', tagText = '最新';
-  if (hours > 24) { tagClass = 'old'; tagText = Math.floor(hours/24) + '天前'; }
-  else if (hours > 6) { tagClass = 'stale'; tagText = Math.floor(hours) + '小时前'; }
-  else if (hours > 1) { tagText = Math.floor(hours) + '小时前'; }
-  
-  const timeEl = document.getElementById('updateTime');
-  if (timeEl) {
-    timeEl.innerHTML = (timeEl.textContent || '') + ` <span class="freshness-tag ${tagClass}">${tagText}</span>`;
-  }
-}
-
-// ===== hashCode helper =====
-if (!String.prototype.hashCode) {
-  String.prototype.hashCode = function() {
-    let hash = 0;
-    for (let i = 0; i < this.length; i++) {
-      const char = this.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash |= 0;
-    }
-    return hash;
-  };
-}
-
-renderBreakdowns();
   renderKanban();
   renderFavorites();
   renderFormatDist();
