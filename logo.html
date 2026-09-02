@@ -267,7 +267,7 @@ function initBgLogoGlow() {
       active: false,
       progress: 0,
       baseSpeed: 0.004,
-      nextFrame: 300 + Math.floor(Math.random() * 600), // 初始延迟5~15秒，更稀有
+      nextFrame: 600 + Math.floor(Math.random() * 600), // 初始延迟10~20秒
       direction: 1,
       startOffset: 0,
       sparkle: 0 // 随机亮度爆发强度（0~1）
@@ -375,7 +375,7 @@ function initBgLogoGlow() {
         if (s.progress >= 1) {
           s.active = false;
           activeSparkCount--;
-          s.nextFrame = frameCount + 800 + Math.floor(Math.random() * 1200); // 间隔13~33秒，留神秘感
+          s.nextFrame = frameCount + 1500 + Math.floor(Math.random() * 2100); // 间隔25~60秒，更神秘
           for (var ti = 0; ti < TRAIL_LENGTH; ti++) {
             s.trailEls[ti].setAttribute('opacity', '0');
           }
