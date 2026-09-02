@@ -245,6 +245,8 @@ function initBgLogoGlow() {
   // 边缘闪耀光点初始化（流星拖尾效果）
   var sparks = [];
   var frameCount = 0;
+  var activeSparkCount = 0; // 全局并发限制：最多2颗
+  var MAX_SPARKS = 2;
   var TRAIL_LENGTH = 1;
   var SVG_NS = 'http://www.w3.org/2000/svg';
   for (var si = 0; si < 4; si++) {
@@ -353,11 +355,17 @@ function initBgLogoGlow() {
     for (var si = 0; si < sparks.length; si++) {
       var s = sparks[si];
       if (!s.active && frameCount >= s.nextFrame) {
-        s.active = true;
-        s.progress = 0;
-        s.baseSpeed = 0.003 + Math.random() * 0.004;
-        s.direction = Math.random() > 0.5 ? 1 : -1;
-        s.startOffset = Math.random() * s.pathLen;
+        if (activeSparkCount < MAX_SPARKS) {
+          s.active = true;
+          s.progress = 0;
+          s.baseSpeed = 0.003 + Math.random() * 0.004;
+          s.direction = Math.random() > 0.5 ? 1 : -1;
+          s.startOffset = Math.random() * s.pathLen;
+          activeSparkCount++;
+        } else {
+          // 达到上限，推迟100帧再试
+          s.nextFrame = frameCount + 80 + Math.floor(Math.random() * 120);
+        }
       }
       if (s.active) {
         // ease-in-out：两端慢中间快
@@ -365,6 +373,7 @@ function initBgLogoGlow() {
         s.progress += s.baseSpeed * easeFactor;
         if (s.progress >= 1) {
           s.active = false;
+          activeSparkCount--;
           s.nextFrame = frameCount + 350 + Math.floor(Math.random() * 700);
           for (var ti = 0; ti < TRAIL_LENGTH; ti++) {
             s.trailEls[ti].setAttribute('opacity', '0');
