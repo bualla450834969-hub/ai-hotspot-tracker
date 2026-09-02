@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
@@ -1180,7 +1180,7 @@ function renderAll() {
   renderScatter(works); renderCollect(hw); renderCommentDemands();
   renderSaturation(hw); renderSmallViral(works); renderFormulas();
   renderAuthors(works); renderBreakdowns(); renderMatrix();
-  renderHistory(); renderHotwordTable(hw); renderWorksTable(works);
+  renderHistory(hw); renderHotwordTable(hw); renderWorksTable(works);
   renderTopics(); updateTracker();
   initCardGlow();
 }
@@ -1423,7 +1423,7 @@ function renderMatrix() {
   }).join('');
 }
 
-function renderHistory() {
+function renderHistory(hw) {
   const hist = DATA.historical_trend || [];
   if (charts.hist) charts.hist.dispose();
   charts.hist = echarts.init(document.getElementById('chartHistory'));
