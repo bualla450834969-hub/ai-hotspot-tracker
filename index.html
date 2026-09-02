@@ -821,6 +821,34 @@ a.work-link:hover { opacity: 0.7; }
   .hero-stat:first-child { grid-column: span 1; }
   .section-title { font-size: 18px; }
 }
+
+/* Platform Switcher */
+.platform-switch { display: flex; gap: 4px; background: rgba(255,255,255,0.06); border-radius: 10px; padding: 3px; backdrop-filter: blur(10px); }
+.platform-btn { background: transparent; border: none; color: rgba(255,255,255,0.5); padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.25s ease; font-family: inherit; }
+.platform-btn:hover { color: rgba(255,255,255,0.8); }
+.platform-btn.active { background: linear-gradient(135deg, #0A84FF, #BF5AF2); color: #fff; box-shadow: 0 2px 12px rgba(10,132,255,0.3); }
+/* Comparison Section */
+.compare-section { display: none; }
+.compare-section.visible { display: block; }
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.compare-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; backdrop-filter: blur(20px); position: relative; overflow: hidden; }
+.compare-card.douyin { border-left: 3px solid #0A84FF; }
+.compare-card.xiaohongshu { border-left: 3px solid #FF453A; }
+.compare-card h4 { margin: 0 0 12px 0; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.compare-card .stat-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+.compare-card .stat-row:last-child { border-bottom: none; }
+.compare-card .stat-label { color: rgba(255,255,255,0.5); }
+.compare-card .stat-value { font-weight: 600; }
+.overlap-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.overlap-table th { text-align: left; padding: 8px 10px; color: rgba(255,255,255,0.5); font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.overlap-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.overlap-table .hotter-dy { color: #64D2FF; }
+.overlap-table .hotter-xhs { color: #FF6B6B; }
+.compare-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+.compare-tag.dy { background: rgba(10,132,255,0.15); color: #64D2FF; }
+.compare-tag.xhs { background: rgba(255,69,58,0.15); color: #FF6B6B; }
+@media (max-width: 768px) { .compare-grid { grid-template-columns: 1fr; } .platform-switch { flex-wrap: wrap; } }
+
 </style>
 <script src="data.js"></script>
 </head>
@@ -837,6 +865,12 @@ a.work-link:hover { opacity: 0.7; }
       <div class="time" id="updateTime">加载中...</div>
       <div>每日 8:00 / 14:00 采集 · 8:00 推送简报</div>
       <div class="hero-filter">
+        <div class="platform-switch" id="platformSwitch">
+          <button class="platform-btn active" data-platform="all" onclick="setPlatform('all')">全部</button>
+          <button class="platform-btn" data-platform="douyin" onclick="setPlatform('douyin')">抖音</button>
+          <button class="platform-btn" data-platform="xiaohongshu" onclick="setPlatform('xiaohongshu')">小红书</button>
+          <button class="platform-btn" data-platform="compare" onclick="setPlatform('compare')">对比</button>
+        </div>
         <select id="categoryFilter" onchange="applyFilter()">
           <option value="all">全部赛道</option>
         </select>
@@ -844,6 +878,34 @@ a.work-link:hover { opacity: 0.7; }
     </div>
   </div>
   <div class="hero-stats anim anim-d2" id="heroStats"></div>
+</div>
+
+<div class="section compare-section" id="compareSection">
+  <div class="section-header">
+    <span class="section-num">00</span>
+    <span class="section-title">双平台对比</span>
+    <span class="section-desc">抖音 vs 小红书 AI 赛道数据对比</span>
+  </div>
+  <div class="compare-grid" id="compareSummary"></div>
+  <div class="bento-card" style="margin-bottom:16px;">
+    <h4 style="margin:0 0 12px 0;font-size:15px;">热词重叠对比（两平台均在榜）</h4>
+    <div style="overflow-x:auto;">
+      <table class="overlap-table" id="overlapTable">
+        <thead><tr><th>关键词</th><th>分类</th><th>抖音作品数</th><th>小红书作品数</th><th>抖音最高赞</th><th>小红书最高赞</th><th>更热平台</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="compare-grid">
+    <div class="compare-card douyin">
+      <h4><span class="compare-tag dy">抖音</span>独有热词 TOP10</h4>
+      <div id="dyOnlyList"></div>
+    </div>
+    <div class="compare-card xiaohongshu">
+      <h4><span class="compare-tag xhs">小红书</span>独有热词 TOP10</h4>
+      <div id="xhsOnlyList"></div>
+    </div>
+  </div>
 </div>
 
 <div class="section anim anim-d2">
@@ -1012,6 +1074,57 @@ a.work-link:hover { opacity: 0.7; }
 
 <script>
 const DATA = window.DASHBOARD_DATA || {};
+let currentPlatform = 'all';
+
+function setPlatform(p) {
+  currentPlatform = p;
+  document.querySelectorAll('.platform-btn').forEach(b => b.classList.toggle('active', b.dataset.platform === p));
+  const compareSec = document.getElementById('compareSection');
+  const mainSections = document.querySelectorAll('.section:not(.compare-section)');
+  if (p === 'compare') {
+    compareSec.classList.add('visible');
+    mainSections.forEach(s => s.style.display = 'none');
+    renderComparison();
+  } else {
+    compareSec.classList.remove('visible');
+    mainSections.forEach(s => s.style.display = '');
+    renderAll();
+  }
+}
+
+function filterByPlatform(arr) {
+  if (!arr) return [];
+  if (currentPlatform === 'all' || currentPlatform === 'compare') return arr;
+  return arr.filter(item => item.platform === currentPlatform);
+}
+
+function renderComparison() {
+  const comp = DATA.comparison || {};
+  const ps = comp.platform_summary || {};
+  const dy = ps.douyin || {};
+  const xhs = ps.xiaohongshu || {};
+  function fmt(n) { return n >= 10000 ? (n/10000).toFixed(1) + '万' : n.toLocaleString(); }
+  document.getElementById('compareSummary').innerHTML = `
+    <div class="compare-card douyin"><h4><span class="compare-tag dy">抖音</span>平台概览</h4>
+      <div class="stat-row"><span class="stat-label">覆盖关键词</span><span class="stat-value">${dy.total_keywords || 0} 个</span></div>
+      <div class="stat-row"><span class="stat-label">作品总量</span><span class="stat-value">${fmt(dy.total_works || 0)}</span></div>
+      <div class="stat-row"><span class="stat-label">平均点赞</span><span class="stat-value">${fmt(dy.avg_like || 0)}</span></div>
+    </div>
+    <div class="compare-card xiaohongshu"><h4><span class="compare-tag xhs">小红书</span>平台概览</h4>
+      <div class="stat-row"><span class="stat-label">覆盖关键词</span><span class="stat-value">${xhs.total_keywords || 0} 个</span></div>
+      <div class="stat-row"><span class="stat-label">笔记总量</span><span class="stat-value">${fmt(xhs.total_works || 0)}</span></div>
+      <div class="stat-row"><span class="stat-label">平均点赞</span><span class="stat-value">${fmt(xhs.avg_like || 0)}</span></div>
+    </div>`;
+  const tbody = document.querySelector('#overlapTable tbody');
+  tbody.innerHTML = (comp.overlapping || []).map(o => `<tr>
+    <td><strong>${o.keyword}</strong></td><td>${o.category || ''}</td>
+    <td>${fmt(o.douyin_total)}</td><td>${fmt(o.xhs_total)}</td>
+    <td>${fmt(o.douyin_max_like)}</td><td>${fmt(o.xhs_max_like)}</td>
+    <td><span class="compare-tag ${o.hotter_platform === 'douyin' ? 'dy' : 'xhs'}">${o.hotter_platform === 'douyin' ? '抖音' : '小红书'}</span></td>
+  </tr>`).join('');
+  document.getElementById('dyOnlyList').innerHTML = (comp.douyin_only || []).map(i => `<div class="stat-row"><span class="stat-label">${i.keyword}</span><span class="stat-value">${fmt(i.total)}</span></div>`).join('');
+  document.getElementById('xhsOnlyList').innerHTML = (comp.xhs_only || []).map(i => `<div class="stat-row"><span class="stat-label">${i.keyword}</span><span class="stat-value">${fmt(i.total)}</span></div>`).join('');
+}
 let currentCategory = 'all';
 let sortDir = {};
 const charts = {};
@@ -1045,7 +1158,7 @@ function init() {
 }
 
 function applyFilter() { currentCategory = document.getElementById('categoryFilter').value; renderAll(); }
-function filteredHotwords() { return currentCategory==='all' ? DATA.hotwords : DATA.hotwords.filter(h=>h.category===currentCategory); }
+function filteredHotwords() { return currentCategory==='all' ? DATA.hotwords : hotwords.filter(h=>h.category===currentCategory); }
 function filteredWorks() {
   if (currentCategory==='all') return DATA.works||[];
   const kws = new Set(filteredHotwords().map(h=>h.keyword));
@@ -1053,6 +1166,10 @@ function filteredWorks() {
 }
 
 function renderAll() {
+  const hotwords = filterByPlatform(DATA.hotwords);
+  const works = filterByPlatform(DATA.works);
+  const topics = filterByPlatform(DATA.topics);
+  const summary = DATA.summary || {};
   const hw = filteredHotwords();
   const works = filteredWorks();
   renderHeroStats(hw, works);
