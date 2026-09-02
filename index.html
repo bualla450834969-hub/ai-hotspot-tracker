@@ -1247,7 +1247,7 @@ body { padding-top: 52px; }
       <div class="formula-list" id="formulaList"></div>
     </div>
     <div class="bento-card">
-      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">对标作者 TOP10</span></div>
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">对标作者 TOP5</span></div>
       <div class="author-list" id="authorList"></div>
     </div>
     <div class="bento-card span-3">
@@ -2251,14 +2251,20 @@ function renderFormulas() {
 }
 
 function renderAuthors(works) {
-  const m={}; works.forEach(w=>{const n=w.accountName||'未知';if(!m[n])m[n]={name:n,followers:w.followerCount||0,likes:0,count:0};m[n].likes+=(w.likeCount||0);m[n].count++;});
-  const top=Object.values(m).sort((a,b)=>b.likes-a.likes).slice(0,8);
-  document.getElementById('authorList').innerHTML=top.map((a,i)=>`
+  const m={}; works.forEach(w=>{const n=w.accountName||'未知';if(!m[n])m[n]={name:n,followers:w.followerCount||0,likes:0,count:0,max:0};m[n].likes+=(w.likeCount||0);m[n].count++;if((w.likeCount||0)>m[n].max)m[n].max=w.likeCount||0;});
+  const top=Object.values(m).sort((a,b)=>b.likes-a.likes).slice(0,5);
+  document.getElementById('authorList').innerHTML=top.map((a,i)=>{
+    const avg=Math.round(a.likes/a.count);
+    return `
     <div class="author-item">
       <div class="author-rank ${i<3?'r'+(i+1):'other'}">${i+1}</div>
-      <div class="author-info"><div class="author-name">${a.name}</div><div class="author-followers">粉丝${(a.followers/10000).toFixed(1)}万 · ${a.count}条</div></div>
-      <div class="author-likes">${(a.likes/10000).toFixed(1)}万</div>
-    </div>`).join('');
+      <div class="author-info">
+        <div class="author-name">${a.name}</div>
+        <div class="author-followers">粉丝${(a.followers/10000).toFixed(1)}万 · ${a.count}条作品 · 均赞${(avg/10000).toFixed(1)}万</div>
+      </div>
+      <div class="author-likes">总赞${(a.likes/10000).toFixed(1)}万<div style="font-size:10px;opacity:.6;margin-top:2px;">最高${(a.max/10000).toFixed(1)}万</div></div>
+    </div>`;
+  }).join('');
 }
 
 function isFavorite(i) { const favs = JSON.parse(localStorage.getItem("viral_favorites") || "[]"); return favs.some(f => f.title === DATA.hot_breakdowns[i]?.title); }
