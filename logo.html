@@ -195,11 +195,6 @@
 <path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56     c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="bg-glass"/>
 <path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96      c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="bg-glass"/>
 <path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56      c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="bg-glass"/>
-<!-- 边缘闪耀光点 -->
-<circle class="spark" id="spark1" r="5" fill="url(#sparkGrad)" filter="url(#sparkBlur)" opacity="0"/>
-<circle class="spark" id="spark2" r="5" fill="url(#sparkGrad)" filter="url(#sparkBlur)" opacity="0"/>
-<circle class="spark" id="spark3" r="5" fill="url(#sparkGrad)" filter="url(#sparkBlur)" opacity="0"/>
-<circle class="spark" id="spark4" r="5" fill="url(#sparkGrad)" filter="url(#sparkBlur)" opacity="0"/>
 </svg>
 </div>
 
@@ -247,20 +242,32 @@ function initBgLogoGlow() {
     });
   }
 
-  // 边缘闪耀光点初始化
+  // 边缘闪耀光点初始化（流星拖尾效果）
   var sparks = [];
   var frameCount = 0;
+  var TRAIL_LENGTH = 6;
+  var SVG_NS = 'http://www.w3.org/2000/svg';
   for (var si = 0; si < 4; si++) {
-    var sparkEl = document.getElementById('spark' + (si + 1));
+    var trailEls = [];
+    for (var ti = 0; ti < TRAIL_LENGTH; ti++) {
+      var c = document.createElementNS(SVG_NS, 'circle');
+      c.setAttribute('fill', 'url(#sparkGrad)');
+      c.setAttribute('filter', 'url(#sparkBlur)');
+      c.setAttribute('opacity', '0');
+      svg.appendChild(c);
+      trailEls.push(c);
+    }
     var pathLen = glassPaths[si].getTotalLength();
     sparks.push({
-      el: sparkEl,
+      trailEls: trailEls,
       path: glassPaths[si],
       pathLen: pathLen,
       active: false,
       progress: 0,
-      speed: 0.004 + Math.random() * 0.005,
-      nextFrame: Math.floor(Math.random() * 400) // 随机首次触发帧
+      baseSpeed: 0.004,
+      nextFrame: Math.floor(Math.random() * 400),
+      direction: 1,
+      startOffset: 0
     });
   }
 
@@ -341,31 +348,45 @@ function initBgLogoGlow() {
       if (subPath) subPath.style.filter = 'hue-rotate(' + hue.toFixed(0) + 'deg) url(#bgBlurS)';
     }
 
-    // 边缘闪耀光点：随机触发，沿path边缘移动一圈后消失
+    // 边缘闪耀光点：流星拖尾，ease-in-out速度，随机起点和方向
     frameCount++;
     for (var si = 0; si < sparks.length; si++) {
       var s = sparks[si];
       if (!s.active && frameCount >= s.nextFrame) {
         s.active = true;
         s.progress = 0;
-        s.speed = 0.004 + Math.random() * 0.005;
+        s.baseSpeed = 0.003 + Math.random() * 0.004;
+        s.direction = Math.random() > 0.5 ? 1 : -1;
+        s.startOffset = Math.random() * s.pathLen;
       }
       if (s.active) {
-        s.progress += s.speed;
+        // ease-in-out：两端慢中间快
+        var easeFactor = 0.25 + 0.75 * Math.sin(s.progress * Math.PI);
+        s.progress += s.baseSpeed * easeFactor;
         if (s.progress >= 1) {
           s.active = false;
-          s.nextFrame = frameCount + 300 + Math.floor(Math.random() * 600);
-          s.el.setAttribute('opacity', '0');
+          s.nextFrame = frameCount + 350 + Math.floor(Math.random() * 700);
+          for (var ti = 0; ti < TRAIL_LENGTH; ti++) {
+            s.trailEls[ti].setAttribute('opacity', '0');
+          }
         } else {
-          var pt = s.path.getPointAtLength(s.progress * s.pathLen);
-          s.el.setAttribute('cx', pt.x.toFixed(1));
-          s.el.setAttribute('cy', pt.y.toFixed(1));
-          // 透明度：前12%渐入，中间76%保持，后12%渐出
-          var spOp;
-          if (s.progress < 0.12) spOp = s.progress / 0.12;
-          else if (s.progress > 0.88) spOp = (1 - s.progress) / 0.12;
-          else spOp = 1;
-          s.el.setAttribute('opacity', spOp.toFixed(2));
+          // 整体透明度：前12%渐入，后12%渐出
+          var globalOp;
+          if (s.progress < 0.12) globalOp = s.progress / 0.12;
+          else if (s.progress > 0.88) globalOp = (1 - s.progress) / 0.12;
+          else globalOp = 1;
+          // 拖尾各点：头部最新最亮最大，尾部渐小渐暗
+          for (var ti2 = 0; ti2 < TRAIL_LENGTH; ti2++) {
+            var trailProgress = Math.max(0, s.progress - ti2 * s.baseSpeed * 10);
+            var len = (s.startOffset + trailProgress * s.pathLen * s.direction) % s.pathLen;
+            if (len < 0) len += s.pathLen;
+            var pt = s.path.getPointAtLength(len);
+            var sizeFactor = 1 - ti2 / TRAIL_LENGTH;
+            s.trailEls[ti2].setAttribute('cx', pt.x.toFixed(1));
+            s.trailEls[ti2].setAttribute('cy', pt.y.toFixed(1));
+            s.trailEls[ti2].setAttribute('r', (5.5 * sizeFactor + 0.8).toFixed(1));
+            s.trailEls[ti2].setAttribute('opacity', (globalOp * sizeFactor * 0.85).toFixed(2));
+          }
         }
       }
     }
