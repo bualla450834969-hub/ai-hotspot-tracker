@@ -984,6 +984,12 @@ body { padding-top: 52px; }
 .persona-bar { height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-top: 8px; overflow: hidden; }
 .persona-bar-fill { height: 100%; background: linear-gradient(90deg, #8b5cf6, #ec4899); border-radius: 2px; }
 .audience-chart { height: 200px; margin-bottom: 20px; }
+
+.topic-persona { margin-top: 8px; padding: 8px 10px; background: rgba(6,182,212,0.06); border-radius: 8px; border-left: 3px solid #06b6d4; }
+.topic-persona .tp-name { font-size: 12px; font-weight: 700; color: #22d3ee; margin-bottom: 4px; }
+.topic-persona .tp-needs { display: flex; flex-wrap: wrap; gap: 4px; }
+.topic-persona .tp-need { font-size: 10px; padding: 2px 6px; border-radius: 5px; background: rgba(6,182,212,0.12); color: #67e8f9; }
+.topic-persona .tp-content { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
 </style>
 <script src="data.js"></script>
 </head>
@@ -2089,6 +2095,11 @@ function renderTopics() {
         <span class="monetize-tag ${mon.cls}">${mon.name}</span>
         <span style="font-size:11px;color:var(--text-secondary)">变现潜力 ${mon.score}分 · ${mon.desc}</span>
       </div>
+      ${t.target_persona ? `<div class="topic-persona">
+        <div class="tp-name">目标人群：${t.target_persona.name} · ${t.target_persona.age} · ${t.target_persona.gender}</div>
+        <div class="tp-needs">${(t.target_persona.needs||[]).slice(0,4).map(n=>'<span class="tp-need">'+n+'</span>').join('')}</div>
+        <div class="tp-content">偏好：${t.target_persona.content_pref}</div>
+      </div>` : ''}
       ${fmt.format?`<div class="tc-format"><span>${fmt.format}</span><span>${fmt.suggested_duration||''}</span><span>${fmt.suggested_publish||''}</span></div>`:''}
       <div class="tc-meta"><span class="audience">${t.audience}</span><span style="color:var(--text-tertiary);">#${t.keyword}</span></div>
       ${fmt.ref_url?`<a href="${fmt.ref_url}" target="_blank" class="ref-link">参考视频 — ${fmt.ref_title||'点击查看'}</a>`:''}
