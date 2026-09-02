@@ -871,6 +871,30 @@ a.work-link:hover { opacity: 0.7; }
 .trend-modal-content { background: var(--bg-card, #1a1a2e); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; width:90%; max-width:560px; }
 .trend-modal-content h3 { margin:0 0 16px; }
 .trend-modal-content .close-btn { float:right; cursor:pointer; font-size:20px; color:var(--text-secondary); }
+
+/* 选题评分 */
+.topic-score { font-size: 28px; font-weight: 800; color: var(--text); }
+.topic-score-label { font-size: 11px; color: var(--text-secondary); }
+.score-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 4px 0; overflow: hidden; }
+.score-bar-fill { height: 100%; border-radius: 2px; }
+/* 标题生成器 */
+.gen-input { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; color: var(--text); font-size: 15px; outline: none; }
+.gen-input:focus { border-color: rgba(139,92,246,0.5); }
+.gen-btn { margin-top: 10px; padding: 10px 24px; background: linear-gradient(135deg, #8b5cf6, #ec4899); border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; }
+.gen-result { margin-top: 16px; }
+.gen-title-item { padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 8px; margin-bottom: 8px; font-size: 14px; border-left: 3px solid #8b5cf6; }
+.gen-title-item .hook { color: var(--text-secondary); font-size: 12px; margin-top: 4px; }
+/* 排期表 */
+.schedule-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 16px; }
+.schedule-day { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px; min-height: 120px; }
+.schedule-day .day-name { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+.schedule-day .day-date { font-size: 11px; color: var(--text-secondary); opacity: 0.7; }
+.schedule-item { margin-top: 8px; padding: 6px 8px; background: rgba(139,92,246,0.12); border-radius: 6px; font-size: 11px; line-height: 1.4; }
+.schedule-item .si-platform { font-size: 10px; color: #c4b5fd; }
+.schedule-item .si-time { font-size: 10px; color: var(--text-secondary); }
+/* 跨平台适配 */
+.adapt-tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.adapt-tag { font-size: 10px; padding: 3px 8px; border-radius: 10px; background: rgba(255,255,255,0.06); color: var(--text-secondary); }
 </style>
 <script src="data.js"></script>
 </head>
@@ -1113,7 +1137,57 @@ a.work-link:hover { opacity: 0.7; }
 <div id="topicPerfContent"></div>
 </div>
 
+
+<div class="section anim anim-d7">
+<div class="section-header">
+<span class="section-num">10</span>
+<span class="section-title">爆款标题生成器</span>
+<span class="section-desc">输入关键词，基于爆款基因自动生成标题+钩子</span>
+</div>
+<div style="display:flex;gap:12px;align-items:flex-end">
+<div style="flex:1">
+<input type="text" id="titleGenInput" class="gen-input" placeholder="输入关键词，如：可灵AI、AI PPT、WorkBuddy..." />
+</div>
+<button class="gen-btn" onclick="generateTitles()">生成标题</button>
+</div>
+<div id="titleGenResult" class="gen-result"></div>
+</div>
+
+<div class="section anim-d8">
+<div class="section-header">
+<span class="section-num">11</span>
+<span class="section-title">一周内容排期表</span>
+<span class="section-desc">基于选题和最佳发布时间自动生成7天排期</span>
+</div>
+<div id="scheduleContent"></div>
+</div>
+
 <!-- 热词趋势弹窗 -->
+
+
+<div class="section anim anim-d7">
+<div class="section-header">
+<span class="section-num">10</span>
+<span class="section-title">爆款标题生成器</span>
+<span class="section-desc">输入关键词，基于爆款基因自动生成标题+钩子</span>
+</div>
+<div style="display:flex;gap:12px;align-items:flex-end">
+<div style="flex:1">
+<input type="text" id="titleGenInput" class="gen-input" placeholder="输入关键词，如：可灵AI、AI PPT、WorkBuddy..." />
+</div>
+<button class="gen-btn" onclick="generateTitles()">生成标题</button>
+</div>
+<div id="titleGenResult" class="gen-result"></div>
+</div>
+
+<div class="section anim-d8">
+<div class="section-header">
+<span class="section-num">11</span>
+<span class="section-title">一周内容排期表</span>
+<span class="section-desc">基于选题和最佳发布时间自动生成7天排期</span>
+</div>
+<div id="scheduleContent"></div>
+</div>
 
 <!-- 热词趋势弹窗 -->
 <div class="trend-modal" id="trendModal" onclick="if(event.target===this)this.classList.remove('active')">
@@ -1289,6 +1363,121 @@ function showKeywordTrend(keyword) {
   modal.classList.add('active');
 }
 
+
+// ========== 1. 选题量化评分 ==========
+function calcTopicScore(topic) {
+  const hw = DATA.hotwords.find(h => h.keyword === topic.keyword);
+  if (!hw) return { total: 50, heat: 50, competition: 50, match: 50, timing: 50 };
+  // 热度分：作品数取对数归一化
+  const heat = Math.min(100, Math.round(Math.log10(hw.total || 1) * 20));
+  // 竞争分：蓝海指数越高分越高（竞争小）
+  const bo = hw.blue_ocean_score || 1;
+  const competition = Math.min(100, Math.round(Math.log10(bo + 1) * 15));
+  // 匹配分：默认60，AI大类相关更高
+  const match = hw.category === 'AI大类' ? 75 : 65;
+  // 时效分：飙升>新热>稳定
+  const timing = hw.trend === '飙升' ? 95 : hw.trend === '新热' ? 80 : 55;
+  const total = Math.round(heat * 0.3 + competition * 0.25 + match * 0.2 + timing * 0.25);
+  return { total, heat, competition, match, timing };
+}
+
+// ========== 2. 爆款标题生成器 ==========
+function generateTitles() {
+  const kw = document.getElementById('titleGenInput').value.trim();
+  if (!kw) { alert('请输入关键词'); return; }
+  const genes = DATA.viral_genes || {};
+  const hooks = genes.hook_distribution || {};
+  const topKws = (genes.top_title_keywords || []).map(k => k[0]);
+  
+  const templates = [
+    { type: '提问式', titles: [kw+'又更新了？这次的功能太离谱了', '为什么高手都在用'+kw+'？3个原因告诉你', kw+'到底怎么选？一篇讲透'] },
+    { type: '数字清单', titles: ['3个'+kw+'隐藏技巧，90%的人不知道', '5个'+kw+'神器，最后一个绝了', kw+'入门必看的7个要点'] },
+    { type: '结果前置', titles: ['用'+kw+'一键搞定，效率提升10倍', kw+'实战教程，看完就会', '我用'+kw+'做了这个，老板惊呆了'] },
+    { type: '反差对比', titles: [kw+'VS传统方式，差距太大了', '别再用老方法了，'+kw+'才是正解', '同样是'+kw+'，为什么别人做的更好？'] },
+    { type: '恐惧焦虑', titles: ['还不会'+kw+'？你已经落后了', kw+'踩坑指南，这些错误别再犯', '再不学'+kw+'就晚了'] },
+    { type: '福利诱惑', titles: [kw+'全套资料整理好了，免费领', '花了3天整理的'+kw+'笔记，分享给你', kw+'资源合集，建议收藏'] },
+  ];
+  
+  const hookLines = {
+    '提问式': '开头直接抛问题，3秒抓住好奇心',
+    '数字清单': '用数字建立预期，清单体完播率高',
+    '结果前置': '先展示效果，再讲方法，转化最强',
+    '反差对比': '制造认知冲突，引发讨论',
+    '恐惧焦虑': '戳中痛点，紧迫感驱动行动',
+    '福利诱惑': '利益点前置，收藏率最高',
+  };
+  
+  // 取前5种类型各1个标题
+  const result = templates.slice(0, 5).map(t => ({
+    type: t.type,
+    title: t.titles[Math.floor(Math.random() * t.titles.length)],
+    hook: hookLines[t.type] || '',
+  }));
+  
+  const html = result.map(r => `
+    <div class="gen-title-item">
+      <div><b>[${r.type}]</b> ${r.title}</div>
+      <div class="hook">${r.hook}</div>
+    </div>
+  `).join('');
+  document.getElementById('titleGenResult').innerHTML = html;
+}
+
+// ========== 3. 跨平台适配建议 ==========
+function getPlatformAdaptation(topic) {
+  const cat = topic.keyword || '';
+  const dy = {
+    title_style: '口语化+悬念，前3秒必须有钩子',
+    cover: '大字报封面，关键词突出',
+    tags: '#' + cat.replace(/\s/g,'') + ' #AI #人工智能 #干货分享',
+    time: '12:00-13:00 或 19:00-21:00',
+    format: '15-40秒口播+AI素材混剪',
+  };
+  const xhs = {
+    title_style: '干货体+emoji，标题控制在20字内',
+    cover: '精致图文，3-5图轮播',
+    tags: '#' + cat.replace(/\s/g,'') + ' #AI工具 #效率神器 #新手必看',
+    time: '7:30-9:00 或 20:00-22:30',
+    format: '图文笔记为主，视频为辅',
+  };
+  return { dy, xhs };
+}
+
+// ========== 4. 一周内容排期表 ==========
+function generateSchedule() {
+  const topics = DATA.topics || [];
+  const days = ['周一','周二','周三','周四','周五','周六','周日'];
+  const today = new Date();
+  const publishTimes = ['08:00', '12:00', '19:00', '21:00'];
+  const platforms = ['抖音', '小红书'];
+  
+  let html = '<div class="schedule-grid">';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const dateStr = (d.getMonth()+1) + '/' + d.getDate();
+    const topic1 = topics[i % topics.length];
+    const topic2 = topics[(i + 3) % topics.length];
+    
+    html += `<div class="schedule-day">
+      <div class="day-name">${days[i]}</div>
+      <div class="day-date">${dateStr}</div>
+      <div class="schedule-item">
+        <div class="si-platform">抖音 · ${publishTimes[i%4]}</div>
+        <div>${topic1 ? topic1.title.substring(0,24) : '休息'}</div>
+      </div>
+      ${i % 2 === 0 ? `<div class="schedule-item">
+        <div class="si-platform">小红书 · ${publishTimes[(i+2)%4]}</div>
+        <div>${topic2 ? topic2.title.substring(0,24) : '休息'}</div>
+      </div>` : ''}
+    </div>`;
+  }
+  html += '</div>';
+  html += '<div style="margin-top:12px;font-size:12px;color:var(--text-secondary)">排期基于选题库自动生成，可根据实际情况调整。抖音日更，小红书隔日更。</div>';
+  document.getElementById('scheduleContent').innerHTML = html;
+}
+
+
 function renderAll() {
   const summary = DATA.summary || {};
   const hw = filteredHotwords();
@@ -1301,7 +1490,7 @@ function renderAll() {
   renderScatter(works); renderCollect(hw); renderCommentDemands();
   renderSaturation(hw); renderSmallViral(works); renderFormulas();
   renderAuthors(works); renderBreakdowns(); renderMatrix();
-  renderHistory(hw); renderHotwordTable(hw); renderWorksTable(works); renderViralGenes(); renderTopicPerf();
+  renderHistory(hw); renderHotwordTable(hw); renderWorksTable(works); renderViralGenes(); renderTopicPerf(); generateSchedule();
   renderTopics(); updateTracker();
   initCardGlow();
 }
@@ -1585,12 +1774,26 @@ function renderTopics() {
   document.getElementById('topicsGrid').innerHTML = topics.map((t,i)=>{
     const fmt = fmtMap[t.title] || {};
     const st = status[t.title] || 'pending';
+    const score = calcTopicScore(t);
+    const adapt = getPlatformAdaptation(t);
     return `<div class="topic-card priority-${t.priority==='高'?'high':t.priority==='中'?'medium':'low'} status-${st}" id="topic-${i}" onclick="cycleTopicStatus(${i}, '${t.title.replace(/'/g,"\\'")}')">
       <div class="status-badge">${st==='pending'?'待拍摄':st==='shooting'?'拍摄中':'已发布'}</div>
       <div class="tc-num">${String(i+1).padStart(2,'0')}</div>
       <div class="tc-priority">${t.priority}优先</div>
       <div class="tc-title">${t.title}</div>
       <div class="tc-hook">${t.hook}</div>
+      <div style="display:flex;align-items:center;gap:12px;margin:6px 0">
+        <div><span class="topic-score">${score.total}</span><span class="topic-score-label"> 综合分</span></div>
+        <div style="flex:1">
+          <div class="score-bar"><div class="score-bar-fill" style="width:${score.heat}%;background:#8b5cf6"></div></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:${score.competition}%;background:#4ade80"></div></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:${score.timing}%;background:#facc15"></div></div>
+        </div>
+      </div>
+      <div class="adapt-tags">
+        <span class="adapt-tag">抖音: ${adapt.dy.format}</span>
+        <span class="adapt-tag">小红书: ${adapt.xhs.format}</span>
+      </div>
       ${fmt.format?`<div class="tc-format"><span>${fmt.format}</span><span>${fmt.suggested_duration||''}</span><span>${fmt.suggested_publish||''}</span></div>`:''}
       <div class="tc-meta"><span class="audience">${t.audience}</span><span style="color:var(--text-tertiary);">#${t.keyword}</span></div>
       ${fmt.ref_url?`<a href="${fmt.ref_url}" target="_blank" class="ref-link">参考视频 — ${fmt.ref_title||'点击查看'}</a>`:''}
