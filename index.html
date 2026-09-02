@@ -849,6 +849,28 @@ a.work-link:hover { opacity: 0.7; }
 .compare-tag.xhs { background: rgba(255,69,58,0.15); color: #FF6B6B; }
 @media (max-width: 768px) { .compare-grid { grid-template-columns: 1fr; } .platform-switch { flex-wrap: wrap; } }
 
+
+/* 效率标签 */
+.tag.blue-ocean { background: rgba(34,197,94,0.15); color: #4ade80; border-color: rgba(34,197,94,0.3); }
+.tag.red-ocean { background: rgba(239,68,68,0.15); color: #f87171; border-color: rgba(239,68,68,0.3); }
+.tag.medium { background: rgba(234,179,8,0.15); color: #facc15; border-color: rgba(234,179,8,0.3); }
+/* 爆款基因 */
+.gene-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:12px; margin-top:16px; }
+.gene-card { background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; }
+.gene-card h4 { margin:0 0 8px; font-size:13px; color: var(--text-secondary); }
+.gene-card .gene-val { font-size:24px; font-weight:700; color: var(--text); }
+.gene-card .gene-bar { height:6px; background: rgba(255,255,255,0.08); border-radius:3px; margin-top:8px; overflow:hidden; }
+.gene-card .gene-bar-fill { height:100%; border-radius:3px; background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+.hook-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.hook-chip { padding:6px 14px; border-radius:20px; font-size:12px; background: rgba(139,92,246,0.12); color: #c4b5fd; border:1px solid rgba(139,92,246,0.25); }
+.kw-cloud { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+.kw-cloud span { padding:4px 10px; border-radius:6px; font-size:12px; background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+/* 趋势弹窗 */
+.trend-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:1000; align-items:center; justify-content:center; }
+.trend-modal.active { display:flex; }
+.trend-modal-content { background: var(--bg-card, #1a1a2e); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; width:90%; max-width:560px; }
+.trend-modal-content h3 { margin:0 0 16px; }
+.trend-modal-content .close-btn { float:right; cursor:pointer; font-size:20px; color:var(--text-secondary); }
 </style>
 <script src="data.js"></script>
 </head>
@@ -1168,6 +1190,75 @@ function filteredWorks() {
 
 function filteredTopics() { return filterByPlatform(DATA.topics||[]); }
 
+
+function renderViralGenes() {
+  const genes = DATA.viral_genes;
+  if (!genes) { document.getElementById('viralGenesContent').innerHTML='<p style="color:var(--text-secondary)">暂无数据</p>'; return; }
+  let html = '<div class="gene-grid">';
+  // 钩子分布
+  const hooks = genes.hook_distribution || {};
+  const maxHook = Math.max(...Object.values(hooks), 1);
+  for (const [name, count] of Object.entries(hooks)) {
+    const pct = Math.round(count/maxHook*100);
+    html += '<div class="gene-card"><h4>'+name+'</h4><div class="gene-val">'+count+'<span style="font-size:12px;color:var(--text-secondary)"> 条</span></div><div class="gene-bar"><div class="gene-bar-fill" style="width:'+pct+'%"></div></div></div>';
+  }
+  html += '</div>';
+  // 平均标题长度
+  html += '<div style="margin-top:16px;font-size:13px;color:var(--text-secondary)">爆款平均标题长度：<b style="color:var(--text)">'+genes.avg_title_length+'</b> 字 | 样本：'+genes.sample_size+'条</div>';
+  // 高频关键词
+  const kws = genes.top_title_keywords || [];
+  if (kws.length) {
+    html += '<div class="kw-cloud">';
+    kws.forEach(([kw, freq]) => { html += '<span>'+kw+' <small style="opacity:0.6">×'+freq+'</small></span>'; });
+    html += '</div>';
+  }
+  // 结构示例
+  const examples = genes.structure_examples || [];
+  if (examples.length) {
+    html += '<div style="margin-top:16px"><h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">爆款结构示例</h4>';
+    examples.forEach(e => {
+      html += '<div style="padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:6px;font-size:13px"><span class="tag medium" style="margin-right:8px">'+e.structure+'</span>'+e.title+' <span style="color:var(--text-secondary);float:right">'+(e.likes||0).toLocaleString()+'赞</span></div>';
+    });
+    html += '</div>';
+  }
+  document.getElementById('viralGenesContent').innerHTML = html;
+}
+
+function renderTopicPerf() {
+  const perf = DATA.topic_performance;
+  if (!perf) { document.getElementById('topicPerfContent').innerHTML='<p style="color:var(--text-secondary)">暂无数据</p>'; return; }
+  let html = '<div class="gene-grid">';
+  html += '<div class="gene-card"><h4>选题总数</h4><div class="gene-val">'+(perf.total_topics||0)+'</div></div>';
+  html += '<div class="gene-card"><h4>已发布</h4><div class="gene-val">'+(perf.published||0)+'</div></div>';
+  html += '<div class="gene-card"><h4>命中率</h4><div class="gene-val">'+(perf.hit_rate||0)+'%</div></div>';
+  html += '</div>';
+  if (perf.note) { html += '<p style="margin-top:12px;font-size:13px;color:var(--text-secondary)">'+perf.note+'</p>'; }
+  document.getElementById('topicPerfContent').innerHTML = html;
+}
+
+function showKeywordTrend(keyword) {
+  const trends = DATA.keyword_trends || {};
+  const t = trends[keyword];
+  const modal = document.getElementById('trendModal');
+  document.getElementById('trendModalTitle').textContent = keyword + ' · 热度趋势';
+  if (!t || !t.data || t.data.length < 2) {
+    document.getElementById('trendModalBody').innerHTML = '<p style="color:var(--text-secondary)">历史数据不足，需积累更多天数据后显示趋势曲线。</p>';
+  } else {
+    const maxVal = Math.max(...t.data.map(d=>d.total), 1);
+    let bars = '<div style="display:flex;align-items:flex-end;gap:6px;height:160px;margin-top:12px">';
+    t.data.forEach(d => {
+      const h = Math.round(d.total/maxVal*100);
+      const dir = t.direction==='up' ? '#4ade80' : t.direction==='down' ? '#f87171' : '#facc15';
+      bars += '<div style="flex:1;text-align:center"><div style="height:'+h+'%;background:linear-gradient(180deg,'+dir+','+dir+'66);border-radius:4px 4px 0 0;min-height:4px" title="'+d.date+': '+d.total.toLocaleString()+'"></div><div style="font-size:10px;color:var(--text-secondary);margin-top:4px">'+d.date.slice(5)+'</div></div>';
+    });
+    bars += '</div>';
+    const growthColor = t.growth>0 ? '#4ade80' : t.growth<0 ? '#f87171' : 'var(--text-secondary)';
+    bars += '<div style="margin-top:12px;font-size:14px">周期变化：<b style="color:'+growthColor+'">'+(t.growth>0?'+':'')+t.growth+'%</b> · '+ (t.direction==='up'?'上升期':t.direction==='down'?'衰退期':'平台期') +'</div>';
+    document.getElementById('trendModalBody').innerHTML = bars;
+  }
+  modal.classList.add('active');
+}
+
 function renderAll() {
   const summary = DATA.summary || {};
   const hw = filteredHotwords();
@@ -1180,7 +1271,7 @@ function renderAll() {
   renderScatter(works); renderCollect(hw); renderCommentDemands();
   renderSaturation(hw); renderSmallViral(works); renderFormulas();
   renderAuthors(works); renderBreakdowns(); renderMatrix();
-  renderHistory(hw); renderHotwordTable(hw); renderWorksTable(works);
+  renderHistory(hw); renderHotwordTable(hw); renderWorksTable(works); renderViralGenes(); renderTopicPerf();
   renderTopics(); updateTracker();
   initCardGlow();
 }
@@ -1446,7 +1537,7 @@ function renderHotwordTable(hw) {
   const satMap = {};
   (DATA.saturation||[]).forEach(s=>satMap[s.keyword]=s.stage);
   document.querySelector('#hotwordTable tbody').innerHTML=sorted.map((h,i)=>`
-    <tr><td>${i+1}</td><td><b style="color:var(--text)">${h.keyword}</b></td><td>${h.category}</td><td>${h.total.toLocaleString()}</td><td class="like-num">${h.max_like.toLocaleString()}</td><td class="collect-num">${h.collect_rate}%</td><td><span class="tag ${trendClass(h.trend)}">${h.trend||'稳定'}</span></td><td><span class="tag ${satMap[h.keyword]==='萌芽期'?'sprout':satMap[h.keyword]==='上升期'?'rise':satMap[h.keyword]==='爆发期'?'boom':'decline'}">${satMap[h.keyword]||'稳定期'}</span></td></tr>`).join('');
+    <tr><td>${i+1}</td><td><b style="color:var(--text);cursor:pointer;text-decoration:underline dotted" onclick="showKeywordTrend('${h.keyword.replace(/'/g,"\\'")}')" title="点击查看趋势">${h.keyword}</b></td><td>${h.category}</td><td>${h.total.toLocaleString()}</td><td class="like-num">${h.max_like.toLocaleString()}</td><td class="collect-num">${h.collect_rate}%</td><td><span class="tag ${trendClass(h.trend)}">${h.trend||'稳定'}</span></td><td><span class="tag ${satMap[h.keyword]==='萌芽期'?'sprout':satMap[h.keyword]==='上升期'?'rise':satMap[h.keyword]==='爆发期'?'boom':'decline'}">${satMap[h.keyword]||'稳定期'}</span></td></tr>`).join('');
 }
 
 function renderWorksTable(works) {
