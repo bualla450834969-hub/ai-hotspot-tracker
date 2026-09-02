@@ -78,10 +78,8 @@
     transition: opacity 0.4s ease;
     pointer-events: none;
   }
-  .bg-glow-main { animation: bgGlowHue 14s linear infinite, bgGlowPulse 4s ease-in-out infinite; }
-  .bg-glow-sub { animation: bgGlowHueSub 14s linear infinite, bgGlowPulse 4s ease-in-out infinite; }
-  @keyframes bgGlowHue { 0%{filter:hue-rotate(0deg) url(#bgBlurM);} 100%{filter:hue-rotate(360deg) url(#bgBlurM);} }
-  @keyframes bgGlowHueSub { 0%{filter:hue-rotate(0deg) url(#bgBlurS);} 100%{filter:hue-rotate(360deg) url(#bgBlurS);} }
+  .bg-glow-main { animation: bgGlowPulse 4s ease-in-out infinite; }
+  .bg-glow-sub { animation: bgGlowPulse 4s ease-in-out infinite; }
   @keyframes bgGlowPulse { 0%,100%{transform:scale(1);} 50%{transform:scale(1.04);} }
 
   /* 品牌文字 */
@@ -230,6 +228,8 @@ function initBgLogoGlow() {
       phase: Math.random() * Math.PI * 2,
       breathSpeed: 0.02 + Math.random() * 0.015,
       breathPhase: Math.random() * Math.PI * 2,
+      hueSpeed: 0.4 + Math.random() * 0.3,
+      huePhase: Math.random() * 360,
       cx: 50, cy: 50,
       mode: 'auto',
       targetCx: 50, targetCy: 50
@@ -307,6 +307,10 @@ function initBgLogoGlow() {
       var subPath = svg.querySelector('.bgs-' + (i+1));
       if (mainPath) mainPath.style.opacity = glowOpacity;
       if (subPath) subPath.style.opacity = (parseFloat(glowOpacity) * 0.8).toFixed(2);
+      // 独立色相循环：每个色块不同相位+速度
+      var hue = (t * b.hueSpeed * 60 + b.huePhase) % 360;
+      if (mainPath) mainPath.style.filter = 'hue-rotate(' + hue.toFixed(0) + 'deg) url(#bgBlurM)';
+      if (subPath) subPath.style.filter = 'hue-rotate(' + hue.toFixed(0) + 'deg) url(#bgBlurS)';
     }
     requestAnimationFrame(animate);
   }
