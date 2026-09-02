@@ -1580,7 +1580,7 @@ function renderChecklist() {
   CHECKLIST_ITEMS.forEach(item => {
     const checked = saved[item.id] ? 'checked' : '';
     const mark = saved[item.id] ? '✓' : '';
-    html += '<div class="checklist-item ' + checked + '" onclick="toggleCheck('' + item.id + '')">';
+    html += '<div class="checklist-item ' + checked + '" onclick="toggleCheck(\'' + item.id + '\')">';
     html += '<div class="checklist-box">' + mark + '</div>';
     html += '<div class="checklist-text">' + item.text + '</div>';
     html += '</div>';
