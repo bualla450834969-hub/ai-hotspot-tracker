@@ -1,0 +1,2223 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 热点追踪工作台</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+:root {
+  --glass-bg: rgba(255,255,255,0.07);
+  --glass-bg-strong: rgba(255,255,255,0.11);
+  --glass-border: rgba(255,255,255,0.14);
+  --glass-border-strong: rgba(255,255,255,0.22);
+  --glass-shadow: 0 8px 32px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.12);
+  --radius: 20px;
+  --radius-sm: 14px;
+  --text: #FFFFFF;
+  --text-secondary: rgba(255,255,255,0.65);
+  --text-tertiary: rgba(255,255,255,0.4);
+  --accent: #0A84FF;
+  --accent-2: #BF5AF2;
+  --accent-3: #FF9F0A;
+  --accent-4: #30D158;
+  --accent-5: #FF453A;
+  --accent-6: #64D2FF;
+  --font: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'PingFang SC', 'Helvetica Neue', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family: var(--font);
+  background: #0a0a12;
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+body::before {
+  content:'';
+  position: fixed;
+  top: -15%; left: -10%;
+  width: 55%; height: 55%;
+  background: radial-gradient(circle, rgba(191,90,242,0.28) 0%, transparent 65%);
+  border-radius: 50%;
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+  animation: float1 20s ease-in-out infinite;
+}
+body::after {
+  content:'';
+  position: fixed;
+  bottom: -10%; right: -5%;
+  width: 50%; height: 50%;
+  background: radial-gradient(circle, rgba(10,132,255,0.25) 0%, transparent 65%);
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+  z-index: 0;
+  animation: float2 25s ease-in-out infinite;
+}
+.blob-3 {
+  position: fixed;
+  top: 30%; right: 20%;
+  width: 35%; height: 35%;
+  background: radial-gradient(circle, rgba(255,159,10,0.15) 0%, transparent 60%);
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 0;
+  animation: float3 18s ease-in-out infinite;
+}
+@keyframes float1 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(8%,6%) scale(1.1);} }
+@keyframes float2 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-6%,-8%) scale(1.08);} }
+@keyframes float3 { 0%,100%{transform:translate(0,0) scale(1);} 50%{transform:translate(-10%,5%) scale(1.15);} }
+::selection { background: var(--accent); color: #fff; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px) scale(0.98); }
+  to { opacity:1; transform:translateY(0) scale(1); }
+}
+@keyframes pulseGlow {
+  0%,100% { box-shadow: 0 0 20px rgba(10,132,255,0.3), inset 0 1px 0 rgba(255,255,255,0.15); }
+  50% { box-shadow: 0 0 40px rgba(10,132,255,0.5), inset 0 1px 0 rgba(255,255,255,0.2); }
+}
+.anim { opacity:0; animation: fadeUp .7s cubic-bezier(.22,1,.36,1) forwards; }
+.anim-d1 { animation-delay:.05s; }
+.anim-d2 { animation-delay:.12s; }
+.anim-d3 { animation-delay:.19s; }
+.anim-d4 { animation-delay:.26s; }
+.anim-d5 { animation-delay:.33s; }
+.anim-d6 { animation-delay:.40s; }
+
+/* ===== HERO ===== */
+.hero {
+  padding: 48px 48px 32px;
+  position: relative;
+  z-index: 1;
+}
+.hero-top {
+  display:flex; justify-content:space-between; align-items:flex-start;
+  margin-bottom: 28px;
+}
+.hero-title {
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #FFFFFF 0%, rgba(255,255,255,0.75) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-title em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-sub {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+.hero-meta {
+  text-align: right;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.hero-meta .time {
+  font-size: 15px;
+  color: var(--text);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.hero-filter { margin-top: 10px; }
+.hero-filter select {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  color: var(--text);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  font-family: var(--font);
+  font-weight: 500;
+}
+.hero-filter select:focus { border-color: var(--accent); }
+.hero-filter select option { background: #1a1a2e; color: #fff; }
+
+.hero-stats {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+.hero-stat {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 24px 26px;
+  box-shadow: var(--glass-shadow);
+  transition: transform .3s, border-color .3s;
+  position: relative;
+  overflow: hidden;
+}
+.hero-stat:hover { transform: translateY(-2px); border-color: var(--glass-border-strong); }
+.hero-stat:first-child {
+  background: linear-gradient(135deg, rgba(10,132,255,0.18) 0%, rgba(191,90,242,0.12) 100%);
+  border-color: rgba(10,132,255,0.3);
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+.hero-stat .hs-label {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.hero-stat .hs-value {
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+.hero-stat:first-child .hs-value {
+  font-size: 52px;
+  background: linear-gradient(135deg, #64D2FF 0%, #BF5AF2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-stat .hs-value.green { color: var(--accent-4); }
+.hero-stat .hs-value.red { color: var(--accent-5); }
+.hero-stat .hs-value.orange { color: var(--accent-3); }
+.hero-stat .hs-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+.hero-stat .hs-trend {
+  display: inline-block;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-top: 10px;
+  font-weight: 600;
+  background: rgba(255,255,255,0.1);
+}
+.hs-trend.up { background: rgba(255,69,58,0.2); color: #FF6B6B; }
+.hs-trend.down { background: rgba(48,209,88,0.2); color: #30D158; }
+.hs-trend.flat { background: rgba(255,255,255,0.08); color: var(--text-secondary); }
+
+/* ===== SECTION ===== */
+.section {
+  padding: 28px 48px;
+  position: relative;
+  z-index: 1;
+}
+.section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.section-num {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  background: rgba(10,132,255,0.15);
+  padding: 4px 10px;
+  border-radius: 8px;
+}
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+.section-desc {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-left: auto;
+}
+
+/* ===== BENTO ===== */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.bento-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--glass-shadow);
+  transition: transform .3s, border-color .3s, background .3s;
+  position: relative;
+  overflow: hidden;
+}
+.bento-card:hover {
+  border-color: var(--glass-border-strong);
+  transform: translateY(-3px);
+  background: var(--glass-bg-strong);
+}
+.bento-card.span-2 { grid-column: span 2; }
+.bento-card.span-3 { grid-column: span 3; }
+.card-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.card-head .ch-bar {
+  width: 4px; height: 16px;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  border-radius: 2px;
+}
+.card-head .ch-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.01em;
+}
+.card-head .ch-tip {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-left: auto;
+  font-weight: 400;
+}
+.chart { width:100%; height:280px; }
+.chart-sm { width:100%; height:220px; }
+.chart-lg { width:100%; height:340px; }
+
+/* ===== ACTION PANEL ===== */
+.action-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  box-shadow: var(--glass-shadow);
+}
+.action-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-3);
+  margin-bottom: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.action-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 8px;
+}
+.action-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  border-left: 2px solid var(--accent-5);
+  transition: all .25s;
+  position: relative;
+  overflow: hidden;
+}
+.action-item:hover { background: rgba(255,255,255,0.09); transform: translateX(3px); }
+.action-item.medium { border-left-color: var(--accent-3); }
+.action-item.low { border-left-color: var(--text-tertiary); }
+.action-icon { font-size: 12px; flex-shrink:0; margin-top:2px; color: var(--text-secondary); }
+.action-content { flex:1; min-width:0; }
+.action-type {
+  font-size: 10px; font-weight: 700; color: var(--accent-5);
+  background: rgba(255,69,58,0.15); padding: 3px 8px; border-radius: 6px;
+  display: inline-block; margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.action-item.medium .action-type { color: var(--accent-3); background: rgba(255,159,10,0.15); }
+.action-item.low .action-type { color: var(--text-secondary); background: rgba(255,255,255,0.08); }
+.action-text { font-size: 13px; color: var(--text); line-height: 1.5; font-weight: 500; }
+.action-detail { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+
+/* ===== INSIGHTS ===== */
+.insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 8px;
+}
+.insight-item {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  border-left: 2px solid var(--accent);
+  font-size: 13px;
+  position: relative;
+  overflow: hidden;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  transition: border-color .25s, background .25s;
+}
+.insight-item:hover { border-left-color: var(--text); background: var(--glass-bg-strong); }
+.insight-item b { color: var(--text); font-weight: 600; }
+.insight-item.hot { border-left-color: var(--accent-5); }
+.insight-item.value { border-left-color: var(--accent-4); }
+.insight-item.warn { border-left-color: var(--accent-3); }
+
+/* ===== TABLES ===== */
+.table-container { overflow-x: auto; }
+table { width:100%; border-collapse:collapse; font-size:12.5px; }
+th {
+  background: rgba(255,255,255,0.06);
+  padding: 10px 12px; text-align:left; font-weight:600;
+  color: var(--accent-6); border-bottom: 1px solid var(--glass-border);
+  white-space:nowrap; cursor:pointer; user-select:none;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+}
+th:hover { background: rgba(255,255,255,0.1); }
+td { padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-secondary); }
+tr:hover { background: rgba(255,255,255,0.04); }
+.tag {
+  display:inline-block; padding: 3px 9px; border-radius: 8px;
+  font-size: 10.5px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em;
+}
+.tag.surging{background:rgba(255,69,58,0.2);color:#FF6B6B;}
+.tag.new-hot{background:rgba(255,159,10,0.2);color:#FFB340;}
+.tag.stable{background:rgba(48,209,88,0.2);color:#30D158;}
+.tag.declining{background:rgba(255,255,255,0.1);color:var(--text-tertiary);}
+.tag.high{background:rgba(255,69,58,0.2);color:#FF6B6B;}
+.tag.medium{background:rgba(255,159,10,0.2);color:#FFB340;}
+.tag.low{background:rgba(255,255,255,0.1);color:var(--text-tertiary);}
+.tag.sprout{background:rgba(48,209,88,0.2);color:#30D158;}
+.tag.rise{background:rgba(100,210,255,0.2);color:#64D2FF;}
+.tag.boom{background:rgba(255,69,58,0.2);color:#FF6B6B;}
+.tag.decline{background:rgba(255,255,255,0.1);color:var(--text-tertiary);}
+.like-num{color:#FF6B6B;font-weight:600;}
+.collect-num{color:#FFB340;font-weight:600;}
+.share-num{color:#30D158;font-weight:600;}
+a.work-link { color:var(--accent-6); text-decoration:none; transition: opacity .2s; }
+a.work-link:hover { opacity: 0.7; }
+
+/* ===== SMALL VIRAL ===== */
+.small-list { display:flex; flex-direction:column; gap:6px; }
+.small-item {
+  display:flex; align-items:center; gap:10px;
+  padding: 10px 12px; background: rgba(255,255,255,0.05);
+  border-radius: var(--radius-sm); border: 1px solid rgba(48,209,88,0.15);
+  transition: border-color .2s, background .2s;
+  position: relative;
+  overflow: hidden;
+}
+.small-item:hover { border-color: rgba(48,209,88,0.35); background: rgba(255,255,255,0.08); }
+.small-item .si-info { flex:1; min-width:0; }
+.small-item .si-title { font-size:12.5px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-weight:500; }
+.small-item .si-meta { font-size:10.5px; color:var(--text-tertiary); margin-top:3px; }
+.small-item .si-likes { font-size:15px; font-weight:700; color:var(--accent-4); white-space:nowrap; }
+
+/* ===== FORMULAS ===== */
+.formula-list { display:flex; flex-direction:column; gap:8px; }
+.formula-item {
+  padding: 12px 14px; background: rgba(255,255,255,0.05);
+  border-radius: var(--radius-sm); border-left: 2px solid var(--accent-3);
+  position: relative;
+  overflow: hidden;
+}
+.formula-item .f-name { font-size:13px; font-weight:600; color:var(--accent-3); margin-bottom:4px; }
+.formula-item .f-example { font-size:11.5px; color:var(--text-secondary); margin-bottom:4px; font-style:italic; }
+.formula-item .f-stats { font-size:10.5px; color:var(--text-tertiary); }
+
+/* ===== KEYWORD CLOUD ===== */
+.kw-cloud { display:flex; flex-wrap:wrap; gap:6px; align-content:flex-start; align-items:center; }
+.kw-tag {
+  padding: 5px 11px; border-radius: 10px; font-size:12px;
+  background: rgba(255,255,255,0.07); color: var(--text-secondary);
+  border: 1px solid var(--glass-border);
+  transition: all .2s;
+  font-weight: 500;
+}
+.kw-tag:hover { background: rgba(255,255,255,0.13); color: var(--text); transform: scale(1.05); }
+.kw-tag.hot { background: rgba(255,69,58,0.15); color: #FF6B6B; border-color: rgba(255,69,58,0.3); font-weight:600; }
+
+/* ===== DEMANDS ===== */
+.demand-section { margin-bottom:10px; }
+.demand-label { font-size:10.5px; font-weight:700; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em; }
+.demand-label.q { color:var(--accent-3); }
+.demand-label.c { color:var(--accent-5); }
+.demand-label.n { color:var(--accent-4); }
+.demand-tags { display:flex; flex-wrap:wrap; gap:5px; }
+.demand-tag {
+  font-size:11.5px; padding:4px 10px; border-radius:8px;
+  background: rgba(255,255,255,0.06); color:var(--text-secondary);
+  border:1px solid var(--glass-border);
+}
+.demand-tag .dc { font-size:9.5px; color:var(--text-tertiary); margin-left:4px; }
+
+/* ===== SATURATION ===== */
+.sat-list { display:flex; flex-direction:column; gap:5px; }
+.sat-item { display:flex; align-items:center; gap:8px; padding:7px 9px; background:rgba(255,255,255,0.04); border-radius:10px; }
+.sat-name { font-size:12px; font-weight:600; width:70px; flex-shrink:0; color:var(--text); }
+.sat-bar { flex:1; height:10px; background:rgba(255,255,255,0.08); border-radius:5px; overflow:hidden; }
+.sat-fill { height:100%; border-radius:5px; transition:width .6s ease; }
+.sat-val { font-size:10.5px; color:var(--text-secondary); width:36px; text-align:right; flex-shrink:0; }
+.sat-advice { width:64px; flex-shrink:0; text-align:right; }
+
+/* ===== BREAKDOWN ===== */
+.breakdown-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:10px; }
+.breakdown-card {
+  background: rgba(255,255,255,0.05);
+  border:1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 18px;
+  transition: all .3s;
+  position: relative;
+  overflow: hidden;
+}
+.breakdown-card:hover { border-color:var(--glass-border-strong); transform:translateY(-2px); background: rgba(255,255,255,0.08); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.bd-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; gap:10px; }
+.bd-title { font-size:13px; font-weight:600; color:var(--text); line-height:1.45; flex:1; }
+.bd-likes { font-size:17px; font-weight:700; color:#FF6B6B; white-space:nowrap; }
+.bd-row { display:flex; gap:8px; margin-bottom:5px; font-size:11.5px; }
+.bd-label { color:var(--text-tertiary); width:36px; flex-shrink:0; text-transform:uppercase; font-size:9.5px; letter-spacing:0.05em; padding-top:2px; font-weight:600; }
+.bd-val { color:var(--text-secondary); flex:1; line-height:1.5; }
+.bd-meta {
+  font-size:10.5px; color:var(--text-tertiary); margin-top:10px;
+  padding-top:8px; border-top:1px solid var(--glass-border);
+  display:flex; justify-content:space-between;
+}
+
+/* ===== MATRIX ===== */
+.matrix-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:8px; }
+.matrix-cell {
+  background:rgba(255,255,255,0.05); border-radius:var(--radius-sm); padding:14px 16px;
+  border-left:2px solid var(--accent);
+  transition: transform .25s, border-color .25s, background .25s;
+  position: relative;
+  overflow: hidden;
+}
+.matrix-cell:hover { transform:translateY(-2px); background: rgba(255,255,255,0.09); }
+.matrix-cell.super { border-left-color:var(--accent-5); }
+.matrix-cell.hot { border-left-color:var(--accent-3); }
+.matrix-cell.rise { border-left-color:var(--accent-6); }
+.matrix-cell.blue { border-left-color:var(--accent-4); }
+.mc-cat { font-size:13px; font-weight:700; color:var(--text); margin-bottom:4px; }
+.mc-level { font-size:9.5px; font-weight:700; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.06em; }
+.mc-stats { font-size:11px; color:var(--text-secondary); margin-bottom:6px; }
+.mc-kws { font-size:10.5px; color:var(--text-tertiary); line-height:1.6; }
+
+/* ===== AUTHORS ===== */
+.author-list { display:flex; flex-direction:column; gap:6px; }
+.author-item { display:flex; align-items:center; gap:10px; padding:8px 10px; background:rgba(255,255,255,0.04); border-radius:10px; }
+.author-rank {
+  width:22px; height:22px; border-radius:7px;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:800; flex-shrink:0;
+}
+.author-rank.r1{background:linear-gradient(135deg,var(--accent-3),var(--accent-5));color:#fff;}
+.author-rank.r2{background:rgba(255,255,255,0.2);color:#fff;}
+.author-rank.r3{background:rgba(255,159,10,0.3);color:#FFB340;}
+.author-rank.other{background:rgba(255,255,255,0.08);color:var(--text-tertiary);}
+.author-info { flex:1; min-width:0; }
+.author-name { font-size:12.5px; font-weight:500; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.author-followers { font-size:10.5px; color:var(--text-tertiary); }
+.author-likes { font-size:13px; font-weight:700; color:#FF6B6B; white-space:nowrap; }
+
+/* ===== TOPIC CARDS ===== */
+.topic-board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 14px;
+}
+.topic-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 24px;
+  transition: all .35s cubic-bezier(.22,1,.36,1);
+  position: relative;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+}
+.topic-card:hover {
+  border-color: var(--glass-border-strong);
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.18);
+  background: var(--glass-bg-strong);
+}
+.hero-stat::before,
+.bento-card::before,
+.breakdown-card::before,
+.topic-card::before,
+.insight-item::before,
+.action-item::before,
+.matrix-cell::before,
+.small-item::before,
+.formula-item::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      280px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(64,156,255,0.36) 0%,
+      rgba(175,82,222,0.23) 35%,
+      transparent 65%
+    ),
+    radial-gradient(
+      180px circle at calc(var(--mx, 50%) + 25px) calc(var(--my, 50%) - 15px),
+      rgba(255,100,170,0.20) 0%,
+      rgba(100,210,255,0.11) 40%,
+      transparent 70%
+    );
+  opacity: 0;
+  transition: opacity .4s ease;
+  pointer-events: none;
+  z-index: 0;
+  filter: hue-rotate(0deg);
+  animation: glowHue 14s linear infinite, glowPulse 4s ease-in-out infinite;
+}
+@keyframes glowHue {
+  0% { filter: hue-rotate(0deg); }
+  100% { filter: hue-rotate(360deg); }
+}
+@keyframes glowPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+.hero-stat:hover::before,
+.bento-card:hover::before,
+.breakdown-card:hover::before,
+.topic-card:hover::before,
+.insight-item:hover::before,
+.action-item:hover::before,
+.matrix-cell:hover::before,
+.small-item:hover::before,
+.formula-item:hover::before {
+  opacity: 1;
+}
+.hero-stat > *, .bento-card > *, .breakdown-card > *, .topic-card > *,
+.insight-item > *, .action-item > *, .matrix-cell > *,
+.small-item > *, .formula-item > * {
+  position: relative;
+  z-index: 1;
+}
+.topic-card .tc-num {
+  position: absolute;
+  bottom: 14px; right: 20px;
+  font-size: 48px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.06);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  pointer-events: none;
+}
+.topic-card .tc-priority {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 12px;
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 8px;
+  vertical-align: middle;
+}
+.topic-card.priority-high .tc-priority { background: rgba(255,69,58,0.2); color: #FF6B6B; }
+.topic-card.priority-medium .tc-priority { background: rgba(255,159,10,0.2); color: #FFB340; }
+.topic-card.priority-low .tc-priority { background: rgba(255,255,255,0.1); color: var(--text-tertiary); }
+.topic-card .tc-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  line-height: 1.35;
+  color: var(--text);
+  padding-right: 44px;
+  letter-spacing: -0.01em;
+}
+.topic-card .tc-hook {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 14px;
+  line-height: 1.6;
+  padding: 12px 14px;
+  background: rgba(255,255,255,0.05);
+  border-radius: var(--radius-sm);
+  border-left: 2px solid var(--accent);
+  font-style: italic;
+}
+.topic-card .tc-format {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.topic-card .tc-format span {
+  background: rgba(255,255,255,0.07);
+  padding: 4px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+}
+.topic-card .tc-meta {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 11px;
+}
+.topic-card .tc-meta .audience {
+  color: var(--accent-6);
+  background: rgba(100,210,255,0.12);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+.topic-card .ref-link {
+  font-size: 11px;
+  color: var(--accent-6);
+  margin-top: 10px;
+  display: block;
+}
+.topic-card .status-badge {
+  position: relative;
+  display: inline-block;
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  display: none;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  margin-right: 8px;
+  margin-bottom: 12px;
+  vertical-align: middle;
+  backdrop-filter: blur(10px);
+}
+.topic-card.status-pending .status-badge { display:inline-block; background:rgba(255,255,255,0.1);color:var(--text-tertiary); }
+.topic-card.status-shooting .status-badge { display:inline-block; background:rgba(255,159,10,0.2);color:#FFB340; }
+.topic-card.status-published .status-badge { display:inline-block; background:rgba(48,209,88,0.2);color:#30D158; }
+.topic-card.status-published { opacity: .55; }
+
+/* ===== TRACKER ===== */
+.tracker-bar {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 20px 24px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  box-shadow: var(--glass-shadow);
+}
+.tracker-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.tracker-stat .ts-num {
+  font-size: 28px;
+  font-weight: 700;
+}
+.tracker-stat .ts-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.tracker-progress {
+  flex: 1;
+  min-width: 200px;
+  height: 8px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+}
+.tracker-progress div {
+  height: 100%;
+  transition: width .4s ease;
+}
+.tracker-bar button {
+  background: rgba(255,255,255,0.08);
+  color: var(--text-secondary);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 7px 16px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all .2s;
+  font-family: var(--font);
+  font-weight: 500;
+}
+.tracker-bar button:hover { background: rgba(255,255,255,0.15); color: var(--text); border-color: var(--glass-border-strong); }
+
+.footer {
+  text-align: center;
+  padding: 32px 20px 28px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  position: relative;
+  z-index: 1;
+}
+
+.empty-state { text-align:center; padding:24px 20px; color:var(--text-tertiary); font-size:13px; }
+
+::-webkit-scrollbar { width:6px; height:6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.15); border-radius:3px; }
+::-webkit-scrollbar-thumb:hover { background:rgba(255,255,255,0.25); }
+
+/* ===== MOBILE ===== */
+@media (max-width: 900px) {
+  .hero { padding: 28px 20px 24px; }
+  .hero-title { font-size: 32px; }
+  .hero-top { flex-direction: column; gap: 16px; }
+  .hero-meta { text-align: left; }
+  .hero-stats { grid-template-columns: 1fr 1fr; }
+  .hero-stat:first-child { grid-column: span 2; }
+  .hero-stat .hs-value { font-size: 32px; }
+  .hero-stat:first-child .hs-value { font-size: 40px; }
+  .section { padding: 24px 20px; }
+  .bento { grid-template-columns: 1fr; }
+  .bento-card.span-2, .bento-card.span-3 { grid-column: span 1; }
+  .topic-board { grid-template-columns: 1fr; }
+  .chart { height: 240px; }
+  .chart-sm { height: 200px; }
+  .chart-lg { height: 280px; }
+  .tracker-bar { gap: 16px; padding: 16px; }
+}
+@media (max-width: 480px) {
+  .hero-title { font-size: 26px; }
+  .hero-stats { grid-template-columns: 1fr; }
+  .hero-stat:first-child { grid-column: span 1; }
+  .section-title { font-size: 18px; }
+}
+
+/* Platform Switcher */
+.platform-switch { display: flex; gap: 4px; background: rgba(255,255,255,0.06); border-radius: 10px; padding: 3px; backdrop-filter: blur(10px); }
+.platform-btn { background: transparent; border: none; color: rgba(255,255,255,0.5); padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.25s ease; font-family: inherit; }
+.platform-btn:hover { color: rgba(255,255,255,0.8); }
+.platform-btn.active { background: linear-gradient(135deg, #0A84FF, #BF5AF2); color: #fff; box-shadow: 0 2px 12px rgba(10,132,255,0.3); }
+/* Comparison Section */
+.compare-section { display: none; }
+.compare-section.visible { display: block; }
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.compare-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; backdrop-filter: blur(20px); position: relative; overflow: hidden; }
+.compare-card.douyin { border-left: 3px solid #0A84FF; }
+.compare-card.xiaohongshu { border-left: 3px solid #FF453A; }
+.compare-card h4 { margin: 0 0 12px 0; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+.compare-card .stat-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
+.compare-card .stat-row:last-child { border-bottom: none; }
+.compare-card .stat-label { color: rgba(255,255,255,0.5); }
+.compare-card .stat-value { font-weight: 600; }
+.overlap-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.overlap-table th { text-align: left; padding: 8px 10px; color: rgba(255,255,255,0.5); font-weight: 500; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.overlap-table td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.overlap-table .hotter-dy { color: #64D2FF; }
+.overlap-table .hotter-xhs { color: #FF6B6B; }
+.compare-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
+.compare-tag.dy { background: rgba(10,132,255,0.15); color: #64D2FF; }
+.compare-tag.xhs { background: rgba(255,69,58,0.15); color: #FF6B6B; }
+@media (max-width: 768px) { .compare-grid { grid-template-columns: 1fr; } .platform-switch { flex-wrap: wrap; } }
+
+
+/* 效率标签 */
+.tag.blue-ocean { background: rgba(34,197,94,0.15); color: #4ade80; border-color: rgba(34,197,94,0.3); }
+.tag.red-ocean { background: rgba(239,68,68,0.15); color: #f87171; border-color: rgba(239,68,68,0.3); }
+.tag.medium { background: rgba(234,179,8,0.15); color: #facc15; border-color: rgba(234,179,8,0.3); }
+/* 爆款基因 */
+.gene-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap:12px; margin-top:16px; }
+.gene-card { background: rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; }
+.gene-card h4 { margin:0 0 8px; font-size:13px; color: var(--text-secondary); }
+.gene-card .gene-val { font-size:24px; font-weight:700; color: var(--text); }
+.gene-card .gene-bar { height:6px; background: rgba(255,255,255,0.08); border-radius:3px; margin-top:8px; overflow:hidden; }
+.gene-card .gene-bar-fill { height:100%; border-radius:3px; background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+.hook-list { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.hook-chip { padding:6px 14px; border-radius:20px; font-size:12px; background: rgba(139,92,246,0.12); color: #c4b5fd; border:1px solid rgba(139,92,246,0.25); }
+.kw-cloud { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+.kw-cloud span { padding:4px 10px; border-radius:6px; font-size:12px; background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+/* 趋势弹窗 */
+.trend-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(8px); z-index:1000; align-items:center; justify-content:center; }
+.trend-modal.active { display:flex; }
+.trend-modal-content { background: var(--bg-card, #1a1a2e); border:1px solid rgba(255,255,255,0.1); border-radius:16px; padding:24px; width:90%; max-width:560px; }
+.trend-modal-content h3 { margin:0 0 16px; }
+.trend-modal-content .close-btn { float:right; cursor:pointer; font-size:20px; color:var(--text-secondary); }
+
+/* 选题评分 */
+.topic-score { font-size: 28px; font-weight: 800; color: var(--text); }
+.topic-score-label { font-size: 11px; color: var(--text-secondary); }
+.score-bar { height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; margin: 4px 0; overflow: hidden; }
+.score-bar-fill { height: 100%; border-radius: 2px; }
+/* 标题生成器 */
+.gen-input { width: 100%; padding: 12px 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; color: var(--text); font-size: 15px; outline: none; }
+.gen-input:focus { border-color: rgba(139,92,246,0.5); }
+.gen-btn { margin-top: 10px; padding: 10px 24px; background: linear-gradient(135deg, #8b5cf6, #ec4899); border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; }
+.gen-result { margin-top: 16px; }
+.gen-title-item { padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 8px; margin-bottom: 8px; font-size: 14px; border-left: 3px solid #8b5cf6; }
+.gen-title-item .hook { color: var(--text-secondary); font-size: 12px; margin-top: 4px; }
+/* 排期表 */
+.schedule-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 16px; }
+.schedule-day { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px; min-height: 120px; }
+.schedule-day .day-name { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+.schedule-day .day-date { font-size: 11px; color: var(--text-secondary); opacity: 0.7; }
+.schedule-item { margin-top: 8px; padding: 6px 8px; background: rgba(139,92,246,0.12); border-radius: 6px; font-size: 11px; line-height: 1.4; }
+.schedule-item .si-platform { font-size: 10px; color: #c4b5fd; }
+.schedule-item .si-time { font-size: 10px; color: var(--text-secondary); }
+/* 跨平台适配 */
+.adapt-tags { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.adapt-tag { font-size: 10px; padding: 3px 8px; border-radius: 10px; background: rgba(255,255,255,0.06); color: var(--text-secondary); }
+
+/* 评论话术库 */
+.comment-tpl { padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 8px; margin-bottom: 8px; border-left: 3px solid #06b6d4; }
+.comment-tpl .ct-type { font-size: 11px; color: #22d3ee; font-weight: 600; margin-bottom: 4px; }
+.comment-tpl .ct-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+.pinned-comment { background: rgba(251,191,36,0.08); border-left-color: #fbbf24; margin-top: 12px; padding: 12px 14px; border-radius: 8px; }
+.pinned-comment .pc-label { font-size: 11px; color: #fbbf24; font-weight: 600; margin-bottom: 6px; }
+/* 变现标签 */
+.monetize-tag { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; margin-right: 6px; }
+.monetize-affiliate { background: rgba(34,197,94,0.15); color: #4ade80; }
+.monetize-ad { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.monetize-private { background: rgba(168,85,247,0.15); color: #c084fc; }
+.monetize-course { background: rgba(236,72,153,0.15); color: #f472b6; }
+/* 自检清单 */
+.checklist-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(255,255,255,0.04); border-radius: 8px; margin-bottom: 6px; cursor: pointer; transition: background 0.2s; }
+.checklist-item:hover { background: rgba(255,255,255,0.08); }
+.checklist-item.checked { background: rgba(34,197,94,0.08); }
+.checklist-box { width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.2); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 14px; color: #4ade80; }
+.checklist-item.checked .checklist-box { background: rgba(34,197,94,0.2); border-color: #4ade80; }
+.checklist-text { font-size: 14px; color: var(--text); flex: 1; }
+.checklist-item.checked .checklist-text { text-decoration: line-through; opacity: 0.6; }
+.checklist-progress { text-align: center; margin: 12px 0; font-size: 14px; color: var(--text-secondary); }
+.checklist-progress b { color: #4ade80; font-size: 18px; }
+
+/* 固定导航栏 */
+.top-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: rgba(15, 15, 25, 0.75);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding: 0 24px; height: 52px;
+  display: flex; align-items: center; gap: 8px;
+  overflow-x: auto; scrollbar-width: none;
+}
+.top-nav::-webkit-scrollbar { display: none; }
+.top-nav .nav-logo {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  white-space: nowrap; margin-right: 12px;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.top-nav .nav-link {
+  font-size: 12px; color: var(--text-secondary); padding: 6px 10px;
+  border-radius: 8px; white-space: nowrap; cursor: pointer;
+  transition: all 0.2s; text-decoration: none;
+}
+.top-nav .nav-link:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.top-nav .nav-link.active {
+  color: #c4b5fd; background: rgba(139,92,246,0.15);
+}
+/* 滚动进度条 */
+.scroll-progress {
+  position: fixed; top: 52px; left: 0; height: 2px; z-index: 999;
+  background: linear-gradient(90deg, #8b5cf6, #ec4899, #06b6d4);
+  width: 0%; transition: width 0.1s;
+}
+/* 回到顶部 */
+.back-to-top {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(139,92,246,0.2); backdrop-filter: blur(10px);
+  border: 1px solid rgba(139,92,246,0.3); color: #c4b5fd;
+  font-size: 18px; cursor: pointer; display: none;
+  align-items: center; justify-content: center;
+  transition: all 0.3s;
+}
+.back-to-top:hover { background: rgba(139,92,246,0.35); transform: translateY(-2px); }
+.back-to-top.show { display: flex; }
+/* 页面内容下移，避免被导航栏遮挡 */
+body { padding-top: 52px; }
+
+/* 人群画像 */
+.persona-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; margin-top: 16px; }
+.persona-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px; position: relative; overflow: hidden; }
+.persona-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+.persona-name { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.persona-cat { font-size: 12px; color: #c4b5fd; margin-bottom: 10px; }
+.persona-meta { display: flex; gap: 12px; margin-bottom: 12px; font-size: 12px; color: var(--text-secondary); }
+.persona-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.persona-tag { font-size: 11px; padding: 3px 8px; border-radius: 10px; background: rgba(139,92,246,0.12); color: #c4b5fd; }
+.persona-section { margin-bottom: 10px; }
+.persona-label { font-size: 11px; color: var(--text-tertiary); font-weight: 600; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.persona-value { font-size: 13px; color: var(--text); line-height: 1.5; }
+.persona-needs { display: flex; flex-wrap: wrap; gap: 4px; }
+.need-tag { font-size: 11px; padding: 2px 7px; border-radius: 6px; background: rgba(34,197,94,0.1); color: #4ade80; }
+.pain-tag { font-size: 11px; padding: 2px 7px; border-radius: 6px; background: rgba(239,68,68,0.1); color: #f87171; }
+.persona-bar { height: 4px; background: rgba(255,255,255,0.08); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+.persona-bar-fill { height: 100%; background: linear-gradient(90deg, #8b5cf6, #ec4899); border-radius: 2px; }
+.audience-chart { height: 200px; margin-bottom: 20px; }
+
+.topic-persona { margin-top: 8px; padding: 8px 10px; background: rgba(6,182,212,0.06); border-radius: 8px; border-left: 3px solid #06b6d4; }
+.topic-persona .tp-name { font-size: 12px; font-weight: 700; color: #22d3ee; margin-bottom: 4px; }
+.topic-persona .tp-needs { display: flex; flex-wrap: wrap; gap: 4px; }
+.topic-persona .tp-need { font-size: 10px; padding: 2px 6px; border-radius: 5px; background: rgba(6,182,212,0.12); color: #67e8f9; }
+.topic-persona .tp-content { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+</style>
+<script src="data.js?v=1788335414"></script>
+</head>
+<body>
+<div class="top-nav" id="topNav">
+  <span class="nav-logo">AI热点追踪</span>
+  <a class="nav-link" data-target="hero">概览</a>
+  <a class="nav-link" data-target="hotwords">热词</a>
+  <a class="nav-link" data-target="works">爆款</a>
+  <a class="nav-link" data-target="topics">选题</a>
+  <a class="nav-link" data-target="insights">洞察</a>
+  <a class="nav-link" data-target="viralGenes">爆款基因</a>
+  <a class="nav-link" data-target="topicPerf">命中率</a>
+  <a class="nav-link" data-target="titleGen">标题生成</a>
+  <a class="nav-link" data-target="schedule">排期</a>
+  <a class="nav-link" data-target="commentScripts">评论话术</a>
+  <a class="nav-link" data-target="checklist">自检</a>
+  <a class="nav-link" data-target="audience">人群</a>
+</div>
+<div class="scroll-progress" id="scrollProgress"></div>
+<div class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+
+<div class="blob-3"></div>
+
+<div class="hero">
+  <div class="hero-top anim anim-d1">
+    <div>
+      <h1 class="hero-title">AI 热点<em>追踪</em><br>工作台</h1>
+      <div class="hero-sub">Daily Hotspot Intelligence · RedFox Hub</div>
+    </div>
+    <div class="hero-meta">
+      <div class="time" id="updateTime">加载中...</div>
+      <div>每日 8:00 / 14:00 采集 · 8:00 推送简报</div>
+      <div class="hero-filter">
+        <div class="platform-switch" id="platformSwitch">
+          <button class="platform-btn active" data-platform="all" onclick="setPlatform('all')">全部</button>
+          <button class="platform-btn" data-platform="douyin" onclick="setPlatform('douyin')">抖音</button>
+          <button class="platform-btn" data-platform="xiaohongshu" onclick="setPlatform('xiaohongshu')">小红书</button>
+          <button class="platform-btn" data-platform="compare" onclick="setPlatform('compare')">对比</button>
+        </div>
+        <select id="categoryFilter" onchange="applyFilter()">
+          <option value="all">全部赛道</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="hero-stats anim anim-d2" id="heroStats"></div>
+</div>
+
+<div class="section compare-section" id="compareSection">
+  <div class="section-header">
+    <span class="section-num">00</span>
+    <span class="section-title">双平台对比</span>
+    <span class="section-desc">抖音 vs 小红书 AI 赛道数据对比</span>
+  </div>
+  <div class="compare-grid" id="compareSummary"></div>
+  <div class="bento-card" style="margin-bottom:16px;">
+    <h4 style="margin:0 0 12px 0;font-size:15px;">热词重叠对比（两平台均在榜）</h4>
+    <div style="overflow-x:auto;">
+      <table class="overlap-table" id="overlapTable">
+        <thead><tr><th>关键词</th><th>分类</th><th>抖音作品数</th><th>小红书作品数</th><th>抖音最高赞</th><th>小红书最高赞</th><th>更热平台</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="compare-grid">
+    <div class="compare-card douyin">
+      <h4><span class="compare-tag dy">抖音</span>独有热词 TOP10</h4>
+      <div id="dyOnlyList"></div>
+    </div>
+    <div class="compare-card xiaohongshu">
+      <h4><span class="compare-tag xhs">小红书</span>独有热词 TOP10</h4>
+      <div id="xhsOnlyList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d2">
+  <div id="hero" class="section-header">
+    <span class="section-num">01</span>
+    <span class="section-title">今日行动</span>
+    <span class="section-desc">基于数据的每日执行清单</span>
+  </div>
+  <div class="action-panel">
+    <div class="action-title">Action List</div>
+    <div class="action-list" id="actionList"></div>
+  </div>
+</div>
+
+<div class="section anim anim-d3">
+  <div id="hotwords" class="section-header">
+    <span class="section-num">02</span>
+    <span class="section-title">智能洞察</span>
+    <span class="section-desc">从数据中提取的关键信号</span>
+  </div>
+  <div class="insights-grid" id="insightsGrid"></div>
+</div>
+
+<div class="section anim anim-d3">
+  <div id="works" class="section-header">
+    <span class="section-num">03</span>
+    <span class="section-title">热度分析</span>
+    <span class="section-desc">什么在火 · 什么时候发 · 多长最好</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card span-2">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">热词热度排行 TOP15</span></div>
+      <div class="chart-lg" id="chartRanking"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">赛道分布</span></div>
+      <div class="chart" id="chartCategory"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">发布时间</span><span class="ch-tip">几点发最容易爆</span></div>
+      <div class="chart-sm" id="chartPublishTime"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">视频时长</span><span class="ch-tip">多长效果最好</span></div>
+      <div class="chart-sm" id="chartDuration"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">钩子爆款率</span></div>
+      <div class="chart-sm" id="chartHook"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d4">
+  <div id="topics" class="section-header">
+    <span class="section-num">04</span>
+    <span class="section-title">观众洞察</span>
+    <span class="section-desc">他们在问什么 · 收藏什么 · 需求在哪</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">评论高频词</span><span class="ch-tip">观众在问什么</span></div>
+      <div class="kw-cloud" id="commentKw"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">点赞 × 收藏</span></div>
+      <div class="chart-sm" id="chartScatter"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">收藏率排行</span><span class="ch-tip">价值型内容</span></div>
+      <div class="chart-sm" id="chartCollect"></div>
+    </div>
+    <div class="bento-card span-2">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">评论区需求挖掘</span><span class="ch-tip">从评论找选题</span></div>
+      <div id="commentDemands"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">饱和度 & 生命周期</span><span class="ch-tip">值越低越蓝海</span></div>
+      <div class="sat-list" id="saturationList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d4">
+  <div id="insights" class="section-header">
+    <span class="section-num">05</span>
+    <span class="section-title">对标拆解</span>
+    <span class="section-desc">谁在做 · 怎么做的 · 可以抄什么</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">小账号爆款</span><span class="ch-tip">粉丝&lt;5万 赞&gt;3千</span></div>
+      <div class="small-list" id="smallViral"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">标题公式</span><span class="ch-tip">可直接套用</span></div>
+      <div class="formula-list" id="formulaList"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">对标作者 TOP10</span></div>
+      <div class="author-list" id="authorList"></div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">爆款结构化拆解 TOP10</span><span class="ch-tip">钩子 → 结构 → CTA</span></div>
+      <div class="breakdown-grid" id="breakdownGrid"></div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">赛道覆盖矩阵</span><span class="ch-tip">找空白机会点</span></div>
+      <div class="matrix-grid" id="matrixGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d5">
+  <div id="history" class="section-header">
+    <span class="section-num">06</span>
+    <span class="section-title">趋势与数据</span>
+    <span class="section-desc">历史走势 · 完整明细</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">热词热度趋势（近14天）</span><span class="ch-tip">跑满2天后显示曲线</span></div>
+      <div class="chart" id="chartHistory"></div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">热词详情</span><span class="ch-tip">点击表头排序</span></div>
+      <div class="table-container">
+        <table id="hotwordTable">
+          <thead><tr><th onclick="sortTable(0)">#</th><th onclick="sortTable(1)">关键词</th><th onclick="sortTable(2)">分类</th><th onclick="sortTable(3)">作品数</th><th onclick="sortTable(4)">最高赞</th><th onclick="sortTable(5)">收藏率</th><th onclick="sortTable(6)">趋势</th><th>生命周期</th><th>效率</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">爆款作品 TOP20</span><span class="ch-tip">点击标题跳转原视频</span></div>
+      <div class="table-container">
+        <table id="worksTable">
+          <thead><tr><th>#</th><th>标题</th><th>作者</th><th>粉丝</th><th>点赞</th><th>收藏</th><th>分享</th><th>热词</th><th>钩子</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d6">
+  <div id="breakdown" class="section-header">
+    <span class="section-num">07</span>
+    <span class="section-title">选题执行</span>
+    <span class="section-desc">今日选题 · 执行追踪</span>
+  </div>
+  <div class="topic-board" id="topicsGrid" style="margin-bottom:16px;"></div>
+  <div class="tracker-bar" id="topicTracker">
+    <div class="tracker-stat"><span class="ts-num" style="color:var(--accent-4);" id="publishedCount">0</span><span class="ts-label">已发布</span></div>
+    <div class="tracker-stat"><span class="ts-num" style="color:var(--accent-3);" id="shootingCount">0</span><span class="ts-label">拍摄中</span></div>
+    <div class="tracker-stat"><span class="ts-num" style="color:var(--text-tertiary);" id="pendingCount">0</span><span class="ts-label">待拍摄</span></div>
+    <div class="tracker-progress">
+      <div id="barPublished" style="background:var(--accent-4);width:0%;"></div>
+      <div id="barShooting" style="background:var(--accent-3);width:0%;"></div>
+    </div>
+    <button onclick="resetTopicStatus()">重置状态</button>
+  </div>
+</div>
+
+<div class="footer">AI 热点追踪工作台 · 数据来源 RedFox Hub · 每日 8:00 / 14:00 自动采集</div>
+
+
+<div class="section anim anim-d6">
+<div id="viralGenes" class="section-header">
+<span class="section-num">08</span>
+<span class="section-title">爆款基因库</span>
+<span class="section-desc">从TOP爆款中提取可复用的钩子、结构和关键词</span>
+</div>
+<div id="viralGenesContent"></div>
+</div>
+
+<div class="section anim anim-d7">
+<div id="topicPerf" class="section-header">
+<span class="section-num">09</span>
+<span class="section-title">选题命中率</span>
+<span class="section-desc">发布后数据回填 · 自动统计哪些选题类型表现好</span>
+</div>
+<div id="topicPerfContent"></div>
+</div>
+
+
+<div class="section anim anim-d7">
+<div class="section anim anim-d7">
+<div id="titleGen" class="section-header">
+<span class="section-num">10</span>
+<span class="section-title">爆款标题生成器</span>
+<span class="section-desc">输入关键词，基于爆款基因自动生成标题+钩子</span>
+</div>
+<div style="display:flex;gap:12px;align-items:flex-end">
+<div style="flex:1">
+<input type="text" id="titleGenInput" class="gen-input" placeholder="输入关键词，如：可灵AI、AI PPT、WorkBuddy..." />
+</div>
+<button class="gen-btn" onclick="generateTitles()">生成标题</button>
+</div>
+<div id="titleGenResult" class="gen-result"></div>
+</div>
+
+<div class="section anim-d8">
+<div id="schedule" class="section-header">
+<span class="section-num">11</span>
+<span class="section-title">一周内容排期表</span>
+<span class="section-desc">基于选题和最佳发布时间自动生成7天排期</span>
+</div>
+<div id="scheduleContent"></div>
+</div>
+
+<div class="section anim-d8">
+<div id="commentScripts" class="section-header">
+<span class="section-num">12</span>
+<span class="section-title">评论区运营话术库</span>
+<span class="section-desc">高赞回复模式 + 置顶引导话术 + 常见问题模板</span>
+</div>
+<div id="commentScriptsContent"></div>
+</div>
+
+<div class="section anim-d9">
+<div id="checklist" class="section-header">
+<span class="section-num">13</span>
+<span class="section-title">发布前自检清单</span>
+<span class="section-desc">每条视频发布前过一遍，打不完勾不发</span>
+</div>
+<div class="checklist-progress" id="checklistProgress">已完成 <b>0</b>/6 项</div>
+<div id="checklistContent"></div>
+</div>
+
+
+<div id="audience" class="section anim-d9">
+<div class="section-header">
+<span class="section-num">14</span>
+<span class="section-title">人群画像</span>
+<span class="section-desc">AI赛道核心受众分析：特征、需求、内容偏好、变现方式</span>
+</div>
+<div class="audience-chart" id="audienceChart"></div>
+<div class="persona-grid" id="personaGrid"></div>
+</div>
+
+<!-- 热词趋势弹窗 -->
+<div class="trend-modal" id="trendModal" onclick="if(event.target===this)this.classList.remove('active')">
+<div class="trend-modal-content">
+<span class="close-btn" onclick="document.getElementById('trendModal').classList.remove('active')">&times;</span>
+<h3 id="trendModalTitle">热词趋势</h3>
+<div id="trendModalBody"><p style="color:var(--text-secondary)">加载中...</p></div>
+</div>
+</div>
+
+<script>
+const DATA = window.DASHBOARD_DATA || {};
+let currentPlatform = 'all';
+
+function setPlatform(p) {
+  currentPlatform = p;
+  document.querySelectorAll('.platform-btn').forEach(b => b.classList.toggle('active', b.dataset.platform === p));
+  const compareSec = document.getElementById('compareSection');
+  const mainSections = document.querySelectorAll('.section:not(.compare-section)');
+  if (p === 'compare') {
+    compareSec.classList.add('visible');
+    mainSections.forEach(s => s.style.display = 'none');
+    renderComparison();
+  } else {
+    compareSec.classList.remove('visible');
+    mainSections.forEach(s => s.style.display = '');
+    renderAll();
+  }
+}
+
+function filterByPlatform(arr) {
+  if (!arr) return [];
+  if (currentPlatform === 'all' || currentPlatform === 'compare') return arr;
+  return arr.filter(item => item.platform === currentPlatform);
+}
+
+function renderComparison() {
+  const comp = DATA.comparison || {};
+  const ps = comp.platform_summary || {};
+  const dy = ps.douyin || {};
+  const xhs = ps.xiaohongshu || {};
+  function fmt(n) { return n >= 10000 ? (n/10000).toFixed(1) + '万' : n.toLocaleString(); }
+  document.getElementById('compareSummary').innerHTML = `
+    <div class="compare-card douyin"><h4><span class="compare-tag dy">抖音</span>平台概览</h4>
+      <div class="stat-row"><span class="stat-label">覆盖关键词</span><span class="stat-value">${dy.total_keywords || 0} 个</span></div>
+      <div class="stat-row"><span class="stat-label">作品总量</span><span class="stat-value">${fmt(dy.total_works || 0)}</span></div>
+      <div class="stat-row"><span class="stat-label">平均点赞</span><span class="stat-value">${fmt(dy.avg_like || 0)}</span></div>
+    </div>
+    <div class="compare-card xiaohongshu"><h4><span class="compare-tag xhs">小红书</span>平台概览</h4>
+      <div class="stat-row"><span class="stat-label">覆盖关键词</span><span class="stat-value">${xhs.total_keywords || 0} 个</span></div>
+      <div class="stat-row"><span class="stat-label">笔记总量</span><span class="stat-value">${fmt(xhs.total_works || 0)}</span></div>
+      <div class="stat-row"><span class="stat-label">平均点赞</span><span class="stat-value">${fmt(xhs.avg_like || 0)}</span></div>
+    </div>`;
+  const tbody = document.querySelector('#overlapTable tbody');
+  tbody.innerHTML = (comp.overlapping || []).map(o => `<tr>
+    <td><strong>${o.keyword}</strong></td><td>${o.category || ''}</td>
+    <td>${fmt(o.douyin_total)}</td><td>${fmt(o.xhs_total)}</td>
+    <td>${fmt(o.douyin_max_like)}</td><td>${fmt(o.xhs_max_like)}</td>
+    <td><span class="compare-tag ${o.hotter_platform === 'douyin' ? 'dy' : 'xhs'}">${o.hotter_platform === 'douyin' ? '抖音' : '小红书'}</span></td>
+  </tr>`).join('');
+  document.getElementById('dyOnlyList').innerHTML = (comp.douyin_only || []).map(i => `<div class="stat-row"><span class="stat-label">${i.keyword}</span><span class="stat-value">${fmt(i.total)}</span></div>`).join('');
+  document.getElementById('xhsOnlyList').innerHTML = (comp.xhs_only || []).map(i => `<div class="stat-row"><span class="stat-label">${i.keyword}</span><span class="stat-value">${fmt(i.total)}</span></div>`).join('');
+}
+let currentCategory = 'all';
+let sortDir = {};
+const charts = {};
+const PALETTE = ['#0A84FF','#BF5AF2','#FF9F0A','#30D158','#FF453A','#64D2FF','#FF375F','#5E5CE6','#FFD60A','#8E8E93'];
+const AXIS_COLOR = 'rgba(255,255,255,0.45)';
+const SPLIT_COLOR = 'rgba(255,255,255,0.07)';
+const AXIS_LINE = 'rgba(255,255,255,0.12)';
+const TOOLTIP_BG = 'rgba(20,20,35,0.92)';
+const TOOLTIP_BORDER = 'rgba(255,255,255,0.15)';
+const TOOLTIP_TEXT = '#FFFFFF';
+
+function animateNumber(el, target, duration=1200) {
+  const start = performance.now();
+  function tick(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - p, 3);
+    el.textContent = Math.round(target * eased).toLocaleString();
+    if (p < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+function init() {
+  if (!DATA || !DATA.hotwords) { document.getElementById('updateTime').textContent='暂无数据'; return; }
+  document.getElementById('updateTime').textContent = DATA.last_update;
+  const cats = [...new Set(DATA.hotwords.map(h=>h.category))];
+  const sel = document.getElementById('categoryFilter');
+  cats.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
+  renderAll();
+  window.addEventListener('resize', () => Object.values(charts).forEach(c=>c.resize()));
+}
+
+function applyFilter() { currentCategory = document.getElementById('categoryFilter').value; renderAll(); }
+function filteredHotwords() { const p = filterByPlatform(DATA.hotwords||[]); return currentCategory==='all' ? p : p.filter(h=>h.category===currentCategory); }
+function filteredWorks() {
+  const p = filterByPlatform(DATA.works||[]);
+  if (currentCategory==='all') return p;
+  const kws = new Set(filteredHotwords().map(h=>h.keyword));
+  return p.filter(w=>kws.has(w._keyword));
+}
+
+function filteredTopics() { return filterByPlatform(DATA.topics||[]); }
+
+
+function renderViralGenes() {
+  const genes = DATA.viral_genes;
+  if (!genes) { document.getElementById('viralGenesContent').innerHTML='<p style="color:var(--text-secondary)">暂无数据</p>'; return; }
+  let html = '<div class="gene-grid">';
+  // 钩子分布
+  const hooks = genes.hook_distribution || {};
+  const maxHook = Math.max(...Object.values(hooks), 1);
+  for (const [name, count] of Object.entries(hooks)) {
+    const pct = Math.round(count/maxHook*100);
+    html += '<div class="gene-card"><h4>'+name+'</h4><div class="gene-val">'+count+'<span style="font-size:12px;color:var(--text-secondary)"> 条</span></div><div class="gene-bar"><div class="gene-bar-fill" style="width:'+pct+'%"></div></div></div>';
+  }
+  html += '</div>';
+  // 平均标题长度
+  html += '<div style="margin-top:16px;font-size:13px;color:var(--text-secondary)">爆款平均标题长度：<b style="color:var(--text)">'+genes.avg_title_length+'</b> 字 | 样本：'+genes.sample_size+'条</div>';
+  // 高频关键词
+  const kws = genes.top_title_keywords || [];
+  if (kws.length) {
+    html += '<div class="kw-cloud">';
+    kws.forEach(([kw, freq]) => { html += '<span>'+kw+' <small style="opacity:0.6">×'+freq+'</small></span>'; });
+    html += '</div>';
+  }
+  // 结构示例
+  const examples = genes.structure_examples || [];
+  if (examples.length) {
+    html += '<div style="margin-top:16px"><h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">爆款结构示例</h4>';
+    examples.forEach(e => {
+      html += '<div style="padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:6px;font-size:13px"><span class="tag medium" style="margin-right:8px">'+e.structure+'</span>'+e.title+' <span style="color:var(--text-secondary);float:right">'+(e.likes||0).toLocaleString()+'赞</span></div>';
+    });
+    html += '</div>';
+  }
+  document.getElementById('viralGenesContent').innerHTML = html;
+}
+
+function renderTopicPerf() {
+  const perf = DATA.topic_performance;
+  if (!perf) { document.getElementById('topicPerfContent').innerHTML='<p style="color:var(--text-secondary)">暂无数据</p>'; return; }
+  let html = '<div class="gene-grid">';
+  html += '<div class="gene-card"><h4>选题总数</h4><div class="gene-val">'+(perf.total_topics||0)+'</div></div>';
+  html += '<div class="gene-card"><h4>已发布</h4><div class="gene-val">'+(perf.published||0)+'</div></div>';
+  html += '<div class="gene-card"><h4>命中率</h4><div class="gene-val">'+(perf.hit_rate||0)+'%</div></div>';
+  html += '</div>';
+  if (perf.note) { html += '<p style="margin-top:12px;font-size:13px;color:var(--text-secondary)">'+perf.note+'</p>'; }
+  document.getElementById('topicPerfContent').innerHTML = html;
+}
+
+function showKeywordTrend(keyword) {
+  const trends = DATA.keyword_trends || {};
+  const t = trends[keyword];
+  const modal = document.getElementById('trendModal');
+  document.getElementById('trendModalTitle').textContent = keyword + ' · 热度趋势';
+  if (!t || !t.data || t.data.length < 2) {
+    document.getElementById('trendModalBody').innerHTML = '<p style="color:var(--text-secondary)">历史数据不足，需积累更多天数据后显示趋势曲线。</p>';
+  } else {
+    const maxVal = Math.max(...t.data.map(d=>d.total), 1);
+    let bars = '<div style="display:flex;align-items:flex-end;gap:6px;height:160px;margin-top:12px">';
+    t.data.forEach(d => {
+      const h = Math.round(d.total/maxVal*100);
+      const dir = t.direction==='up' ? '#4ade80' : t.direction==='down' ? '#f87171' : '#facc15';
+      bars += '<div style="flex:1;text-align:center"><div style="height:'+h+'%;background:linear-gradient(180deg,'+dir+','+dir+'66);border-radius:4px 4px 0 0;min-height:4px" title="'+d.date+': '+d.total.toLocaleString()+'"></div><div style="font-size:10px;color:var(--text-secondary);margin-top:4px">'+d.date.slice(5)+'</div></div>';
+    });
+    bars += '</div>';
+    const growthColor = t.growth>0 ? '#4ade80' : t.growth<0 ? '#f87171' : 'var(--text-secondary)';
+    bars += '<div style="margin-top:12px;font-size:14px">周期变化：<b style="color:'+growthColor+'">'+(t.growth>0?'+':'')+t.growth+'%</b> · '+ (t.direction==='up'?'上升期':t.direction==='down'?'衰退期':'平台期') +'</div>';
+    document.getElementById('trendModalBody').innerHTML = bars;
+  }
+  modal.classList.add('active');
+}
+
+
+// ========== 1. 选题量化评分 ==========
+function calcTopicScore(topic) {
+  const hw = DATA.hotwords.find(h => h.keyword === topic.keyword);
+  if (!hw) return { total: 50, heat: 50, competition: 50, match: 50, timing: 50 };
+  // 热度分：作品数取对数归一化
+  const heat = Math.min(100, Math.round(Math.log10(hw.total || 1) * 20));
+  // 竞争分：蓝海指数越高分越高（竞争小）
+  const bo = hw.blue_ocean_score || 1;
+  const competition = Math.min(100, Math.round(Math.log10(bo + 1) * 15));
+  // 匹配分：默认60，AI大类相关更高
+  const match = hw.category === 'AI大类' ? 75 : 65;
+  // 时效分：飙升>新热>稳定
+  const timing = hw.trend === '飙升' ? 95 : hw.trend === '新热' ? 80 : 55;
+  const total = Math.round(heat * 0.3 + competition * 0.25 + match * 0.2 + timing * 0.25);
+  return { total, heat, competition, match, timing };
+}
+
+// ========== 2. 爆款标题生成器 ==========
+function generateTitles() {
+  const kw = document.getElementById('titleGenInput').value.trim();
+  if (!kw) { alert('请输入关键词'); return; }
+  const genes = DATA.viral_genes || {};
+  const hooks = genes.hook_distribution || {};
+  const topKws = (genes.top_title_keywords || []).map(k => k[0]);
+  
+  const templates = [
+    { type: '提问式', titles: [kw+'又更新了？这次的功能太离谱了', '为什么高手都在用'+kw+'？3个原因告诉你', kw+'到底怎么选？一篇讲透'] },
+    { type: '数字清单', titles: ['3个'+kw+'隐藏技巧，90%的人不知道', '5个'+kw+'神器，最后一个绝了', kw+'入门必看的7个要点'] },
+    { type: '结果前置', titles: ['用'+kw+'一键搞定，效率提升10倍', kw+'实战教程，看完就会', '我用'+kw+'做了这个，老板惊呆了'] },
+    { type: '反差对比', titles: [kw+'VS传统方式，差距太大了', '别再用老方法了，'+kw+'才是正解', '同样是'+kw+'，为什么别人做的更好？'] },
+    { type: '恐惧焦虑', titles: ['还不会'+kw+'？你已经落后了', kw+'踩坑指南，这些错误别再犯', '再不学'+kw+'就晚了'] },
+    { type: '福利诱惑', titles: [kw+'全套资料整理好了，免费领', '花了3天整理的'+kw+'笔记，分享给你', kw+'资源合集，建议收藏'] },
+  ];
+  
+  const hookLines = {
+    '提问式': '开头直接抛问题，3秒抓住好奇心',
+    '数字清单': '用数字建立预期，清单体完播率高',
+    '结果前置': '先展示效果，再讲方法，转化最强',
+    '反差对比': '制造认知冲突，引发讨论',
+    '恐惧焦虑': '戳中痛点，紧迫感驱动行动',
+    '福利诱惑': '利益点前置，收藏率最高',
+  };
+  
+  // 取前5种类型各1个标题
+  const result = templates.slice(0, 5).map(t => ({
+    type: t.type,
+    title: t.titles[Math.floor(Math.random() * t.titles.length)],
+    hook: hookLines[t.type] || '',
+  }));
+  
+  const html = result.map(r => `
+    <div class="gen-title-item">
+      <div><b>[${r.type}]</b> ${r.title}</div>
+      <div class="hook">${r.hook}</div>
+    </div>
+  `).join('');
+  document.getElementById('titleGenResult').innerHTML = html;
+}
+
+// ========== 3. 跨平台适配建议 ==========
+function getPlatformAdaptation(topic) {
+  const cat = topic.keyword || '';
+  const dy = {
+    title_style: '口语化+悬念，前3秒必须有钩子',
+    cover: '大字报封面，关键词突出',
+    tags: '#' + cat.replace(/\s/g,'') + ' #AI #人工智能 #干货分享',
+    time: '12:00-13:00 或 19:00-21:00',
+    format: '15-40秒口播+AI素材混剪',
+  };
+  const xhs = {
+    title_style: '干货体+emoji，标题控制在20字内',
+    cover: '精致图文，3-5图轮播',
+    tags: '#' + cat.replace(/\s/g,'') + ' #AI工具 #效率神器 #新手必看',
+    time: '7:30-9:00 或 20:00-22:30',
+    format: '图文笔记为主，视频为辅',
+  };
+  return { dy, xhs };
+}
+
+// ========== 4. 一周内容排期表 ==========
+function generateSchedule() {
+  const topics = DATA.topics || [];
+  const days = ['周一','周二','周三','周四','周五','周六','周日'];
+  const today = new Date();
+  const publishTimes = ['08:00', '12:00', '19:00', '21:00'];
+  const platforms = ['抖音', '小红书'];
+  
+  let html = '<div class="schedule-grid">';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + i);
+    const dateStr = (d.getMonth()+1) + '/' + d.getDate();
+    const topic1 = topics[i % topics.length];
+    const topic2 = topics[(i + 3) % topics.length];
+    
+    html += `<div class="schedule-day">
+      <div class="day-name">${days[i]}</div>
+      <div class="day-date">${dateStr}</div>
+      <div class="schedule-item">
+        <div class="si-platform">抖音 · ${publishTimes[i%4]}</div>
+        <div>${topic1 ? topic1.title.substring(0,24) : '休息'}</div>
+      </div>
+      ${i % 2 === 0 ? `<div class="schedule-item">
+        <div class="si-platform">小红书 · ${publishTimes[(i+2)%4]}</div>
+        <div>${topic2 ? topic2.title.substring(0,24) : '休息'}</div>
+      </div>` : ''}
+    </div>`;
+  }
+  html += '</div>';
+  html += '<div style="margin-top:12px;font-size:12px;color:var(--text-secondary)">排期基于选题库自动生成，可根据实际情况调整。抖音日更，小红书隔日更。</div>';
+  document.getElementById('scheduleContent').innerHTML = html;
+}
+
+
+
+// ========== 1. 评论区运营话术库 ==========
+function renderCommentScripts() {
+  const demands = DATA.comment_demands || [];
+  const topics = DATA.topics || [];
+  
+  // 高赞回复模式
+  const replyPatterns = [
+    { type: '补充干货型', text: '补充一个：用XX工具的XX功能效果更好，亲测有效！' },
+    { type: '提问互动型', text: '你们最想用AI解决什么问题？评论区告诉我，下期安排！' },
+    { type: '共鸣认同型', text: '说到点子上了，我也是踩了无数坑才总结出来的' },
+    { type: '反转惊喜型', text: '其实还有个隐藏功能，90%的人不知道，看我主页' },
+    { type: '福利引导型', text: '整理了全套资料，需要的评论区扣"想要"' },
+  ];
+  
+  let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+  html += '<div>';
+  html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">高赞回复模式（直接套用）</h4>';
+  replyPatterns.forEach(p => {
+    html += '<div class="comment-tpl"><div class="ct-type">' + p.type + '</div><div class="ct-text">' + p.text + '</div></div>';
+  });
+  html += '</div>';
+  
+  // 置顶评论话术（基于当前TOP选题）
+  html += '<div>';
+  html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">置顶评论引导话术</h4>';
+  const topTopics = topics.slice(0, 3);
+  topTopics.forEach(t => {
+    const kw = t.keyword || '';
+    html += '<div class="pinned-comment">';
+    html += '<div class="pc-label">选题：' + t.title.substring(0, 20) + '</div>';
+    html += '<div class="ct-text">想要' + kw + '全套教程的，评论区扣"1"，我整理好了发你！<br>觉得有用的点个赞，你的支持是我更新的动力</div>';
+    html += '</div>';
+  });
+  html += '</div></div>';
+  
+  // 评论区需求洞察
+  if (demands.length) {
+    html += '<div style="margin-top:16px"><h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">评论区高频需求（下期选题参考）</h4>';
+    html += '<div class="kw-cloud">';
+    demands.slice(0, 10).forEach(d => {
+      html += '<span>' + (d.demand || d.keyword || d) + '</span>';
+    });
+    html += '</div></div>';
+  }
+  
+  document.getElementById('commentScriptsContent').innerHTML = html;
+}
+
+// ========== 2. 变现路径标注 ==========
+function getMonetization(topic) {
+  const kw = (topic.keyword || '').toLowerCase();
+  const cat = topic.keyword || '';
+  // 判断变现方式
+  let type, score, desc;
+  if (kw.includes('工具') || kw.includes('教程') || kw.includes('入门') || kw.includes('怎么做') || cat.includes('AI做图') || cat.includes('AI视频') || cat.includes('AI PPT')) {
+    type = 'affiliate'; score = 85; desc = '带货：AI工具会员/ affiliate 佣金';
+  } else if (kw.includes('资讯') || kw.includes('新闻') || kw.includes('发布') || cat.includes('AI大类') || cat.includes('AI Agent')) {
+    type = 'ad'; score = 70; desc = '广告：品牌合作、商单植入';
+  } else if (kw.includes('工作流') || kw.includes('自动化') || kw.includes('效率') || cat.includes('AI工作流') || cat.includes('AI自动化')) {
+    type = 'private'; score = 90; desc = '私域：引流微信，卖方案/咨询';
+  } else if (kw.includes('提示词') || kw.includes('prompt') || cat.includes('AI提示词')) {
+    type = 'course'; score = 75; desc = '知识付费：提示词课程/社群';
+  } else {
+    type = 'affiliate'; score = 60; desc = '带货：通用AI工具推荐';
+  }
+  const typeMap = { affiliate: { name: '带货', cls: 'monetize-affiliate' }, ad: { name: '广告', cls: 'monetize-ad' }, private: { name: '私域', cls: 'monetize-private' }, course: { name: '知识付费', cls: 'monetize-course' } };
+  return { type, score, desc, ...typeMap[type] };
+}
+
+// ========== 3. 发布前自检清单 ==========
+const CHECKLIST_ITEMS = [
+  { id: 'title', text: '标题有钩子：前3秒制造悬念/冲突/利益点' },
+  { id: 'cover', text: '封面达标：大字清晰、对比色强、主体突出' },
+  { id: 'tags', text: '标签完整：3-5个精准标签，含1个大词+2个长尾词' },
+  { id: 'cta', text: '有CTA：结尾引导关注/评论/收藏，话术自然' },
+  { id: 'duration', text: '时长合适：口播15-40秒，教程不超过3分钟' },
+  { id: 'time', text: '发布时间：在排期表建议时段内发布' },
+];
+
+function renderChecklist() {
+  const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+  let html = '';
+  CHECKLIST_ITEMS.forEach(item => {
+    const checked = saved[item.id] ? 'checked' : '';
+    const mark = saved[item.id] ? '✓' : '';
+    html += '<div class="checklist-item ' + checked + '" onclick="toggleCheck(\'' + item.id + '\')">';
+    html += '<div class="checklist-box">' + mark + '</div>';
+    html += '<div class="checklist-text">' + item.text + '</div>';
+    html += '</div>';
+  });
+  document.getElementById('checklistContent').innerHTML = html;
+  updateChecklistProgress();
+}
+
+function toggleCheck(id) {
+  const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+  saved[id] = !saved[id];
+  localStorage.setItem('publishChecklist', JSON.stringify(saved));
+  renderChecklist();
+}
+
+function updateChecklistProgress() {
+  const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+  const done = Object.values(saved).filter(Boolean).length;
+  document.getElementById('checklistProgress').innerHTML = '已完成 <b>' + done + '</b>/' + CHECKLIST_ITEMS.length + ' 项' + (done === CHECKLIST_ITEMS.length ? ' 可以发布了！' : '');
+}
+
+
+
+// ========== 人群画像渲染 ==========
+function renderAudience() {
+  const personas = DATA.audience_personas || [];
+  if (!personas.length) {
+    document.getElementById('personaGrid').innerHTML = '<p style="color:var(--text-secondary)">暂无人群画像数据</p>';
+    return;
+  }
+  
+  // 分布柱状图
+  const chartDom = document.getElementById('audienceChart');
+  if (chartDom && typeof echarts !== 'undefined') {
+    const chart = echarts.init(chartDom);
+    chart.setOption({
+      grid: { left: 80, right: 20, top: 10, bottom: 20 },
+      xAxis: { type: 'value', axisLabel: { color: '#9ca3af', fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
+      yAxis: { type: 'category', data: personas.map(p => p.name).reverse(), axisLabel: { color: '#d1d5db', fontSize: 12 } },
+      series: [{
+        type: 'bar',
+        data: personas.map(p => Math.max(p.proportion, 0.5)).reverse(),
+        itemStyle: { color: new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#8b5cf6'},{offset:1,color:'#ec4899'}]), borderRadius: [0,4,4,0] },
+        barWidth: 16,
+        label: { show: true, position: 'right', color: '#c4b5fd', fontSize: 11, formatter: '{c}%' }
+      }]
+    });
+  }
+  
+  // 画像卡片
+  const grid = document.getElementById('personaGrid');
+  grid.innerHTML = personas.map(p => `
+    <div class="persona-card">
+      <div class="persona-name">${p.name}</div>
+      <div class="persona-cat">${p.category} · 占比 ${Math.max(p.proportion,0.1)}%</div>
+      <div class="persona-meta">
+        <span>${p.age}</span>
+        <span>${p.gender}</span>
+      </div>
+      <div class="persona-tags">
+        ${(p.traits||[]).map(t => '<span class="persona-tag">'+t+'</span>').join('')}
+      </div>
+      <div class="persona-section">
+        <div class="persona-label">核心需求</div>
+        <div class="persona-needs">
+          ${(p.needs||[]).map(n => '<span class="need-tag">'+n+'</span>').join('')}
+        </div>
+      </div>
+      <div class="persona-section">
+        <div class="persona-label">内容偏好</div>
+        <div class="persona-value">${p.content_pref}</div>
+      </div>
+      <div class="persona-section">
+        <div class="persona-label">活跃时间</div>
+        <div class="persona-value">${p.active_time}</div>
+      </div>
+      <div class="persona-section">
+        <div class="persona-label">变现方式</div>
+        <div class="persona-value" style="color:#c4b5fd">${p.monetization}</div>
+      </div>
+      <div class="persona-section">
+        <div class="persona-label">痛点</div>
+        <div class="persona-needs">
+          ${(p.pain_points||[]).map(pp => '<span class="pain-tag">'+pp+'</span>').join('')}
+        </div>
+      </div>
+      <div class="persona-bar"><div class="persona-bar-fill" style="width:${Math.min(Math.max(p.proportion,1),100)}%"></div></div>
+    </div>
+  `).join('');
+}
+
+
+function renderAll() {
+  const summary = DATA.summary || {};
+  const hw = filteredHotwords();
+  const works = filteredWorks();
+  const topics = filteredTopics();
+  renderHeroStats(hw, works, topics);
+  renderActions(); renderInsights(hw, works);
+  renderRanking(hw); renderCategory(hw); renderPublishTime(works);
+  renderDuration(works); renderHook(works); renderCommentKw(works);
+  renderScatter(works); renderCollect(hw); renderCommentDemands();
+  renderSaturation(hw); renderSmallViral(works); renderFormulas();
+  renderAuthors(works); renderBreakdowns(); renderMatrix();
+  renderHistory(hw); renderHotwordTable(hw); renderWorksTable(works); renderViralGenes(); renderTopicPerf(); generateSchedule(); renderCommentScripts(); renderChecklist(); renderAudience();
+  renderTopics(); updateTracker();
+  initCardGlow();
+}
+
+function renderHeroStats(hw, works, topics) {
+  const totalLikes = works.reduce((s,w)=>s+(w.likeCount||0),0);
+  const surging = hw.filter(h=>h.trend==='飙升'||h.trend==='新热').length;
+  const topSurging = hw.filter(h=>h.trend==='飙升').sort((a,b)=>b.total-a.total)[0];
+  document.getElementById('heroStats').innerHTML = `
+    <div class="hero-stat">
+      <div class="hs-label">${topSurging?'今日飙升热词':'追踪关键词'}</div>
+      <div class="hs-value" id="heroMainVal">${topSurging?topSurging.keyword:hw.length}</div>
+      <div class="hs-sub">${topSurging?topSurging.total.toLocaleString()+' 条作品 · '+topSurging.category:new Set(hw.map(h=>h.category)).size+' 个细分赛道'}</div>
+      ${surging>0?`<span class="hs-trend up">▲ ${surging} 个热词异动</span>`:`<span class="hs-trend flat">— 市场平稳</span>`}
+    </div>
+    <div class="hero-stat">
+      <div class="hs-label">采集作品</div>
+      <div class="hs-value green" id="heroWorksVal">${works.length}</div>
+      <div class="hs-sub">总点赞 ${(totalLikes/10000).toFixed(1)} 万</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-label">飙升 / 新热</div>
+      <div class="hs-value red" id="heroSurgingVal">${surging}</div>
+      <div class="hs-sub">飙升 ${hw.filter(h=>h.trend==='飙升').length} · 新热 ${hw.filter(h=>h.trend==='新热').length}</div>
+    </div>
+    <div class="hero-stat">
+      <div class="hs-label">选题建议</div>
+      <div class="hs-value orange" id="heroTopicsVal">${topics.length}</div>
+      <div class="hs-sub">标题 + 钩子 + 形式</div>
+    </div>`;
+  setTimeout(()=>{
+    animateNumber(document.getElementById('heroWorksVal'), works.length);
+    animateNumber(document.getElementById('heroSurgingVal'), surging);
+    animateNumber(document.getElementById('heroTopicsVal'), topics.length);
+  }, 300);
+}
+
+function renderActions() {
+  const actions = DATA.daily_actions || [];
+  const el = document.getElementById('actionList');
+  if (!actions.length) { el.innerHTML='<div class="empty-state">暂无行动建议</div>'; return; }
+  el.innerHTML = actions.map(a => `
+    <div class="action-item ${a.priority==='高'?'':a.priority==='中'?'medium':'low'}">
+      <div class="action-icon">${a.priority==='高'?'▲':a.priority==='中'?'●':'○'}</div>
+      <div class="action-content">
+        <span class="action-type">${a.type}</span>
+        <div class="action-text">${a.content}</div>
+        ${a.detail?`<div class="action-detail">${a.detail}</div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+function renderInsights(hw, works) {
+  const ins = [];
+  const topWork = [...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0))[0];
+  if (topWork) ins.push({type:'hot',text:`单条最高赞 <b>${(topWork.likeCount/10000).toFixed(1)}万</b> — 「${(topWork.title||'').slice(0,16)}…」· ${topWork._keyword}`});
+  const topCollect = [...hw].sort((a,b)=>(b.collect_rate||0)-(a.collect_rate||0))[0];
+  if (topCollect && topCollect.collect_rate>0) ins.push({type:'value',text:`收藏率最高 <b>${topCollect.keyword}</b>（${topCollect.collect_rate}%），适合做教程型内容`});
+  const blueOcean = hw.filter(h=>h.total<1000&&h.max_like>10000).sort((a,b)=>b.max_like-a.max_like)[0];
+  if (blueOcean) ins.push({type:'value',text:`蓝海机会 <b>${blueOcean.keyword}</b> 仅${blueOcean.total}条但最高赞${blueOcean.max_like.toLocaleString()}，优先切入`});
+  const surging = hw.filter(h=>h.trend==='飙升');
+  if (surging.length) ins.push({type:'hot',text:`飙升热词 ${surging.slice(0,3).map(h=>h.keyword).join(' / ')}`});
+  const pt = DATA.publish_time_dist||[];
+  const bestHour = pt.sort((a,b)=>b.count-a.count)[0];
+  if (bestHour && bestHour.count>0) ins.push({type:'warn',text:`最佳发布时段 <b>${bestHour.hour}:00</b>（占比${bestHour.pct}%）`});
+  const sat = DATA.saturation || [];
+  const lowestSat = sat[0];
+  if (lowestSat && lowestSat.saturation < 50) ins.push({type:'value',text:`最低饱和度 <b>${lowestSat.keyword}</b>（${lowestSat.saturation}）· ${lowestSat.stage}`});
+  document.getElementById('insightsGrid').innerHTML = ins.slice(0,6).map(i=>`<div class="insight-item ${i.type}">${i.text}</div>`).join('');
+}
+
+function renderRanking(hw) {
+  const sorted=[...hw].sort((a,b)=>b.total-a.total).slice(0,15);
+  if (charts.ranking) charts.ranking.dispose();
+  charts.ranking=echarts.init(document.getElementById('chartRanking'));
+  charts.ranking.setOption({color:PALETTE,grid:{left:90,right:50,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:11},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.total).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#0A84FF'},{offset:1,color:'#BF5AF2'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:p=>p.value>=10000?(p.value/10000).toFixed(1)+'万':p.value,fontSize:10,color:'rgba(255,255,255,0.6)'},animationDuration:1200,animationEasing:'cubicOut'}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}<br/>作品总数 ${p[0].value.toLocaleString()}`}});
+}
+
+function renderCategory(hw) {
+  const m={}; hw.forEach(h=>{m[h.category]=(m[h.category]||0)+h.total;});
+  const data=Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([n,v])=>({name:n,value:v}));
+  if (charts.category) charts.category.dispose();
+  charts.category=echarts.init(document.getElementById('chartCategory'));
+  charts.category.setOption({color:PALETTE,tooltip:{trigger:'item',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:'{b}<br/>{c} ({d}%)'},legend:{type:'scroll',orient:'vertical',right:5,top:'center',textStyle:{color:'rgba(255,255,255,0.6)',fontSize:10}},series:[{type:'pie',radius:['38%','65%'],center:['38%','50%'],data,label:{color:'rgba(255,255,255,0.6)',fontSize:10,formatter:'{d}%'},itemStyle:{borderColor:'rgba(10,10,18,0.6)',borderWidth:2},animationDuration:1200}]});
+}
+
+function renderPublishTime(works) {
+  const dist = DATA.publish_time_dist || [];
+  if (charts.pt) charts.pt.dispose();
+  charts.pt = echarts.init(document.getElementById('chartPublishTime'));
+  charts.pt.setOption({color:PALETTE,grid:{left:40,right:15,top:15,bottom:25},xAxis:{type:'category',data:dist.map(d=>d.hour+'时'),axisLabel:{color:AXIS_COLOR,fontSize:9,interval:2},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:dist.map(d=>d.count),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#0A84FF'},{offset:1,color:'#5E5CE6'}]),borderRadius:[4,4,0,0]},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}<br/>爆款数 ${p[0].value}`}});
+}
+
+function renderDuration(works) {
+  const dist = DATA.duration_dist || [];
+  if (charts.dur) charts.dur.dispose();
+  charts.dur = echarts.init(document.getElementById('chartDuration'));
+  charts.dur.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:dist.map(d=>d.range),axisLabel:{color:AXIS_COLOR,fontSize:9,interval:0,rotate:15},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:dist.map(d=>({value:d.count,itemStyle:{color:d.avg_likes>5000?'#30D158':'#0A84FF'}})),label:{show:true,position:'top',fontSize:9,color:'rgba(255,255,255,0.5)',formatter:p=>`${p.value}条`},barWidth:'50%',animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>{const d=dist[p[0].dataIndex];return `${d.range}<br/>作品数 ${d.count}<br/>平均点赞 ${d.avg_likes.toLocaleString()}`;}}});
+}
+
+function renderHook(works) {
+  const hs={}; works.forEach(w=>{const h=classifyHook(w.title||'');if(!hs[h])hs[h]={count:0,likes:0};hs[h].count++;hs[h].likes+=(w.likeCount||0);});
+  const data=Object.entries(hs).map(([n,v])=>({name:n,value:Math.round(v.likes/v.count)}));
+  if (charts.hook) charts.hook.dispose();
+  charts.hook=echarts.init(document.getElementById('chartHook'));
+  charts.hook.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:data.map(d=>d.name),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:data.map(d=>d.value),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#FF9F0A'},{offset:1,color:'#FF453A'}]),borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:'rgba(255,255,255,0.5)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}型<br/>平均点赞 ${p[0].value.toLocaleString()}`}});
+}
+
+function renderCommentKw(works) {
+  const kws = DATA.comment_keywords || [];
+  const el = document.getElementById('commentKw');
+  if (!kws.length) { el.innerHTML='<div class="empty-state">暂无评论关键词数据</div>'; return; }
+  el.innerHTML = kws.slice(0,20).map((k,i)=>`<span class="kw-tag ${i<5?'hot':''}" style="font-size:${Math.max(11,16-i*0.4)}px;">${k.keyword} <span style="opacity:.5;font-size:10px;">${k.count}</span></span>`).join('');
+}
+
+function renderCommentDemands() {
+  const d = DATA.comment_demands || {};
+  const el = document.getElementById('commentDemands');
+  let html = '';
+  if (d.questions && d.questions.length) {
+    html += '<div class="demand-section"><div class="demand-label q">用户在问</div><div class="demand-tags">';
+    html += d.questions.map(q=>`<span class="demand-tag">${q.demand}<span class="dc">${q.count}</span></span>`).join('');
+    html += '</div></div>';
+  }
+  if (d.complaints && d.complaints.length) {
+    html += '<div class="demand-section"><div class="demand-label c">用户在吐槽</div><div class="demand-tags">';
+    html += d.complaints.map(q=>`<span class="demand-tag">${q.demand}<span class="dc">${q.count}</span></span>`).join('');
+    html += '</div></div>';
+  }
+  if (d.needs && d.needs.length) {
+    html += '<div class="demand-section"><div class="demand-label n">用户在求</div><div class="demand-tags">';
+    html += d.needs.map(q=>`<span class="demand-tag">${q.demand}<span class="dc">${q.count}</span></span>`).join('');
+    html += '</div></div>';
+  }
+  el.innerHTML = html || '<div class="empty-state">暂无评论需求数据</div>';
+}
+
+function renderSaturation(hw) {
+  const sat = DATA.saturation || [];
+  const filtered = currentCategory==='all' ? sat : sat.filter(s=>hw.some(h=>h.keyword===s.keyword));
+  const el = document.getElementById('saturationList');
+  if (!filtered.length) { el.innerHTML='<div class="empty-state">暂无饱和度数据</div>'; return; }
+  const maxSat = Math.max(...filtered.map(s=>s.saturation), 1);
+  el.innerHTML = filtered.slice(0,12).map(s=>{
+    const pct = Math.min(100, s.saturation/maxSat*100);
+    const color = s.saturation<50?'#30D158':s.saturation<150?'#64D2FF':s.saturation<300?'#FF9F0A':'#FF453A';
+    return `<div class="sat-item">
+      <div class="sat-name">${s.keyword}</div>
+      <div class="sat-bar"><div class="sat-fill" style="width:${pct}%;background:${color};"></div></div>
+      <div class="sat-val">${s.saturation}</div>
+      <div class="sat-advice"><span class="tag ${s.stage==='萌芽期'?'sprout':s.stage==='上升期'?'rise':s.stage==='爆发期'?'boom':'decline'}">${s.stage}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function renderScatter(works) {
+  const top=[...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0)).slice(0,30);
+  const data=top.map(w=>[w.likeCount||0,w.collectCount||0,w.title||'']);
+  if (charts.scatter) charts.scatter.dispose();
+  charts.scatter=echarts.init(document.getElementById('chartScatter'));
+  charts.scatter.setOption({color:PALETTE,grid:{left:50,right:15,top:15,bottom:30},xAxis:{name:'点赞',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{name:'收藏',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'scatter',data,symbolSize:d=>Math.max(8,Math.min(28,Math.sqrt(d[0])/12)),itemStyle:{color:'rgba(10,132,255,0.5)',borderColor:'#64D2FF',borderWidth:1}}],tooltip:{backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${(p.data[2]||'').slice(0,25)}<br/>点赞 ${p.data[0].toLocaleString()}<br/>收藏 ${p.data[1].toLocaleString()}`}});
+}
+
+function renderCollect(hw) {
+  const sorted=[...hw].filter(h=>h.collect_rate>0).sort((a,b)=>b.collect_rate-a.collect_rate).slice(0,10);
+  if (charts.collect) charts.collect.dispose();
+  charts.collect=echarts.init(document.getElementById('chartCollect'));
+  charts.collect.setOption({color:PALETTE,grid:{left:75,right:30,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:'{value}%'},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.collect_rate).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#30D158'},{offset:1,color:'#64D2FF'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:'{c}%',fontSize:10,color:'rgba(48,209,88,0.8)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:'rgba(48,209,88,0.3)',textStyle:{color:TOOLTIP_TEXT}}});
+}
+
+function renderSmallViral(works) {
+  const list = DATA.small_account_viral || [];
+  const el = document.getElementById('smallViral');
+  if (!list.length) { el.innerHTML='<div class="empty-state">暂无小账号爆款数据</div>'; return; }
+  el.innerHTML = list.slice(0,6).map(w=>`
+    <div class="small-item">
+      <div class="si-info">
+        <div class="si-title"><a href="${w.workUrl||'#'}" target="_blank" class="work-link">${(w.title||'无标题').slice(0,22)}</a></div>
+        <div class="si-meta">${w.accountName||''} · 粉丝${(w.followerCount/10000).toFixed(1)}万 · ${w._keyword||''}</div>
+      </div>
+      <div class="si-likes">${(w.likeCount/10000).toFixed(1)}万</div>
+    </div>`).join('');
+}
+
+function renderFormulas() {
+  const list = DATA.title_formulas || [];
+  const el = document.getElementById('formulaList');
+  if (!list.length) { el.innerHTML='<div class="empty-state">暂无标题公式</div>'; return; }
+  el.innerHTML = list.map(f=>`
+    <div class="formula-item">
+      <div class="f-name">${f.formula}</div>
+      <div class="f-example">${f.example}</div>
+      <div class="f-stats">命中 ${f.count} 条 · 平均点赞 ${f.avg_likes.toLocaleString()}</div>
+    </div>`).join('');
+}
+
+function renderAuthors(works) {
+  const m={}; works.forEach(w=>{const n=w.accountName||'未知';if(!m[n])m[n]={name:n,followers:w.followerCount||0,likes:0,count:0};m[n].likes+=(w.likeCount||0);m[n].count++;});
+  const top=Object.values(m).sort((a,b)=>b.likes-a.likes).slice(0,8);
+  document.getElementById('authorList').innerHTML=top.map((a,i)=>`
+    <div class="author-item">
+      <div class="author-rank ${i<3?'r'+(i+1):'other'}">${i+1}</div>
+      <div class="author-info"><div class="author-name">${a.name}</div><div class="author-followers">粉丝${(a.followers/10000).toFixed(1)}万 · ${a.count}条</div></div>
+      <div class="author-likes">${(a.likes/10000).toFixed(1)}万</div>
+    </div>`).join('');
+}
+
+function renderBreakdowns() {
+  const list = DATA.hot_breakdowns || [];
+  const el = document.getElementById('breakdownGrid');
+  if (!list.length) { el.innerHTML='<div class="empty-state">暂无爆款拆解数据</div>'; return; }
+  el.innerHTML = list.map((b,i)=>`
+    <div class="breakdown-card">
+      <div class="bd-header">
+        <div class="bd-title">${i+1}. ${b.title}</div>
+        <div class="bd-likes">${(b.likes/10000).toFixed(1)}万</div>
+      </div>
+      <div class="bd-row"><span class="bd-label">钩子</span><span class="bd-val">${b.hook}型</span></div>
+      <div class="bd-row"><span class="bd-label">结构</span><span class="bd-val">${b.structure}</span></div>
+      <div class="bd-row"><span class="bd-label">CTA</span><span class="bd-val">${b.cta}</span></div>
+      ${b.target_persona ? `<div class="bd-row"><span class="bd-label">人群</span><span class="bd-val"><span style="color:#22d3ee;font-weight:600">${b.target_persona.name}</span> · ${b.target_persona.age} · ${(b.target_persona.needs||[]).slice(0,2).join(' / ')}</span></div>` : ''}
+      <div class="bd-meta">
+        <span>${b.author} · ${b.duration}</span>
+        <span>${b.interaction} · <a href="${b.work_url||'#'}" target="_blank" class="work-link">原视频</a></span>
+      </div>
+    </div>`).join('');
+}
+
+function renderMatrix() {
+  const matrix = DATA.keyword_matrix || [];
+  const el = document.getElementById('matrixGrid');
+  if (!matrix.length) { el.innerHTML='<div class="empty-state">暂无矩阵数据</div>'; return; }
+  el.innerHTML = matrix.map(m=>{
+    const cls = m.level.includes('超热')?'super':m.level.includes('热门')?'hot':m.level.includes('上升')?'rise':'blue';
+    return `<div class="matrix-cell ${cls}">
+      <div class="mc-cat">${m.category}</div>
+      <div class="mc-level">${m.level}</div>
+      <div class="mc-stats">${m.count}关键词 · ${m.total.toLocaleString()}作品 · 最高赞${(m.max_like/10000).toFixed(1)}万</div>
+      <div class="mc-kws">${m.keywords.join(' · ')}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderHistory(hw) {
+  const hist = DATA.historical_trend || [];
+  if (charts.hist) charts.hist.dispose();
+  charts.hist = echarts.init(document.getElementById('chartHistory'));
+  if (hist.length < 2) {
+    charts.hist.setOption({title:{text:'数据积累中，跑满 2 天后显示趋势曲线',left:'center',top:'center',textStyle:{color:AXIS_COLOR,fontSize:13,fontWeight:'normal'}}});
+    return;
+  }
+  const dates = hist.map(h=>h.date.slice(5));
+  const topKws = [...hw].sort((a,b)=>b.total-a.total).slice(0,5).map(h=>h.keyword);
+  const series = topKws.map((kw,i)=>({
+    name:kw, type:'line', smooth:true, symbol:'circle', symbolSize:5,
+    data: hist.map(h=>{const f=h.hotwords.find(x=>x.keyword===kw);return f?f.total:null;}),
+    lineStyle:{width:2}, itemStyle:{color:PALETTE[i%PALETTE.length]},
+  }));
+  charts.hist.setOption({color:PALETTE,tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT}},legend:{data:topKws,textStyle:{color:'rgba(255,255,255,0.6)',fontSize:11},top:0},grid:{left:60,right:20,top:40,bottom:30},xAxis:{type:'category',data:dates,axisLabel:{color:AXIS_COLOR},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series});
+}
+
+function renderHotwordTable(hw) {
+  const sorted=[...hw].sort((a,b)=>b.total-a.total);
+  const satMap = {};
+  (DATA.saturation||[]).forEach(s=>satMap[s.keyword]=s.stage);
+  document.querySelector('#hotwordTable tbody').innerHTML=sorted.map((h,i)=>`
+    <tr><td>${i+1}</td><td><b style="color:var(--text);cursor:pointer;text-decoration:underline dotted" onclick="showKeywordTrend('${h.keyword.replace(/'/g,"\\'")}')" title="点击查看趋势">${h.keyword}</b></td><td>${h.category}</td><td>${h.total.toLocaleString()}</td><td class="like-num">${h.max_like.toLocaleString()}</td><td class="collect-num">${h.collect_rate}%</td><td><span class="tag ${trendClass(h.trend)}">${h.trend||'稳定'}</span></td><td><span class="tag ${satMap[h.keyword]==='萌芽期'?'sprout':satMap[h.keyword]==='上升期'?'rise':satMap[h.keyword]==='爆发期'?'boom':'decline'}">${satMap[h.keyword]||'稳定期'}</span></td><td><span class="tag ${h.efficiency_tag==='蓝海'?'blue-ocean':h.efficiency_tag==='红海'?'red-ocean':'medium'}">${h.efficiency_tag||'适中'}</span></td></tr>`).join('');
+}
+
+function renderWorksTable(works) {
+  const sorted=[...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0)).slice(0,20);
+  document.querySelector('#worksTable tbody').innerHTML=sorted.map((w,i)=>`
+    <tr><td>${i+1}</td><td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="${w.workUrl||'#'}" target="_blank" class="work-link" title="${w.title||''}">${w.title||''}</a></td><td>${w.accountName||''}</td><td>${(w.followerCount||0).toLocaleString()}</td><td class="like-num">${(w.likeCount||0).toLocaleString()}</td><td class="collect-num">${(w.collectCount||0).toLocaleString()}</td><td class="share-num">${(w.shareCount||0).toLocaleString()}</td><td>${w._keyword||''}</td><td><span class="tag medium">${classifyHook(w.title||'')}</span></td></tr>`).join('');
+}
+
+function renderTopics() {
+  const formats = DATA.content_formats || [];
+  const fmtMap = {};
+  formats.forEach(f=>fmtMap[f.title]=f);
+  const topics = filteredTopics();
+  const status = getTopicStatus();
+  document.getElementById('topicsGrid').innerHTML = topics.map((t,i)=>{
+    const fmt = fmtMap[t.title] || {};
+    const st = status[t.title] || 'pending';
+    const score = calcTopicScore(t);
+    const adapt = getPlatformAdaptation(t);
+    const mon = getMonetization(t);
+    return `<div class="topic-card priority-${t.priority==='高'?'high':t.priority==='中'?'medium':'low'} status-${st}" id="topic-${i}" onclick="cycleTopicStatus(${i}, '${t.title.replace(/'/g,"\\'")}')">
+      <div class="status-badge">${st==='pending'?'待拍摄':st==='shooting'?'拍摄中':'已发布'}</div>
+      <div class="tc-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="tc-priority">${t.priority}优先</div>
+      <div class="tc-title">${t.title}</div>
+      <div class="tc-hook">${t.hook}</div>
+      <div style="display:flex;align-items:center;gap:12px;margin:6px 0">
+        <div><span class="topic-score">${score.total}</span><span class="topic-score-label"> 综合分</span></div>
+        <div style="flex:1">
+          <div class="score-bar"><div class="score-bar-fill" style="width:${score.heat}%;background:#8b5cf6"></div></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:${score.competition}%;background:#4ade80"></div></div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:${score.timing}%;background:#facc15"></div></div>
+        </div>
+      </div>
+      <div class="adapt-tags">
+        <span class="adapt-tag">抖音: ${adapt.dy.format}</span>
+        <span class="adapt-tag">小红书: ${adapt.xhs.format}</span>
+      </div>
+      <div style="margin-top:6px">
+        <span class="monetize-tag ${mon.cls}">${mon.name}</span>
+        <span style="font-size:11px;color:var(--text-secondary)">变现潜力 ${mon.score}分 · ${mon.desc}</span>
+      </div>
+      ${t.target_persona ? `<div class="topic-persona">
+        <div class="tp-name">目标人群：${t.target_persona.name} · ${t.target_persona.age} · ${t.target_persona.gender}</div>
+        <div class="tp-needs">${(t.target_persona.needs||[]).slice(0,4).map(n=>'<span class="tp-need">'+n+'</span>').join('')}</div>
+        <div class="tp-content">偏好：${t.target_persona.content_pref}</div>
+      </div>` : ''}
+      ${fmt.format?`<div class="tc-format"><span>${fmt.format}</span><span>${fmt.suggested_duration||''}</span><span>${fmt.suggested_publish||''}</span></div>`:''}
+      <div class="tc-meta"><span class="audience">${t.audience}</span><span style="color:var(--text-tertiary);">#${t.keyword}</span></div>
+      ${fmt.ref_url?`<a href="${fmt.ref_url}" target="_blank" class="ref-link">参考视频 — ${fmt.ref_title||'点击查看'}</a>`:''}
+    </div>`;
+  }).join('');
+  updateTracker();
+}
+
+
+// 导航栏交互
+document.querySelectorAll('.nav-link').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.getElementById(this.dataset.target);
+    if (target) {
+      const y = target.getBoundingClientRect().top + window.scrollY - 60;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  });
+});
+
+// 滚动监听：进度条 + 回到顶部 + 当前section高亮
+const sections = document.querySelectorAll('[id].section-header');
+const navLinks = document.querySelectorAll('.nav-link');
+window.addEventListener('scroll', function() {
+  const scrolled = window.scrollY;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const progress = (scrolled / height) * 100;
+  document.getElementById('scrollProgress').style.width = progress + '%';
+  
+  // 回到顶部按钮
+  document.getElementById('backToTop').classList.toggle('show', scrolled > 400);
+  
+  // 当前section高亮
+  let current = '';
+  sections.forEach(section => {
+    const top = section.offsetTop - 100;
+    if (scrolled >= top) current = section.id;
+  });
+  navLinks.forEach(link => {
+    link.classList.toggle('active', link.dataset.target === current);
+  });
+});
+
+function initCardGlow() {
+  document.querySelectorAll('.hero-stat, .bento-card, .breakdown-card, .topic-card, .insight-item, .action-item, .matrix-cell, .small-item, .formula-item').forEach(card => {
+    let mouseX = 50, mouseY = 50;
+    let glowX = 50, glowY = 50;
+    let t = Math.random() * Math.PI * 2;
+    let rafId = null;
+    let hovering = false;
+
+    function animate() {
+      t += 0.015;
+      const orbitX = Math.sin(t * 0.7) * 10;
+      const orbitY = Math.cos(t * 0.5) * 7;
+      const targetX = hovering ? mouseX + orbitX : 50;
+      const targetY = hovering ? mouseY + orbitY : 50;
+      glowX += (targetX - glowX) * 0.08;
+      glowY += (targetY - glowY) * 0.08;
+      card.style.setProperty('--mx', glowX.toFixed(2) + '%');
+      card.style.setProperty('--my', glowY.toFixed(2) + '%');
+      if (hovering || Math.abs(glowX - 50) > 0.5 || Math.abs(glowY - 50) > 0.5) {
+        rafId = requestAnimationFrame(animate);
+      } else {
+        rafId = null;
+      }
+    }
+
+    card.addEventListener('mouseenter', () => {
+      hovering = true;
+      if (!rafId) rafId = requestAnimationFrame(animate);
+    });
+    card.addEventListener('mouseleave', () => { hovering = false; });
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      mouseX = (e.clientX - r.left) / r.width * 100;
+      mouseY = (e.clientY - r.top) / r.height * 100;
+    });
+  });
+}
+
+function cycleTopicStatus(i, title) {
+  const status = getTopicStatus();
+  const cur = status[title] || 'pending';
+  const next = cur==='pending'?'shooting':cur==='shooting'?'published':'pending';
+  if (next==='pending') delete status[title]; else status[title]=next;
+  localStorage.setItem('ai_hotspot_status', JSON.stringify(status));
+  const card = document.getElementById('topic-'+i);
+  card.className = card.className.replace(/status-\w+/, 'status-'+next);
+  card.querySelector('.status-badge').textContent = next==='pending'?'待拍摄':next==='shooting'?'拍摄中':'已发布';
+  updateTracker();
+}
+function getTopicStatus() { try { return JSON.parse(localStorage.getItem('ai_hotspot_status')||'{}'); } catch(e) { return {}; } }
+function resetTopicStatus() { localStorage.removeItem('ai_hotspot_status'); renderTopics(); }
+function updateTracker() {
+  const status = getTopicStatus();
+  const total = filteredTopics().length;
+  let published=0, shooting=0, pending=0;
+  filteredTopics().forEach(t=>{
+    const s = status[t.title] || 'pending';
+    if (s==='published') published++;
+    else if (s==='shooting') shooting++;
+    else pending++;
+  });
+  document.getElementById('publishedCount').textContent = published;
+  document.getElementById('shootingCount').textContent = shooting;
+  document.getElementById('pendingCount').textContent = pending;
+  document.getElementById('barPublished').style.width = total ? (published/total*100)+'%' : '0%';
+  document.getElementById('barShooting').style.width = total ? (shooting/total*100)+'%' : '0%';
+}
+
+function trendClass(t){ if(t==='飙升')return'surging'; if(t==='新热')return'new-hot'; if(t==='衰退')return'declining'; return'stable'; }
+function classifyHook(title){ if(/翻车|踩坑|避坑|别再|不要|后悔/.test(title))return'痛点'; if(/对比|vs|VS|区别|哪个好|pk/i.test(title))return'对比'; if(/揭秘|竟然|居然|没想到|真相|内幕/.test(title))return'悬念'; if(/太美了|绝了|惊艳|震撼|效果|大片/.test(title))return'效果'; if(/哭了|感动|暖心|治愈|陪伴/.test(title))return'情感'; return'数字'; }
+function sortTable(col){ const tb=document.getElementById('hotwordTable');const tbody=tb.querySelector('tbody');const rows=Array.from(tbody.querySelectorAll('tr'));const dir=sortDir[col]=!sortDir[col];rows.sort((a,b)=>{let va=a.cells[col].textContent.trim(),vb=b.cells[col].textContent.trim();const na=parseFloat(va.replace(/[^0-9.-]/g,'')),nb=parseFloat(vb.replace(/[^0-9.-]/g,''));if(!isNaN(na)&&!isNaN(nb))return dir?na-nb:nb-na;return dir?va.localeCompare(vb):vb.localeCompare(va);});rows.forEach(r=>tbody.appendChild(r)); }
+
+init();
+</script>
+</body>
+</html>
