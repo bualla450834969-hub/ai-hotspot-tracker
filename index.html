@@ -1108,10 +1108,394 @@ body { padding-top: 52px; }
 .format-bar-fill { height:100%; border-radius:4px; transition:width .6s ease; }
 .format-bar-val { width:80px; font-size:11px; color:var(--text-secondary); flex-shrink:0; }
 
+
+/* ===== 登录首屏 ===== */
+.login-screen {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  background: #0a0a12;
+  z-index: 100;
+}
+.login-screen .login-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.4;
+  pointer-events: none;
+}
+.login-screen .login-orb-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(64,156,255,0.3), transparent 70%);
+  top: -100px; left: -100px;
+  animation: loginOrb1 20s ease-in-out infinite;
+}
+.login-screen .login-orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(175,82,222,0.25), transparent 70%);
+  bottom: -80px; right: -80px;
+  animation: loginOrb2 25s ease-in-out infinite;
+}
+.login-screen .login-orb-3 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(255,100,170,0.15), transparent 70%);
+  top: 40%; left: 60%;
+  animation: loginOrb3 18s ease-in-out infinite;
+}
+@keyframes loginOrb1 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(80px,60px);} }
+@keyframes loginOrb2 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(-60px,-80px);} }
+@keyframes loginOrb3 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(-40px,50px);} }
+
+.login-screen .login-logo-wrap {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -56%);
+  width: 50vmin; height: 50vmin;
+}
+.login-screen .login-logo-svg {
+  width: 100%; height: 100%;
+  overflow: visible;
+}
+.login-screen .login-glass {
+  fill: rgba(255,255,255,0.04);
+  stroke: rgba(255,255,255,0.12);
+  stroke-width: 1.5;
+  cursor: pointer;
+  transition: stroke 0.3s ease;
+}
+.login-screen .login-glass:hover {
+  stroke: rgba(255,255,255,0.3);
+}
+.login-screen .login-glow {
+  opacity: 0.7;
+  transform-origin: center;
+  pointer-events: none;
+}
+.login-screen .login-brand {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+.login-screen .login-brand-name {
+  font-size: clamp(24px, 4vw, 42px);
+  font-weight: 200;
+  letter-spacing: 0.3em;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 8px;
+}
+.login-screen .login-brand-tag {
+  font-size: clamp(11px, 1.5vw, 14px);
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+}
+
+/* 上滑进入提示 */
+.scroll-hint {
+  position: absolute;
+  bottom: 4%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+  animation: scrollHintPulse 2.5s ease-in-out infinite;
+}
+.scroll-hint .scroll-arrow {
+  width: 24px; height: 24px;
+  margin: 0 auto 6px;
+  border-left: 2px solid rgba(255,255,255,0.4);
+  border-bottom: 2px solid rgba(255,255,255,0.4);
+  transform: rotate(-45deg);
+  animation: scrollArrowBounce 2.5s ease-in-out infinite;
+}
+.scroll-hint .scroll-text {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+}
+@keyframes scrollHintPulse {
+  0%,100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+@keyframes scrollArrowBounce {
+  0%,100% { transform: rotate(-45deg) translate(0,0); }
+  50% { transform: rotate(-45deg) translate(-4px,4px); }
+}
+
+/* 导航栏在首屏时隐藏 */
+.top-nav.hidden-nav {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.top-nav {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+@media (max-width: 768px) {
+  .login-screen .login-logo-wrap { width: 65vmin; height: 65vmin; }
+}
+@media (max-width: 480px) {
+  .login-screen .login-logo-wrap { width: 75vmin; height: 75vmin; }
+  .login-screen .login-glow { opacity: 0.6; }
+}
+
 </style>
+<script>
+
+// 登录页Logo动效（独立ID前缀lg-，避免与背景logo冲突）
+function initLoginLogo() {
+  var svg = document.querySelector('.login-logo-svg');
+  if (!svg) return;
+  var rgMains = [], rgSubs = [], glassPaths = [];
+  for (var i = 1; i <= 4; i++) {
+    rgMains.push(document.getElementById('lgMain' + i));
+    rgSubs.push(document.getElementById('lgSub' + i));
+  }
+  svg.querySelectorAll('path.login-glass').forEach(function(p) { glassPaths.push(p); });
+  var vb = svg.viewBox.baseVal;
+  var vbX = vb.x, vbY = vb.y, vbW = vb.width, vbH = vb.height;
+  var t = Math.random() * Math.PI * 2;
+  var blocks = [];
+  for (var i = 0; i < 4; i++) {
+    blocks.push({
+      fx: 0.3 + Math.random() * 0.5, fy: 0.25 + Math.random() * 0.4,
+      fx2: 0.1 + Math.random() * 0.2, fy2: 0.15 + Math.random() * 0.25,
+      phase: Math.random() * Math.PI * 2,
+      breathSpeed: 0.012 + Math.random() * 0.004,
+      breathPhase: i * Math.PI / 2,
+      hueSpeed: 0.4 + Math.random() * 0.3,
+      huePhase: Math.random() * 360,
+      cx: 50, cy: 50, mode: 'auto', targetCx: 50, targetCy: 50
+    });
+  }
+  var sparks = [], frameCount = 0, activeSparkCount = 0, MAX_SPARKS = 2, TRAIL_LENGTH = 1;
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  for (var si = 0; si < 4; si++) {
+    var trailEls = [];
+    for (var ti = 0; ti < TRAIL_LENGTH; ti++) {
+      var c = document.createElementNS(SVG_NS, 'circle');
+      c.setAttribute('fill', 'url(#lgSparkGrad)');
+      c.setAttribute('filter', 'url(#lgSparkBlur)');
+      c.setAttribute('opacity', '0');
+      svg.appendChild(c);
+      trailEls.push(c);
+    }
+    sparks.push({
+      trailEls: trailEls, path: glassPaths[si], pathLen: glassPaths[si].getTotalLength(),
+      active: false, progress: 0, baseSpeed: 0.004,
+      nextFrame: 600 + Math.floor(Math.random() * 600),
+      direction: 1, startOffset: 0, sparkle: 0
+    });
+  }
+  function mouseToSvgPercent(e) {
+    var pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    var ctm = svg.getScreenCTM();
+    if (!ctm) return {x:50,y:50};
+    var svgPt = pt.matrixTransform(ctm.inverse());
+    return {x:(svgPt.x-vbX)/vbW*100, y:(svgPt.y-vbY)/vbH*100};
+  }
+  glassPaths.forEach(function(path, idx) {
+    path.addEventListener('mouseenter', function(e) {
+      blocks[idx].mode = 'follow';
+      var p = mouseToSvgPercent(e);
+      blocks[idx].targetCx = p.x; blocks[idx].targetCy = p.y;
+    });
+    path.addEventListener('mousemove', function(e) {
+      if (blocks[idx].mode === 'follow') {
+        var p = mouseToSvgPercent(e);
+        blocks[idx].targetCx = p.x; blocks[idx].targetCy = p.y;
+      }
+    });
+    path.addEventListener('mouseleave', function() { blocks[idx].mode = 'auto'; });
+  });
+  function animate() {
+    t += 0.012;
+    for (var i = 0; i < 4; i++) {
+      var b = blocks[i];
+      var breath = 0.5 + 0.5 * Math.sin(t * b.breathSpeed * 60 + b.breathPhase);
+      var mainR = (40 + breath * 48).toFixed(1) + '%';
+      var subR = (25 + breath * 35).toFixed(1) + '%';
+      var glowOpacity = (0.03 + breath * 0.85).toFixed(2);
+      if (b.mode === 'auto') {
+        b.targetCx = 50 + Math.sin(t*b.fx+b.phase)*20 + Math.sin(t*b.fx2+b.phase*2)*8;
+        b.targetCy = 50 + Math.cos(t*b.fy+b.phase*1.5)*18 + Math.cos(t*b.fy2+b.phase)*6;
+        b.cx += (b.targetCx-b.cx)*0.04; b.cy += (b.targetCy-b.cy)*0.04;
+      } else {
+        b.cx += (b.targetCx-b.cx)*0.15; b.cy += (b.targetCy-b.cy)*0.15;
+      }
+      if (rgMains[i]) { rgMains[i].setAttribute('cx',b.cx.toFixed(2)+'%'); rgMains[i].setAttribute('cy',b.cy.toFixed(2)+'%'); rgMains[i].setAttribute('r',mainR); }
+      if (rgSubs[i]) { rgSubs[i].setAttribute('cx',(b.cx+5).toFixed(2)+'%'); rgSubs[i].setAttribute('cy',(b.cy-3).toFixed(2)+'%'); rgSubs[i].setAttribute('r',subR); }
+      var mainPath = svg.querySelector('.lgm-'+(i+1));
+      var subPath = svg.querySelector('.lgs-'+(i+1));
+      if (mainPath) mainPath.style.opacity = glowOpacity;
+      if (subPath) subPath.style.opacity = (parseFloat(glowOpacity)*0.8).toFixed(2);
+      var hue = (t*b.hueSpeed*60+b.huePhase)%360;
+      if (mainPath) mainPath.style.filter = 'hue-rotate('+hue.toFixed(0)+'deg) url(#lgBlurM)';
+      if (subPath) subPath.style.filter = 'hue-rotate('+hue.toFixed(0)+'deg) url(#lgBlurS)';
+    }
+    frameCount++;
+    for (var si = 0; si < sparks.length; si++) {
+      var s = sparks[si];
+      if (!s.active && frameCount >= s.nextFrame) {
+        if (activeSparkCount < MAX_SPARKS) {
+          s.active = true; s.progress = 0;
+          s.baseSpeed = 0.003 + Math.random()*0.004;
+          s.direction = Math.random()>0.5?1:-1;
+          s.startOffset = Math.random()*s.pathLen;
+          activeSparkCount++;
+        } else {
+          s.nextFrame = frameCount + 200 + Math.floor(Math.random()*300);
+        }
+      }
+      if (s.active) {
+        var easeFactor = 0.25 + 0.75*Math.sin(s.progress*Math.PI);
+        s.progress += s.baseSpeed*easeFactor;
+        if (s.progress >= 1) {
+          s.active = false; activeSparkCount--;
+          s.nextFrame = frameCount + 1500 + Math.floor(Math.random()*2100);
+          for (var ti=0; ti<TRAIL_LENGTH; ti++) s.trailEls[ti].setAttribute('opacity','0');
+        } else {
+          var globalOp;
+          if (s.progress<0.12) globalOp = s.progress/0.12;
+          else if (s.progress>0.88) globalOp = (1-s.progress)/0.12;
+          else globalOp = 1;
+          for (var ti2=0; ti2<TRAIL_LENGTH; ti2++) {
+            var trailProgress = Math.max(0, s.progress-ti2*s.baseSpeed*10);
+            var len = (s.startOffset+trailProgress*s.pathLen*s.direction)%s.pathLen;
+            if (len<0) len += s.pathLen;
+            var pt = s.path.getPointAtLength(len);
+            var sizeFactor = 1-ti2/TRAIL_LENGTH;
+            var pulse = 1+0.15*Math.sin(s.progress*Math.PI*6+si);
+            if (Math.random()<0.008) s.sparkle = 1;
+            s.sparkle *= 0.92;
+            var sparkleBoost = 1+s.sparkle*0.9;
+            var sizeSparkle = 1+s.sparkle*0.35;
+            s.trailEls[ti2].setAttribute('cx',pt.x.toFixed(1));
+            s.trailEls[ti2].setAttribute('cy',pt.y.toFixed(1));
+            s.trailEls[ti2].setAttribute('r',(5.5*sizeFactor*pulse*sizeSparkle+0.8).toFixed(1));
+            var flicker = 0.85+0.15*Math.sin(s.progress*Math.PI*11+si*2.3);
+            s.trailEls[ti2].setAttribute('opacity',(globalOp*sizeFactor*flicker*sparkleBoost).toFixed(2));
+          }
+        }
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+// 导航栏首屏隐藏逻辑
+function initNavHide() {
+  var nav = document.getElementById('topNav');
+  if (!nav) return;
+  function check() {
+    if (window.scrollY < window.innerHeight * 0.5) {
+      nav.classList.add('hidden-nav');
+    } else {
+      nav.classList.remove('hidden-nav');
+    }
+  }
+  window.addEventListener('scroll', check, {passive:true});
+  check();
+}
+
+</script>
 <script src="data.js?v=1788337537"></script>
 </head>
 <body>
+<div class="login-screen" id="loginScreen">
+  <div class="login-orb login-orb-1"></div>
+  <div class="login-orb login-orb-2"></div>
+  <div class="login-orb login-orb-3"></div>
+  <div class="login-logo-wrap">
+  <svg class="login-logo-svg" viewBox="212.9 89.4 403.6 287.9" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+  <radialGradient id="lgMain1" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgSub1" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgMain2" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgSub2" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgMain3" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgSub3" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgMain4" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgSub4" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+
+  <filter id="lgBlurM" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10"/></filter>
+  <filter id="lgBlurS" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="7"/></filter>
+  <radialGradient id="lgSparkGrad">
+  <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+  <stop offset="35%" stop-color="#b8e0ff" stop-opacity="0.7"/>
+  <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+  </radialGradient>
+  <filter id="lgSparkBlur" x="-300%" y="-300%" width="700%" height="700%"><feGaussianBlur stdDeviation="3.5"/></filter>
+  </defs>
+  <path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="login-glow lgm-1" fill="url(#lgMain1)" filter="url(#lgBlurM)"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="login-glow lgm-2" fill="url(#lgMain2)" filter="url(#lgBlurM)"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="login-glow lgm-3" fill="url(#lgMain3)" filter="url(#lgBlurM)"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="login-glow lgm-4" fill="url(#lgMain4)" filter="url(#lgBlurM)"/>
+
+  <path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="login-glow lgs-1" fill="url(#lgSub1)" filter="url(#lgBlurS)"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="login-glow lgs-2" fill="url(#lgSub2)" filter="url(#lgBlurS)"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="login-glow lgs-3" fill="url(#lgSub3)" filter="url(#lgBlurS)"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="login-glow lgs-4" fill="url(#lgSub4)" filter="url(#lgBlurS)"/>
+
+  <path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="login-glass"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="login-glass"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="login-glass"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="login-glass"/>
+
+  </svg>
+  </div>
+  <div class="login-brand">
+    <div class="login-brand-name">PYRALUMA</div>
+    <div class="login-brand-tag">璃火矩创 · AI Intelligence</div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-arrow"></div>
+    <div class="scroll-text">上滑进入工作台</div>
+  </div>
+</div>
+
 <div class="top-nav" id="topNav">
   <span class="nav-logo">AI热点追踪</span>
   <a class="nav-link" data-target="hero">工作台</a>
@@ -2681,6 +3065,9 @@ function classifyHook(title){ if(/翻车|踩坑|避坑|别再|不要|后悔/.tes
 function sortTable(col){ const tb=document.getElementById('hotwordTable');const tbody=tb.querySelector('tbody');const rows=Array.from(tbody.querySelectorAll('tr'));const dir=sortDir[col]=!sortDir[col];rows.sort((a,b)=>{let va=a.cells[col].textContent.trim(),vb=b.cells[col].textContent.trim();const na=parseFloat(va.replace(/[^0-9.-]/g,'')),nb=parseFloat(vb.replace(/[^0-9.-]/g,''));if(!isNaN(na)&&!isNaN(nb))return dir?na-nb:nb-na;return dir?va.localeCompare(vb):vb.localeCompare(va);});rows.forEach(r=>tbody.appendChild(r)); }
 
 init();
+initLoginLogo();
+initNavHide();
 </script>
 </body>
 </html>
+
