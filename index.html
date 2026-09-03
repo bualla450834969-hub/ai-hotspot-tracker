@@ -1258,6 +1258,44 @@ body[data-reveal="0"] section {
   transform: translateY(50px);
 }
 
+
+/* AI技术雷达 */
+.tech-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+.tech-summary-card { padding: 16px; border-radius: 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); text-align: center; }
+.tech-summary-card .num { font-size: 28px; font-weight: 700; }
+.tech-summary-card .label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+.tech-summary-card.blue .num { color: #60a5fa; }
+.tech-summary-card.fire .num { color: #f87171; }
+.tech-summary-card.rise .num { color: #fbbf24; }
+.tech-summary-card.watch .num { color: #94a3b8; }
+.tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+.tech-card { padding: 18px; border-radius: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); position: relative; overflow: hidden; transition: all 0.3s; }
+.tech-card:hover { border-color: rgba(255,255,255,0.18); transform: translateY(-2px); }
+.tech-card .tech-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.tech-card .tech-name { font-size: 15px; font-weight: 600; color: var(--text); word-break: break-all; flex: 1; }
+.tech-card .tech-badge { font-size: 11px; padding: 3px 8px; border-radius: 20px; white-space: nowrap; margin-left: 8px; }
+.tech-card .tech-badge.blue { background: rgba(96,165,250,0.15); color: #60a5fa; }
+.tech-card .tech-badge.fire { background: rgba(248,113,113,0.15); color: #f87171; }
+.tech-card .tech-badge.rise { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.tech-card .tech-badge.watch { background: rgba(148,163,184,0.15); color: #94a3b8; }
+.tech-card .tech-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin-bottom: 12px; min-height: 36px; }
+.tech-card .tech-meta { display: flex; gap: 12px; font-size: 11px; color: var(--text-secondary); margin-bottom: 10px; flex-wrap: wrap; }
+.tech-card .tech-meta span { display: flex; align-items: center; gap: 3px; }
+.tech-card .tech-heat-bar { height: 4px; border-radius: 2px; background: rgba(255,255,255,0.08); overflow: hidden; margin-bottom: 6px; display: flex; }
+.tech-card .tech-heat-bar .tech-fill { height: 100%; border-radius: 2px; }
+.tech-card .tech-heat-bar .tech-fill.t { background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+.tech-card .tech-heat-bar .tech-fill.s { background: linear-gradient(90deg, #06b6d4, #3b82f6); }
+.tech-card .tech-heat-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text-secondary); }
+.tech-card .tech-match { font-size: 11px; color: var(--text-secondary); margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.06); }
+.tech-card .tech-match .match-kw { display: inline-block; background: rgba(139,92,246,0.15); color: #c4b5fd; padding: 2px 6px; border-radius: 4px; margin: 2px; font-size: 10px; }
+.tech-card .tech-reason { font-size: 11px; color: #a78bfa; margin-top: 6px; font-style: italic; }
+.tech-card .tech-source { position: absolute; top: 12px; right: 12px; font-size: 10px; color: var(--text-secondary); opacity: 0.6; }
+.forecast-tag { display: inline-block; background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px; margin-right: 6px; }
+@media (max-width: 768px) {
+  .tech-summary { grid-template-columns: repeat(2, 1fr); }
+  .tech-grid { grid-template-columns: 1fr; }
+}
+
 </style>
 <script>
 
@@ -1538,6 +1576,7 @@ function initNavHide() {
 <div class="top-nav" id="topNav">
   <span class="nav-logo">AI热点追踪</span>
   <a class="nav-link" data-target="hero">工作台</a>
+  <a class="nav-link" data-target="techradar">技术雷达</a>
   <a class="nav-link" data-target="hotwords">热点</a>
   <a class="nav-link" data-target="breakdown">爆款</a>
   <a class="nav-link" data-target="topics">生产</a>
@@ -1709,6 +1748,16 @@ function initNavHide() {
       <div class="chart-sm" id="chartHook"></div>
     </div>
   </div>
+</div>
+
+<div class="section anim anim-d2">
+  <div id="techradar" class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">AI技术雷达</span>
+    <span class="section-desc">每日AI新技术/新模型/新项目 × 社媒热度关联分析，提前发现蓝海机会</span>
+  </div>
+  <div class="tech-summary" id="techSummary"></div>
+  <div class="tech-grid" id="techGrid"></div>
 </div>
 
 <div class="section anim anim-d3">
@@ -2980,6 +3029,57 @@ window.addEventListener('scroll', function() {
   });
 });
 
+
+// 渲染AI技术雷达
+function renderTechRadar() {
+  var ts = window.DASHBOARD_DATA && window.DASHBOARD_DATA.tech_signals;
+  if (!ts || !ts.signals || ts.signals.length === 0) {
+    document.getElementById('techradar').parentElement.style.display = 'none';
+    return;
+  }
+  var summary = ts.summary || {};
+  var sumHtml = '';
+  sumHtml += '<div class="tech-summary-card blue"><div class="num">' + (summary.blue_ocean || 0) + '</div><div class="label">🔵 蓝海机会</div></div>';
+  sumHtml += '<div class="tech-summary-card fire"><div class="num">' + (summary.exploding || 0) + '</div><div class="label">🔥 正在爆发</div></div>';
+  sumHtml += '<div class="tech-summary-card rise"><div class="num">' + (summary.rising || 0) + '</div><div class="label">📈 上升期</div></div>';
+  sumHtml += '<div class="tech-summary-card watch"><div class="num">' + (summary.watching || 0) + '</div><div class="label">👀 观察中</div></div>';
+  document.getElementById('techSummary').innerHTML = sumHtml;
+
+  var grid = document.getElementById('techGrid');
+  var html = '';
+  ts.signals.slice(0, 12).forEach(function(sig) {
+    var a = sig.analysis || {};
+    var opp = a.opportunity || '';
+    var badgeClass = 'watch';
+    if (opp.indexOf('蓝海') >= 0) badgeClass = 'blue';
+    else if (opp.indexOf('爆发') >= 0) badgeClass = 'fire';
+    else if (opp.indexOf('上升') >= 0) badgeClass = 'rise';
+    var name = sig.name || '';
+    var shortName = name.indexOf('/') >= 0 ? name.split('/').pop() : name;
+    var meta = '';
+    if (sig.source === 'github') {
+      meta = '<span>⭐ ' + (sig.stars || 0) + '</span><span>🍴 ' + (sig.forks || 0) + '</span><span>📈 ' + (sig.star_growth_per_day || 0) + '/天</span>';
+    } else if (sig.source === 'huggingface') {
+      meta = '<span>⬇️ ' + (sig.downloads || 0) + '</span><span>❤️ ' + (sig.likes || 0) + '</span><span>' + (sig.pipeline || '') + '</span>';
+    }
+    var matchKw = (a.matched_hotwords || []).map(function(k) { return '<span class="match-kw">' + k + '</span>'; }).join('');
+    var techHeat = a.tech_heat || 0;
+    var socialHeat = a.social_heat || 0;
+    html += '<div class="tech-card">';
+    html += '<div class="tech-source">' + (sig.source === 'github' ? 'GitHub' : 'HuggingFace') + '</div>';
+    html += '<div class="tech-header"><div class="tech-name">' + shortName + '</div><span class="tech-badge ' + badgeClass + '">' + opp + '</span></div>';
+    html += '<div class="tech-desc">' + (sig.description || '暂无描述') + '</div>';
+    html += '<div class="tech-meta">' + meta + '</div>';
+    html += '<div class="tech-heat-bar"><div class="tech-fill t" style="width:' + techHeat + '%"></div></div>';
+    html += '<div class="tech-heat-labels"><span>技术热度 ' + techHeat + '</span><span>社媒热度 ' + socialHeat + '</span></div>';
+    html += '<div class="tech-heat-bar" style="margin-top:4px"><div class="tech-fill s" style="width:' + socialHeat + '%"></div></div>';
+    if (matchKw) html += '<div class="tech-match">关联热词: ' + matchKw + '</div>';
+    html += '<div class="tech-reason">' + (a.reason || '') + '</div>';
+    html += '</div>';
+  });
+  grid.innerHTML = html;
+}
+
 function initCardGlow() {
   document.querySelectorAll('.hero-stat, .bento-card, .breakdown-card, .topic-card, .insight-item, .action-item, .matrix-cell, .small-item, .formula-item').forEach(card => {
     let mouseX = 50, mouseY = 50;
@@ -3104,6 +3204,7 @@ function classifyHook(title){ if(/翻车|踩坑|避坑|别再|不要|后悔/.tes
 function sortTable(col){ const tb=document.getElementById('hotwordTable');const tbody=tb.querySelector('tbody');const rows=Array.from(tbody.querySelectorAll('tr'));const dir=sortDir[col]=!sortDir[col];rows.sort((a,b)=>{let va=a.cells[col].textContent.trim(),vb=b.cells[col].textContent.trim();const na=parseFloat(va.replace(/[^0-9.-]/g,'')),nb=parseFloat(vb.replace(/[^0-9.-]/g,''));if(!isNaN(na)&&!isNaN(nb))return dir?na-nb:nb-na;return dir?va.localeCompare(vb):vb.localeCompare(va);});rows.forEach(r=>tbody.appendChild(r)); }
 
 init();
+renderTechRadar();
 initLoginLogo();
 initNavHide();
 initScrollReveal();
