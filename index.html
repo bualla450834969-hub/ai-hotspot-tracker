@@ -787,6 +787,29 @@ a.work-link:hover { opacity: 0.7; }
 .topic-card.status-published .status-badge { display:inline-block; background:rgba(48,209,88,0.2);color:#30D158; }
 .topic-card.status-published { opacity: .55; }
 
+/* ===== 模块折叠 ===== */
+.hero.collapsed > *:not(:first-child),
+section.collapsed > *:not(:first-child) {
+  display: none !important;
+}
+.section-collapse-btn {
+  display: inline-block;
+  margin-left: 12px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.2s;
+  user-select: none;
+}
+.section-collapse-btn:hover {
+  background: rgba(255,255,255,0.12);
+  color: var(--text-primary);
+}
+
 /* ===== TRACKER ===== */
 .tracker-bar {
   display: flex;
@@ -1085,6 +1108,14 @@ body { padding-top: 52px; }
 .topic-persona .tp-needs { display: flex; flex-wrap: wrap; gap: 4px; }
 .topic-persona .tp-need { font-size: 10px; padding: 2px 6px; border-radius: 5px; background: rgba(6,182,212,0.12); color: #67e8f9; }
 .topic-persona .tp-content { font-size: 11px; color: var(--text-secondary); margin-top: 4px; }
+.conv-path { margin-top: 8px; padding: 8px 10px; background: rgba(16,185,129,0.06); border-radius: 8px; border-left: 3px solid #10b981; }
+.conv-path .cp-title { font-size: 11px; font-weight: 700; color: #34d399; margin-bottom: 4px; }
+.conv-path .cp-row { font-size: 10px; color: var(--text-secondary); margin: 2px 0; line-height: 1.5; }
+.conv-path .cp-label { color: var(--text-tertiary); margin-right: 4px; }
+.conv-path .cp-level { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 10px; font-weight: 700; }
+.conv-path .cp-level.high { background: rgba(16,185,129,0.2); color: #34d399; }
+.conv-path .cp-level.medium { background: rgba(245,158,11,0.2); color: #fbbf24; }
+.conv-path .cp-level.low { background: rgba(156,163,175,0.2); color: #9ca3af; }
 
 /* ===== 选题看板 ===== */
 .kanban-board { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px; }
@@ -1509,7 +1540,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788414318909"></script>
+<script src="data.js?v=1788415452469"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
@@ -1690,7 +1721,7 @@ function initNavHide() {
     </div>
     <div class="hero-meta">
       <div class="time" id="updateTime">加载中...</div>
-      <div>每日 8:00 / 14:00 采集 · 8:00 推送简报</div>
+      <div>每日 8:00 自动采集 · 8:05 推送简报</div>
       <div class="hero-filter">
         <div class="platform-switch" id="platformSwitch">
           <button class="platform-btn active" data-platform="all" onclick="setPlatform('all')">全部</button>
@@ -1847,7 +1878,7 @@ function initNavHide() {
   </div>
 </div>
 
-<div class="footer">AI 热点追踪工作台 · 数据来源 RedFox Hub · 每日 8:00 / 14:00 自动采集</div>
+<div class="footer">AI 热点追踪工作台 · 数据来源 RedFox Hub · 每日 8:00 自动采集</div>
 
 <div class="section anim anim-d6">
 <div id="viralGenes" class="section-header">
@@ -2032,13 +2063,18 @@ const DATA = window.DASHBOARD_DATA || {};
 let currentPlatform = 'all';
 
 
-// ===== 选题看板 =====
-function getKanbanStatus(topic) {
-  const saved = localStorage.getItem('topic_status_' + String(topic.title).hashCode());
-  return saved || 'pending';
+// ===== 选题看板（统一状态管理） =====
+function getAllKanbanStatus() {
+  try { return JSON.parse(localStorage.getItem('ai_hotspot_status') || '{}'); } catch(e) { return {}; }
 }
-function setKanbanStatus(topic, status) {
-  localStorage.setItem('kb_status_' + String(topic.title).hashCode(), status);
+function getTopicStatus(title) {
+  const all = getAllKanbanStatus();
+  return all[title] || 'pending';
+}
+function setTopicStatus(title, status) {
+  const all = getAllKanbanStatus();
+  all[title] = status;
+  localStorage.setItem('ai_hotspot_status', JSON.stringify(all));
   renderKanban();
   renderTopics();
 }
@@ -2047,9 +2083,9 @@ function renderKanban() {
   if (!board) return;
   const topics = DATA.topics || [];
   const cols = { pending: [], shooting: [], published: [] };
+  const allStatus = getAllKanbanStatus();
   topics.forEach(function(t) {
-    const key = 'kb_status_' + String(t.title).hashCode();
-    const s = localStorage.getItem(key) || 'pending';
+    const s = allStatus[t.title] || 'pending';
     if (!cols[s]) cols[s] = [];
     cols[s].push(t);
   });
@@ -2066,7 +2102,7 @@ function renderKanban() {
         '<div class="kanban-card-title">' + t.title + '</div>' +
         '<div class="kanban-card-meta"><span>' + pname + '</span><span>' + t.priority + '优先</span><span>' + plat + '</span></div>' +
         '<div class="kanban-card-actions">' +
-        '<button class="kanban-btn" onclick="cycleKanbanStatus(\'' + t.title.replace(/'/g, "\\'") + '\')">切换状态</button>' +
+        '<button class="kanban-btn" onclick="cycleKanbanStatusByTitle(\'' + t.title.replace(/'/g, "\\'") + '\')">切换状态</button>' +
         '<button class="kanban-btn" onclick="generateScript(\'' + t.title.replace(/'/g, "\\'") + '\')">生成脚本</button>' +
         '</div></div>';
     }).join('');
@@ -2077,15 +2113,11 @@ function renderKanban() {
       '</div>';
   }).join('');
 }
-function cycleKanbanStatus(title) {
+function cycleKanbanStatusByTitle(title) {
   const topic = DATA.topics.find(function(t) { return t.title === title; });
   if (!topic) return;
-  const key = 'kb_status_' + String(topic.title).hashCode();
-  const current = localStorage.getItem(key) || 'pending';
-  const next = { pending: 'shooting', shooting: 'published', published: 'pending' }[current];
-  localStorage.setItem(key, next);
-  renderKanban();
-  renderTopics();
+  const idx = DATA.topics.indexOf(topic);
+  cycleKanbanStatus(idx, title);
 }
 
 // ===== 脚本生成 =====
@@ -2294,6 +2326,38 @@ function init() {
   cats.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; sel.appendChild(o); });
   renderAll();
   window.addEventListener('resize', () => Object.values(charts).forEach(c=>c.resize()));
+  setTimeout(initSectionCollapse, 1500);
+}
+
+// ===== 模块折叠 =====
+function initSectionCollapse() {
+  var sections = document.querySelectorAll('.hero, section');
+  sections.forEach(function(sec, idx) {
+    var header = sec.querySelector('.section-title, h2, .hero-title');
+    if (!header) return;
+    if (header.querySelector('.section-collapse-btn')) return;
+    var btn = document.createElement('span');
+    btn.className = 'section-collapse-btn';
+    btn.textContent = '收起';
+    header.style.display = 'flex';
+    header.style.alignItems = 'center';
+    header.style.flexWrap = 'wrap';
+    header.style.gap = '8px';
+    header.appendChild(btn);
+
+    var isCollapsed = localStorage.getItem('sec_collapse_' + idx) === '1';
+    if (isCollapsed) {
+      sec.classList.add('collapsed');
+      btn.textContent = '展开';
+    }
+
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var collapsed = sec.classList.toggle('collapsed');
+      btn.textContent = collapsed ? '展开' : '收起';
+      localStorage.setItem('sec_collapse_' + idx, collapsed ? '1' : '0');
+    });
+  });
 }
 
 function applyFilter() { currentCategory = document.getElementById('categoryFilter').value; renderAll(); }
@@ -2888,18 +2952,43 @@ function renderFormulas() {
 }
 
 function renderAuthors(works) {
-  const m={}; works.forEach(w=>{const n=w.accountName||'未知';if(!m[n])m[n]={name:n,followers:w.followerCount||0,likes:0,count:0,max:0};m[n].likes+=(w.likeCount||0);m[n].count++;if((w.likeCount||0)>m[n].max)m[n].max=w.likeCount||0;});
+  const m={}; works.forEach(w=>{
+    const n=w.accountName||'未知';
+    if(!m[n])m[n]={name:n,followers:w.followerCount||0,likes:0,count:0,max:0,titles:[],keywords:{}};
+    m[n].likes+=(w.likeCount||0);
+    m[n].count++;
+    if((w.likeCount||0)>m[n].max)m[n].max=w.likeCount||0;
+    if(w.title)m[n].titles.push(w.title);
+  });
+  // 提取每个账号的内容主题关键词
+  const themeKeywords = ['可灵','即梦','AI绘画','AI视频','数字人','工作流','Agent','提示词','教程','实测','对比','免费','神器','效率','自动化','Sora','Midjourney','ComfyUI','Dify','Coze','豆包','GPT','Claude'];
+  Object.values(m).forEach(a=>{
+    a.titles.forEach(t=>{
+      themeKeywords.forEach(k=>{
+        if(t.toLowerCase().includes(k.toLowerCase()))a.keywords[k]=(a.keywords[k]||0)+1;
+      });
+    });
+  });
   const top=Object.values(m).sort((a,b)=>b.likes-a.likes).slice(0,5);
   document.getElementById('authorList').innerHTML=top.map((a,i)=>{
     const avg=Math.round(a.likes/a.count);
+    const themes=Object.entries(a.keywords).sort((x,y)=>y[1]-x[1]).slice(0,3).map(k=>k[0]).join(' · ')||'综合AI内容';
+    const learnNote = avg > 50000 ? '高均赞：内容质量驱动，值得拆解爆款结构' : a.count > 10 ? '高频更新：量产策略，可学习选题节奏' : '单条爆款：钩子+选题精准，可复用其标题公式';
     return `
-    <div class="author-item">
-      <div class="author-rank ${i<3?'r'+(i+1):'other'}">${i+1}</div>
-      <div class="author-info">
-        <div class="author-name">${a.name}</div>
-        <div class="author-followers">粉丝${(a.followers/10000).toFixed(1)}万 · ${a.count}条作品 · 均赞${(avg/10000).toFixed(1)}万</div>
+    <div class="author-item" style="flex-direction:column;align-items:stretch;gap:6px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="author-rank ${i<3?'r'+(i+1):'other'}">${i+1}</div>
+        <div class="author-info" style="flex:1;">
+          <div class="author-name">${a.name}</div>
+          <div class="author-followers">粉丝${(a.followers/10000).toFixed(1)}万 · ${a.count}条作品 · 均赞${(avg/10000).toFixed(1)}万</div>
+        </div>
+        <div class="author-likes">总赞${(a.likes/10000).toFixed(1)}万<div style="font-size:10px;opacity:.6;margin-top:2px;">最高${(a.max/10000).toFixed(1)}万</div></div>
       </div>
-      <div class="author-likes">总赞${(a.likes/10000).toFixed(1)}万<div style="font-size:10px;opacity:.6;margin-top:2px;">最高${(a.max/10000).toFixed(1)}万</div></div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;padding-left:36px;">
+        <span style="font-size:10px;color:var(--text-tertiary);">内容方向：</span>
+        <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(139,92,246,0.15);color:#a78bfa;">${themes}</span>
+      </div>
+      <div style="font-size:10px;color:#34d399;padding-left:36px;">💡 ${learnNote}</div>
     </div>`;
   }).join('');
 }
@@ -3008,6 +3097,12 @@ function renderTopics() {
         <span class="monetize-tag ${mon.cls}">${mon.name}</span>
         <span style="font-size:11px;color:var(--text-secondary)">变现潜力 ${mon.score}分 · ${mon.desc}</span>
       </div>
+      ${t.conversion_path ? `<div class="conv-path">
+        <div class="cp-title">转化路径 <span class="cp-level ${t.conversion_path.conversion_potential==='高'?'high':t.conversion_path.conversion_potential==='中'?'medium':'low'}">${t.conversion_path.conversion_potential}转化</span></div>
+        <div class="cp-row"><span class="cp-label">私域钩子：</span>${t.conversion_path.private_hook}</div>
+        <div class="cp-row"><span class="cp-label">对应产品：</span>${t.conversion_path.product_match}</div>
+        <div class="cp-row"><span class="cp-label">漏斗：</span>${t.conversion_path.funnel_step}</div>
+      </div>` : ''}
       ${t.target_persona ? `<div class="topic-persona">
         <div class="tp-name">目标人群：${t.target_persona.name} · ${t.target_persona.age} · ${t.target_persona.gender}</div>
         <div class="tp-needs">${(t.target_persona.needs||[]).slice(0,4).map(n=>'<span class="tp-need">'+n+'</span>').join('')}</div>
