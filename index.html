@@ -1279,6 +1279,7 @@ body[data-reveal="0"] section {
 .tech-card .tech-badge.rise { background: rgba(251,191,36,0.15); color: #fbbf24; }
 .tech-card .tech-badge.watch { background: rgba(148,163,184,0.15); color: #94a3b8; }
 .tech-card .tech-desc { font-size: 13px; color: var(--text); line-height: 1.5; margin-bottom: 4px; min-height: 20px; font-weight: 500; }
+.tech-card .new-badge { display: inline-block; background: linear-gradient(135deg, #10b981, #06b6d4); color: white; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; margin-right: 6px; vertical-align: middle; letter-spacing: 0.5px; }
 .tech-card .tech-desc-en { font-size: 11px; color: var(--text-secondary); line-height: 1.4; margin-bottom: 12px; opacity: 0.7; font-style: italic; }
 .tech-card .tech-meta { display: flex; gap: 12px; font-size: 11px; color: var(--text-secondary); margin-bottom: 10px; flex-wrap: wrap; }
 .tech-card .tech-meta span { display: flex; align-items: center; gap: 3px; }
@@ -1483,7 +1484,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788410589115"></script>
+<script src="data.js?v=1788411172497"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
@@ -3059,16 +3060,18 @@ function renderTechRadar() {
     var shortName = name.indexOf('/') >= 0 ? name.split('/').pop() : name;
     var meta = '';
     if (sig.source === 'github') {
-      meta = '<span>⭐ ' + (sig.stars || 0) + '</span><span>🍴 ' + (sig.forks || 0) + '</span><span>📈 ' + (sig.star_growth_per_day || 0) + '/天</span>';
+      var daysOld = sig.days_old ? sig.days_old + '天前创建' : '';
+      meta = '<span>⭐ ' + (sig.stars || 0) + '</span><span>🍴 ' + (sig.forks || 0) + '</span><span>📈 ' + (sig.star_growth_per_day || 0) + '/天</span>' + (daysOld ? '<span>🕐 ' + daysOld + '</span>' : '');
     } else if (sig.source === 'huggingface') {
       meta = '<span>⬇️ ' + (sig.downloads || 0) + '</span><span>❤️ ' + (sig.likes || 0) + '</span><span>' + (sig.pipeline || '') + '</span>';
     }
+    var newBadge = sig.is_new ? '<span class="new-badge">NEW</span>' : '';
     var matchKw = (a.matched_hotwords || []).map(function(k) { return '<span class="match-kw">' + k + '</span>'; }).join('');
     var techHeat = a.tech_heat || 0;
     var socialHeat = a.social_heat || 0;
     html += '<div class="tech-card">';
     html += '<div class="tech-source">' + (sig.source === 'github' ? 'GitHub' : 'HuggingFace') + '</div>';
-    html += '<div class="tech-header"><div class="tech-name">' + shortName + '</div><span class="tech-badge ' + badgeClass + '">' + opp + '</span></div>';
+    html += '<div class="tech-header"><div class="tech-name">' + newBadge + shortName + '</div><span class="tech-badge ' + badgeClass + '">' + opp + '</span></div>';
     var descZh = sig.description_zh || sig.description || '暂无描述';
     var descEn = sig.description_zh ? sig.description : '';
     html += '<div class="tech-desc">' + descZh + '</div>';
