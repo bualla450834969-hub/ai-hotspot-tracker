@@ -787,6 +787,43 @@ a.work-link:hover { opacity: 0.7; }
 .topic-card.status-published .status-badge { display:inline-block; background:rgba(48,209,88,0.2);color:#30D158; }
 .topic-card.status-published { opacity: .55; }
 
+/* ===== 全局搜索 ===== */
+.global-search {
+  position: relative;
+  margin-left: auto;
+}
+.global-search input {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 6px 14px 6px 32px;
+  font-size: 12px;
+  color: var(--text);
+  width: 180px;
+  transition: all 0.3s;
+  outline: none;
+}
+.global-search input:focus {
+  width: 260px;
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(139,92,246,0.4);
+}
+.global-search input::placeholder { color: rgba(255,255,255,0.4); }
+.global-search .search-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+}
+.search-results-count {
+  font-size: 10px;
+  color: #a78bfa;
+  margin-left: 8px;
+}
+.topic-card.search-hidden, .hotword-row.search-hidden { display: none !important; }
+
 /* ===== 模块折叠 ===== */
 .hero.collapsed > *:not(:first-child),
 section.collapsed > *:not(:first-child) {
@@ -965,6 +1002,32 @@ section.collapsed > *:not(:first-child) {
 .compare-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; }
 .compare-tag.dy { background: rgba(10,132,255,0.15); color: #64D2FF; }
 .compare-tag.xhs { background: rgba(255,69,58,0.15); color: #FF6B6B; }
+@media (max-width: 768px) {
+  .global-search { display: none; }
+  .hero-stats { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+  .hero-stat { padding: 12px !important; }
+  .hero-stat .hs-num { font-size: 20px !important; }
+  .topic-grid { grid-template-columns: 1fr !important; }
+  .breakdown-grid { grid-template-columns: 1fr !important; }
+  .gene-grid { grid-template-columns: 1fr !important; }
+  .kanban-board { flex-direction: column !important; }
+  .kanban-column { min-height: auto !important; }
+  table { font-size: 10px !important; }
+  table td, table th { padding: 4px 6px !important; }
+  .section-title { font-size: 16px !important; }
+  .nav-link { font-size: 11px !important; padding: 4px 8px !important; }
+  .tracker-bar { gap: 12px !important; padding: 12px !important; }
+  .persona-grid { grid-template-columns: 1fr !important; }
+  .tech-grid { grid-template-columns: 1fr !important; }
+  .conv-path, .topic-persona { padding: 6px 8px !important; }
+  .title-variants .tv-item { font-size: 10px !important; }
+}
+@media (max-width: 480px) {
+  .hero-stats { grid-template-columns: 1fr !important; }
+  .nav-links { overflow-x: auto; flex-wrap: nowrap; }
+  .section-collapse-btn { font-size: 10px !important; padding: 1px 6px !important; }
+}
+
 @media (max-width: 768px) { .compare-grid { grid-template-columns: 1fr; } .platform-switch { flex-wrap: wrap; } }
 
 
@@ -1116,6 +1179,22 @@ body { padding-top: 52px; }
 .conv-path .cp-level.high { background: rgba(16,185,129,0.2); color: #34d399; }
 .conv-path .cp-level.medium { background: rgba(245,158,11,0.2); color: #fbbf24; }
 .conv-path .cp-level.low { background: rgba(156,163,175,0.2); color: #9ca3af; }
+/* 选题效果追踪 */
+.perf-record { margin-top: 8px; padding: 8px 10px; background: rgba(245,158,11,0.06); border-radius: 8px; border-left: 3px solid #f59e0b; }
+.perf-record .pr-title { font-size: 11px; font-weight: 700; color: #fbbf24; margin-bottom: 4px; }
+.perf-record .pr-row { display: flex; gap: 8px; margin: 4px 0; }
+.perf-record input { flex: 1; min-width: 0; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 3px 6px; font-size: 10px; color: var(--text); }
+.perf-record button { font-size: 10px; padding: 3px 8px; border-radius: 4px; border: none; background: rgba(245,158,11,0.2); color: #fbbf24; cursor: pointer; }
+.perf-stats { font-size: 10px; color: var(--text-secondary); margin-top: 4px; }
+/* A/B标题变体 */
+.title-variants { margin-top: 6px; }
+.title-variants .tv-label { font-size: 10px; color: var(--text-tertiary); margin-bottom: 3px; }
+.title-variants .tv-item { font-size: 11px; padding: 3px 8px; margin: 2px 0; background: rgba(139,92,246,0.08); border-radius: 5px; color: #c4b5fd; cursor: pointer; transition: background 0.2s; }
+.title-variants .tv-item:hover { background: rgba(139,92,246,0.18); }
+/* 导出按钮 */
+.export-btn { display: inline-block; padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: 600; background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); cursor: pointer; transition: all 0.2s; }
+.export-btn:hover { background: rgba(16,185,129,0.25); }
+
 
 /* ===== 选题看板 ===== */
 .kanban-board { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px; }
@@ -1540,7 +1619,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788415740314"></script>
+<script src="data.js?v=1788416570023"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
@@ -1640,6 +1719,10 @@ function initNavHide() {
   <a class="nav-link" data-target="topics">生产</a>
   <a class="nav-link" data-target="topicPerf">运营</a>
   <a class="nav-link" data-target="audience">受众</a>
+      <div class="global-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="globalSearch" placeholder="搜索选题/热词..." oninput="doGlobalSearch(this.value)">
+      </div>
 </div>
 <div class="scroll-progress" id="scrollProgress"></div>
 <div class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
@@ -1915,7 +1998,7 @@ function initNavHide() {
     </div>
     <div class="bento-card">
       <div class="card-head"><span class="ch-bar"></span><span class="ch-title">对标作者 TOP5</span></div>
-      <div class="author-list" id="authorList"></div>
+      <div class="author-list" id="authorList"></div><div id="competitorWorks"></div>
     </div>
     <div class="bento-card span-3">
       <div class="card-head"><span class="ch-bar"></span><span class="ch-title">爆款结构化拆解 TOP10</span><span class="ch-tip">钩子 → 结构 → CTA</span></div>
@@ -2159,6 +2242,41 @@ function copyScript() {
 function getFavorites() {
   return JSON.parse(localStorage.getItem('viral_favorites') || '[]');
 }
+// ===== 竞品最新动态 =====
+function renderCompetitorWorks() {
+  var works = DATA.works || [];
+  if (!works.length) return;
+  // 按账号分组，取每个账号最新的1-2条
+  var byAuthor = {};
+  works.forEach(function(w) {
+    var name = w.accountName || '未知';
+    if (!byAuthor[name]) byAuthor[name] = [];
+    byAuthor[name].push(w);
+  });
+  // 按总点赞排序取top5账号
+  var authors = Object.entries(byAuthor).map(function(entry) {
+    return { name: entry[0], works: entry[1], totalLikes: entry[1].reduce(function(s,w){return s+(w.likeCount||0);},0) };
+  }).sort(function(a,b){return b.totalLikes-a.totalLikes;}).slice(0,5);
+
+  var html = '<div style="margin-top:12px;">';
+  html += '<div style="font-size:11px;color:var(--text-tertiary);margin-bottom:8px;">📡 竞品最新作品（来自搜索数据）</div>';
+  authors.forEach(function(a) {
+    var topWorks = a.works.sort(function(x,y){return (y.likeCount||0)-(x.likeCount||0);}).slice(0,2);
+    topWorks.forEach(function(w) {
+      var title = (w.title || '无标题').slice(0,40);
+      var likes = (w.likeCount||0).toLocaleString();
+      html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">';
+      html += '<div style="flex:1;min-width:0;"><div style="font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + title + '</div>';
+      html += '<div style="font-size:10px;color:var(--text-tertiary);">' + a.name + '</div></div>';
+      html += '<div style="font-size:11px;color:#f87171;margin-left:8px;">❤' + likes + '</div>';
+      html += '</div>';
+    });
+  });
+  html += '</div>';
+  var el = document.getElementById('competitorWorks');
+  if (el) el.innerHTML = html;
+}
+
 function isFavorite(i) {
   const favs = getFavorites();
   return favs.some(function(f) { return f.title === (DATA.hot_breakdowns[i] || {}).title; });
@@ -2327,6 +2445,130 @@ function init() {
   renderAll();
   window.addEventListener('resize', () => Object.values(charts).forEach(c=>c.resize()));
   setTimeout(initSectionCollapse, 1500);
+  setTimeout(checkDataFreshness, 2000);
+}
+
+
+  // 数据新鲜度检查
+  function checkDataFreshness() {
+    if (!DATA || !DATA.last_update) return;
+    var updateTime = new Date(DATA.last_update.replace(/-/g, '/'));
+    var now = new Date();
+    var hours = (now - updateTime) / (1000 * 60 * 60);
+    var el = document.getElementById('updateTime');
+    if (!el) return;
+    if (hours > 24) {
+      el.style.color = '#f87171';
+      el.innerHTML = DATA.last_update + ' <span style="color:#f87171;font-size:11px;">⚠️ 数据超过24小时未更新</span>';
+    } else if (DATA.collection_status === 'failed') {
+      el.style.color = '#fbbf24';
+      el.innerHTML = DATA.last_update + ' <span style="color:#fbbf24;font-size:11px;">⚠️ 今日采集失败，展示缓存数据</span>';
+    }
+  }
+  setTimeout(checkDataFreshness, 2000);
+
+
+// ===== 全局搜索 =====
+function doGlobalSearch(query) {
+  query = query.trim().toLowerCase();
+  var topicCards = document.querySelectorAll('#topicGrid .topic-card');
+  var hotwordRows = document.querySelectorAll('#hotwordTable tbody tr');
+  var topicCount = 0, hotwordCount = 0;
+
+  if (!query) {
+    topicCards.forEach(function(c) { c.classList.remove('search-hidden'); });
+    hotwordRows.forEach(function(r) { r.classList.remove('search-hidden'); });
+    var sc = document.querySelector('.search-results-count');
+    if (sc) sc.remove();
+    return;
+  }
+
+  // 搜索选题
+  topicCards.forEach(function(card) {
+    var text = card.textContent.toLowerCase();
+    if (text.includes(query)) {
+      card.classList.remove('search-hidden');
+      topicCount++;
+    } else {
+      card.classList.add('search-hidden');
+    }
+  });
+
+  // 搜索热词
+  hotwordRows.forEach(function(row) {
+    var text = row.textContent.toLowerCase();
+    if (text.includes(query)) {
+      row.classList.remove('search-hidden');
+      hotwordCount++;
+    } else {
+      row.classList.add('search-hidden');
+    }
+  });
+
+  // 显示结果数
+  var existing = document.querySelector('.search-results-count');
+  if (existing) existing.remove();
+  var countEl = document.createElement('span');
+  countEl.className = 'search-results-count';
+  countEl.textContent = topicCount + '选题/' + hotwordCount + '热词';
+  document.getElementById('globalSearch').parentNode.appendChild(countEl);
+}
+
+// ===== 选题效果追踪 =====
+function getPerfData() {
+  try { return JSON.parse(localStorage.getItem('topic_perf') || '{}'); } catch(e) { return {}; }
+}
+function savePerfData(d) { localStorage.setItem('topic_perf', JSON.stringify(d)); }
+function recordPerf(title) {
+  var views = prompt('请输入播放量（数字）：', '');
+  if (views === null) return;
+  var likes = prompt('请输入点赞数（数字）：', '');
+  if (likes === null) return;
+  var followers = prompt('请输入涨粉数（数字）：', '');
+  if (followers === null) return;
+  var perf = getPerfData();
+  perf[title] = { views: parseInt(views)||0, likes: parseInt(likes)||0, followers: parseInt(followers)||0, date: new Date().toLocaleDateString() };
+  savePerfData(perf);
+  renderTopics();
+  updateTracker();
+  alert('效果数据已保存！');
+}
+function calcHitRate() {
+  var perf = getPerfData();
+  var published = Object.keys(perf).length;
+  if (published === 0) return { rate: 0, avgViews: 0, avgLikes: 0, total: 0 };
+  var totalViews = 0, totalLikes = 0, hits = 0;
+  Object.values(perf).forEach(function(p) {
+    totalViews += p.views; totalLikes += p.likes;
+    if (p.views >= 10000) hits++;
+  });
+  return { rate: Math.round(hits/published*100), avgViews: Math.round(totalViews/published), avgLikes: Math.round(totalLikes/published), total: published };
+}
+
+// ===== A/B标题变体生成 =====
+function genTitleVariants(title) {
+  var variants = [title];
+  var core = title.replace(/^[^：:]*[：:]\s*/, '');
+  variants.push('3个方法搞定：' + core);
+  variants.push(core + '？90%的人不知道');
+  return variants.slice(0, 3);
+}
+
+// ===== 导出选题 =====
+function exportTopics() {
+  var topics = filteredTopics();
+  var text = '【AI热点选题清单】' + new Date().toLocaleDateString() + '\n\n';
+  topics.forEach(function(t, i) {
+    var status = getTopicStatus(t.title);
+    var statusText = status === 'published' ? '已发布' : status === 'shooting' ? '拍摄中' : '待拍摄';
+    text += (i+1) + '. [' + statusText + '] ' + t.title + '\n';
+    text += '   钩子：' + (t.hook || '') + '\n';
+    text += '   平台：' + (t.platform || '双平台') + ' | 优先：' + (t.priority || '') + '\n\n';
+  });
+  var ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  document.execCommand('copy'); document.body.removeChild(ta);
+  alert('已复制 ' + topics.length + ' 条选题到剪贴板！');
 }
 
 // ===== 模块折叠 =====
@@ -2745,7 +2987,7 @@ function renderAll() {
   renderDuration(works); renderHook(works); renderCommentKw(works);
   renderScatter(works); renderCollect(hw); renderCommentDemands();
   renderSaturation(hw); renderSmallViral(works); renderFormulas();
-  renderAuthors(works); 
+  renderAuthors(works); renderCompetitorWorks(); 
 
   renderKanban();
   renderFavorites();
@@ -2783,7 +3025,7 @@ function renderHeroStats(hw, works, topics) {
     <div class="hero-stat">
       <div class="hs-label">选题建议</div>
       <div class="hs-value orange" id="heroTopicsVal">${topics.length}</div>
-      <div class="hs-sub">标题 + 钩子 + 形式</div>
+      <div class="hs-sub">标题 + 钩子 + 形式</div><span class="export-btn" onclick="exportTopics()" style="margin-left:12px;">📋 导出选题</span>
     </div>`;
   setTimeout(()=>{
     animateNumber(document.getElementById('heroWorksVal'), works.length);
@@ -3110,6 +3352,20 @@ function renderTopics() {
       </div>` : ''}
       ${fmt.format?`<div class="tc-format"><span>${fmt.format}</span><span>${fmt.suggested_duration||''}</span><span>${fmt.suggested_publish||''}</span></div>`:''}
       <div class="tc-meta"><span class="audience">${t.audience}</span><span style="color:var(--text-tertiary);">#${t.keyword}</span></div>
+      ${st==='published' ? (function(){
+        var perf = getPerfData();
+        var p = perf[t.title];
+        if (p) {
+          return '<div class="perf-stats">📊 播放'+p.views.toLocaleString()+' · 点赞'+p.likes.toLocaleString()+' · 涨粉'+p.followers+' ('+p.date+')</div>';
+        }
+        return '<div style="margin-top:6px;"><button onclick="event.stopPropagation();recordPerf(\''+t.title.replace(/'/g,"\\'")+'\')" style="font-size:10px;padding:3px 8px;border-radius:5px;border:none;background:rgba(245,158,11,0.15);color:#fbbf24;cursor:pointer;">📊 记录发布效果</button></div>';
+      })() : ''}
+      <div class="title-variants">
+        <div class="tv-label">A/B标题变体（点击复制）：</div>
+        ${genTitleVariants(t.title).map(function(v,vi){
+          return '<div class="tv-item" onclick="event.stopPropagation();navigator.clipboard.writeText(\''+v.replace(/'/g,"\\'")+'\');this.style.color=\'#34d399\';this.textContent=\'✅ 已复制\'">'+(vi+1)+'. '+v+'</div>';
+        }).join('')}
+      </div>
       ${fmt.ref_url?`<a href="${fmt.ref_url}" target="_blank" class="ref-link">参考视频 — ${fmt.ref_title||'点击查看'}</a>`:''}
     </div>`;
   }).join('');
