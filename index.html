@@ -134,6 +134,13 @@ body::after {
   position: relative;
   z-index: 1;
 }
+/* 光晕卡片基础样式 */
+.author-item, .gene-card, .persona-card, .tech-card, .tech-summary-card,
+.kanban-card, .schedule-item, .checklist-item, .compare-card, .sat-item, .tracker-bar {
+  position: relative;
+  overflow: hidden;
+}
+
 .hero-top {
   display:flex; justify-content:space-between; align-items:flex-start;
   margin-bottom: 28px;
@@ -614,7 +621,18 @@ a.work-link:hover { opacity: 0.7; }
 .action-item::before,
 .matrix-cell::before,
 .small-item::before,
-.formula-item::before {
+.formula-item::before,
+.author-item::before,
+.gene-card::before,
+.persona-card::before,
+.tech-card::before,
+.tech-summary-card::before,
+.kanban-card::before,
+.schedule-item::before,
+.checklist-item::before,
+.compare-card::before,
+.sat-item::before,
+.tracker-bar::before {
   content: '';
   position: absolute;
   inset: -1px;
@@ -655,12 +673,24 @@ a.work-link:hover { opacity: 0.7; }
 .action-item:hover::before,
 .matrix-cell:hover::before,
 .small-item:hover::before,
-.formula-item:hover::before {
+.formula-item:hover::before,
+.author-item:hover::before,
+.gene-card:hover::before,
+.persona-card:hover::before,
+.tech-card:hover::before,
+.tech-summary-card:hover::before,
+.kanban-card:hover::before,
+.schedule-item:hover::before,
+.checklist-item:hover::before,
+.compare-card:hover::before,
+.sat-item:hover::before,
+.tracker-bar:hover::before {
   opacity: 1;
 }
 .hero-stat > *, .bento-card > *, .breakdown-card > *, .topic-card > *,
 .insight-item > *, .action-item > *, .matrix-cell > *,
-.small-item > *, .formula-item > * {
+.small-item > *, .formula-item > *,
+.author-item > *, .gene-card > *, .persona-card > *, .tech-card > *, .tech-summary-card > *, .kanban-card > *, .schedule-item > *, .checklist-item > *, .compare-card > *, .sat-item > *, .tracker-bar > * {
   position: relative;
   z-index: 1;
 }
@@ -1619,7 +1649,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788416570023"></script>
+<script src="data.js?v=1788417409870"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
@@ -3465,7 +3495,7 @@ function renderTechRadar() {
 }
 
 function initCardGlow() {
-  document.querySelectorAll('.hero-stat, .bento-card, .breakdown-card, .topic-card, .insight-item, .action-item, .matrix-cell, .small-item, .formula-item').forEach(card => {
+  document.querySelectorAll('.hero-stat, .bento-card, .breakdown-card, .topic-card, .insight-item, .action-item, .matrix-cell, .small-item, .formula-item, .author-item, .gene-card, .persona-card, .tech-card, .tech-summary-card, .kanban-card, .schedule-item, .checklist-item, .compare-card, .sat-item, .tracker-bar').forEach(card => {
     let mouseX = 50, mouseY = 50;
     let glowX = 50, glowY = 50;
     let t = Math.random() * Math.PI * 2;
