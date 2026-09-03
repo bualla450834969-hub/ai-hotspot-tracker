@@ -674,6 +674,27 @@ a.work-link:hover { opacity: 0.7; }
   letter-spacing: -0.03em;
   pointer-events: none;
 }
+.topic-card .info-gap-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, rgba(16,185,129,0.25), rgba(6,182,212,0.25));
+  color: #34d399;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-left: 6px;
+  border: 1px solid rgba(52,211,153,0.3);
+}
+.topic-card .forecast-badge {
+  display: inline-block;
+  background: rgba(139,92,246,0.2);
+  color: #a78bfa;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  margin-left: 6px;
+}
 .topic-card .tc-priority {
   font-size: 10px;
   font-weight: 700;
@@ -1484,7 +1505,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788411172497"></script>
+<script src="data.js?v=1788413839677"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
@@ -2964,6 +2985,7 @@ function renderTopics() {
       <div class="status-badge">${st==='pending'?'待拍摄':st==='shooting'?'拍摄中':'已发布'}</div>
       <div class="tc-num">${String(i+1).padStart(2,'0')}</div>
       <div class="tc-priority">${t.priority}优先</div>
+      ${t.is_info_gap ? '<div class="info-gap-badge">💎 信息差</div>' : (t.is_forecast ? '<div class="forecast-badge">🔮 前瞻</div>' : '')}
       <div class="tc-title">${t.title}</div>
       <div class="tc-hook">${t.hook}</div>
       <div style="display:flex;align-items:center;gap:12px;margin:6px 0">
