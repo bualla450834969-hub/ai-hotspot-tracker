@@ -863,6 +863,40 @@ a.work-link:hover { opacity: 0.7; }
 .shoot-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; color: var(--text-secondary); }
 .shoot-item input[type="checkbox"] { accent-color: #8b5cf6; }
 
+/* ===== 起号运营 ===== */
+.launch-phase-banner { display:flex; align-items:center; gap:16px; padding:16px 20px; background:linear-gradient(135deg, rgba(139,92,246,0.15), rgba(59,130,246,0.1)); border:1px solid rgba(139,92,246,0.2); border-radius:12px; margin-bottom:16px; }
+.launch-phase-icon { font-size:28px; }
+.launch-phase-info { flex:1; }
+.launch-phase-name { font-size:16px; font-weight:700; color:var(--text); }
+.launch-phase-desc { font-size:11px; color:var(--text-tertiary); margin-top:2px; }
+.launch-phase-day { font-size:24px; font-weight:800; color:#a78bfa; text-align:center; }
+.launch-phase-day span { font-size:11px; color:var(--text-tertiary); font-weight:400; display:block; }
+.health-gauge { display:flex; align-items:center; gap:16px; margin:12px 0; }
+.health-score { font-size:36px; font-weight:800; color:#30D158; }
+.health-score.low { color:#f87171; }
+.health-score.mid { color:#fbbf24; }
+.health-bar-wrap { flex:1; }
+.health-bar { height:8px; background:rgba(255,255,255,0.08); border-radius:4px; overflow:hidden; }
+.health-bar-fill { height:100%; border-radius:4px; transition:width 0.5s; }
+.ratio-bar { display:flex; height:24px; border-radius:6px; overflow:hidden; margin:8px 0; }
+.ratio-seg { display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:600; color:#fff; }
+.ratio-legend { display:flex; gap:16px; margin-top:8px; font-size:11px; }
+.ratio-legend span { display:flex; align-items:center; gap:4px; }
+.ratio-dot { width:8px; height:8px; border-radius:2px; }
+.task-item { display:flex; align-items:flex-start; gap:8px; padding:6px 0; font-size:12px; color:var(--text-secondary); border-bottom:1px solid rgba(255,255,255,0.04); }
+.task-item .task-check { width:16px; height:16px; border:1px solid rgba(255,255,255,0.2); border-radius:4px; flex-shrink:0; margin-top:1px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:10px; }
+.task-item .task-check.done { background:rgba(48,209,88,0.2); border-color:#30D158; color:#30D158; }
+.pitfall-item { display:flex; gap:8px; padding:8px 10px; border-radius:8px; margin-bottom:6px; font-size:11px; }
+.pitfall-item.high { background:rgba(248,113,113,0.1); border-left:3px solid #f87171; }
+.pitfall-item.mid { background:rgba(251,191,36,0.1); border-left:3px solid #fbbf24; }
+.pitfall-item.low { background:rgba(255,255,255,0.04); border-left:3px solid var(--text-tertiary); }
+.content-type-tag { font-size:9px; padding:1px 5px; border-radius:3px; font-weight:600; }
+.content-type-tag.core { background:rgba(48,209,88,0.15); color:#30D158; }
+.content-type-tag.related { background:rgba(59,130,246,0.15); color:#60a5fa; }
+.content-type-tag.general { background:rgba(255,255,255,0.08); color:var(--text-tertiary); }
+.guide-comment { font-size:10px; color:#a78bfa; font-style:italic; margin-top:4px; padding:4px 8px; background:rgba(139,92,246,0.08); border-radius:4px; }
+.kw-chip { display:inline-block; font-size:9px; padding:1px 5px; border-radius:3px; background:rgba(139,92,246,0.12); color:#a78bfa; margin:1px; }
+
 /* ===== 积分监控 ===== */
 .credit-monitor { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); border-radius: 20px; font-size: 11px; color: #fbbf24; }
 .credit-monitor .cm-bar { width: 60px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
@@ -1790,7 +1824,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788508825977"></script>
+<script src="data.js?v=1788510535045"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
@@ -1892,6 +1926,7 @@ function initNavHide() {
   <a class="nav-link" data-target="publishTime">发布时间</a>
       <a class="nav-link" data-target="titleFormulas">标题公式</a>
       <a class="nav-link" data-target="leadScripts">引流话术</a>
+      <a class="nav-link" data-target="launchOps">起号运营</a>
       <a class="nav-link" data-target="audience">受众</a>
       <div class="global-search">
         <span class="search-icon">🔍</span>
@@ -2332,6 +2367,52 @@ function initNavHide() {
     <div class="glass-card" style="padding:20px;" id="scriptContainer"></div>
   </div>
 
+<div id="launchOps" class="section">
+    <div class="section-header">
+      <div><h2 class="section-title">🚀 起号运营</h2><div class="hs-sub">零推流贴标签起号法 · 阶段追踪与任务清单</div></div>
+      <button class="section-collapse-btn" onclick="toggleSection('launchOps')">收起</button>
+    </div>
+    <!-- 阶段横幅 -->
+    <div class="launch-phase-banner" id="launchBanner"></div>
+    <div class="grid-2">
+      <!-- 标签健康度 -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="card-head" style="margin-bottom:12px;"><span class="ch-bar"></span><span class="ch-title">账号标签健康度</span></div>
+        <div class="health-gauge">
+          <div class="health-score" id="healthScore">--</div>
+          <div class="health-bar-wrap">
+            <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;">核心内容占比 <span id="coreCoverage">--</span></div>
+            <div class="health-bar"><div class="health-bar-fill" id="healthBar" style="width:0%"></div></div>
+            <div style="font-size:10px;color:var(--text-tertiary);margin-top:6px;" id="healthTip"></div>
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px;">已覆盖核心关键词</div>
+          <div id="coreKwCloud"></div>
+        </div>
+      </div>
+      <!-- 内容配比 -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="card-head" style="margin-bottom:12px;"><span class="ch-bar"></span><span class="ch-title">内容配比（目标70/20/10）</span></div>
+        <div class="ratio-bar" id="ratioBar"></div>
+        <div class="ratio-legend" id="ratioLegend"></div>
+        <div style="margin-top:12px;font-size:11px;color:var(--text-tertiary);line-height:1.8;" id="ratioTip"></div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:16px;">
+      <!-- 阶段任务清单 -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="card-head" style="margin-bottom:12px;"><span class="ch-bar"></span><span class="ch-title">本阶段任务清单</span></div>
+        <div id="launchTasks"></div>
+      </div>
+      <!-- 避坑提醒 -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="card-head" style="margin-bottom:12px;"><span class="ch-bar"></span><span class="ch-title">⚠️ 起号避坑提醒</span></div>
+        <div id="pitfallList"></div>
+      </div>
+    </div>
+  </div>
+
 <div id="audience" class="section anim-d9">
 <div class="section-header">
 <span class="section-num">06</span>
@@ -2689,6 +2770,59 @@ function init() {
   }
   setTimeout(checkDataFreshness, 2000);
 
+
+// ===== 起号运营渲染 =====
+function renderLaunchOps() {
+  var lo = DATA.launch_ops;
+  if(!lo) return;
+  // 阶段横幅
+  var phaseColors = {'打标期':'#fbbf24','验证期':'#60a5fa','放大期':'#30D158'};
+  var pc = phaseColors[lo.phase] || '#a78bfa';
+  document.getElementById('launchBanner').innerHTML =
+    '<div class="launch-phase-icon">' + (lo.phase==='打标期'?'🏷️':lo.phase==='验证期'?'📊':'🚀') + '</div>' +
+    '<div class="launch-phase-info"><div class="launch-phase-name" style="color:'+pc+'">' + lo.phase + '</div>' +
+    '<div class="launch-phase-desc">' + lo.desc + ' · 起号日 ' + lo.start_date + '</div></div>' +
+    '<div class="launch-phase-day">第' + lo.days + '天<span>of 14天打标</span></div>';
+  // 健康度
+  var hs = lo.tag_health || 0;
+  var hsEl = document.getElementById('healthScore');
+  hsEl.textContent = hs;
+  hsEl.className = 'health-score ' + (hs>=60?'':hs>=40?'mid':'low');
+  document.getElementById('coreCoverage').textContent = lo.core_coverage + '%';
+  var hb = document.getElementById('healthBar');
+  hb.style.width = hs + '%';
+  hb.style.background = hs>=60 ? 'linear-gradient(90deg,#30D158,#4ade80)' : hs>=40 ? 'linear-gradient(90deg,#fbbf24,#f97316)' : 'linear-gradient(90deg,#f87171,#ef4444)';
+  document.getElementById('healthTip').textContent = hs>=60 ? '标签健康，算法可精准推流' : hs>=40 ? '标签正在形成，继续保持垂直输出' : '标签混乱，建议减少泛内容，聚焦核心领域';
+  // 关键词云
+  var kws = lo.core_keywords || [];
+  document.getElementById('coreKwCloud').innerHTML = kws.length ? kws.map(function(k){return '<span class="kw-chip">'+k+'</span>';}).join('') : '<span style="font-size:11px;color:var(--text-tertiary);">暂无核心关键词覆盖</span>';
+  // 内容配比
+  var r = lo.content_ratio || {};
+  var total = (r.core||0)+(r.related||0)+(r.general||0) || 1;
+  var corePct = Math.round((r.core||0)/total*100);
+  var relPct = Math.round((r.related||0)/total*100);
+  var genPct = 100-corePct-relPct;
+  document.getElementById('ratioBar').innerHTML =
+    '<div class="ratio-seg" style="width:'+corePct+'%;background:#30D158;">'+(corePct>10?corePct+'%':'')+'</div>' +
+    '<div class="ratio-seg" style="width:'+relPct+'%;background:#60a5fa;">'+(relPct>10?relPct+'%':'')+'</div>' +
+    '<div class="ratio-seg" style="width:'+genPct+'%;background:rgba(255,255,255,0.15);">'+(genPct>10?genPct+'%':'')+'</div>';
+  document.getElementById('ratioLegend').innerHTML =
+    '<span><span class="ratio-dot" style="background:#30D158;"></span>核心 '+corePct+'% (目标70%)</span>' +
+    '<span><span class="ratio-dot" style="background:#60a5fa;"></span>关联 '+relPct+'% (目标20%)</span>' +
+    '<span><span class="ratio-dot" style="background:rgba(255,255,255,0.15);"></span>泛内容 '+genPct+'% (目标10%)</span>';
+  var ratioTip = corePct < 50 ? '⚠️ 核心内容占比过低，打标期建议核心内容>70%，否则算法无法识别账号标签' : corePct >= 70 ? '✅ 核心占比达标，标签识别良好' : '核心占比接近目标，继续保持';
+  document.getElementById('ratioTip').textContent = ratioTip;
+  // 任务清单
+  var tasks = lo.tasks || [];
+  document.getElementById('launchTasks').innerHTML = tasks.map(function(t,i){
+    return '<div class="task-item"><div class="task-check" onclick="this.classList.toggle('done');this.innerHTML=this.classList.contains('done')?'✓':''"></div><span>'+t+'</span></div>';
+  }).join('');
+  // 避坑提醒
+  var pitfalls = (lo.pitfalls||[]).filter(function(p){return p.active;});
+  document.getElementById('pitfallList').innerHTML = pitfalls.map(function(p){
+    return '<div class="pitfall-item '+p.level+'"><span>'+(p.level==='high'?'🔴':p.level==='mid'?'🟡':'⚪')+'</span><span>'+p.text+'</span></div>';
+  }).join('');
+}
 
 // ===== 互动率分析渲染 =====
 function renderEngagement() {
@@ -3437,7 +3571,7 @@ function renderAll() {
   renderDuration(works); renderHook(works); renderCommentKw(works);
   renderScatter(works); renderCollect(hw); renderCommentDemands();
   renderSaturation(hw); renderSmallViral(works); renderFormulas();
-  renderAuthors(works); renderCompetitorWorks(); renderPublishTimeDetail(); renderEngagement(); renderTitleFormulas(); renderLeadScripts(); renderCreditMonitor(); 
+  renderAuthors(works); renderCompetitorWorks(); renderPublishTimeDetail(); renderEngagement(); renderTitleFormulas(); renderLeadScripts(); renderCreditMonitor(); renderLaunchOps(); 
 
   renderKanban();
   renderFavorites();
@@ -3850,9 +3984,9 @@ function renderTopics() {
       <div class="tc-num">${String(i+1).padStart(2,'0')}</div>
       <div class="tc-priority">${t.priority}优先</div>
       ${t.smart_priority ? '<span class="smart-priority ' + (t.smart_priority>=60?'high':t.smart_priority>=40?'mid':'low') + '" title="信息差'+(t.priority_breakdown?.info_gap||0)+' 热度'+(t.priority_breakdown?.heat||0)+' 低竞争'+(t.priority_breakdown?.low_competition||0)+'">智能 ' + t.smart_priority + '</span>' : ''}
-      ${t.is_info_gap ? '<div class="info-gap-badge">💎 信息差</div>' : (t.is_forecast ? '<div class="forecast-badge">🔮 前瞻</div>' : '')}
+      ${t.content_type ? '<span class="content-type-tag '+t.content_type+'">'+t.content_type+'</span>' : ''}${t.is_info_gap ? '<div class="info-gap-badge">💎 信息差</div>' : (t.is_forecast ? '<div class="forecast-badge">🔮 前瞻</div>' : '')}
       <div class="tc-title">${t.title}</div>
-      <div class="tc-hook">${t.hook}</div>
+      <div class="tc-hook">${t.hook}</div>\n      ${t.guide_comment ? '<div class="guide-comment">💬 小号引导：' + t.guide_comment + '</div>' : ''}
       <div style="display:flex;align-items:center;gap:12px;margin:6px 0">
         <div><span class="topic-score">${score.total}</span><span class="topic-score-label"> 综合分</span></div>
         <div style="flex:1">
