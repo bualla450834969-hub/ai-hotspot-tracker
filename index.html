@@ -1739,7 +1739,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788483157168"></script>
+<script src="data.js?v=1788483542675"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
@@ -2607,7 +2607,7 @@ function init() {
 
 
 // ===== 发布时间分析渲染 =====
-function renderPublishTime() {
+function renderPublishTimeDetail() {
   var works = DATA.works || [];
   if (!works.length) return;
   var hourData = {};
@@ -3332,10 +3332,67 @@ function renderCategory(hw) {
 }
 
 function renderPublishTime(works) {
-  const dist = DATA.publish_time_dist || [];
+  // 从works实时计算发布时间分布
+  const hourCount = new Array(24).fill(0);
+  const hourLikes = new Array(24).fill(0);
+  const hourViral = new Array(24).fill(0);
+  (works || []).forEach(w => {
+    const pt = w.publishTime;
+    if (!pt) return;
+    const m = pt.match(/ (\d{2}):/);
+    if (!m) return;
+    const h = parseInt(m[1]);
+    hourCount[h]++;
+    hourLikes[h] += (w.likeCount || 0);
+    if ((w.likeCount || 0) >= 10000) hourViral[h]++;
+  });
+  const dist = hourCount.map((cnt, h) => ({
+    hour: h,
+    count: cnt,
+    avg_likes: cnt > 0 ? Math.round(hourLikes[h] / cnt) : 0,
+    viral_count: hourViral[h],
+    viral_rate: cnt > 0 ? Math.round(hourViral[h] / cnt * 100) : 0
+  }));
   if (charts.pt) charts.pt.dispose();
   charts.pt = echarts.init(document.getElementById('chartPublishTime'));
-  charts.pt.setOption({color:PALETTE,grid:{left:40,right:15,top:15,bottom:25},xAxis:{type:'category',data:dist.map(d=>d.hour+'时'),axisLabel:{color:AXIS_COLOR,fontSize:9,interval:2},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:dist.map(d=>d.count),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#0A84FF'},{offset:1,color:'#5E5CE6'}]),borderRadius:[4,4,0,0]},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}<br/>爆款数 ${p[0].value}`}});
+  charts.pt.setOption({
+    color: PALETTE,
+    grid: { left: 40, right: 15, top: 25, bottom: 25 },
+    xAxis: {
+      type: 'category',
+      data: dist.map(d => d.hour + '时'),
+      axisLabel: { color: AXIS_COLOR, fontSize: 9, interval: 2 },
+      axisLine: { lineStyle: { color: AXIS_LINE } }
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: { color: AXIS_COLOR },
+      splitLine: { lineStyle: { color: SPLIT_COLOR } }
+    },
+    series: [{
+      type: 'bar',
+      data: dist.map(d => ({
+        value: d.count,
+        itemStyle: {
+          color: d.viral_rate >= 10
+            ? new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#FFD60A' }, { offset: 1, color: '#FF9F0A' }])
+            : new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#0A84FF' }, { offset: 1, color: '#5E5CE6' }]),
+          borderRadius: [4, 4, 0, 0]
+        }
+      })),
+      animationDuration: 1000
+    }],
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: TOOLTIP_BG,
+      borderColor: TOOLTIP_BORDER,
+      textStyle: { color: TOOLTIP_TEXT },
+      formatter: p => {
+        const d = dist[p[0].dataIndex];
+        return `${d.hour}时<br/>作品数 ${d.count}<br/>平均点赞 ${d.avg_likes.toLocaleString()}<br/>爆款数 ${d.viral_count}（${d.viral_rate}%）`;
+      }
+    }
+  });
 }
 
 function renderDuration(works) {
