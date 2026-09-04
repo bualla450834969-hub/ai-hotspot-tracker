@@ -574,6 +574,11 @@ a.work-link:hover { opacity: 0.7; }
 /* ===== AUTHORS ===== */
 .author-list { display:flex; flex-direction:column; gap:6px; }
 .author-item { position:relative; overflow:hidden; display:flex; align-items:center; gap:10px; padding:8px 10px; background:rgba(255,255,255,0.04); border-radius:10px; }
+.author-item::before {
+  background:
+    radial-gradient(120px circle at var(--mx, 50%) var(--my, 50%), rgba(64,156,255,0.45) 0%, rgba(175,82,222,0.28) 40%, transparent 70%),
+    radial-gradient(80px circle at calc(var(--mx, 50%) + 15px) calc(var(--my, 50%) - 10px), rgba(255,100,170,0.25) 0%, rgba(100,210,255,0.15) 50%, transparent 75%);
+}
 .author-rank {
   width:22px; height:22px; border-radius:7px;
   display:flex; align-items:center; justify-content:center;
@@ -1785,7 +1790,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788506790289"></script>
+<script src="data.js?v=1788508568040"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
