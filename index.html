@@ -817,6 +817,96 @@ a.work-link:hover { opacity: 0.7; }
 .topic-card.status-published .status-badge { display:inline-block; background:rgba(48,209,88,0.2);color:#30D158; }
 .topic-card.status-published { opacity: .55; }
 
+/* ===== 发布时间分析 ===== */
+.publish-time-section { padding: 24px; }
+.pt-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 140px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 8px;
+}
+.pt-bar-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  position: relative;
+}
+.pt-bar {
+  width: 100%;
+  max-width: 28px;
+  background: linear-gradient(180deg, rgba(139,92,246,0.6), rgba(59,130,246,0.3));
+  border-radius: 3px 3px 0 0;
+  transition: all 0.3s;
+  min-height: 2px;
+  position: relative;
+}
+.pt-bar.best {
+  background: linear-gradient(180deg, rgba(251,191,36,0.8), rgba(249,115,22,0.5));
+  box-shadow: 0 0 12px rgba(251,191,36,0.3);
+}
+.pt-bar:hover { filter: brightness(1.3); }
+.pt-bar-label {
+  font-size: 9px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
+}
+.pt-bar-viral {
+  position: absolute;
+  top: -18px;
+  font-size: 9px;
+  color: #fbbf24;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pt-best-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+.pt-best-card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+.pt-best-card .rank { font-size: 20px; margin-bottom: 4px; }
+.pt-best-card .time { font-size: 15px; font-weight: 700; color: var(--text); }
+.pt-best-card .stats { font-size: 11px; color: var(--text-tertiary); margin-top: 6px; line-height: 1.6; }
+.pt-best-card .viral-rate { color: #fbbf24; font-weight: 600; }
+.pt-tips {
+  margin-top: 16px;
+  padding: 14px 16px;
+  background: rgba(139,92,246,0.08);
+  border-left: 3px solid #8b5cf6;
+  border-radius: 0 8px 8px 0;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+.pt-tips strong { color: #c4b5fd; }
+.pt-platform {
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+}
+.pt-platform-item {
+  flex: 1;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 8px;
+  font-size: 12px;
+}
+.pt-platform-item .plat-name { font-weight: 600; margin-bottom: 4px; }
+.pt-platform-item .plat-best { color: #fbbf24; }
+
 /* ===== 全局搜索 ===== */
 .global-search {
   position: relative;
@@ -1649,7 +1739,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788417409870"></script>
+<script src="data.js?v=1788483157168"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
@@ -1748,7 +1838,8 @@ function initNavHide() {
   <a class="nav-link" data-target="breakdown">爆款</a>
   <a class="nav-link" data-target="topics">生产</a>
   <a class="nav-link" data-target="topicPerf">运营</a>
-  <a class="nav-link" data-target="audience">受众</a>
+  <a class="nav-link" data-target="publishTime">发布时间</a>
+      <a class="nav-link" data-target="audience">受众</a>
       <div class="global-search">
         <span class="search-icon">🔍</span>
         <input type="text" id="globalSearch" placeholder="搜索选题/热词..." oninput="doGlobalSearch(this.value)">
@@ -2141,6 +2232,23 @@ function initNavHide() {
   </div>
   <div class="breakdown-grid" id="favoritesGrid"></div>
 </div>
+<div id="publishTime" class="section">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">⏰ 发布时间分析</h2>
+        <div class="hs-sub">几点发最容易爆 · 基于爆款作品数据</div>
+      </div>
+      <button class="section-collapse-btn" onclick="toggleSection('publishTime')">收起</button>
+    </div>
+    <div class="publish-time-section glass-card">
+      <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px;">24小时发布热度分布（柱高=作品数，金色=爆款率最高时段，柱顶数字=爆款率）</div>
+      <div class="pt-chart" id="ptChart"></div>
+      <div class="pt-best-cards" id="ptBestCards"></div>
+      <div class="pt-platform" id="ptPlatform"></div>
+      <div class="pt-tips" id="ptTips"></div>
+    </div>
+  </div>
+
 <div id="audience" class="section anim-d9">
 <div class="section-header">
 <span class="section-num">06</span>
@@ -2497,6 +2605,116 @@ function init() {
   }
   setTimeout(checkDataFreshness, 2000);
 
+
+// ===== 发布时间分析渲染 =====
+function renderPublishTime() {
+  var works = DATA.works || [];
+  if (!works.length) return;
+  var hourData = {};
+  for (var h = 0; h < 24; h++) {
+    hourData[h] = { count: 0, totalLikes: 0, viralCount: 0, highLikeCount: 0 };
+  }
+  var platformHour = { douyin: {}, xiaohongshu: {} };
+  for (var p in platformHour) {
+    for (var h2 = 0; h2 < 24; h2++) platformHour[p][h2] = { count: 0, viralCount: 0, totalLikes: 0 };
+  }
+
+  works.forEach(function(w) {
+    var pt = w.publishTime;
+    if (!pt) return;
+    var m = pt.match(/ (\d{2}):/);
+    if (!m) return;
+    var hour = parseInt(m[1]);
+    var likes = w.likeCount || 0;
+    var hd = hourData[hour];
+    hd.count++;
+    hd.totalLikes += likes;
+    if (likes >= 10000) hd.viralCount++;
+    if (likes >= 5000) hd.highLikeCount++;
+    var plat = w.platform === 'xiaohongshu' ? 'xiaohongshu' : 'douyin';
+    if (platformHour[plat]) {
+      platformHour[plat][hour].count++;
+      platformHour[plat][hour].totalLikes += likes;
+      if (likes >= 10000) platformHour[plat][hour].viralCount++;
+    }
+  });
+
+  // 计算爆款率，找出TOP3时段（样本量>=10）
+  var hoursWithData = [];
+  for (var h3 = 0; h3 < 24; h3++) {
+    var d = hourData[h3];
+    if (d.count >= 5) {
+      var viralRate = d.viralCount / d.count * 100;
+      var avgLikes = d.totalLikes / d.count;
+      var score = viralRate * 0.5 + (d.highLikeCount / d.count * 100) * 0.3 + Math.min(avgLikes / 500, 100) * 0.2;
+      hoursWithData.push({ hour: h3, count: d.count, avgLikes: avgLikes, viralRate: viralRate, score: score });
+    }
+  }
+  hoursWithData.sort(function(a, b) { return b.score - a.score; });
+  var bestHours = hoursWithData.slice(0, 3);
+  var bestHourSet = {};
+  bestHours.forEach(function(b) { bestHourSet[b.hour] = true; });
+
+  // 渲染柱状图
+  var maxCount = 0;
+  for (var h4 = 0; h4 < 24; h4++) maxCount = Math.max(maxCount, hourData[h4].count);
+  var chartHtml = '';
+  for (var h5 = 0; h5 < 24; h5++) {
+    var d5 = hourData[h5];
+    var heightPct = maxCount > 0 ? (d5.count / maxCount * 100) : 0;
+    var isBest = bestHourSet[h5];
+    var viralLabel = (d5.count >= 5 && d5.viralCount > 0) ? (d5.viralCount / d5.count * 100).toFixed(0) + '%' : '';
+    chartHtml += '<div class="pt-bar-wrap">';
+    if (viralLabel) chartHtml += '<div class="pt-bar-viral">' + viralLabel + '</div>';
+    chartHtml += '<div class="pt-bar' + (isBest ? ' best' : '') + '" style="height:' + Math.max(heightPct, 1) + '%" title="' + h5 + ':00 - ' + d5.count + '条作品, 平均点赞' + Math.round(d5.totalLikes / Math.max(d5.count,1)) + '"></div>';
+    chartHtml += '<div class="pt-bar-label">' + h5 + '</div>';
+    chartHtml += '</div>';
+  }
+  document.getElementById('ptChart').innerHTML = chartHtml;
+
+  // 渲染TOP3最佳时段
+  var rankEmoji = ['🥇', '🥈', '🥉'];
+  var bestHtml = '';
+  bestHours.forEach(function(b, i) {
+    bestHtml += '<div class="pt-best-card">';
+    bestHtml += '<div class="rank">' + rankEmoji[i] + '</div>';
+    bestHtml += '<div class="time">' + b.hour + ':00 - ' + (b.hour + 1) + ':00</div>';
+    bestHtml += '<div class="stats">样本<b>' + b.count + '</b>条<br>平均点赞<b>' + Math.round(b.avgLikes).toLocaleString() + '</b><br>爆款率<span class="viral-rate">' + b.viralRate.toFixed(1) + '%</span></div>';
+    bestHtml += '</div>';
+  });
+  document.getElementById('ptBestCards').innerHTML = bestHtml;
+
+  // 分平台最佳时段
+  var platHtml = '';
+  var platNames = { douyin: '抖音', xiaohongshu: '小红书' };
+  for (var p2 in platformHour) {
+    var bestH = -1, bestVR = -1, bestCount = 0, bestAvg = 0;
+    for (var h6 = 0; h6 < 24; h6++) {
+      var ph = platformHour[p2][h6];
+      if (ph.count >= 5) {
+        var vr = ph.viralCount / ph.count * 100;
+        if (vr > bestVR) { bestVR = vr; bestH = h6; bestCount = ph.count; bestAvg = ph.totalLikes / ph.count; }
+      }
+    }
+    if (bestH >= 0) {
+      platHtml += '<div class="pt-platform-item">';
+      platHtml += '<div class="plat-name">' + platNames[p2] + '最佳时段</div>';
+      platHtml += '<div class="plat-best">' + bestH + ':00 - ' + (bestH + 1) + ':00</div>';
+      platHtml += '<div style="color:var(--text-tertiary);font-size:11px;margin-top:2px;">爆款率' + bestVR.toFixed(1) + '% · 平均点赞' + Math.round(bestAvg).toLocaleString() + '</div>';
+      platHtml += '</div>';
+    }
+  }
+  document.getElementById('ptPlatform').innerHTML = platHtml;
+
+  // 实操建议
+  var tipsHtml = '<strong>💡 实操建议：</strong>';
+  if (bestHours.length > 0) {
+    tipsHtml += '优先在<strong>' + bestHours[0].hour + ':00前后</strong>发布，爆款率是平均水平的' + (bestHours[0].viralRate / Math.max(hoursWithData.reduce(function(s, x) { return s + x.viralRate; }, 0) / Math.max(hoursWithData.length, 1), 0.1)).toFixed(1) + '倍。';
+  }
+  tipsHtml += ' 避开<strong>13:00-14:00午间</strong>（AI内容互动最差）。';
+  tipsHtml += ' 若一天发2条，选<strong>18点 + 20点</strong>覆盖晚高峰双波峰。';
+  document.getElementById('ptTips').innerHTML = tipsHtml;
+}
 
 // ===== 全局搜索 =====
 function doGlobalSearch(query) {
@@ -3017,7 +3235,7 @@ function renderAll() {
   renderDuration(works); renderHook(works); renderCommentKw(works);
   renderScatter(works); renderCollect(hw); renderCommentDemands();
   renderSaturation(hw); renderSmallViral(works); renderFormulas();
-  renderAuthors(works); renderCompetitorWorks(); 
+  renderAuthors(works); renderCompetitorWorks(); renderPublishTime(); 
 
   renderKanban();
   renderFavorites();
