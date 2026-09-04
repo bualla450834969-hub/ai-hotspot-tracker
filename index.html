@@ -1785,7 +1785,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788491290920"></script>
+<script src="data.js?v=1788491530257"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
@@ -2056,6 +2056,18 @@ function initNavHide() {
     <div class="bento-card">
       <div class="card-head"><span class="ch-bar"></span><span class="ch-title">钩子爆款率</span></div>
       <div class="chart-sm" id="chartHook"></div>
+      </div>
+      <div class="bento-card" style="position:relative;overflow:hidden;">
+        <div class="card-head"><span class="ch-bar"></span><span class="ch-title">互动质量</span><span class="ch-tip">评论率/收藏率越高越有价值</span></div>
+        <div class="engage-card">
+          <div class="engage-stats">
+            <div class="engage-stat"><div class="es-num" id="avgCommentRate">--</div><div class="es-label">平均评论率</div></div>
+            <div class="engage-stat"><div class="es-num" id="avgCollectRate">--</div><div class="es-label">平均收藏率</div></div>
+          </div>
+          <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;">🔥 高评论率作品</div>
+          <div class="engage-list" id="highCommentList"></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -2675,13 +2687,17 @@ function init() {
 // ===== 互动率分析渲染 =====
 function renderEngagement() {
   var ea = DATA.engagement_analysis || {};
-  document.getElementById('avgCommentRate').textContent = (ea.avg_comment_rate || 0) + '%';
-  document.getElementById('avgCollectRate').textContent = (ea.avg_collect_rate || 0) + '%';
+  var el1 = document.getElementById('avgCommentRate');
+  if (el1) el1.textContent = (ea.avg_comment_rate || 0) + '%';
+  var el2 = document.getElementById('avgCollectRate');
+  if (el2) el2.textContent = (ea.avg_collect_rate || 0) + '%';
+  var listEl = document.getElementById('highCommentList');
+  if (!listEl) return;
   var list = ea.high_comment_works || [];
   var html = list.slice(0, 5).map(function(w) {
     return '<div class="engage-item"><span class="ei-title">' + w.title + '</span><span class="ei-rate">' + w.comment_rate + '%</span><span class="ei-plat">' + w.platform + '</span></div>';
   }).join('');
-  document.getElementById('highCommentList').innerHTML = html || '<div style="font-size:11px;color:var(--text-tertiary);">暂无数据</div>';
+  listEl.innerHTML = html || '<div style="font-size:11px;color:var(--text-tertiary);">暂无数据</div>';
 }
 
 // ===== 标题公式库渲染 =====
@@ -2701,7 +2717,7 @@ function renderTitleFormulas() {
     var ex = examples[name] || '点击查看套用示例';
     return '<div class="formula-item" onclick="copyFormula(\'' + name + '\')"><div class="fi-name">' + name + '</div><div class="fi-count">爆款中出现 ' + count + ' 次</div><div class="fi-example">示例：' + ex + '</div></div>';
   }).join('');
-  document.getElementById('formulaGrid').innerHTML = html || '<div style="color:var(--text-tertiary);">暂无数据</div>';
+  var fg = document.getElementById('formulaGrid'); if (fg) fg.innerHTML = html || '<div style="color:var(--text-tertiary);">暂无数据</div>';
 }
 function copyFormula(name) {
   alert('已复制【' + name + '】标题公式，可在选题标题中套用');
@@ -2719,7 +2735,7 @@ function renderLeadScripts() {
   var html = scripts.map(function(s) {
     return '<div class="script-card"><div class="sc-target">' + s.target + '</div><div class="sc-text">' + s.text + '</div><span class="sc-copy" onclick="copyScript(this)">📋 复制话术</span></div>';
   }).join('');
-  document.getElementById('scriptContainer').innerHTML = html;
+  var sc = document.getElementById('scriptContainer'); if (sc) sc.innerHTML = html;
 }
 function copyScript(el) {
   var text = el.previousElementSibling.textContent;
@@ -2769,7 +2785,7 @@ function renderCreditMonitor() {
   html += '<span>已用' + Math.round(usedSoFar) + '/1000</span>';
   // 插入到hero区域或导航栏
   var heroStats = document.querySelector('.hero-stats');
-  if (heroStats && !document.getElementById('creditMonitor')) {
+  if (heroStats && !document.getElementById('creditMonitor') && heroStats.parentNode) {
     var monitor = document.createElement('div');
     monitor.id = 'creditMonitor';
     monitor.className = 'credit-monitor';
@@ -2992,6 +3008,14 @@ function exportTopics() {
 }
 
 // ===== 模块折叠 =====
+function toggleSection(id) {
+  var sec = document.getElementById(id);
+  if (!sec) return;
+  sec.classList.toggle('collapsed');
+  var btn = sec.querySelector('.section-collapse-btn');
+  if (btn) btn.textContent = sec.classList.contains('collapsed') ? '展开' : '收起';
+}
+
 function initSectionCollapse() {
   var sections = document.querySelectorAll('.hero, section');
   sections.forEach(function(sec, idx) {
