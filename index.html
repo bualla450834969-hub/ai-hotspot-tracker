@@ -1785,7 +1785,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788491530257"></script>
+<script src="data.js?v=1788506358330"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
@@ -3697,44 +3697,66 @@ function renderFormulas() {
 function renderAuthors(works) {
   const m={}; works.forEach(w=>{
     const n=w.accountName||'未知';
-    if(!m[n])m[n]={name:n,followers:w.followerCount||0,likes:0,count:0,max:0,titles:[],keywords:{}};
+    if(!m[n])m[n]={name:n,followers:w.followerCount||0,likes:0,count:0,max:0,titles:[],keywords:{},platforms:{},accountType:w.accountType||'',formats:{},commentKw:{}};
     m[n].likes+=(w.likeCount||0);
     m[n].count++;
+    const plat = w.platform||'dy';
+    m[n].platforms[plat]=(m[n].platforms[plat]||0)+1;
+    if(w.accountType) m[n].accountType=w.accountType;
     if((w.likeCount||0)>m[n].max)m[n].max=w.likeCount||0;
     if(w.title)m[n].titles.push(w.title);
+    // 评论关键词
+    if(w.commentTopKeywords && typeof w.commentTopKeywords === 'object') {
+      Object.entries(w.commentTopKeywords).forEach(([k,v])=>{ m[n].commentKw[k]=(m[n].commentKw[k]||0)+(v||0); });
+    }
   });
-  // 提取每个账号的内容主题关键词
-  const themeKeywords = ['可灵','即梦','AI绘画','AI视频','数字人','工作流','Agent','提示词','教程','实测','对比','免费','神器','效率','自动化','Sora','Midjourney','ComfyUI','Dify','Coze','豆包','GPT','Claude'];
+  // 提取内容主题关键词
+  const themeKeywords = ['可灵','即梦','AI绘画','AI视频','数字人','工作流','Agent','提示词','教程','实测','对比','免费','神器','效率','自动化','Sora','Midjourney','ComfyUI','Dify','Coze','豆包','GPT','Claude','剪映','PPT','电商','带货','变现','副业','编程','代码','写作','翻译','配音','音乐','图片','头像','壁纸','表情包','游戏','动漫','影视','解说','测评','盘点','干货','避坑','新手','入门','进阶','高阶','开源','GitHub','模型','大模型','LLM','RAG','微调','训练'];
+  // 内容形式标签
+  const formatKeywords = {'教程':['教程','手把手','入门','教学','怎么','如何','步骤'],'实测':['实测','体验','测试','对比','测评','横评'],'盘点':['盘点','排行','TOP','合集','汇总','清单'],'干货':['干货','技巧','方法','攻略','指南','避坑'],'资讯':['最新','发布','上线','更新','新闻','快讯'],'变现':['变现','赚钱','副业','带货','收入','盈利']};
   Object.values(m).forEach(a=>{
     a.titles.forEach(t=>{
-      themeKeywords.forEach(k=>{
-        if(t.toLowerCase().includes(k.toLowerCase()))a.keywords[k]=(a.keywords[k]||0)+1;
+      const tl = t.toLowerCase();
+      themeKeywords.forEach(k=>{ if(tl.includes(k.toLowerCase()))a.keywords[k]=(a.keywords[k]||0)+1; });
+      Object.entries(formatKeywords).forEach(([fmt, kws])=>{
+        if(kws.some(k=>tl.includes(k))) a.formats[fmt]=(a.formats[fmt]||0)+1;
       });
     });
   });
-  const top=Object.values(m).sort((a,b)=>b.likes-a.likes).slice(0,5);
+  const top=Object.values(m).sort((a,b)=>b.likes-a.likes).slice(0,10);
   document.getElementById('authorList').innerHTML=top.map((a,i)=>{
     const avg=Math.round(a.likes/a.count);
-    const themes=Object.entries(a.keywords).sort((x,y)=>y[1]-x[1]).slice(0,3).map(k=>k[0]).join(' · ')||'综合AI内容';
+    const themes=Object.entries(a.keywords).sort((x,y)=>y[1]-x[1]).slice(0,4).map(k=>k[0]);
+    const formats=Object.entries(a.formats).sort((x,y)=>y[1]-x[1]).slice(0,2).map(f=>f[0]);
+    const platDy = a.platforms['dy']||0;
+    const platXhs = a.platforms['xhs']||0;
+    const platLabel = platDy>0 && platXhs>0 ? '双平台' : platDy>0 ? '抖音' : '小红书';
+    const platColor = platDy>0 && platXhs>0 ? '#a78bfa' : platDy>0 ? '#60a5fa' : '#f472b6';
     const learnNote = avg > 50000 ? '高均赞：内容质量驱动，值得拆解爆款结构' : a.count > 10 ? '高频更新：量产策略，可学习选题节奏' : '单条爆款：钩子+选题精准，可复用其标题公式';
+    const themeTags = themes.length ? themes.map(t=>'<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(139,92,246,0.15);color:#a78bfa;">'+t+'</span>').join('') : '<span style="font-size:10px;color:var(--text-tertiary);">综合AI内容</span>';
+    const formatTags = formats.length ? formats.map(f=>'<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(52,211,153,0.15);color:#34d399;">'+f+'</span>').join('') : '';
     return `
     <div class="author-item" style="flex-direction:column;align-items:stretch;gap:6px;">
       <div style="display:flex;align-items:center;gap:12px;">
         <div class="author-rank ${i<3?'r'+(i+1):'other'}">${i+1}</div>
         <div class="author-info" style="flex:1;">
-          <div class="author-name">${a.name}</div>
+          <div class="author-name">${a.name}
+            <span style="font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(251,191,36,0.15);color:#fbbf24;margin-left:6px;">${a.accountType||'未分类'}</span>
+            <span style="font-size:9px;padding:1px 5px;border-radius:3px;background:${platColor}22;color:${platColor};margin-left:4px;">${platLabel}</span>
+          </div>
           <div class="author-followers">粉丝${(a.followers/10000).toFixed(1)}万 · ${a.count}条作品 · 均赞${(avg/10000).toFixed(1)}万</div>
         </div>
         <div class="author-likes">总赞${(a.likes/10000).toFixed(1)}万<div style="font-size:10px;opacity:.6;margin-top:2px;">最高${(a.max/10000).toFixed(1)}万</div></div>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;padding-left:36px;">
-        <span style="font-size:10px;color:var(--text-tertiary);">内容方向：</span>
-        <span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(139,92,246,0.15);color:#a78bfa;">${themes}</span>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;padding-left:36px;align-items:center;">
+        <span style="font-size:10px;color:var(--text-tertiary);">内容标签：</span>${themeTags}
       </div>
+      ${formatTags ? '<div style="display:flex;flex-wrap:wrap;gap:4px;padding-left:36px;align-items:center;"><span style="font-size:10px;color:var(--text-tertiary);">内容形式：</span>'+formatTags+'</div>' : ''}
       <div style="font-size:10px;color:#34d399;padding-left:36px;">💡 ${learnNote}</div>
     </div>`;
   }).join('');
 }
+
 
 function isFavorite(i) { const favs = JSON.parse(localStorage.getItem("viral_favorites") || "[]"); return favs.some(f => f.title === DATA.hot_breakdowns[i]?.title); }
 function renderBreakdowns() {
