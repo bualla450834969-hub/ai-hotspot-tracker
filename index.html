@@ -1824,7 +1824,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788510535045"></script>
+<script src="data.js?v=1788510941852"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
@@ -2815,7 +2815,7 @@ function renderLaunchOps() {
   // 任务清单
   var tasks = lo.tasks || [];
   document.getElementById('launchTasks').innerHTML = tasks.map(function(t,i){
-    return '<div class="task-item"><div class="task-check" onclick="this.classList.toggle('done');this.innerHTML=this.classList.contains('done')?'✓':''"></div><span>'+t+'</span></div>';
+    return '<div class="task-item"><div class="task-check"></div><span>'+t+'</span></div>';
   }).join('');
   // 避坑提醒
   var pitfalls = (lo.pitfalls||[]).filter(function(p){return p.active;});
@@ -2823,6 +2823,15 @@ function renderLaunchOps() {
     return '<div class="pitfall-item '+p.level+'"><span>'+(p.level==='high'?'🔴':p.level==='mid'?'🟡':'⚪')+'</span><span>'+p.text+'</span></div>';
   }).join('');
 }
+
+
+// 任务清单点击事件委托
+document.addEventListener('click', function(e) {
+  if(e.target.classList.contains('task-check')) {
+    e.target.classList.toggle('done');
+    e.target.innerHTML = e.target.classList.contains('done') ? '✓' : '';
+  }
+});
 
 // ===== 互动率分析渲染 =====
 function renderEngagement() {
