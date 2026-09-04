@@ -817,6 +817,52 @@ a.work-link:hover { opacity: 0.7; }
 .topic-card.status-published .status-badge { display:inline-block; background:rgba(48,209,88,0.2);color:#30D158; }
 .topic-card.status-published { opacity: .55; }
 
+/* ===== 互动率分析 ===== */
+.engage-card { padding: 16px; }
+.engage-stats { display: flex; gap: 16px; margin-bottom: 12px; }
+.engage-stat { flex: 1; text-align: center; padding: 10px; background: rgba(255,255,255,0.04); border-radius: 8px; }
+.engage-stat .es-num { font-size: 22px; font-weight: 700; color: #30D158; }
+.engage-stat .es-label { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+.engage-list { max-height: 200px; overflow-y: auto; }
+.engage-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 11px; }
+.engage-item .ei-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-secondary); }
+.engage-item .ei-rate { color: #fbbf24; font-weight: 600; margin-left: 8px; }
+.engage-item .ei-plat { font-size: 9px; color: var(--text-tertiary); margin-left: 6px; }
+
+/* ===== 标题公式库 ===== */
+.formula-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 12px; }
+.formula-item { padding: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; cursor: pointer; transition: all 0.3s; }
+.formula-item:hover { border-color: rgba(139,92,246,0.4); background: rgba(139,92,246,0.08); }
+.formula-item .fi-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.formula-item .fi-count { font-size: 10px; color: #fbbf24; margin-top: 2px; }
+.formula-item .fi-example { font-size: 10px; color: var(--text-tertiary); margin-top: 6px; line-height: 1.5; }
+
+/* ===== 引流话术 ===== */
+.script-card { padding: 14px; background: rgba(255,255,255,0.04); border-radius: 10px; margin-bottom: 10px; border-left: 3px solid #8b5cf6; }
+.script-card .sc-target { font-size: 12px; font-weight: 600; color: #c4b5fd; margin-bottom: 6px; }
+.script-card .sc-text { font-size: 11px; color: var(--text-secondary); line-height: 1.7; }
+.script-card .sc-copy { font-size: 10px; color: #8b5cf6; cursor: pointer; margin-top: 6px; display: inline-block; }
+.script-card .sc-copy:hover { text-decoration: underline; }
+
+/* ===== 智能优先级标签 ===== */
+.smart-priority { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; background: rgba(48,209,88,0.15); color: #30D158; }
+.smart-priority.high { background: rgba(251,191,36,0.15); color: #fbbf24; }
+.smart-priority.mid { background: rgba(48,209,88,0.15); color: #30D158; }
+.smart-priority.low { background: rgba(255,255,255,0.08); color: var(--text-tertiary); }
+
+/* ===== 拍摄清单弹窗 ===== */
+.shoot-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; justify-content: center; align-items: center; }
+.shoot-modal.active { display: flex; }
+.shoot-modal-content { background: var(--bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 24px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+.shoot-modal-content h3 { margin: 0 0 16px 0; color: var(--text); }
+.shoot-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 12px; color: var(--text-secondary); }
+.shoot-item input[type="checkbox"] { accent-color: #8b5cf6; }
+
+/* ===== 积分监控 ===== */
+.credit-monitor { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); border-radius: 20px; font-size: 11px; color: #fbbf24; }
+.credit-monitor .cm-bar { width: 60px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+.credit-monitor .cm-fill { height: 100%; background: linear-gradient(90deg, #fbbf24, #f97316); border-radius: 2px; transition: width 0.5s; }
+
 /* ===== 发布时间分析 ===== */
 .publish-time-section { padding: 24px; }
 .pt-chart {
@@ -1739,7 +1785,7 @@ function initNavHide() {
 }
 
 </script>
-<script src="data.js?v=1788484159184"></script>
+<script src="data.js?v=1788491290920"></script>
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
@@ -1839,6 +1885,8 @@ function initNavHide() {
   <a class="nav-link" data-target="topics">生产</a>
   <a class="nav-link" data-target="topicPerf">运营</a>
   <a class="nav-link" data-target="publishTime">发布时间</a>
+      <a class="nav-link" data-target="titleFormulas">标题公式</a>
+      <a class="nav-link" data-target="leadScripts">引流话术</a>
       <a class="nav-link" data-target="audience">受众</a>
       <div class="global-search">
         <span class="search-icon">🔍</span>
@@ -2249,6 +2297,24 @@ function initNavHide() {
     </div>
   </div>
 
+<div id="titleFormulas" class="section">
+    <div class="section-header">
+      <div><h2 class="section-title">📝 爆款标题公式库</h2><div class="hs-sub">从爆款作品中自动提取的标题模式</div></div>
+      <button class="section-collapse-btn" onclick="toggleSection('titleFormulas')">收起</button>
+    </div>
+    <div class="glass-card" style="padding:20px;">
+      <div class="formula-grid" id="formulaGrid"></div>
+    </div>
+  </div>
+
+  <div id="leadScripts" class="section">
+    <div class="section-header">
+      <div><h2 class="section-title">💬 私域引流话术库</h2><div class="hs-sub">针对不同人群的评论区引流话术</div></div>
+      <button class="section-collapse-btn" onclick="toggleSection('leadScripts')">收起</button>
+    </div>
+    <div class="glass-card" style="padding:20px;" id="scriptContainer"></div>
+  </div>
+
 <div id="audience" class="section anim-d9">
 <div class="section-header">
 <span class="section-num">06</span>
@@ -2605,6 +2671,112 @@ function init() {
   }
   setTimeout(checkDataFreshness, 2000);
 
+
+// ===== 互动率分析渲染 =====
+function renderEngagement() {
+  var ea = DATA.engagement_analysis || {};
+  document.getElementById('avgCommentRate').textContent = (ea.avg_comment_rate || 0) + '%';
+  document.getElementById('avgCollectRate').textContent = (ea.avg_collect_rate || 0) + '%';
+  var list = ea.high_comment_works || [];
+  var html = list.slice(0, 5).map(function(w) {
+    return '<div class="engage-item"><span class="ei-title">' + w.title + '</span><span class="ei-rate">' + w.comment_rate + '%</span><span class="ei-plat">' + w.platform + '</span></div>';
+  }).join('');
+  document.getElementById('highCommentList').innerHTML = html || '<div style="font-size:11px;color:var(--text-tertiary);">暂无数据</div>';
+}
+
+// ===== 标题公式库渲染 =====
+function renderTitleFormulas() {
+  var formulas = DATA.title_formulas_extracted || [];
+  var examples = {
+    '感叹句': '太绝了！这个AI工具让我效率提升10倍',
+    '教程型': '手把手教你用AI做XX，3分钟上手',
+    '疑问句': 'AI做图还在手动调参？这个方法90%的人不知道',
+    '否定警告': '千万别再用XX做AI了，这3个坑踩过的人都哭了',
+    '极限词': '2026最强AI工具排行，第一名居然是它',
+    '实测型': '我用AI工作流跑了一周，效率提升了200%',
+    '免费型': '免费白嫖！这款AI工具比付费的还好用',
+  };
+  var html = formulas.map(function(f) {
+    var name = f[0], count = f[1];
+    var ex = examples[name] || '点击查看套用示例';
+    return '<div class="formula-item" onclick="copyFormula(\'' + name + '\')"><div class="fi-name">' + name + '</div><div class="fi-count">爆款中出现 ' + count + ' 次</div><div class="fi-example">示例：' + ex + '</div></div>';
+  }).join('');
+  document.getElementById('formulaGrid').innerHTML = html || '<div style="color:var(--text-tertiary);">暂无数据</div>';
+}
+function copyFormula(name) {
+  alert('已复制【' + name + '】标题公式，可在选题标题中套用');
+}
+
+// ===== 引流话术库渲染 =====
+function renderLeadScripts() {
+  var scripts = [
+    { target: '🎯 技术极客（65.9%）', text: '评论区扣"1"，我把这套AI工作流的完整配置和提示词打包发你，都是自己实测过的，直接能用。' },
+    { target: '🎨 视觉创作者（9.8%）', text: '想要这套AI出图的完整提示词和参数设置吗？评论区告诉我你用的是什么工具，我针对性发你。' },
+    { target: '👀 泛AI关注者（22.5%）', text: '刚整理了一份《AI工具避坑指南》，把我花了几万块踩过的坑都写进去了，评论区"避坑"我发你。' },
+    { target: '💼 职场效率人群', text: '这套AI工作流我自己用了半年，每天省2小时。想要的评论区"效率"，我把模板和教程一起发你。' },
+    { target: '🚀 创业者/副业人群', text: '用AI做副业第一个月赚了XX，把完整的工具链和操作流程整理好了，评论区"副业"发你完整版。' },
+  ];
+  var html = scripts.map(function(s) {
+    return '<div class="script-card"><div class="sc-target">' + s.target + '</div><div class="sc-text">' + s.text + '</div><span class="sc-copy" onclick="copyScript(this)">📋 复制话术</span></div>';
+  }).join('');
+  document.getElementById('scriptContainer').innerHTML = html;
+}
+function copyScript(el) {
+  var text = el.previousElementSibling.textContent;
+  var ta = document.createElement('textarea');
+  ta.value = text; document.body.appendChild(ta); ta.select();
+  document.execCommand('copy'); document.body.removeChild(ta);
+  el.textContent = '✅ 已复制';
+  setTimeout(function(){ el.textContent = '📋 复制话术'; }, 2000);
+}
+
+// ===== 拍摄清单生成 =====
+function generateShootList(topicIndex) {
+  var topics = filteredTopics();
+  var t = topics[topicIndex];
+  if (!t) return;
+  var items = [
+    '确认选题标题和钩子文案',
+    '准备数字人形象和口播文案',
+    '收集AI生成素材（截图/演示视频）',
+    '准备参考爆款视频的结构和节奏',
+    '录制数字人口播（注意语速和停顿）',
+    '剪辑：口播+素材混剪，控制在60-90秒',
+    '添加字幕和关键信息高亮',
+    '选择最佳发布时间（18:00-21:00）',
+    '准备评论区引流话术',
+    '发布后30分钟内回复前10条评论',
+  ];
+  var html = '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">选题：' + t.title + '</div>';
+  html += items.map(function(item, i) {
+    return '<div class="shoot-item"><input type="checkbox" id="shoot-' + i + '"><label for="shoot-' + i + '">' + (i+1) + '. ' + item + '</label></div>';
+  }).join('');
+  document.getElementById('shootModalBody').innerHTML = html;
+  document.getElementById('shootModal').classList.add('active');
+}
+
+// ===== 积分监控渲染 =====
+function renderCreditMonitor() {
+  // 估算：每天约13次API调用，每次0.4积分 = 每天5.2积分
+  var dailyCost = 5.2;
+  var today = new Date();
+  var dayOfMonth = today.getDate();
+  var estimatedMonthly = dailyCost * 30;
+  var usedSoFar = dailyCost * dayOfMonth;
+  var pct = Math.min(usedSoFar / 1000 * 100, 100);
+  var html = '<span>💰 积分</span>';
+  html += '<div class="cm-bar"><div class="cm-fill" style="width:' + pct + '%"></div></div>';
+  html += '<span>已用' + Math.round(usedSoFar) + '/1000</span>';
+  // 插入到hero区域或导航栏
+  var heroStats = document.querySelector('.hero-stats');
+  if (heroStats && !document.getElementById('creditMonitor')) {
+    var monitor = document.createElement('div');
+    monitor.id = 'creditMonitor';
+    monitor.className = 'credit-monitor';
+    monitor.innerHTML = html;
+    heroStats.parentNode.insertBefore(monitor, heroStats.nextSibling);
+  }
+}
 
 // ===== 发布时间分析渲染 =====
 function renderPublishTimeDetail() {
@@ -3235,7 +3407,7 @@ function renderAll() {
   renderDuration(works); renderHook(works); renderCommentKw(works);
   renderScatter(works); renderCollect(hw); renderCommentDemands();
   renderSaturation(hw); renderSmallViral(works); renderFormulas();
-  renderAuthors(works); renderCompetitorWorks(); renderPublishTimeDetail(); 
+  renderAuthors(works); renderCompetitorWorks(); renderPublishTimeDetail(); renderEngagement(); renderTitleFormulas(); renderLeadScripts(); renderCreditMonitor(); 
 
   renderKanban();
   renderFavorites();
@@ -3625,6 +3797,7 @@ function renderTopics() {
       <div class="status-badge">${st==='pending'?'待拍摄':st==='shooting'?'拍摄中':'已发布'}</div>
       <div class="tc-num">${String(i+1).padStart(2,'0')}</div>
       <div class="tc-priority">${t.priority}优先</div>
+      ${t.smart_priority ? '<span class="smart-priority ' + (t.smart_priority>=60?'high':t.smart_priority>=40?'mid':'low') + '" title="信息差'+(t.priority_breakdown?.info_gap||0)+' 热度'+(t.priority_breakdown?.heat||0)+' 低竞争'+(t.priority_breakdown?.low_competition||0)+'">智能 ' + t.smart_priority + '</span>' : ''}
       ${t.is_info_gap ? '<div class="info-gap-badge">💎 信息差</div>' : (t.is_forecast ? '<div class="forecast-badge">🔮 前瞻</div>' : '')}
       <div class="tc-title">${t.title}</div>
       <div class="tc-hook">${t.hook}</div>
@@ -3898,6 +4071,15 @@ initLoginLogo();
 initNavHide();
 initScrollReveal();
 </script>
+<div class="shoot-modal" id="shootModal" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="shoot-modal-content">
+    <h3>🎬 拍摄清单</h3>
+    <div id="shootModalBody"></div>
+    <div style="margin-top:16px;text-align:right;">
+      <button onclick="document.getElementById('shootModal').classList.remove('active')" style="padding:8px 16px;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.3);border-radius:8px;color:#c4b5fd;cursor:pointer;">关闭</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
 
