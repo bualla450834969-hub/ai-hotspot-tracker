@@ -29,18 +29,18 @@
   function getMonetization(topic) {
     const kw = (topic.keyword || '').toLowerCase();
     const cat = topic.keyword || '';
-    // 判断变现方式
-    let type, score, desc;
-    if (kw.includes('工具') || kw.includes('教程') || kw.includes('入门') || kw.includes('怎么做') || cat.includes('AI做图') || cat.includes('AI视频') || cat.includes('AI PPT')) {
-      type = 'affiliate'; score = 85; desc = '带货：AI工具会员/ affiliate 佣金';
-    } else if (kw.includes('资讯') || kw.includes('新闻') || kw.includes('发布') || cat.includes('AI大类') || cat.includes('AI Agent')) {
-      type = 'ad'; score = 70; desc = '广告：品牌合作、商单植入';
-    } else if (kw.includes('工作流') || kw.includes('自动化') || kw.includes('效率') || cat.includes('AI工作流') || cat.includes('AI自动化')) {
-      type = 'private'; score = 90; desc = '私域：引流微信，卖方案/咨询';
-    } else if (kw.includes('提示词') || kw.includes('prompt') || cat.includes('AI提示词')) {
-      type = 'course'; score = 75; desc = '知识付费：提示词课程/社群';
-    } else {
-      type = 'affiliate'; score = 60; desc = '带货：通用AI工具推荐';
+    const rules = cfg('monetization_rules', [
+      { match: ['工具','教程','入门','怎么做','做图','视频','ppt'], type: 'affiliate', score: 85, desc: '带货：工具会员/affiliate佣金' },
+      { match: ['资讯','新闻','发布','agent'], type: 'ad', score: 70, desc: '广告：品牌合作、商单植入' },
+      { match: ['工作流','自动化','效率'], type: 'private', score: 90, desc: '私域：引流微信，卖方案/咨询' },
+      { match: ['提示词','prompt'], type: 'course', score: 75, desc: '知识付费：课程/社群' },
+    ]);
+    let type = 'affiliate', score = 60, desc = '带货：通用工具推荐';
+    for (let i = 0; i < rules.length; i++) {
+      const r = rules[i];
+      if (r.match.some(m => kw.includes(m) || cat.includes(m))) {
+        type = r.type; score = r.score; desc = r.desc; break;
+      }
     }
     const typeMap = { affiliate: { name: '带货', cls: 'monetize-affiliate' }, ad: { name: '广告', cls: 'monetize-ad' }, private: { name: '私域', cls: 'monetize-private' }, course: { name: '知识付费', cls: 'monetize-course' } };
     return { type, score, desc, ...typeMap[type] };
@@ -195,7 +195,7 @@
   // exportTopics
   function exportTopics() {
     var topics = filteredTopics();
-    var text = '【AI热点选题清单】' + new Date().toLocaleDateString() + '\n\n';
+    var text = '【' + cfg('name', '热点') + '选题清单】' + new Date().toLocaleDateString() + '\n\n';
     topics.forEach(function(t, i) {
       var status = getTopicStatus(t.title);
       var statusText = status === 'published' ? '已发布' : status === 'shooting' ? '拍摄中' : '待拍摄';
