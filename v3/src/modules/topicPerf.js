@@ -66,4 +66,9 @@
       }
     });
   }
+  window.renderTopicPerf = renderTopicPerf;
+  window.recordPerf = recordPerf;
+  window.calcHitRate = calcHitRate;
+  window.getPerfData = getPerfData;
+  window.savePerfData = savePerfData;
 })();
