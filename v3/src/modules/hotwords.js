@@ -56,7 +56,7 @@
     mergedHist.forEach(h => h.hotwords.forEach(x => kwSet.add(x.keyword)));
     const kwVolatility = [];
     kwSet.forEach(kw => {
-      if (kw === 'AI') return; // 排除超大词
+      if (cfg('exclude_keywords', ['AI']).includes(kw)) return; // 排除超大词
       const vals = mergedHist.map(h => {
         const f = h.hotwords.find(x => x.keyword === kw);
         return f ? f.total : null;
@@ -73,7 +73,7 @@
     let topKws = kwVolatility.slice(0,5).map(x => x.kw);
     // 如果波动率不足5个，补充当前热门词
     if (topKws.length < 5) {
-      const currentTop = [...hw].sort((a,b) => b.total-a.total).map(h => h.keyword).filter(k => k !== 'AI' && !topKws.includes(k));
+      const currentTop = [...hw].sort((a,b) => b.total-a.total).map(h => h.keyword).filter(k => !cfg('exclude_keywords', ['AI']).includes(k) && !topKws.includes(k));
       topKws = topKws.concat(currentTop).slice(0,5);
     }
     const series = topKws.map((kw,i) => {
