@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>热点追踪工作台</title>
+  <!-- ===== 样式层（模块化）===== -->
+  <link rel="stylesheet" href="src/styles/base.css">
+  <link rel="stylesheet" href="src/styles/components.css">
+  <link rel="stylesheet" href="src/styles/glass.css">
+  <link rel="stylesheet" href="src/styles/login.css">
+  <link rel="stylesheet" href="src/styles/modules.css">
+  <!-- ECharts -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+</head>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-orb login-orb-1"></div>
+  <div class="login-orb login-orb-2"></div>
+  <div class="login-orb login-orb-3"></div>
+  <div class="login-logo-wrap">
+  <svg class="login-logo-svg" viewBox="212.9 89.4 403.6 287.9" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+  <radialGradient id="lgMain1" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgSub1" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgMain2" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgSub2" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgMain3" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgSub3" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgMain4" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgSub4" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+
+  <filter id="lgBlurM" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10"/></filter>
+  <filter id="lgBlurS" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="7"/></filter>
+  <radialGradient id="lgSparkGrad">
+  <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+  <stop offset="35%" stop-color="#b8e0ff" stop-opacity="0.7"/>
+  <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+  </radialGradient>
+  <filter id="lgSparkBlur" x="-300%" y="-300%" width="700%" height="700%"><feGaussianBlur stdDeviation="3.5"/></filter>
+  </defs>
+  <path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="login-glow lgm-1" fill="url(#lgMain1)" filter="url(#lgBlurM)"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="login-glow lgm-2" fill="url(#lgMain2)" filter="url(#lgBlurM)"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="login-glow lgm-3" fill="url(#lgMain3)" filter="url(#lgBlurM)"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="login-glow lgm-4" fill="url(#lgMain4)" filter="url(#lgBlurM)"/>
+
+  <path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="login-glow lgs-1" fill="url(#lgSub1)" filter="url(#lgBlurS)"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="login-glow lgs-2" fill="url(#lgSub2)" filter="url(#lgBlurS)"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="login-glow lgs-3" fill="url(#lgSub3)" filter="url(#lgBlurS)"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="login-glow lgs-4" fill="url(#lgSub4)" filter="url(#lgBlurS)"/>
+
+  <path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="login-glass"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="login-glass"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="login-glass"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="login-glass"/>
+
+  </svg>
+  </div>
+  <div class="login-brand">
+    <div class="login-brand-name">PYRALUMA</div>
+    <div class="login-brand-tag">璃火矩创 · AI Intelligence</div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-arrow"></div>
+    <div class="scroll-text">上滑进入工作台</div>
+  </div>
+</div>
+
+<div class="top-nav" id="topNav">
+  <span class="nav-logo">AI热点追踪</span>
+  <a class="nav-link" data-target="hero">工作台</a>
+  <a class="nav-link" data-target="techradar">技术雷达</a>
+  <a class="nav-link" data-target="hotwords">热点</a>
+  <a class="nav-link" data-target="breakdown">爆款</a>
+  <a class="nav-link" data-target="topics">生产</a>
+  <a class="nav-link" data-target="topicPerf">运营</a>
+  <a class="nav-link" data-target="publishTime">发布时间</a>
+      <a class="nav-link" data-target="titleFormulas">标题公式</a>
+      <a class="nav-link" data-target="leadScripts">引流话术</a>
+      <a class="nav-link" data-target="launchOps">起号运营</a>
+      <a class="nav-link" data-target="audience">受众</a>
+      <div class="global-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="globalSearch" placeholder="搜索选题/热词..." oninput="doGlobalSearch(this.value)">
+      </div>
+</div>
+<div class="scroll-progress" id="scrollProgress"></div>
+<div class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+<div class="bg-logo">
+<svg class="bg-logo-svg" viewBox="212.9 89.4 403.6 287.9" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="bgMain1" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgSub1" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgMain2" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgSub2" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgMain3" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgSub3" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgMain4" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgSub4" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<filter id="bgBlurM" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10"/></filter>
+<filter id="bgBlurS" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="7"/></filter>
+</defs>
+<path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96     c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="bg-glow bg-glow-main bgm-1" fill="url(#bgMain1)" filter="url(#bgBlurM)"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56     c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="bg-glow bg-glow-main bgm-2" fill="url(#bgMain2)" filter="url(#bgBlurM)"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96      c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="bg-glow bg-glow-main bgm-3" fill="url(#bgMain3)" filter="url(#bgBlurM)"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56      c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="bg-glow bg-glow-main bgm-4" fill="url(#bgMain4)" filter="url(#bgBlurM)"/>
+
+<path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96     c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="bg-glow bg-glow-sub bgs-1" fill="url(#bgSub1)" filter="url(#bgBlurS)"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56     c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="bg-glow bg-glow-sub bgs-2" fill="url(#bgSub2)" filter="url(#bgBlurS)"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96      c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="bg-glow bg-glow-sub bgs-3" fill="url(#bgSub3)" filter="url(#bgBlurS)"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56      c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="bg-glow bg-glow-sub bgs-4" fill="url(#bgSub4)" filter="url(#bgBlurS)"/>
+
+<path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96     c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="bg-glass"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56     c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="bg-glass"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96      c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="bg-glass"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56      c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="bg-glass"/>
+
+</svg>
+</div>
+
+<div class="blob-3"></div>
+
+<div class="hero">
+  <div class="hero-top anim anim-d1">
+    <div>
+      <h1 class="hero-title">AI 热点<em>追踪</em><br>工作台</h1>
+      <div class="hero-sub">Daily Hotspot Intelligence · RedFox Hub</div>
+    </div>
+    <div class="hero-meta">
+      <div class="time" id="updateTime">加载中...</div>
+      <div>每日 8:00 自动采集 · 8:05 推送简报</div>
+      <div class="hero-filter">
+        <div class="platform-switch" id="platformSwitch">
+          <button class="platform-btn active" data-platform="all" onclick="setPlatform('all')">全部</button>
+          <button class="platform-btn" data-platform="douyin" onclick="setPlatform('douyin')">抖音</button>
+          <button class="platform-btn" data-platform="xiaohongshu" onclick="setPlatform('xiaohongshu')">小红书</button>
+          <button class="platform-btn" data-platform="compare" onclick="setPlatform('compare')">对比</button>
+        </div>
+        <select id="categoryFilter" onchange="applyFilter()">
+          <option value="all">全部赛道</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="hero-stats anim anim-d2" id="heroStats"></div>
+</div>
+
+<div class="section anim anim-d2">
+  <div id="hero" class="section-header">
+    <span class="section-num">01</span>
+    <span class="section-title">今日行动</span>
+    <span class="section-desc">每日待办 · 核心指标</span>
+  </div>
+  <div class="action-panel">
+    <div class="action-title">Action List</div>
+    <div class="action-list" id="actionList"></div>
+  </div>
+</div>
+
+<div class="section compare-section" id="compareSection">
+  <div class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">双平台对比</span>
+    <span class="section-desc">抖音 vs 小红书数据对比</span>
+  </div>
+  <div class="compare-grid" id="compareSummary"></div>
+  <div class="bento-card" style="margin-bottom:16px;">
+    <h4 style="margin:0 0 12px 0;font-size:15px;">热词重叠对比（两平台均在榜）</h4>
+    <div style="overflow-x:auto;">
+      <table class="overlap-table" id="overlapTable">
+        <thead><tr><th>关键词</th><th>分类</th><th>抖音作品数</th><th>小红书作品数</th><th>抖音最高赞</th><th>小红书最高赞</th><th>更热平台</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="compare-grid">
+    <div class="compare-card douyin">
+      <h4><span class="compare-tag dy">抖音</span>独有热词 TOP10</h4>
+      <div id="dyOnlyList"></div>
+    </div>
+    <div class="compare-card xiaohongshu">
+      <h4><span class="compare-tag xhs">小红书</span>独有热词 TOP10</h4>
+      <div id="xhsOnlyList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d3">
+  <div id="works" class="section-header">
+    <span class="section-num">02</span>
+    <span class="section-title">热度分析</span>
+    <span class="section-desc">什么在火 · 什么时候发 · 多长最好</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card span-2">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">热词热度排行 TOP15</span></div>
+      <div class="chart-lg" id="chartRanking"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">赛道分布</span></div>
+      <div class="chart" id="chartCategory"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">发布时间</span><span class="ch-tip">几点发最容易爆</span></div>
+      <div class="chart-sm" id="chartPublishTime"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">视频时长</span><span class="ch-tip">多长效果最好</span></div>
+      <div class="chart-sm" id="chartDuration"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">钩子爆款率</span></div>
+      <div class="chart-sm" id="chartHook"></div>
+      </div>
+      <div class="bento-card" style="position:relative;overflow:hidden;">
+        <div class="card-head"><span class="ch-bar"></span><span class="ch-title">互动质量</span><span class="ch-tip">评论率/收藏率越高越有价值</span></div>
+        <div class="engage-card">
+          <div class="engage-stats">
+            <div class="engage-stat"><div class="es-num" id="avgCommentRate">--</div><div class="es-label">平均评论率</div></div>
+            <div class="engage-stat"><div class="es-num" id="avgCollectRate">--</div><div class="es-label">平均收藏率</div></div>
+          </div>
+          <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;">🔥 高评论率作品</div>
+          <div class="engage-list" id="highCommentList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d2">
+  <div id="techradar" class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">AI技术雷达</span>
+    <span class="section-desc">每日AI新技术/新模型/新项目 × 社媒热度关联分析，提前发现蓝海机会</span>
+  </div>
+  <div class="tech-summary" id="techSummary"></div>
+  <div class="tech-grid" id="techGrid"></div>
+</div>
+
+<div class="section anim anim-d3">
+  <div id="hotwords" class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">智能洞察</span>
+    <span class="section-desc">从数据中提取的关键信号</span>
+  </div>
+  <div class="insights-grid" id="insightsGrid"></div>
+</div>
+
+<div class="section anim anim-d5">
+  <div id="history" class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">趋势与数据</span>
+    <span class="section-desc">历史走势 · 完整明细</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">热词热度趋势（近14天）</span><span class="ch-tip">跑满2天后显示曲线</span></div>
+      <div class="chart" id="chartHistory"></div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">热词详情</span><span class="ch-tip">点击表头排序</span></div>
+      <div class="table-container">
+        <table id="hotwordTable">
+          <thead><tr><th onclick="sortTable(0)">#</th><th onclick="sortTable(1)">关键词</th><th onclick="sortTable(2)">分类</th><th onclick="sortTable(3)">作品数</th><th onclick="sortTable(4)">最高赞</th><th onclick="sortTable(5)">收藏率</th><th onclick="sortTable(6)">趋势</th><th>生命周期</th><th>效率</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">爆款作品 TOP20</span><span class="ch-tip">点击标题跳转原视频</span></div>
+      <div class="table-container">
+        <table id="worksTable">
+          <thead><tr><th>#</th><th>标题</th><th>作者</th><th>粉丝</th><th>点赞</th><th>收藏</th><th>分享</th><th>热词</th><th>钩子</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d6">
+  <div id="breakdown" class="section-header">
+    <span class="section-num">03</span>
+    <span class="section-title">爆款结构拆解</span>
+    <span class="section-desc">钩子 → 结构 → CTA → 目标人群</span>
+  </div>
+  <div class="topic-board" id="topicsGrid" style="margin-bottom:16px;"></div>
+  <div class="tracker-bar" id="topicTracker">
+    <div class="tracker-stat"><span class="ts-num" style="color:var(--accent-4);" id="publishedCount">0</span><span class="ts-label">已发布</span></div>
+    <div class="tracker-stat"><span class="ts-num" style="color:var(--accent-3);" id="shootingCount">0</span><span class="ts-label">拍摄中</span></div>
+    <div class="tracker-stat"><span class="ts-num" style="color:var(--text-tertiary);" id="pendingCount">0</span><span class="ts-label">待拍摄</span></div>
+    <div class="tracker-progress">
+      <div id="barPublished" style="background:var(--accent-4);width:0%;"></div>
+      <div id="barShooting" style="background:var(--accent-3);width:0%;"></div>
+    </div>
+    <button onclick="resetKanbanStatus()">重置状态</button>
+  </div>
+</div>
+
+<div class="footer">AI 热点追踪工作台 · 数据来源 RedFox Hub · 每日 8:00 自动采集</div>
+
+<div class="section anim anim-d6">
+<div id="viralGenes" class="section-header">
+<span class="section-num"></span>
+<span class="section-title">爆款基因库</span>
+<span class="section-desc">钩子类型 · 标题公式 · 高频词</span>
+</div>
+<div id="viralGenesContent"></div>
+</div>
+
+
+<div class="section anim anim-d4">
+  <div class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">内容形式分布</span>
+    <span class="section-desc">什么形式最容易火 · 占比 × 平均点赞</span>
+  </div>
+  <div class="format-bars" id="formatBars"></div>
+</div>
+<div class="section anim anim-d4">
+  <div id="insights" class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">对标与评论</span>
+    <span class="section-desc">评论关键词 · 收藏率 · 需求挖掘 · 饱和度</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">小账号爆款</span><span class="ch-tip">粉丝&lt;5万 赞&gt;3千</span></div>
+      <div class="small-list" id="smallViral"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">标题公式</span><span class="ch-tip">可直接套用</span></div>
+      <div class="formula-list" id="formulaList"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">对标作者 TOP10</span></div>
+      <div class="author-list" id="authorList"></div><div id="competitorWorks"></div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">爆款结构化拆解 TOP10</span><span class="ch-tip">钩子 → 结构 → CTA</span></div>
+      <div class="breakdown-grid" id="breakdownGrid"></div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">赛道覆盖矩阵</span><span class="ch-tip">找空白机会点</span></div>
+      <div class="matrix-grid" id="matrixGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d4">
+  <div id="topics" class="section-header">
+    <span class="section-num">04</span>
+    <span class="section-title">选题建议</span>
+    <span class="section-desc">带人群画像 · 综合评分 · 变现路径</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">评论高频词</span><span class="ch-tip">观众在问什么</span></div>
+      <div class="kw-cloud" id="commentKw"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">点赞 × 收藏</span></div>
+      <div class="chart-sm" id="chartScatter"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">收藏率排行</span><span class="ch-tip">价值型内容</span></div>
+      <div class="chart-sm" id="chartCollect"></div>
+    </div>
+    <div class="bento-card span-2">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">评论区需求挖掘</span><span class="ch-tip">从评论找选题</span></div>
+      <div id="commentDemands"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">饱和度 & 生命周期</span><span class="ch-tip">值越低越蓝海</span></div>
+      <div class="sat-list" id="saturationList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d7">
+<div id="titleGen" class="section-header">
+<span class="section-num"></span>
+<span class="section-title">爆款标题生成器</span>
+<span class="section-desc">输入关键词 → 5条标题+钩子</span>
+</div>
+<div style="display:flex;gap:12px;align-items:flex-end">
+<div style="flex:1">
+<input type="text" id="titleGenInput" class="gen-input" placeholder="输入关键词，如：可灵AI、AI PPT、WorkBuddy..." />
+</div>
+<button class="gen-btn" onclick="generateTitles()">生成标题</button>
+</div>
+<div id="titleGenResult" class="gen-result"></div>
+</div>
+
+<div class="section anim-d8">
+<div class="section-header">
+<span class="section-num"></span>
+<span class="section-title">选题看板</span>
+<span class="section-desc">三列状态管理 · 点击切换状态 · 一键生成脚本</span>
+</div>
+<div class="kanban-board" id="kanbanBoard"></div>
+</div>
+
+<div class="section anim-d8">
+<div id="schedule" class="section-header">
+<span class="section-num"></span>
+<span class="section-title">一周内容排期</span>
+<span class="section-desc">抖音日更 · 小红书隔日更</span>
+</div>
+<div id="scheduleContent"></div>
+</div>
+
+<div class="section anim anim-d7">
+<div id="topicPerf" class="section-header">
+<span class="section-num">05</span>
+<span class="section-title">选题命中率</span>
+<span class="section-desc">发布后自动追踪效果</span>
+</div>
+<div id="topicPerfContent"></div>
+</div>
+
+<div class="section anim-d8">
+<div id="commentScripts" class="section-header">
+<span class="section-num"></span>
+<span class="section-title">评论区话术库</span>
+<span class="section-desc">高赞回复 · 置顶引导 · 需求收集</span>
+</div>
+<div id="commentScriptsContent"></div>
+</div>
+
+<div class="section anim-d9">
+<div id="checklist" class="section-header">
+<span class="section-num"></span>
+<span class="section-title">发布前自检</span>
+<span class="section-desc">6项检查 · 避免低级错误</span>
+</div>
+<div class="checklist-progress" id="checklistProgress">已完成 <b>0</b>/6 项</div>
+<div id="checklistContent"></div>
+</div>
+
+
+<div class="section anim anim-d4">
+  <div class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">我的对标库</span>
+    <span class="section-desc">收藏的爆款拆解 · 拍之前翻一翻</span>
+  </div>
+  <div class="breakdown-grid" id="favoritesGrid"></div>
+</div>
+<div id="publishTime" class="section">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">⏰ 发布时间分析</h2>
+        <div class="hs-sub">几点发最容易爆 · 基于爆款作品数据</div>
+      </div>
+      <button class="section-collapse-btn" onclick="toggleSection('publishTime')">收起</button>
+    </div>
+    <div class="publish-time-section glass-card">
+      <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px;">24小时发布热度分布（柱高=作品数，金色=爆款率最高时段，柱顶数字=爆款率）</div>
+      <div class="pt-chart" id="ptChart"></div>
+      <div class="pt-best-cards" id="ptBestCards"></div>
+      <div class="pt-platform" id="ptPlatform"></div>
+      <div class="pt-tips" id="ptTips"></div>
+    </div>
+  </div>
+
+<div id="titleFormulas" class="section">
+    <div class="section-header">
+      <div><h2 class="section-title">📝 爆款标题公式库</h2><div class="hs-sub">从爆款作品中自动提取的标题模式</div></div>
+      <button class="section-collapse-btn" onclick="toggleSection('titleFormulas')">收起</button>
+    </div>
+    <div class="glass-card" style="padding:20px;">
+      <div class="formula-grid" id="formulaGrid"></div>
+    </div>
+  </div>
+
+  <div id="leadScripts" class="section">
+    <div class="section-header">
+      <div><h2 class="section-title">💬 私域引流话术库</h2><div class="hs-sub">针对不同人群的评论区引流话术</div></div>
+      <button class="section-collapse-btn" onclick="toggleSection('leadScripts')">收起</button>
+    </div>
+    <div class="glass-card" style="padding:20px;" id="scriptContainer"></div>
+  </div>
+
+<div id="launchOps" class="section">
+    <div class="section-header">
+      <div><h2 class="section-title">🚀 起号运营</h2><div class="hs-sub">零推流贴标签起号法 · 阶段追踪与任务清单</div></div>
+      <button class="section-collapse-btn" onclick="toggleSection('launchOps')">收起</button>
+    </div>
+    <!-- 阶段横幅 -->
+    <div class="launch-phase-banner" id="launchBanner"></div>
+    <div class="grid-2">
+      <!-- 标签健康度 -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="card-head" style="margin-bottom:12px;"><span class="ch-bar"></span><span class="ch-title">账号标签健康度</span></div>
+        <div class="health-gauge">
+          <div class="health-score" id="healthScore">--</div>
+          <div class="health-bar-wrap">
+            <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;">核心内容占比 <span id="coreCoverage">--</span></div>
+            <div class="health-bar"><div class="health-bar-fill" id="healthBar" style="width:0%"></div></div>
+            <div style="font-size:10px;color:var(--text-tertiary);margin-top:6px;" id="healthTip"></div>
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px;">已覆盖核心关键词</div>
+          <div id="coreKwCloud"></div>
+        </div>
+      </div>
+      <!-- 内容配比 -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="card-head" style="margin-bottom:12px;"><span class="ch-bar"></span><span class="ch-title">内容配比（目标70/20/10）</span></div>
+        <div class="ratio-bar" id="ratioBar"></div>
+        <div class="ratio-legend" id="ratioLegend"></div>
+        <div style="margin-top:12px;font-size:11px;color:var(--text-tertiary);line-height:1.8;" id="ratioTip"></div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:16px;">
+      <!-- 阶段任务清单 -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="card-head" style="margin-bottom:12px;"><span class="ch-bar"></span><span class="ch-title">本阶段任务清单</span></div>
+        <div id="launchTasks"></div>
+      </div>
+      <!-- 避坑提醒 -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="card-head" style="margin-bottom:12px;"><span class="ch-bar"></span><span class="ch-title">⚠️ 起号避坑提醒</span></div>
+        <div id="pitfallList"></div>
+      </div>
+    </div>
+  </div>
+
+<div id="audience" class="section anim-d9">
+<div class="section-header">
+<span class="section-num">06</span>
+<span class="section-title">人群画像</span>
+<span class="section-desc">10类核心受众 · 特征 · 需求 · 变现</span>
+</div>
+<div class="audience-chart" id="audienceChart"></div>
+<div class="persona-grid" id="personaGrid"></div>
+</div>
+
+<!-- 热词趋势弹窗 -->
+<div class="trend-modal" id="trendModal" onclick="if(event.target===this)this.classList.remove('active')">
+<div class="trend-modal-content">
+<span class="close-btn" onclick="document.getElementById('trendModal').classList.remove('active')">&times;</span>
+<h3 id="trendModalTitle">热词趋势</h3>
+<div id="trendModalBody"><p style="color:var(--text-secondary)">加载中...</p></div>
+</div>
+</div>
+
+
+
+<div class="script-modal-overlay" id="scriptModal">
+  <div class="script-modal" style="position:relative;">
+    <button class="script-close" onclick="closeScriptModal()">&times;</button>
+    <h3 id="scriptModalTitle">生成脚本</h3>
+    <div id="scriptModalContent"></div>
+    <button class="script-copy-btn" onclick="copyScript()">复制脚本</button>
+  </div>
+</div>
+
+
+<div class="shoot-modal" id="shootModal" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="shoot-modal-content">
+    <h3>🎬 拍摄清单</h3>
+    <div id="shootModalBody"></div>
+    <div style="margin-top:16px;text-align:right;">
+      <button onclick="document.getElementById('shootModal').classList.remove('active')" style="padding:8px 16px;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.3);border-radius:8px;color:#c4b5fd;cursor:pointer;">关闭</button>
+    </div>
+  </div>
+</div>
+
+  <!-- ===== 脚本层（模块化，按依赖顺序）===== -->
+  <script src="config/domain.js"></script>
+  <script src="data/data.js"></script>
+  <script src="src/core/state.js"></script>
+  <script src="src/core/renderer.js"></script>
+  <script src="src/core/framework.js"></script>
+  <script src="src/effects/glow.js"></script>
+  <script src="src/effects/login.js"></script>
+  <script src="src/modules/_helpers.js"></script>
+  <script src="src/modules/hero.js"></script>
+  <script src="src/modules/hotwords.js"></script>
+  <script src="src/modules/works.js"></script>
+  <script src="src/modules/topics.js"></script>
+  <script src="src/modules/techradar.js"></script>
+  <script src="src/modules/breakdown.js"></script>
+  <script src="src/modules/viralGenes.js"></script>
+  <script src="src/modules/publishTime.js"></script>
+  <script src="src/modules/titleFormulas.js"></script>
+  <script src="src/modules/leadScripts.js"></script>
+  <script src="src/modules/launchOps.js"></script>
+  <script src="src/modules/audience.js"></script>
+  <script src="src/modules/engagement.js"></script>
+  <script src="src/modules/topicPerf.js"></script>
+  <script src="src/modules/kanban.js"></script>
+  <script src="src/modules/favorites.js"></script>
+  <script src="src/modules/credit.js"></script>
+  <script src="src/modules/scriptGen.js"></script>
+  <script src="src/modules/comparison.js"></script>
+  <!-- 所有模块加载完毕后启动框架 -->
+  <script>
+    if (window.initFramework) window.initFramework();
+    else window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework());
+  </script>
+</body>
+</html>
