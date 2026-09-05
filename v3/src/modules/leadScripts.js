@@ -31,4 +31,5 @@
       }
     });
   }
+  window.renderLeadScripts = renderLeadScripts;
 })();
