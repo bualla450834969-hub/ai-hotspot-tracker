@@ -47,7 +47,7 @@
       requiredFields: ['viral_genes'],
       render: domainGuard("viralGenes", function(data) {
         try { renderViralGenes(data); } catch(e) { console.error("[viralGenes]", e); }
-      }
+      })
     });
   }
   window.renderViralGenes = renderViralGenes;
