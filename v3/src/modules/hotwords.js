@@ -88,4 +88,10 @@
       }
     });
   }
+  window.renderHotwordTable = renderHotwordTable;
+  window.renderCategory = renderCategory;
+  window.renderRanking = renderRanking;
+  window.renderHistory = renderHistory;
+  window.showKeywordTrend = showKeywordTrend;
+  window.filteredHotwords = filteredHotwords;
 })();
