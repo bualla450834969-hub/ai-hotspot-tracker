@@ -161,4 +161,10 @@
       }
     });
   }
+  window.renderWorksTable = renderWorksTable;
+  window.renderSmallViral = renderSmallViral;
+  window.renderAuthors = renderAuthors;
+  window.renderCompetitorWorks = renderCompetitorWorks;
+  window.renderFormatDist = renderFormatDist;
+  window.filteredWorks = filteredWorks;
 })();
