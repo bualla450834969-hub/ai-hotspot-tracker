@@ -63,7 +63,7 @@
   if (window.Module) {
     Module.register({
       id: "launchOps",
-      requiredFields: ['launch_ops'],
+      // requiredFields removed: launch_ops not in DATA, renders empty state
       render: function(data) {
         try { renderLaunchOps(data); } catch(e) { console.error("[launchOps]", e); }
       }
