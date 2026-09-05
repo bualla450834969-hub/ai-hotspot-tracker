@@ -45,4 +45,5 @@
       }
     });
   }
+  window.renderComparison = renderComparison;
 })();
