@@ -32,4 +32,5 @@
       }
     });
   }
+  window.renderEngagement = renderEngagement;
 })();
