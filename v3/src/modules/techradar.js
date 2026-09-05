@@ -68,7 +68,7 @@
       requiredFields: ['tech_signals'],
       render: domainGuard("techradar", function(data) {
         try { renderTechRadar(data); } catch(e) { console.error("[techradar]", e); }
-      }
+      })
     });
   }
   window.renderTechRadar = renderTechRadar;
