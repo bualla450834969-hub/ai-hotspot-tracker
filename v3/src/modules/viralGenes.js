@@ -45,7 +45,7 @@
     Module.register({
       id: "viralGenes",
       requiredFields: ['viral_genes'],
-      render: function(data) {
+      render: domainGuard("viralGenes", function(data) {
         try { renderViralGenes(data); } catch(e) { console.error("[viralGenes]", e); }
       }
     });
