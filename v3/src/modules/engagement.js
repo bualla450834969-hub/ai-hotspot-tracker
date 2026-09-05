@@ -26,7 +26,7 @@
   if (window.Module) {
     Module.register({
       id: "engagement",
-      requiredFields: ['engagement_analysis'],
+      // requiredFields removed: engagement_analysis not in DATA, renders empty state
       render: function(data) {
         try { renderEngagement(data); } catch(e) { console.error("[engagement]", e); }
       }
