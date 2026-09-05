@@ -237,6 +237,16 @@
     document.getElementById('commentScriptsContent').innerHTML = html;
   }
 
+  // CHECKLIST_ITEMS - 发布前自检清单
+  const CHECKLIST_ITEMS = [
+    { id: 'title', text: '确认选题标题和钩子文案（前3秒留人）' },
+    { id: 'avatar', text: '准备数字人形象和口播文案（语速自然）' },
+    { id: 'footage', text: '收集AI生成素材并完成混剪（60-90秒）' },
+    { id: 'subtitle', text: '添加字幕、配乐和关键信息高亮' },
+    { id: 'timing', text: '选择最佳发布时间（18:00-21:00）' },
+    { id: 'comment', text: '准备评论区置顶引流话术和小号引导' },
+  ];
+
   // renderChecklist
   function renderChecklist() {
     const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
