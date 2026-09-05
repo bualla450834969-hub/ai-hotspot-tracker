@@ -126,4 +126,5 @@
       }
     });
   }
+  window.renderPublishTimeDetail = renderPublishTimeDetail;
 })();
