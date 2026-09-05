@@ -302,7 +302,7 @@
       id: "topics",
       requiredFields: ['topics'],
       render: function(data) {
-        try { renderTopics(data); } catch(e) { console.error("[topics]", e); }
+        try { renderTopics(data); generateSchedule(data); renderCommentScripts(data); renderChecklist(); } catch(e) { console.error("[topics]", e); }
       }
     });
   }
