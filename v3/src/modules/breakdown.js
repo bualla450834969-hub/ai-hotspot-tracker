@@ -135,7 +135,31 @@
 
   // renderDuration
   function renderDuration(works) {
-    const dist = DATA.duration_dist || [];
+    const ranges = [
+      { range: '0-15秒', min: 0, max: 15 },
+      { range: '15-30秒', min: 15, max: 30 },
+      { range: '30-60秒', min: 30, max: 60 },
+      { range: '1-3分钟', min: 60, max: 180 },
+      { range: '3分钟+', min: 180, max: Infinity },
+    ];
+    const counts = ranges.map(() => 0);
+    const likes = ranges.map(() => 0);
+    (works || []).forEach(w => {
+      const durMs = w.duration || 0;
+      if (durMs <= 0) return;
+      const sec = durMs / 1000;
+      for (let i = 0; i < ranges.length; i++) {
+        if (sec >= ranges[i].min && sec < ranges[i].max) {
+          counts[i]++;
+          likes[i] += (w.likeCount || 0);
+          break;
+        }
+      }
+    });
+    const dist = ranges.map((r, i) => ({
+      range: r.range, count: counts[i],
+      avg_likes: counts[i] > 0 ? Math.round(likes[i] / counts[i]) : 0
+    }));
     if (charts.dur) charts.dur.dispose();
     charts.dur = echarts.init(document.getElementById('chartDuration'));
     charts.dur.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:dist.map(d=>d.range),axisLabel:{color:AXIS_COLOR,fontSize:9,interval:0,rotate:15},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:dist.map(d=>({value:d.count,itemStyle:{color:d.avg_likes>5000?'#30D158':'#0A84FF'}})),label:{show:true,position:'top',fontSize:9,color:'rgba(255,255,255,0.5)',formatter:p=>`${p.value}条`},barWidth:'50%',animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>{const d=dist[p[0].dataIndex];return `${d.range}<br/>作品数 ${d.count}<br/>平均点赞 ${d.avg_likes.toLocaleString()}`;}}});
