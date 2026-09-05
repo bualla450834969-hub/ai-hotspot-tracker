@@ -50,4 +50,5 @@
       }
     });
   }
+  window.renderViralGenes = renderViralGenes;
 })();
