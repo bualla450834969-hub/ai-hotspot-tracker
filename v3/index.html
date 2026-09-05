@@ -5,11 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="pageTitle">热点追踪工作台</title>
   <!-- ===== 样式层（模块化）===== -->
-  <link rel="stylesheet" href="src/styles/base.css?v=1788616517">
-  <link rel="stylesheet" href="src/styles/components.css?v=1788616517">
-  <link rel="stylesheet" href="src/styles/glass.css?v=1788616517">
-  <link rel="stylesheet" href="src/styles/login.css?v=1788616517">
-  <link rel="stylesheet" href="src/styles/modules.css?v=1788616517">
+  <link rel="stylesheet" href="src/styles/base.css?v=1788620777">
+  <link rel="stylesheet" href="src/styles/components.css?v=1788620777">
+  <link rel="stylesheet" href="src/styles/glass.css?v=1788620777">
+  <link rel="stylesheet" href="src/styles/login.css?v=1788620777">
+  <link rel="stylesheet" href="src/styles/modules.css?v=1788620777">
   <!-- ECharts -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
@@ -330,7 +330,7 @@
       <div class="chart" id="chartHistory"></div>
     </div>
     <div class="bento-card span-3">
-      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">热词详情</span><span class="ch-tip">点击表头排序</span></div>
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">热词详情</span><span class="ch-tip">点击表头排序</span><button class="export-btn" onclick="exportHotwordsCSV()">导出CSV</button></div>
       <div class="table-container">
         <table id="hotwordTable">
           <thead><tr><th onclick="sortTable(0)">#</th><th onclick="sortTable(1)">关键词</th><th onclick="sortTable(2)">分类</th><th onclick="sortTable(3)">作品数</th><th onclick="sortTable(4)">最高赞</th><th onclick="sortTable(5)">收藏率</th><th onclick="sortTable(6)">趋势</th><th>生命周期</th><th>效率</th></tr></thead>
@@ -424,6 +424,7 @@
     <span class="section-num">04</span>
     <span class="section-title">选题建议</span>
     <span class="section-desc">带人群画像 · 综合评分 · 变现路径</span>
+    <button class="export-btn" onclick="exportTopicsCSV()" style="margin-left:auto;">导出选题CSV</button>
   </div>
   <div class="bento">
     <div class="bento-card">
@@ -666,34 +667,8 @@
     })();
   </script>
 
-  <script src="data/data.js"></script>
-  <script src="src/core/state.js?v=1788616517"></script>
-  <script src="src/core/renderer.js?v=1788616517"></script>
-    <script src="src/core/globals.js?v=1788616517"></script>
-  <script src="src/core/framework.js?v=1788616517"></script>
-  <script src="src/effects/glow.js?v=1788616517"></script>
-  <script src="src/effects/login.js?v=1788616517"></script>
-  <script src="src/modules/_helpers.js?v=1788616517"></script>
-  <script src="src/modules/hero.js?v=1788616517"></script>
-  <script src="src/modules/hotwords.js?v=1788616517"></script>
-  <script src="src/modules/works.js?v=1788616517"></script>
-  <script src="src/modules/topics.js?v=1788616517"></script>
-  <script src="src/modules/techradar.js?v=1788616517"></script>
-  <script src="src/modules/breakdown.js?v=1788616517"></script>
-  <script src="src/modules/viralGenes.js?v=1788616517"></script>
-  <script src="src/modules/publishTime.js?v=1788616517"></script>
-  <script src="src/modules/titleFormulas.js?v=1788616517"></script>
-  <script src="src/modules/leadScripts.js?v=1788616517"></script>
-  <script src="src/modules/launchOps.js?v=1788616517"></script>
-  <script src="src/modules/audience.js?v=1788616517"></script>
-  <script src="src/modules/engagement.js?v=1788616517"></script>
-  <script src="src/modules/topicPerf.js?v=1788616517"></script>
-  <script src="src/modules/kanban.js?v=1788616517"></script>
-  <script src="src/modules/favorites.js?v=1788616517"></script>
-  <script src="src/modules/credit.js?v=1788616517"></script>
-  <script src="src/modules/scriptGen.js?v=1788616517"></script>
-  <script src="src/modules/comparison.js?v=1788616517"></script>
-  <!-- 所有模块加载完毕后启动框架 -->
+  <script src="data/data.min.js"></script>
+    <script src="bundle.js"></script><!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
     else window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework());
