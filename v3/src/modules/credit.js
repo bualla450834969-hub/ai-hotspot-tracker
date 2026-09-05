@@ -39,4 +39,5 @@
       }
     });
   }
+  window.renderCreditMonitor = renderCreditMonitor;
 })();
