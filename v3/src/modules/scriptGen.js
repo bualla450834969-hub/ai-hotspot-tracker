@@ -47,4 +47,7 @@
     setTimeout(function(){ el.textContent = '📋 复制话术'; }, 2000);
   }
 
+  window.generateScript = generateScript;
+  window.closeScriptModal = closeScriptModal;
+  window.copyScript = copyScript;
 })();
