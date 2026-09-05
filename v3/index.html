@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>热点追踪工作台</title>
+  <title id="pageTitle">热点追踪工作台</title>
   <!-- ===== 样式层（模块化）===== -->
-  <link rel="stylesheet" href="src/styles/base.css?v=1788603025">
-  <link rel="stylesheet" href="src/styles/components.css?v=1788603025">
-  <link rel="stylesheet" href="src/styles/glass.css?v=1788603025">
-  <link rel="stylesheet" href="src/styles/login.css?v=1788603025">
-  <link rel="stylesheet" href="src/styles/modules.css?v=1788603025">
+  <link rel="stylesheet" href="src/styles/base.css?v=1788604085">
+  <link rel="stylesheet" href="src/styles/components.css?v=1788604085">
+  <link rel="stylesheet" href="src/styles/glass.css?v=1788604085">
+  <link rel="stylesheet" href="src/styles/login.css?v=1788604085">
+  <link rel="stylesheet" href="src/styles/modules.css?v=1788604085">
   <!-- ECharts -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
@@ -93,8 +93,8 @@
   </svg>
   </div>
   <div class="login-brand">
-    <div class="login-brand-name">PYRALUMA</div>
-    <div class="login-brand-tag">璃火矩创 · AI Intelligence</div>
+    <div class="login-brand-name" id="loginBrandName">PYRALUMA</div>
+    <div class="login-brand-tag" id="loginBrandTag">璃火矩创 · AI Intelligence</div>
   </div>
   <div class="scroll-hint">
     <div class="scroll-arrow"></div>
@@ -103,7 +103,7 @@
 </div>
 
 <div class="top-nav" id="topNav">
-  <span class="nav-logo">AI热点追踪</span>
+  <span class="nav-logo" id="navLogo">AI热点追踪</span>
   <a class="nav-link" data-target="hero">工作台</a>
   <a class="nav-link" data-target="techradar">技术雷达</a>
   <a class="nav-link" data-target="hotwords">热点</a>
@@ -195,7 +195,7 @@
 <div class="hero">
   <div class="hero-top anim anim-d1">
     <div>
-      <h1 class="hero-title">AI 热点<em>追踪</em><br>工作台</h1>
+      <h1 class="hero-title" id="heroTitle">AI 热点<em>追踪</em><br>工作台</h1>
       <div class="hero-sub">Daily Hotspot Intelligence · RedFox Hub</div>
     </div>
     <div class="hero-meta">
@@ -302,7 +302,7 @@
 <div class="section anim anim-d2">
   <div id="techradar" class="section-header">
     <span class="section-num"></span>
-    <span class="section-title">AI技术雷达</span>
+    <span class="section-title" data-section="techradar">AI技术雷达</span>
     <span class="section-desc">每日AI新技术/新模型/新项目 × 社媒热度关联分析，提前发现蓝海机会</span>
   </div>
   <div class="tech-summary" id="techSummary"></div>
@@ -369,7 +369,7 @@
   </div>
 </div>
 
-<div class="footer">AI 热点追踪工作台 · 数据来源 RedFox Hub · 每日 8:00 自动采集</div>
+<div class="footer" id="pageFooter">AI 热点追踪工作台 · 数据来源 RedFox Hub · 每日 8:00 自动采集</div>
 
 <div class="section anim anim-d6">
 <div id="viralGenes" class="section-header">
@@ -643,33 +643,56 @@
 
   <!-- ===== 脚本层（模块化，按依赖顺序）===== -->
   <script src="config/domain.js"></script>
+  <script>
+    // 动态注入品牌信息和页面文案（从domain.js配置读取）
+    (function() {
+      var name = cfg('display_name', '热点追踪');
+      document.getElementById('pageTitle').textContent = name;
+      document.getElementById('navLogo').textContent = name;
+      document.getElementById('loginBrandName').textContent = cfg('brand.name_en', 'BRAND');
+      document.getElementById('loginBrandTag').textContent = cfg('brand.name_cn', '') + ' · ' + cfg('brand.slogan', '');
+      // hero标题
+      var ht = document.getElementById('heroTitle');
+      if (ht) ht.innerHTML = cfg('name', 'AI') + ' 热点<em>追踪</em><br>工作台';
+      // section标题
+      document.querySelectorAll('[data-section]').forEach(function(el) {
+        var key = el.getAttribute('data-section');
+        var title = cfg('copy.section_titles.' + key, '');
+        if (title) el.textContent = title;
+      });
+      // footer
+      var ft = document.getElementById('pageFooter');
+      if (ft) ft.textContent = name + ' · 数据来源 RedFox Hub · 每日 8:00 自动采集';
+    })();
+  </script>
+
   <script src="data/data.js"></script>
-  <script src="src/core/state.js?v=1788603025"></script>
-  <script src="src/core/renderer.js?v=1788603025"></script>
-    <script src="src/core/globals.js?v=1788603025"></script>
-  <script src="src/core/framework.js?v=1788603025"></script>
-  <script src="src/effects/glow.js?v=1788603025"></script>
-  <script src="src/effects/login.js?v=1788603025"></script>
-  <script src="src/modules/_helpers.js?v=1788603025"></script>
-  <script src="src/modules/hero.js?v=1788603025"></script>
-  <script src="src/modules/hotwords.js?v=1788603025"></script>
-  <script src="src/modules/works.js?v=1788603025"></script>
-  <script src="src/modules/topics.js?v=1788603025"></script>
-  <script src="src/modules/techradar.js?v=1788603025"></script>
-  <script src="src/modules/breakdown.js?v=1788603025"></script>
-  <script src="src/modules/viralGenes.js?v=1788603025"></script>
-  <script src="src/modules/publishTime.js?v=1788603025"></script>
-  <script src="src/modules/titleFormulas.js?v=1788603025"></script>
-  <script src="src/modules/leadScripts.js?v=1788603025"></script>
-  <script src="src/modules/launchOps.js?v=1788603025"></script>
-  <script src="src/modules/audience.js?v=1788603025"></script>
-  <script src="src/modules/engagement.js?v=1788603025"></script>
-  <script src="src/modules/topicPerf.js?v=1788603025"></script>
-  <script src="src/modules/kanban.js?v=1788603025"></script>
-  <script src="src/modules/favorites.js?v=1788603025"></script>
-  <script src="src/modules/credit.js?v=1788603025"></script>
-  <script src="src/modules/scriptGen.js?v=1788603025"></script>
-  <script src="src/modules/comparison.js?v=1788603025"></script>
+  <script src="src/core/state.js?v=1788604085"></script>
+  <script src="src/core/renderer.js?v=1788604085"></script>
+    <script src="src/core/globals.js?v=1788604085"></script>
+  <script src="src/core/framework.js?v=1788604085"></script>
+  <script src="src/effects/glow.js?v=1788604085"></script>
+  <script src="src/effects/login.js?v=1788604085"></script>
+  <script src="src/modules/_helpers.js?v=1788604085"></script>
+  <script src="src/modules/hero.js?v=1788604085"></script>
+  <script src="src/modules/hotwords.js?v=1788604085"></script>
+  <script src="src/modules/works.js?v=1788604085"></script>
+  <script src="src/modules/topics.js?v=1788604085"></script>
+  <script src="src/modules/techradar.js?v=1788604085"></script>
+  <script src="src/modules/breakdown.js?v=1788604085"></script>
+  <script src="src/modules/viralGenes.js?v=1788604085"></script>
+  <script src="src/modules/publishTime.js?v=1788604085"></script>
+  <script src="src/modules/titleFormulas.js?v=1788604085"></script>
+  <script src="src/modules/leadScripts.js?v=1788604085"></script>
+  <script src="src/modules/launchOps.js?v=1788604085"></script>
+  <script src="src/modules/audience.js?v=1788604085"></script>
+  <script src="src/modules/engagement.js?v=1788604085"></script>
+  <script src="src/modules/topicPerf.js?v=1788604085"></script>
+  <script src="src/modules/kanban.js?v=1788604085"></script>
+  <script src="src/modules/favorites.js?v=1788604085"></script>
+  <script src="src/modules/credit.js?v=1788604085"></script>
+  <script src="src/modules/scriptGen.js?v=1788604085"></script>
+  <script src="src/modules/comparison.js?v=1788604085"></script>
   <!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
