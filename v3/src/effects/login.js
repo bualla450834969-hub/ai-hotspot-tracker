@@ -181,3 +181,17 @@ function initNavHide() {
   check();
 }
 
+
+
+// 初始化登录页所有特效
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    initLoginLogo();
+    initScrollReveal();
+    initNavHide();
+  });
+} else {
+  initLoginLogo();
+  initScrollReveal();
+  initNavHide();
+}
