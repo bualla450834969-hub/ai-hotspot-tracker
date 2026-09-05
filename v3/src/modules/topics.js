@@ -86,7 +86,7 @@
     const bo = hw.blue_ocean_score || 1;
     const competition = Math.min(100, Math.round(Math.log10(bo + 1) * 15));
     // 匹配分：默认60，AI大类相关更高
-    const match = hw.category === 'AI大类' ? 75 : 65;
+    const match = hw.category === cfg('name', 'AI') + '大类' ? 75 : 65;
     // 时效分：飙升>新热>稳定
     const timing = hw.trend === '飙升' ? 95 : hw.trend === '新热' ? 80 : 55;
     const total = Math.round(heat * 0.3 + competition * 0.25 + match * 0.2 + timing * 0.25);
@@ -141,14 +141,14 @@
     const dy = {
       title_style: '口语化+悬念，前3秒必须有钩子',
       cover: '大字报封面，关键词突出',
-      tags: '#' + cat.replace(/\s/g,'') + ' #AI #人工智能 #干货分享',
+      tags: cfg('hashtags.core', '#AI #人工智能 #干货分享').replace('{cat}', '#' + cat.replace(/\s/g,'')),
       time: '12:00-13:00 或 19:00-21:00',
-      format: '15-40秒口播+AI素材混剪',
+      format: cfg('content_format', '15-40秒口播+素材混剪'),
     };
     const xhs = {
       title_style: '干货体+emoji，标题控制在20字内',
       cover: '精致图文，3-5图轮播',
-      tags: '#' + cat.replace(/\s/g,'') + ' #AI工具 #效率神器 #新手必看',
+      tags: cfg('hashtags.tool', '#AI工具 #效率神器 #新手必看').replace('{cat}', '#' + cat.replace(/\s/g,'')),
       time: '7:30-9:00 或 20:00-22:30',
       format: '图文笔记为主，视频为辅',
     };
@@ -197,7 +197,7 @@
     // 高赞回复模式
     const replyPatterns = [
       { type: '补充干货型', text: '补充一个：用XX工具的XX功能效果更好，亲测有效！' },
-      { type: '提问互动型', text: '你们最想用AI解决什么问题？评论区告诉我，下期安排！' },
+      { type: '提问互动型', text: cfg('cta.question', '你们最想解决什么问题？评论区告诉我，下期安排！') },
       { type: '共鸣认同型', text: '说到点子上了，我也是踩了无数坑才总结出来的' },
       { type: '反转惊喜型', text: '其实还有个隐藏功能，90%的人不知道，看我主页' },
       { type: '福利引导型', text: '整理了全套资料，需要的评论区扣"想要"' },
@@ -241,7 +241,7 @@
   const CHECKLIST_ITEMS = [
     { id: 'title', text: '确认选题标题和钩子文案（前3秒留人）' },
     { id: 'avatar', text: '准备数字人形象和口播文案（语速自然）' },
-    { id: 'footage', text: '收集AI生成素材并完成混剪（60-90秒）' },
+    { id: 'footage', text: cfg('tasks.collect_footage', '收集素材并完成混剪（60-90秒）') },
     { id: 'subtitle', text: '添加字幕、配乐和关键信息高亮' },
     { id: 'timing', text: '选择最佳发布时间（18:00-21:00）' },
     { id: 'comment', text: '准备评论区置顶引流话术和小号引导' },
@@ -289,7 +289,7 @@
     var items = [
       '确认选题标题和钩子文案',
       '准备数字人形象和口播文案',
-      '收集AI生成素材（截图/演示视频）',
+      cfg('tasks.collect_footage_short', '收集素材（截图/演示视频）'),
       '准备参考爆款视频的结构和节奏',
       '录制数字人口播（注意语速和停顿）',
       '剪辑：口播+素材混剪，控制在60-90秒',
