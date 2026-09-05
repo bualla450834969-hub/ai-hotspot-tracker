@@ -100,4 +100,12 @@
       }
     });
   }
+  window.renderKanban = renderKanban;
+  window.getAllKanbanStatus = getAllKanbanStatus;
+  window.getTopicStatus = getTopicStatus;
+  window.setTopicStatus = setTopicStatus;
+  window.cycleKanbanStatus = cycleKanbanStatus;
+  window.cycleKanbanStatusByTitle = cycleKanbanStatusByTitle;
+  window.getKanbanStatus = getKanbanStatus;
+  window.resetKanbanStatus = resetKanbanStatus;
 })();
