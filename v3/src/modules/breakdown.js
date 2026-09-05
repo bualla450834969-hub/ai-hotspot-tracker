@@ -212,8 +212,19 @@
       id: "breakdown",
       requiredFields: ['works'],
       render: function(data) {
-        try { renderBreakdowns(data); renderMatrix(data); renderFormulas(data); renderCollect(data); renderScatter(data); renderSaturation(data); renderCommentDemands(data); renderCommentKw(data); renderHook(data); renderDuration(data); renderPublishTime(data); } catch(e) { console.error("[breakdown]", e); }
+        try { renderBreakdowns(); renderMatrix(); renderFormulas(); renderCollect(DATA.hotwords); renderScatter(data); renderSaturation(DATA.hotwords); renderCommentDemands(); renderCommentKw(); renderHook(data); renderDuration(data); renderPublishTime(data); } catch(e) { console.error("[breakdown]", e); }
       }
     });
   }
+  window.renderBreakdowns = renderBreakdowns;
+  window.renderMatrix = renderMatrix;
+  window.renderFormulas = renderFormulas;
+  window.renderCollect = renderCollect;
+  window.renderScatter = renderScatter;
+  window.renderSaturation = renderSaturation;
+  window.renderCommentDemands = renderCommentDemands;
+  window.renderCommentKw = renderCommentKw;
+  window.renderHook = renderHook;
+  window.renderDuration = renderDuration;
+  window.renderPublishTime = renderPublishTime;
 })();
