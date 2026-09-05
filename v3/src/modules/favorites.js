@@ -59,6 +59,17 @@
     renderBreakdowns();
   }
 
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "favorites",
+      render: function() {
+        try { renderFavorites(); } catch(e) { console.error("[favorites]", e); }
+      }
+    });
+  }
+
   window.getFavorites = getFavorites;
   window.isFavorite = isFavorite;
   window.toggleFavorite = toggleFavorite;
