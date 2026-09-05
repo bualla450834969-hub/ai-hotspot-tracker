@@ -222,5 +222,55 @@
   window.setPlatform = setPlatform;
   window.filterByPlatform = filterByPlatform;
   window.doGlobalSearch = doGlobalSearch;
+  // CSV导出工具
+  function downloadCSV(filename, rows) {
+    var csv = rows.map(function(r) {
+      return r.map(function(cell) {
+        cell = String(cell == null ? '' : cell);
+        if (cell.indexOf(',') >= 0 || cell.indexOf('"') >= 0 || cell.indexOf('\n') >= 0) {
+          cell = '"' + cell.replace(/"/g, '""') + '"';
+        }
+        return cell;
+      }).join(',');
+    }).join('\n');
+    var blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8;'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function exportHotwordsCSV() {
+    var hw = DATA.hotwords || [];
+    var rows = [['排名','关键词','分类','平台','作品数','最高赞','平均赞','收藏率','增长率','趋势','生命周期']];
+    hw.forEach(function(h, i) {
+      rows.push([
+        i+1, h.keyword || '', h.category || '', h.platform || '',
+        h.total || 0, h.max_like || 0, h.avg_like || 0,
+        (h.collect_rate || 0) + '%', (h.growth || 0) + '%',
+        h.trend || '', h.stage || ''
+      ]);
+    });
+    downloadCSV(cfg('name','热点') + '_热词_' + new Date().toISOString().slice(0,10) + '.csv', rows);
+  }
+
+  function exportTopicsCSV() {
+    var topics = filteredTopics();
+    var rows = [['序号','标题','钩子','平台','优先级','人群','状态','关联热词']];
+    topics.forEach(function(t, i) {
+      var status = getTopicStatus(t.title);
+      var statusText = status === 'published' ? '已发布' : status === 'shooting' ? '拍摄中' : '待拍摄';
+      rows.push([
+        i+1, t.title || '', t.hook || '', t.platform || '双平台',
+        t.priority || '', t.audience || '', statusText, t.keyword || ''
+      ]);
+    });
+    downloadCSV(cfg('name','热点') + '_选题_' + new Date().toISOString().slice(0,10) + '.csv', rows);
+  }
+
   window.exportTopics = exportTopics;
+  window.exportHotwordsCSV = exportHotwordsCSV;
+  window.exportTopicsCSV = exportTopicsCSV;
+  window.downloadCSV = downloadCSV;
 })();
