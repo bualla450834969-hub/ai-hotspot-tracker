@@ -84,7 +84,7 @@
       id: "hotwords",
       requiredFields: ['hotwords'],
       render: function(data) {
-        try { renderHotwordTable(data); renderCategory(data); renderRanking(data); } catch(e) { console.error("[hotwords]", e); }
+        try { renderHotwordTable(data); renderCategory(data); renderRanking(data); renderHistory(data); } catch(e) { console.error("[hotwords]", e); }
       }
     });
   }
