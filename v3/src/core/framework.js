@@ -84,10 +84,14 @@
         return;
       }
 
-      // 渲染
+      // 渲染 — 根据requiredFields传递子数据，单字段传子数据，多字段/无字段传完整DATA
       try {
         showSection(id);
-        mod.render(DATA);
+        var renderData = DATA;
+        if (mod.requiredFields && mod.requiredFields.length === 1) {
+          renderData = DATA[mod.requiredFields[0]] || DATA;
+        }
+        mod.render(renderData);
       } catch (e) {
         console.error(`[Module] ${id} 渲染失败:`, e);
         // 单个模块崩溃不影响其他模块
