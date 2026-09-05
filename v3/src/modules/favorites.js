@@ -59,4 +59,9 @@
     renderBreakdowns();
   }
 
+  window.getFavorites = getFavorites;
+  window.isFavorite = isFavorite;
+  window.toggleFavorite = toggleFavorite;
+  window.renderFavorites = renderFavorites;
+  window.removeFavorite = removeFavorite;
 })();
