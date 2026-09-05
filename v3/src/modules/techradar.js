@@ -71,4 +71,5 @@
       }
     });
   }
+  window.renderTechRadar = renderTechRadar;
 })();
