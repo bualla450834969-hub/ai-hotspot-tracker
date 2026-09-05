@@ -66,7 +66,7 @@
     Module.register({
       id: "techradar",
       requiredFields: ['tech_signals'],
-      render: function(data) {
+      render: domainGuard("techradar", function(data) {
         try { renderTechRadar(data); } catch(e) { console.error("[techradar]", e); }
       }
     });
