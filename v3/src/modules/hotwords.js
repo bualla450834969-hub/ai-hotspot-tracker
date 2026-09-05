@@ -41,14 +41,62 @@
       charts.hist.setOption({title:{text:'数据积累中，跑满 2 天后显示趋势曲线',left:'center',top:'center',textStyle:{color:AXIS_COLOR,fontSize:13,fontWeight:'normal'}}});
       return;
     }
-    const dates = hist.map(h=>h.date.slice(5));
-    const topKws = [...hw].sort((a,b)=>b.total-a.total).slice(0,5).map(h=>h.keyword);
-    const series = topKws.map((kw,i)=>({
-      name:kw, type:'line', smooth:true, symbol:'circle', symbolSize:5,
-      data: hist.map(h=>{const f=h.hotwords.find(x=>x.keyword===kw);return f?f.total:null;}),
-      lineStyle:{width:2}, itemStyle:{color:PALETTE[i%PALETTE.length]},
-    }));
-    charts.hist.setOption({color:PALETTE,tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT}},legend:{data:topKws,textStyle:{color:'rgba(255,255,255,0.6)',fontSize:11},top:0},grid:{left:60,right:20,top:40,bottom:30},xAxis:{type:'category',data:dates,axisLabel:{color:AXIS_COLOR},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series});
+    // 合并每天的重复关键词（双平台未合并问题）
+    const mergedHist = hist.map(h => {
+      const map = {};
+      h.hotwords.forEach(x => {
+        if (map[x.keyword]) map[x.keyword] += x.total;
+        else map[x.keyword] = x.total;
+      });
+      return { date: h.date, hotwords: Object.keys(map).map(k => ({keyword:k, total:map[k]})) };
+    });
+    const dates = mergedHist.map(h => h.date.slice(5));
+    // 收集所有出现过的关键词，计算波动率（排除超大词AI避免压缩Y轴）
+    const kwSet = new Set();
+    mergedHist.forEach(h => h.hotwords.forEach(x => kwSet.add(x.keyword)));
+    const kwVolatility = [];
+    kwSet.forEach(kw => {
+      if (kw === 'AI') return; // 排除超大词
+      const vals = mergedHist.map(h => {
+        const f = h.hotwords.find(x => x.keyword === kw);
+        return f ? f.total : null;
+      }).filter(v => v !== null);
+      if (vals.length < 2) return;
+      const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+      if (avg < 10) return; // 排除过小词
+      const variance = vals.reduce((s,v) => s + Math.pow(v-avg,2), 0) / vals.length;
+      const cv = Math.sqrt(variance) / avg; // 变异系数
+      kwVolatility.push({ kw, cv, avg, vals });
+    });
+    // 按波动率排序取TOP5，同时确保至少有数据
+    kwVolatility.sort((a,b) => b.cv - a.cv);
+    let topKws = kwVolatility.slice(0,5).map(x => x.kw);
+    // 如果波动率不足5个，补充当前热门词
+    if (topKws.length < 5) {
+      const currentTop = [...hw].sort((a,b) => b.total-a.total).map(h => h.keyword).filter(k => k !== 'AI' && !topKws.includes(k));
+      topKws = topKws.concat(currentTop).slice(0,5);
+    }
+    const series = topKws.map((kw,i) => {
+      const vals = mergedHist.map(h => {
+        const f = h.hotwords.find(x => x.keyword === kw);
+        return f ? f.total : null;
+      });
+      return {
+        name: kw, type: 'line', smooth: true, symbol: 'circle', symbolSize: 6,
+        data: vals,
+        lineStyle: { width: 2 }, itemStyle: { color: PALETTE[i % PALETTE.length] },
+        connectNulls: true,
+      };
+    });
+    charts.hist.setOption({
+      color: PALETTE,
+      tooltip: { trigger: 'axis', backgroundColor: TOOLTIP_BG, borderColor: TOOLTIP_BORDER, textStyle: { color: TOOLTIP_TEXT } },
+      legend: { data: topKws, textStyle: { color: 'rgba(255,255,255,0.7)', fontSize: 11 }, top: 0 },
+      grid: { left: 60, right: 20, top: 40, bottom: 30 },
+      xAxis: { type: 'category', data: dates, axisLabel: { color: AXIS_COLOR }, axisLine: { lineStyle: { color: AXIS_LINE } } },
+      yAxis: { type: 'value', axisLabel: { color: AXIS_COLOR, formatter: v => v >= 10000 ? (v/10000).toFixed(0) + '万' : v }, splitLine: { lineStyle: { color: SPLIT_COLOR } } },
+      series
+    });
   }
 
   // showKeywordTrend
