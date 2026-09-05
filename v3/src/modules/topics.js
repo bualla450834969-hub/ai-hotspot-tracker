@@ -306,4 +306,15 @@
       }
     });
   }
+  window.renderTopics = renderTopics;
+  window.calcTopicScore = calcTopicScore;
+  window.generateTitles = generateTitles;
+  window.getPlatformAdaptation = getPlatformAdaptation;
+  window.generateSchedule = generateSchedule;
+  window.renderCommentScripts = renderCommentScripts;
+  window.renderChecklist = renderChecklist;
+  window.toggleCheck = toggleCheck;
+  window.updateChecklistProgress = updateChecklistProgress;
+  window.filteredTopics = filteredTopics;
+  window.generateShootList = generateShootList;
 })();
