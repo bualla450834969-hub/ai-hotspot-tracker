@@ -84,4 +84,5 @@
       }
     });
   }
+  window.renderAudience = renderAudience;
 })();
