@@ -1,26 +1,37 @@
 /**
  * effects/glow.js — UFO动态光晕特效
- * 自动扫描所有带[data-glow]属性的元素，绑定鼠标跟随光晕
- * 特性：色相循环14s + 椭圆轨道漂移 + 呼吸脉动 + 鼠标跟随
+ * 自动扫描所有卡片元素，绑定鼠标跟随光晕
+ * 特性：色相循环 + 椭圆轨道漂移 + 呼吸脉动 + 鼠标跟随
  * 零业务依赖，可独立使用
  */
 (function() {
   'use strict';
 
-  const GLOW_SELECTOR = '[data-glow]';
+  // 所有需要光晕的卡片选择器（与modules.css中的::before样式对应）
+  const CARD_SELECTORS = [
+    '.hero-stat', '.bento-card', '.breakdown-card', '.topic-card',
+    '.insight-item', '.action-item', '.matrix-cell', '.small-item',
+    '.formula-item', '.author-item', '.gene-card', '.persona-card',
+    '.tech-card', '.tech-summary-card', '.kanban-card', '.schedule-item',
+    '.checklist-item', '.compare-card', '.sat-item', '.tracker-bar',
+    '.stat-card', '.glass-card', '.work-card', '.hotword-row',
+    '[data-glow]'
+  ].join(',');
+
   let animationId = null;
   const activeCards = new Set();
 
   /** 初始化所有光晕卡片 */
   function initCardGlow() {
-    // 清理旧的监听器（通过标记避免重复绑定）
-    document.querySelectorAll(GLOW_SELECTOR).forEach(card => {
+    document.querySelectorAll(CARD_SELECTORS).forEach(card => {
       if (card._glowBound) return;
+      // 跳过太小的元素和表格行
+      if (card.offsetWidth < 30 || card.offsetHeight < 20) return;
       card._glowBound = true;
+      card.setAttribute('data-glow', '');
       bindGlow(card);
     });
 
-    // 启动全局动画循环
     if (!animationId) {
       animationId = requestAnimationFrame(animate);
     }
@@ -28,25 +39,22 @@
 
   /** 绑定单个卡片的光晕 */
   function bindGlow(card) {
-    let targetX = 50, targetY = 50;
-    let currentX = 50, currentY = 50;
-    let isHovering = false;
-    let hue = Math.random() * 360;
-    let orbitAngle = Math.random() * Math.PI * 2;
-    let breathPhase = Math.random() * Math.PI * 2;
-
-    card._glowState = { targetX, targetY, currentX, currentY, isHovering, hue, orbitAngle, breathPhase };
+    card._glowState = {
+      targetX: 50, targetY: 50,
+      currentX: 50, currentY: 50,
+      isHovering: false,
+      hue: Math.random() * 360,
+      orbitAngle: Math.random() * Math.PI * 2,
+      breathPhase: Math.random() * Math.PI * 2
+    };
 
     card.addEventListener('mouseenter', () => {
-      isHovering = true;
       card._glowState.isHovering = true;
       activeCards.add(card);
     });
 
     card.addEventListener('mouseleave', () => {
-      isHovering = false;
       card._glowState.isHovering = false;
-      // 光晕回到中心
       card._glowState.targetX = 50;
       card._glowState.targetY = 50;
     });
@@ -112,11 +120,11 @@
   window.initCardGlow = initCardGlow;
   window.refreshGlow = refreshGlow;
 
-  // DOM就绪后自动初始化
+  // DOM就绪后自动初始化（延迟等模块渲染完成）
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(initCardGlow, 300));
+    document.addEventListener('DOMContentLoaded', () => setTimeout(initCardGlow, 800));
   } else {
-    setTimeout(initCardGlow, 300);
+    setTimeout(initCardGlow, 800);
   }
 
   // 监听DOM变化，自动给新元素绑定光晕
@@ -124,15 +132,13 @@
     let needsRefresh = false;
     mutations.forEach(m => {
       m.addedNodes.forEach(node => {
-        if (node.nodeType === 1 && node.matches && node.matches(GLOW_SELECTOR)) {
-          needsRefresh = true;
-        }
-        if (node.nodeType === 1 && node.querySelector && node.querySelector(GLOW_SELECTOR)) {
-          needsRefresh = true;
+        if (node.nodeType === 1) {
+          if (node.matches && node.matches(CARD_SELECTORS)) needsRefresh = true;
+          if (node.querySelector && node.querySelector(CARD_SELECTORS)) needsRefresh = true;
         }
       });
     });
-    if (needsRefresh) setTimeout(initCardGlow, 100);
+    if (needsRefresh) setTimeout(initCardGlow, 200);
   });
   observer.observe(document.body, { childList: true, subtree: true });
 })();
