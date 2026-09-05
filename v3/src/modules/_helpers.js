@@ -209,4 +209,18 @@
     alert('已复制 ' + topics.length + ' 条选题到剪贴板！');
   }
 
+  window.animateNumber = animateNumber;
+  window.trendClass = trendClass;
+  window.classifyHook = classifyHook;
+  window.sortTable = sortTable;
+  window.getMonetization = getMonetization;
+  window.addFreshnessTags = addFreshnessTags;
+  window.updateTracker = updateTracker;
+  window.toggleSection = toggleSection;
+  window.initSectionCollapse = initSectionCollapse;
+  window.applyFilter = applyFilter;
+  window.setPlatform = setPlatform;
+  window.filterByPlatform = filterByPlatform;
+  window.doGlobalSearch = doGlobalSearch;
+  window.exportTopics = exportTopics;
 })();
