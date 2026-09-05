@@ -1,0 +1,41 @@
+{
+  "domain": "ai",
+  "name": "AI热点追踪",
+  "keywords": ["AI", "AI工具", "AI做图", "AI视频", "AI编程", "Agent", "自动化", "工作流", "提示词", "数字人"],
+  "platforms": ["douyin", "xiaohongshu"],
+  "modules": {
+    "hero": true,
+    "hotwords": true,
+    "works": true,
+    "topics": true,
+    "techradar": true,
+    "breakdown": true,
+    "viralGenes": true,
+    "publishTime": true,
+    "titleFormulas": true,
+    "leadScripts": true,
+    "launchOps": true,
+    "audience": true,
+    "engagement": true,
+    "topicPerf": true,
+    "kanban": true,
+    "credit": true,
+    "comparison": true
+  },
+  "brand": {
+    "name_en": "PYRALUMA",
+    "name_cn": "璃火矩创",
+    "slogan": "AI Intelligence"
+  },
+  "colors": {
+    "primary": "#8b5cf6",
+    "accent": "#30D158",
+    "bg": "#0a0a0f"
+  },
+  "audience_personas": [
+    {"name": "技术极客", "ratio": 65.9, "needs": "高效工作流、进阶技巧、信息差"},
+    {"name": "职场效率党", "ratio": 20.3, "needs": "办公提效、快速上手"},
+    {"name": "内容创作者", "ratio": 10.2, "needs": "AI绘画、视频生成、数字人"},
+    {"name": "泛娱乐用户", "ratio": 3.6, "needs": "好玩、猎奇、视觉冲击"}
+  ]
+}
