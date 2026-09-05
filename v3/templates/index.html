@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>热点追踪工作台</title>
+  <!-- ===== 样式层 ===== -->
+  <link rel="stylesheet" href="src/styles/base.css">
+  <link rel="stylesheet" href="src/styles/components.css">
+  <link rel="stylesheet" href="src/styles/glass.css">
+  <link rel="stylesheet" href="src/styles/login.css">
+  <!-- 模块专属样式（按需加载） -->
+  <link rel="stylesheet" href="src/styles/modules.css">
+</head>
+<body>
+  <!-- ===== 顶部导航 ===== -->
+  <nav class="top-nav">
+    <div class="nav-inner">
+      <div class="brand" id="brandName">热点追踪</div>
+      <div class="nav-links" id="mainNav"></div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <select id="categoryFilter" class="select" onchange="applyFilter()" style="width:100px;">
+          <option value="">全部分类</option>
+        </select>
+        <input type="text" id="globalSearch" class="input" placeholder="搜索选题/热词..." style="width:160px;" oninput="doGlobalSearch(this.value)">
+        <span id="updateTime" style="font-size:11px;color:var(--text-tertiary);">加载中...</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ===== 背景Logo ===== -->
+  <div class="bg-logo" id="bgLogo"></div>
+
+  <!-- ===== 主内容区 ===== -->
+  <main class="container" style="padding-top:80px;position:relative;z-index:1;">
+
+    <!-- Hero -->
+    <section id="hero" class="section">
+      <div class="section-header">
+        <div><h2 class="section-title">📊 工作台概览</h2><div class="section-subtitle" id="heroSubtitle"></div></div>
+      </div>
+      <div class="grid-4" id="heroStats"></div>
+      <div class="grid-2" style="margin-top:16px;" id="heroActions"></div>
+    </section>
+
+    <!-- 技术雷达 -->
+    <section id="techradar" class="section">
+      <div class="section-header">
+        <div><h2 class="section-title">🔬 技术雷达</h2><div class="section-subtitle">最新技术信号与信息差机会</div></div>
+        <button class="section-collapse-btn" onclick="toggleSection('techradar')">收起</button>
+      </div>
+      <div id="techRadarContent"></div>
+    </section>
+
+    <!-- 热词追踪 -->
+    <section id="hotwords" class="section">
+      <div class="section-header">
+        <div><h2 class="section-title">🔥 热点追踪</h2><div class="section-subtitle">双平台热词数据</div></div>
+        <button class="section-collapse-btn" onclick="toggleSection('hotwords')">收起</button>
+      </div>
+      <div id="hotwordCategory"></div>
+      <div id="hotwordTable" style="margin-top:16px;"></div>
+    </section>
+
+    <!-- 爆款拆解 -->
+    <section id="breakdown" class="section">
+      <div class="section-header">
+        <div><h2 class="section-title">💥 爆款拆解</h2><div class="section-subtitle">爆款作品结构与数据</div></div>
+        <button class="section-collapse-btn" onclick="toggleSection('breakdown')">收起</button>
+      </div>
+      <div id="breakdownContent"></div>
+    </section>
+
+    <!-- 选题建议 -->
+    <section id="topics" class="section">
+      <div class="section-header">
+        <div><h2 class="section-title">💡 选题建议</h2><div class="section-subtitle">智能优先级排序 · 标题+钩子</div></div>
+        <button class="section-collapse-btn" onclick="toggleSection('topics')">收起</button>
+      </div>
+      <div id="topicsContent"></div>
+    </section>
+
+    <!-- 选题效果 -->
+    <section id="topicPerf" class="section">
+      <div class="section-header">
+        <div><h2 class="section-title">📈 选题效果追踪</h2><div class="section-subtitle">命中率与表现记录</div></div>
+        <button class="section-collapse-btn" onclick="toggleSection('topicPerf')">收起</button>
+      </div>
+      <div id="topicPerfContent"></div>
+    </section>
+
+    <!-- 发布时间 -->
+    <section id="publishTime" class="section">
+      <div class="section-header">
+        <div><h2 class="section-title">⏰ 发布时间分析</h2><div class="section-subtitle">几点发最容易爆</div></div>
+        <button class="section-collapse-btn" onclick="toggleSection('publishTime')">收起</button>
+      </div>
+      <div id="publishTimeContent"></div>
+    </section>
+
+    <!-- 标题公式 -->
+    <section id="titleFormulas" class="section">
+      <div class="section-header">
+        <div><h2 class="section-title">✍️ 爆款标题公式</h2><div class="section-subtitle">可直接套用的标题模板</div></div>
+        <button class="section-collapse-btn" onclick="toggleSection('titleFormulas')">收起</button>
+      </div>
+      <div id="titleFormulasContent"></div>
+    </section>
+
+    <!-- 引流话术 -->
+    <section id="leadScripts" class="section">
+      <div class="section-header">
+        <div><h2 class="section-title">🎯 私域引流话术</h2><div class="section-subtitle">按人群分类的转化话术</div></div>
+        <button class="section-collapse-btn" onclick="toggleSection('leadScripts')">收起</button>
+      </div>
+      <div id="leadScriptsContent"></div>
+    </section>
+
+    <!-- 起号运营 -->
+    <section id="launchOps" class="section">
+      <div class="section-header">
+        <div><h2 class="section-title">🚀 起号运营</h2><div class="section-subtitle">零推流贴标签起号法 · 阶段追踪</div></div>
+        <button class="section-collapse-btn" onclick="toggleSection('launchOps')">收起</button>
+      </div>
+      <div id="launchOpsContent"></div>
+    </section>
+
+    <!-- 人群画像 -->
+    <section id="audience" class="section">
+      <div class="section-header">
+        <div><h2 class="section-title">👥 人群画像</h2><div class="section-subtitle">核心受众特征与需求</div></div>
+        <button class="section-collapse-btn" onclick="toggleSection('audience')">收起</button>
+      </div>
+      <div id="audienceContent"></div>
+    </section>
+
+  </main>
+
+  <!-- ===== 脚本层（按依赖顺序加载）===== -->
+  <!-- 配置层 -->
+  <script src="config/domain.js"></script>
+  <!-- 数据层 -->
+  <script src="data/data.js"></script>
+  <!-- 核心层 -->
+  <script src="src/core/state.js"></script>
+  <script src="src/core/renderer.js"></script>
+  <script src="src/core/framework.js"></script>
+  <!-- 特效层 -->
+  <script src="src/effects/glow.js"></script>
+  <script src="src/effects/login.js"></script>
+  <!-- 辅助函数 -->
+  <script src="src/modules/_helpers.js"></script>
+  <!-- 业务模块（按注册顺序） -->
+  <script src="src/modules/hero.js"></script>
+  <script src="src/modules/hotwords.js"></script>
+  <script src="src/modules/works.js"></script>
+  <script src="src/modules/topics.js"></script>
+  <script src="src/modules/techradar.js"></script>
+  <script src="src/modules/breakdown.js"></script>
+  <script src="src/modules/viralGenes.js"></script>
+  <script src="src/modules/publishTime.js"></script>
+  <script src="src/modules/titleFormulas.js"></script>
+  <script src="src/modules/leadScripts.js"></script>
+  <script src="src/modules/launchOps.js"></script>
+  <script src="src/modules/audience.js"></script>
+  <script src="src/modules/engagement.js"></script>
+  <script src="src/modules/topicPerf.js"></script>
+  <script src="src/modules/kanban.js"></script>
+  <script src="src/modules/favorites.js"></script>
+  <script src="src/modules/credit.js"></script>
+  <script src="src/modules/scriptGen.js"></script>
+  <script src="src/modules/comparison.js"></script>
+</body>
+</html>
