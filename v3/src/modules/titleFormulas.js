@@ -50,4 +50,7 @@
       }
     });
   }
+  window.renderTitleFormulas = renderTitleFormulas;
+  window.copyFormula = copyFormula;
+  window.genTitleVariants = genTitleVariants;
 })();
