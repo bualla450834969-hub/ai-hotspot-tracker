@@ -80,14 +80,26 @@
     const filtered = currentCategory==='all' ? sat : sat.filter(s=>hw.some(h=>h.keyword===s.keyword));
     const el = document.getElementById('saturationList');
     if (!filtered.length) { el.innerHTML='<div class="empty-state">暂无饱和度数据</div>'; return; }
-    const maxSat = Math.max(...filtered.map(s=>s.saturation), 1);
-    el.innerHTML = filtered.slice(0,12).map(s=>{
-      const pct = Math.min(100, s.saturation/maxSat*100);
+    // 合并重复关键词（双平台数据去重）
+    const merged = {};
+    filtered.forEach(s=>{
+      if (!merged[s.keyword]) { merged[s.keyword] = {keyword:s.keyword, saturation:0, stage:s.stage}; }
+      merged[s.keyword].saturation += (s.saturation || 0);
+      const stageOrder = {'萌芽期':1,'上升期':2,'爆发期':3,'衰退期':4};
+      if (stageOrder[s.stage] > stageOrder[merged[s.keyword].stage]) merged[s.keyword].stage = s.stage;
+    });
+    const mergedList = Object.values(merged);
+    // 按饱和度升序（蓝海优先），取前12
+    const sorted = mergedList.sort((a,b)=>a.saturation-b.saturation).slice(0,12);
+    const maxSat = Math.max(...sorted.map(s=>s.saturation), 1);
+    el.innerHTML = sorted.map(s=>{
+      const pct = Math.max(2, Math.min(100, s.saturation/maxSat*100));
       const color = s.saturation<50?'#30D158':s.saturation<150?'#64D2FF':s.saturation<300?'#FF9F0A':'#FF453A';
+      const satDisplay = s.saturation >= 10000 ? (s.saturation/10000).toFixed(1)+'万' : Math.round(s.saturation);
       return `<div class="sat-item">
         <div class="sat-name">${s.keyword}</div>
         <div class="sat-bar"><div class="sat-fill" style="width:${pct}%;background:${color};"></div></div>
-        <div class="sat-val">${s.saturation}</div>
+        <div class="sat-val">${satDisplay}</div>
         <div class="sat-advice"><span class="tag ${s.stage==='萌芽期'?'sprout':s.stage==='上升期'?'rise':s.stage==='爆发期'?'boom':'decline'}">${s.stage}</span></div>
       </div>`;
     }).join('');
