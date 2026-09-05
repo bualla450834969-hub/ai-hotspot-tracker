@@ -103,7 +103,7 @@
     var coreCount = 0, relCount = 0, genCount = 0;
     topics.forEach(function(t) {
       var cat = t.category || '';
-      if (cat.indexOf('AI') >= 0 || cat.indexOf('工具') >= 0 || cat.indexOf('工作流') >= 0) coreCount++;
+      if (cat.indexOf(cfg('name','AI')) >= 0 || cat.indexOf('工具') >= 0 || cat.indexOf('工作流') >= 0) coreCount++;
       else if (cat.indexOf('教程') >= 0 || cat.indexOf('测评') >= 0) relCount++;
       else genCount++;
     });
@@ -125,7 +125,7 @@
       core_keywords: coreKws,
       content_ratio: { core: coreCount, related: relCount, general: genCount },
       tasks: [
-        '每日发布1条核心领域垂直内容（数字人口播+AI素材混剪）',
+        cfg('launch.daily_content', '每日发布1条核心领域垂直内容（口播+素材混剪）'),
         '选题覆盖TOP5飙升热词，标题包含关键词',
         '发布时间选择18:00-21:00黄金时段',
         '前3秒钩子用数字/痛点/对比型',
