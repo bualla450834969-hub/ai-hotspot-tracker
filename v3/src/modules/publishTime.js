@@ -120,7 +120,7 @@
   if (window.Module) {
     Module.register({
       id: "publishTime",
-      requiredFields: ['publish_time_dist'],
+      requiredFields: ['works'],
       render: function(data) {
         try { renderPublishTimeDetail(data); } catch(e) { console.error("[publishTime]", e); }
       }
