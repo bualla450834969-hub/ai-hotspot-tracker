@@ -111,7 +111,7 @@
     if (bestHours.length > 0) {
       tipsHtml += '优先在<strong>' + bestHours[0].hour + ':00前后</strong>发布，爆款率是平均水平的' + (bestHours[0].viralRate / Math.max(hoursWithData.reduce(function(s, x) { return s + x.viralRate; }, 0) / Math.max(hoursWithData.length, 1), 0.1)).toFixed(1) + '倍。';
     }
-    tipsHtml += ' 避开<strong>13:00-14:00午间</strong>（AI内容互动最差）。';
+    tipsHtml += ' 避开<strong>13:00-14:00午间</strong>（'+cfg('name','该领域')+'内容互动最差）。';
     tipsHtml += ' 若一天发2条，选<strong>18点 + 20点</strong>覆盖晚高峰双波峰。';
     document.getElementById('ptTips').innerHTML = tipsHtml;
   }
