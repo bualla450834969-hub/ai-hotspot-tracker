@@ -1,0 +1,3798 @@
+/* ===== config/domain.js ===== */
+
+/**
+ * 领域配置 — 换领域时唯一需要修改的文件
+ * 所有业务文案、关键词、模块开关、配色都从这里读取
+ */
+window.DOMAIN_CONFIG = {
+  // ===== 基础信息 =====
+  id: 'ai',
+  name: 'AI',
+  display_name: 'AI热点追踪',
+  tagline: '零推流贴标签起号法 · 数据驱动内容运营',
+  language: 'zh-CN',
+
+  // ===== 品牌配置 =====
+  brand: {
+    name_en: 'PYRALUMA',
+    name_cn: '璃火矩创',
+    slogan: 'AI Intelligence',
+    logo_type: 'shapes',
+  },
+
+  // ===== 采集关键词（RedFox API用）=====
+  collect_keywords: [
+    'AI', 'AI工具', 'AI绘画', 'AI视频', 'AI数字人',
+    'AI工作流', 'AI提示词', 'AI编程', '大模型', 'ChatGPT',
+    '可灵AI', '即梦AI', 'Midjourney', 'Sora', '豆包AI',
+    'Dify', 'Coze', 'ComfyUI', 'n8n', 'AI Agent'
+  ],
+
+  // ===== 核心关键词（用于标签健康度计算）=====
+  core_keywords: [
+    'AI工作流', '自动化', '工作流', '效率', '提示词',
+    'Agent', 'Dify', 'Coze', 'ComfyUI', 'n8n',
+    'AI编程', 'AI教程', '实操', '配置', '部署'
+  ],
+  exclude_keywords: ['AI'],  // 趋势图中排除的超大词
+  related_keywords: [
+    'AI工具', 'AI绘画', 'AI视频', '大模型', 'GPT',
+    'Claude', '可灵', '即梦', 'Midjourney', 'Sora',
+    '开源', 'GitHub'
+  ],
+
+  // ===== 内容分类规则（关键词→分类映射）=====
+  content_categories: [
+    { name: 'AI工具', keywords: ['工具', '推荐', '神器', '软件'] },
+    { name: 'AI绘画', keywords: ['绘画', '画图', '做图', '生图', 'Midjourney', '即梦'] },
+    { name: 'AI视频', keywords: ['视频', '短片', '动画', '可灵', 'Sora', '数字人'] },
+    { name: 'AI工作流', keywords: ['工作流', '自动化', 'Agent', 'Dify', 'Coze', 'n8n', 'ComfyUI'] },
+    { name: 'AI编程', keywords: ['编程', '代码', '开发', 'Cursor', 'GitHub'] },
+    { name: 'AI办公', keywords: ['PPT', 'Excel', '办公', '文档', '写作', '文案'] },
+    { name: 'AI资讯', keywords: ['资讯', '新闻', '发布', '更新', '趋势'] },
+    { name: 'AI教程', keywords: ['教程', '教学', '入门', '怎么用', '实操'] },
+  ],
+
+  // ===== 视频格式分类规则 =====
+  format_rules: [
+    { name: '教程实操', keywords: ['教程', '教学', '步骤', '怎么', '实操', '手把手'] },
+    { name: '工具测评', keywords: ['测评', '评测', '对比', '推荐', '神器', '工具'] },
+    { name: '资讯速报', keywords: ['资讯', '新闻', '发布', '更新', '最新'] },
+    { name: '效果展示', keywords: ['展示', '效果', '作品', '案例', '欣赏'] },
+    { name: '观点解读', keywords: ['观点', '解读', '分析', '思考', '为什么'] },
+  ],
+
+  // ===== 模块开关 =====
+  modules: {
+    hero: true, works: true, techradar: true, hotwords: true,
+    history: true, breakdown: true, viralGenes: true, insights: true,
+    topics: true, titleGen: true, schedule: true, topicPerf: true,
+    commentScripts: true, checklist: true, publishTime: true,
+    titleFormulas: true, leadScripts: true, launchOps: true,
+    audience: true, saturation: true,
+  },
+
+  // ===== 导航顺序 =====
+  nav_order: ['hero', 'techradar', 'hotwords', 'breakdown', 'topics', 'topicPerf', 'publishTime', 'titleFormulas', 'leadScripts', 'launchOps', 'audience'],
+
+  // ===== 导航标签 =====
+  nav_labels: {
+    hero: '总览', techradar: '技术雷达', hotwords: '热词',
+    breakdown: '爆款拆解', topics: '选题', topicPerf: '选题表现',
+    publishTime: '发布时间', titleFormulas: '标题公式',
+    leadScripts: '钩子话术', launchOps: '起号运营', audience: '人群画像',
+  },
+
+  // ===== 主题配色 =====
+  theme: {
+    bg: '#0a0a0f',
+    bg_gradient: 'linear-gradient(135deg, #0a0a0f 0%, #1a1025 50%, #0f1a2a 100%)',
+    primary: '#8b5cf6', primary_light: '#a78bfa',
+    accent: '#30D158', warning: '#fbbf24', danger: '#f87171', info: '#60a5fa',
+    text: '#f1f5f9', text_secondary: '#94a3b8', text_tertiary: '#64748b',
+    glass_bg: 'rgba(255,255,255,0.06)', glass_border: 'rgba(255,255,255,0.1)',
+    glow_hue_start: 280, glow_hue_end: 200,
+  },
+
+  // ===== 起号配置 =====
+  launch: {
+    start_date: '2026-09-01',
+    target_ratio: { core: 70, related: 20, general: 10 },
+    tasks: [
+      '每日发布1-2条，覆盖核心关键词',
+      '前10条不挂车、不带货，纯内容打标签',
+      '每条视频标题包含1个核心关键词',
+      '发布时间固定在18:00-21:00黄金时段',
+      '评论区主动回复前20条，引导互动',
+      '不删视频、不隐藏作品，保持账号稳定',
+      '7天后检查标签健康度，调整内容方向',
+    ],
+    pitfalls: [
+      '不要发泛娱乐内容，会打乱账号标签',
+      '不要买粉买赞，会被系统识别降权',
+      '打标期不要频繁删视频，影响权重',
+      '不要一开始就带货，转化率极低',
+      '不要追与领域无关的热点',
+    ],
+  },
+
+  // ===== 人群画像 =====
+  audience_categories: [
+    { name: '技术极客', proportion: 65.9, needs: ['深度教程', '工作流', '源码', '前沿技术'] },
+    { name: '视觉创作者', proportion: 15.2, needs: ['AI绘画', 'AI视频', '提示词', '风格参考'] },
+    { name: '泛AI关注者', proportion: 10.1, needs: ['资讯', '测评', '趋势', '入门'] },
+    { name: '职场效率', proportion: 5.3, needs: ['办公自动化', 'PPT', '文案', '效率工具'] },
+    { name: '创业者', proportion: 3.5, needs: ['AI创业', '变现', '商业模式', '投资'] },
+  ],
+
+  // ===== 标题公式 =====
+  title_formulas: [
+    { pattern: '{keyword}保姆级教程，小白也能上手', type: '教程型', ctr: '高' },
+    { pattern: '我用{keyword}做了一个{result}，效果惊人', type: '效果型', ctr: '高' },
+    { pattern: '{keyword} vs {keyword2}，到底谁更强？', type: '对比型', ctr: '中' },
+    { pattern: '2026年最值得学的{keyword}，收藏吃灰', type: '收藏型', ctr: '中' },
+    { pattern: '别再用{keyword}了，这个方法快10倍', type: '反常识型', ctr: '高' },
+    { pattern: '{keyword}从入门到精通，看这一篇就够了', type: '合集型', ctr: '中' },
+  ],
+
+  // ===== 钩子话术 =====
+  lead_scripts: [
+    { hook: '90%的人不知道，{keyword}还能这么用', type: '反常识', duration: '0-3秒' },
+    { hook: '学会这个{keyword}技巧，效率直接翻倍', type: '利益点', duration: '0-3秒' },
+    { hook: '我花了3天研究{keyword}，总结出这5点', type: '付出感', duration: '0-5秒' },
+    { hook: '{keyword}最新更新，这个功能太香了', type: '新鲜感', duration: '0-3秒' },
+    { hook: '新手做{keyword}最容易犯的3个错误', type: '避坑型', duration: '0-5秒' },
+  ],
+
+  // ===== 文案模板 =====
+  copy: {
+    hero_title: '热点追踪工作台',
+    hero_subtitle: '双平台数据 · 智能选题 · 起号运营',
+    data_fresh_warning: '数据超过24小时未更新',
+    collect_failed: '采集失败，显示上次缓存数据',
+    section_titles: {
+      hero: '总览', techradar: '技术雷达', hotwords: '热词分析',
+      breakdown: '爆款拆解', topics: '选题建议', topicPerf: '选题表现',
+      publishTime: '发布时间分析', titleFormulas: '标题公式库',
+      leadScripts: '钩子话术库', launchOps: '起号运营', audience: '人群画像',
+    },
+  },
+
+  // ===== 变现规则 =====
+  monetization_rules: [
+    { match: ['工具','教程','入门','怎么做','做图','视频','ppt'], type: 'affiliate', score: 85, desc: '带货：工具会员/affiliate佣金' },
+    { match: ['资讯','新闻','发布','agent'], type: 'ad', score: 70, desc: '广告：品牌合作、商单植入' },
+    { match: ['工作流','自动化','效率'], type: 'private', score: 90, desc: '私域：引流微信，卖方案/咨询' },
+    { match: ['提示词','prompt'], type: 'course', score: 75, desc: '知识付费：课程/社群' },
+  ],
+
+  // ===== 话题标签模板 =====
+  hashtags: {
+    core: '{cat} #AI #人工智能 #干货分享',
+    tool: '{cat} #AI工具 #效率神器 #新手必看',
+  },
+
+  // ===== 内容格式 =====
+  content_format: '15-40秒口播+AI素材混剪',
+
+  // ===== CTA文案 =====
+  cta: {
+    question: '你们最想用AI解决什么问题？评论区告诉我，下期安排！',
+  },
+
+  // ===== 任务文案 =====
+  tasks: {
+    collect_footage: '收集AI生成素材并完成混剪（60-90秒）',
+    collect_footage_short: '收集AI生成素材（截图/演示视频）',
+  },
+
+  // ===== 脚本模板 =====
+  script_templates: {
+    follow_cta: '关注我，每天分享一个AI实用技巧',
+    comment_cta: '评论区扣1，发你完整工具包',
+    hashtag_prefix: '#AI #',
+    bg_desc: 'AI生成的',
+  },
+
+  // ===== 作品标签关键词 =====
+  works: {
+    theme_keywords: ['可灵','即梦','AI绘画','AI视频','数字人','工作流','Agent','提示词','教程','实测','对比','免费','神器','效率'],
+  },
+
+  // ===== 钩子话术详情（leadScripts用）=====
+  lead_scripts_detail: [
+    { target: '技术极客（65.9%）', text: '评论区扣"1"，我把这套AI工作流的完整配置和提示词打包发你，都是自己实测过的，直接能用。' },
+    { target: '视觉创作者（9.8%）', text: '想要这套AI出图的完整提示词和参数设置吗？评论区告诉我你用的是什么工具，我针对性发你。' },
+    { target: '泛AI关注者（22.5%）', text: '刚整理了一份《AI工具避坑指南》，把我花了几万块踩过的坑都写进去了，评论区"避坑"我发你。' },
+    { target: '职场效率人群', text: '这套AI工作流我自己用了半年，每天省2小时。想要的评论区"效率"，我把模板和教程一起发你。' },
+    { target: '创业者/副业人群', text: '用AI做副业第一个月赚了XX，把完整的工具链和操作流程整理好了，评论区"副业"发你完整版。' },
+  ],
+
+  // ===== 标题公式示例 =====
+  title_formula_examples: {
+    '感叹句': '太绝了！这个AI工具让我效率提升10倍',
+    '教程型': '手把手教你用AI做XX，3分钟上手',
+    '疑问句': 'AI做图还在手动调参？这个方法90%的人不知道',
+    '否定警告': '千万别再用XX做AI了，这3个坑踩过的人都哭了',
+    '极限词': '2026最强AI工具排行，第一名居然是它',
+    '实测型': '我用AI工作流跑了一周，效率提升了200%',
+    '免费型': '免费白嫖！这款AI工具比付费的还好用',
+  },
+
+
+
+  // ===== 领域专属模块（换领域时自动关闭）=====
+  domain_specific_modules: ['techradar', 'viralGenes', 'saturation'],
+};
+
+/**
+ * 配置读取工具 — 所有模块通过cfg()读取配置，带兜底
+ * 用法: cfg('brand.name_en') → 'PYRALUMA'
+ *       cfg('modules.techradar', false) → true/false
+ *       cfg('nonexistent.key', '默认值') → '默认值'
+ */
+window.cfg = function(path, defaultValue) {
+  if (!window.DOMAIN_CONFIG) return defaultValue;
+  const parts = path.split('.');
+  let obj = window.DOMAIN_CONFIG;
+  for (const p of parts) {
+    if (obj == null || typeof obj !== 'object') return defaultValue;
+    obj = obj[p];
+  }
+  return obj === undefined ? defaultValue : obj;
+};
+
+/**
+ * 领域守卫 — AI专属模块调用，非AI领域显示提示而非崩溃
+ */
+window.domainGuard = function(moduleId, renderFn) {
+  const domainId = cfg('id', 'unknown');
+  const specific = cfg('domain_specific_modules', []);
+  if (specific.includes(moduleId) && domainId !== 'ai') {
+    return function() {
+      const el = document.querySelector('[data-module="' + moduleId + '"]');
+      if (el) el.innerHTML = '<div style="padding:40px;text-align:center;color:#64748b;">该模块为AI领域专属，当前领域「' + domainId + '」暂不支持</div>';
+    };
+  }
+  return renderFn;
+};
+
+
+/* ===== src/core/state.js ===== */
+
+/**
+ * 状态管理 — localStorage持久化
+ * 看板状态、收藏、选题性能追踪、清单进度
+ */
+(function() {
+  'use strict';
+
+  const PREFIX = 'hotspot_';
+
+  const State = {
+    get(key, def) {
+      try {
+        const raw = localStorage.getItem(PREFIX + key);
+        return raw ? JSON.parse(raw) : def;
+      } catch (e) { return def; }
+    },
+    set(key, val) {
+      try { localStorage.setItem(PREFIX + key, JSON.stringify(val)); } catch (e) {}
+    },
+
+    // ===== 选题看板状态 =====
+    getTopicStatus(title) {
+      const all = this.get('topic_status', {});
+      return all[title] || '待拍摄';
+    },
+    setTopicStatus(title, status) {
+      const all = this.get('topic_status', {});
+      all[title] = status;
+      this.set('topic_status', all);
+    },
+    cycleTopicStatus(title) {
+      const order = ['待拍摄', '拍摄中', '已发布', '已归档'];
+      const cur = this.getTopicStatus(title);
+      const next = order[(order.indexOf(cur) + 1) % order.length];
+      this.setTopicStatus(title, next);
+      return next;
+    },
+    getAllTopicStatus() {
+      return this.get('topic_status', {});
+    },
+
+    // ===== 收藏 =====
+    getFavorites() {
+      return this.get('favorites', []);
+    },
+    isFavorite(workId) {
+      return this.getFavorites().includes(workId);
+    },
+    toggleFavorite(workId) {
+      const favs = this.getFavorites();
+      const idx = favs.indexOf(workId);
+      if (idx >= 0) favs.splice(idx, 1);
+      else favs.push(workId);
+      this.set('favorites', favs);
+      return idx < 0;
+    },
+
+    // ===== 选题性能追踪 =====
+    getPerfData() {
+      return this.get('topic_perf', {});
+    },
+    recordPerf(title, data) {
+      const all = this.getPerfData();
+      all[title] = { ...all[title], ...data, recorded_at: new Date().toISOString() };
+      this.set('topic_perf', all);
+    },
+    calcHitRate() {
+      const perf = this.getPerfData();
+      const total = Object.keys(perf).length;
+      const hits = Object.values(perf).filter(p => p.views > 10000).length;
+      return total ? Math.round(hits / total * 100) : 0;
+    },
+
+    // ===== 拍摄清单进度 =====
+    getChecklist() {
+      return this.get('checklist', {});
+    },
+    toggleCheck(topicTitle, itemIndex) {
+      const all = this.getChecklist();
+      if (!all[topicTitle]) all[topicTitle] = {};
+      all[topicTitle][itemIndex] = !all[topicTitle][itemIndex];
+      this.set('checklist', all);
+      return all[topicTitle][itemIndex];
+    },
+    getChecklistProgress(topicTitle) {
+      const data = this.getChecklist()[topicTitle] || {};
+      const done = Object.values(data).filter(Boolean).length;
+      const total = 10; // 固定10步
+      return { done, total, percent: Math.round(done / total * 100) };
+    },
+
+    // ===== 积分追踪 =====
+    getCreditUsage() {
+      return this.get('credit_usage', { used: 0, total: 1000, history: [] });
+    },
+    addCreditUsage(points) {
+      const data = this.getCreditUsage();
+      data.used += points;
+      data.history.push({ date: new Date().toISOString(), points });
+      this.set('credit_usage', data);
+      return data;
+    },
+  };
+
+  window.State = State;
+})();
+
+
+/* ===== src/core/renderer.js ===== */
+
+/**
+ * 通用渲染器 — 表格、卡片、图表、数字动画、标签
+ * 所有业务模块共用，不包含领域逻辑
+ */
+(function() {
+  'use strict';
+
+  const Renderer = {
+    /** 数字动画 */
+    animateNumber(el, target, duration = 800) {
+      if (!el) return;
+      const start = 0;
+      const startTime = performance.now();
+      function update(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(start + (target - start) * eased).toLocaleString();
+        if (progress < 1) requestAnimationFrame(update);
+      }
+      requestAnimationFrame(update);
+    },
+
+    /** 格式化大数字 */
+    formatNum(n) {
+      if (n >= 10000) return (n / 10000).toFixed(1) + '万';
+      if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
+      return n?.toLocaleString() || '0';
+    },
+
+    /** 趋势标签 */
+    trendClass(trend) {
+      if (!trend) return '';
+      if (trend > 0) return 'trend-up';
+      if (trend < 0) return 'trend-down';
+      return 'trend-flat';
+    },
+
+    /** 生成标签chip */
+    chip(text, color = 'default') {
+      const colors = {
+        default: 'rgba(255,255,255,0.08)',
+        primary: 'rgba(139,92,246,0.15)',
+        success: 'rgba(48,209,88,0.15)',
+        warning: 'rgba(251,191,36,0.15)',
+        danger: 'rgba(248,113,113,0.15)',
+        info: 'rgba(96,165,250,0.15)',
+      };
+      const textColors = {
+        default: '#94a3b8', primary: '#a78bfa', success: '#30D158',
+        warning: '#fbbf24', danger: '#f87171', info: '#60a5fa',
+      };
+      return `<span class="kw-chip" style="background:${colors[color]};color:${textColors[color]}">${text}</span>`;
+    },
+
+    /** 通用卡片容器 */
+    card(content, extraClass = '') {
+      return `<div class="glass-card ${extraClass}" data-glow>${content}</div>`;
+    },
+
+    /** 进度条 */
+    progressBar(percent, color = '#8b5cf6', height = 6) {
+      return `<div class="progress-bar" style="height:${height}px;background:rgba(255,255,255,0.08);border-radius:${height/2}px;overflow:hidden;">
+        <div style="width:${percent}%;height:100%;background:${color};border-radius:${height/2}px;transition:width 0.5s;"></div>
+      </div>`;
+    },
+
+    /** 空状态 */
+    emptyState(message = '暂无数据') {
+      return `<div style="text-align:center;padding:40px 20px;color:var(--text-tertiary);font-size:13px;">
+        <div style="font-size:32px;margin-bottom:8px;opacity:0.3;">📭</div>${message}
+      </div>`;
+    },
+
+    /** 复制到剪贴板 */
+    copyToClipboard(text, btnEl) {
+      navigator.clipboard.writeText(text).then(() => {
+        if (btnEl) {
+          const orig = btnEl.textContent;
+          btnEl.textContent = '✓ 已复制';
+          setTimeout(() => btnEl.textContent = orig, 1500);
+        }
+      });
+    },
+
+    /** 表格排序 */
+    sortTable(tableEl, colIndex, asc = true) {
+      const tbody = tableEl.querySelector('tbody');
+      if (!tbody) return;
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+      rows.sort((a, b) => {
+        const aVal = parseFloat(a.cells[colIndex]?.textContent?.replace(/[^0-9.]/g, '')) || 0;
+        const bVal = parseFloat(b.cells[colIndex]?.textContent?.replace(/[^0-9.]/g, '')) || 0;
+        return asc ? aVal - bVal : bVal - aVal;
+      });
+      rows.forEach(r => tbody.appendChild(r));
+    },
+
+    /** 折叠section */
+    toggleSection(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const content = el.querySelector('.section-content') || el;
+      const btn = el.querySelector('.section-collapse-btn');
+      const isHidden = content.style.display === 'none';
+      content.style.display = isHidden ? '' : 'none';
+      if (btn) btn.textContent = isHidden ? '收起' : '展开';
+    },
+
+    /** 初始化折叠功能 */
+    initCollapse() {
+      document.querySelectorAll('.section-collapse-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const section = btn.closest('.section');
+          if (section) this.toggleSection(section.id);
+        });
+      });
+    },
+  };
+
+  window.Renderer = Renderer;
+  window.animateNumber = Renderer.animateNumber;
+  window.toggleSection = Renderer.toggleSection;
+})();
+
+
+/* ===== src/core/globals.js ===== */
+
+/**
+ * core/globals.js — 全局共享变量与常量
+ * 所有模块共用的全局状态、ECharts配置、辅助函数
+ * 必须在模块之前加载
+ */
+(function() {
+  'use strict';
+
+  // ===== ECharts 实例容器 =====
+  window.charts = {};
+
+  // ===== ECharts 配色与样式常量 =====
+  window.PALETTE = ['#0A84FF', '#BF5AF2', '#FF375F', '#FF9F0A', '#30D158', '#64D2FF', '#FFD60A', '#FF6482', '#5E5CE6', '#C08FC0'];
+  window.TOOLTIP_BG = 'rgba(20,20,30,0.92)';
+  window.TOOLTIP_BORDER = 'rgba(100,100,140,0.3)';
+  window.TOOLTIP_TEXT = 'rgba(255,255,255,0.9)';
+  window.AXIS_COLOR = 'rgba(255,255,255,0.45)';
+  window.AXIS_LINE = 'rgba(255,255,255,0.15)';
+  window.SPLIT_COLOR = 'rgba(255,255,255,0.06)';
+
+  // ===== 筛选状态 =====
+  window.currentCategory = 'all';
+  window.currentPlatform = 'all';
+  window.sortDir = {};
+
+  // ===== 辅助函数（暴露到全局） =====
+  window.trendClass = function(t) {
+    if (t === '飙升') return 'surging';
+    if (t === '新热') return 'new-hot';
+    if (t === '衰退') return 'declining';
+    return 'stable';
+  };
+
+  window.classifyHook = function(title) {
+    if (/翻车|踩坑|避坑|别再|不要|后悔/.test(title)) return '痛点';
+    if (/对比|vs|VS|区别|哪个好|pk/i.test(title)) return '对比';
+    if (/揭秘|竟然|居然|没想到|真相|内幕/.test(title)) return '悬念';
+    if (/太美了|绝了|惊艳|震撼|效果|大片/.test(title)) return '效果';
+    if (/哭了|感动|暖心|治愈|陪伴/.test(title)) return '情感';
+    return '数字';
+  };
+
+  window.animateNumber = function(el, target, duration) {
+    duration = duration || 1200;
+    var start = performance.now();
+    function tick(now) {
+      var p = Math.min((now - start) / duration, 1);
+      var eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased).toLocaleString();
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  };
+
+  // ===== renderAll — 重新渲染所有已注册模块 =====
+  window.renderAll = function() {
+    if (window.Module && window.Module.all) {
+      var data = window.DASHBOARD_DATA || window.DATA || {};
+      window.Module.all().forEach(function(m) {
+        if (m.render) {
+          try {
+            var renderData = data;
+            if (m.requiredFields && m.requiredFields.length === 1) {
+              renderData = data[m.requiredFields[0]] || data;
+            }
+            m.render(renderData);
+          } catch (e) {
+            console.error('[renderAll:' + m.id + ']', e);
+          }
+        }
+      });
+    }
+  };
+
+  // ===== applyFilter — 分类筛选 =====
+  window.applyFilter = function() {
+    var sel = document.getElementById('categoryFilter');
+    if (sel) window.currentCategory = sel.value;
+    window.renderAll();
+  };
+
+  // ===== setPlatform — 平台切换 =====
+  window.setPlatform = function(p) {
+    window.currentPlatform = p;
+    document.querySelectorAll('.platform-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.platform === p);
+    });
+    window.renderAll();
+  };
+
+  // ===== filterByPlatform =====
+  window.filterByPlatform = function(arr) {
+    if (!arr) return [];
+    if (window.currentPlatform === 'all' || window.currentPlatform === 'compare') return arr;
+    return arr.filter(function(item) { return item.platform === window.currentPlatform; });
+  };
+
+})();
+
+
+/* ===== src/core/framework.js ===== */
+
+/**
+ * 核心框架 — 模块注册、初始化、导航、筛选
+ * 所有业务模块通过 Module.register() 注册，框架自动管理生命周期
+ */
+(function() {
+  'use strict';
+
+  // ===== 模块注册表 =====
+  const modules = {};
+  const moduleOrder = [];
+
+  const Module = {
+    /**
+     * 注册一个业务模块
+     * @param {Object} mod - 模块定义
+     * @param {string} mod.id - 模块唯一ID（对应section的id）
+     * @param {string[]} mod.requiredFields - 依赖的DATA字段，缺数据自动隐藏
+     * @param {Function} mod.render - 渲染函数(data)
+     * @param {Function} [mod.init] - 初始化函数（只执行一次）
+     * @param {Function} [mod.destroy] - 销毁函数
+     */
+    register(mod) {
+      if (!mod.id || !mod.render) {
+        console.warn('[Module] 注册失败，缺少id或render:', mod);
+        return;
+      }
+      modules[mod.id] = mod;
+      moduleOrder.push(mod.id);
+      if (mod.init) mod.init();
+    },
+
+    get(id) { return modules[id]; },
+    all() { return moduleOrder.map(id => modules[id]); },
+
+    /** 检查模块所需数据是否存在 */
+    hasData(mod) {
+      if (!mod.requiredFields) return true;
+      const DATA = window.DASHBOARD_DATA || {};
+      return mod.requiredFields.every(f => {
+        const val = DATA[f];
+        return val !== undefined && val !== null &&
+               !(Array.isArray(val) && val.length === 0);
+      });
+    },
+  };
+
+  // ===== 安全数据访问 =====
+  const Safe = {
+    /** 安全获取嵌套字段，不存在返回默认值 */
+    get(obj, path, def) {
+      if (!obj) return def;
+      const keys = path.split('.');
+      let cur = obj;
+      for (const k of keys) {
+        if (cur == null || cur[k] === undefined) return def;
+        cur = cur[k];
+      }
+      return cur === undefined ? def : cur;
+    },
+    arr(val) { return Array.isArray(val) ? val : []; },
+    num(val, def) { return typeof val === 'number' ? val : (def || 0); },
+    str(val, def) { return typeof val === 'string' ? val : (def || ''); },
+  };
+
+  // ===== 渲染调度 =====
+  function renderAll() {
+    const DATA = window.DASHBOARD_DATA || {};
+    const config = window.DOMAIN_CONFIG || {};
+    const mods = config.modules || {};
+
+    moduleOrder.forEach(id => {
+      const mod = modules[id];
+      if (!mod) return;
+
+      // 模块开关检查
+      if (mods[id] === false) {
+        hideSection(id);
+        return;
+      }
+
+      // 数据依赖检查
+      if (!Module.hasData(mod)) {
+        hideSection(id);
+        return;
+      }
+
+      // 渲染 — 根据requiredFields传递子数据，单字段传子数据，多字段/无字段传完整DATA
+      try {
+        showSection(id);
+        var renderData = DATA;
+        if (mod.requiredFields && mod.requiredFields.length === 1) {
+          renderData = DATA[mod.requiredFields[0]] || DATA;
+        }
+        mod.render(renderData);
+      } catch (e) {
+        console.error(`[Module] ${id} 渲染失败:`, e);
+        // 单个模块崩溃不影响其他模块
+      }
+    });
+
+    // 更新导航
+    updateNav();
+  }
+
+  function hideSection(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  }
+  function showSection(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = '';
+  }
+
+  function updateNav() {
+    const config = window.DOMAIN_CONFIG || {};
+    const order = config.nav_order || [];
+    const mods = config.modules || {};
+    const nav = document.getElementById('mainNav');
+    if (!nav) return;
+
+    nav.innerHTML = order.filter(id => {
+      if (mods[id] === false) return false;
+      const mod = modules[id];
+      return mod ? Module.hasData(mod) : true;
+    }).map(id => {
+      const label = getSectionLabel(id);
+      return `<a class="nav-link" data-target="${id}">${label}</a>`;
+    }).join('');
+
+    // 绑定导航点击
+    nav.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        const target = document.getElementById(link.dataset.target);
+        if (target) target.scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  }
+
+  function getSectionLabel(id) {
+    const labels = {
+      hero: '工作台', techradar: '技术雷达', hotwords: '热点',
+      breakdown: '爆款', topics: '选题', topicPerf: '效果',
+      publishTime: '发布时间', titleFormulas: '标题公式',
+      leadScripts: '引流话术', launchOps: '起号运营', audience: '受众',
+      works: '作品', viralGenes: '爆款基因', insights: '洞察',
+      schedule: '排期', commentScripts: '评论话术', checklist: '清单',
+    };
+    return labels[id] || id;
+  }
+
+  // ===== 平台筛选 =====
+  let currentPlatform = 'all';
+  function setPlatform(p) {
+    currentPlatform = p;
+    document.querySelectorAll('.platform-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.platform === p);
+    });
+    renderAll();
+  }
+  function filterByPlatform(arr) {
+    if (!arr) return [];
+    if (currentPlatform === 'all' || currentPlatform === 'compare') return arr;
+    return arr.filter(item => item.platform === currentPlatform);
+  }
+
+  // ===== 分类筛选 =====
+  let currentCategory = '';
+  function applyFilter() {
+    const sel = document.getElementById('categoryFilter');
+    currentCategory = sel ? sel.value : '';
+    renderAll();
+  }
+
+  // ===== 初始化 =====
+  function init() {
+    const DATA = window.DASHBOARD_DATA || {};
+    const config = window.DOMAIN_CONFIG || {};
+
+    // 更新时间
+    const updateEl = document.getElementById('updateTime');
+    if (updateEl) {
+      updateEl.textContent = Safe.str(DATA.last_update, '暂无数据');
+      // 数据新鲜度
+      if (DATA.last_update) {
+        const hours = (new Date() - new Date(DATA.last_update.replace(/-/g, '/'))) / 3600000;
+        if (hours > 24) {
+          updateEl.style.color = config.theme?.danger || '#f87171';
+          updateEl.innerHTML = DATA.last_update + ' <span style="color:#f87171;font-size:11px;">⚠️ ' + (config.copy?.data_fresh_warning || '数据超过24小时未更新') + '</span>';
+        }
+      }
+    }
+
+    // 分类筛选器
+    const cats = [...new Set(Safe.arr(DATA.hotwords).map(h => h.category).filter(Boolean))];
+    const sel = document.getElementById('categoryFilter');
+    if (sel) {
+      sel.innerHTML = '<option value="">全部分类</option>' +
+        cats.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+
+    // 页面标题
+    document.title = config.display_name || '热点追踪工作台';
+
+    // 渲染所有模块
+    renderAll();
+
+    // 滚动动画
+    initScrollReveal();
+
+    // 导航隐藏
+    initNavHide();
+
+    // 延迟初始化
+    setTimeout(() => { if (typeof initSectionCollapse === 'function') initSectionCollapse(); }, 1500);
+    setTimeout(() => { if (typeof checkDataFreshness === 'function') checkDataFreshness(); }, 2000);
+    setTimeout(() => { if (typeof initCardGlow === 'function') initCardGlow(); }, 500);
+  }
+
+  // ===== 滚动显现动画 =====
+  function initScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.section, .glass-card, .hero-stat').forEach(el => {
+      el.classList.add('anim-item');
+      observer.observe(el);
+    });
+  }
+
+  // ===== 导航栏滚动隐藏 =====
+  function initNavHide() {
+    let lastScroll = 0;
+    const nav = document.querySelector('.top-nav');
+    if (!nav) return;
+    window.addEventListener('scroll', () => {
+      const cur = window.scrollY;
+      nav.style.transform = cur > lastScroll && cur > 100 ? 'translateY(-100%)' : 'translateY(0)';
+      lastScroll = cur;
+    });
+  }
+
+  // ===== 全局搜索 =====
+  function doGlobalSearch(query) {
+    if (!query) { renderAll(); return; }
+    const q = query.toLowerCase();
+    const DATA = window.DASHBOARD_DATA || {};
+    // 筛选选题
+    const topics = Safe.arr(DATA.topics).filter(t =>
+      Safe.str(t.title).toLowerCase().includes(q) ||
+      Safe.str(t.hook).toLowerCase().includes(q) ||
+      Safe.str(t.keyword).toLowerCase().includes(q)
+    );
+    // 筛选热词
+    const hotwords = Safe.arr(DATA.hotwords).filter(h =>
+      Safe.str(h.keyword).toLowerCase().includes(q)
+    );
+    // 只渲染筛选结果（简化版）
+    console.log('[Search] 选题:', topics.length, '热词:', hotwords.length);
+    return { topics, hotwords };
+  }
+
+  // ===== 导出到全局（不自动init，由页面末尾在所有模块加载后调用initFramework()）=====
+  window.Module = Module;
+  window.Safe = Safe;
+  window.renderAll = renderAll;
+  window.setPlatform = setPlatform;
+  window.filterByPlatform = filterByPlatform;
+  window.applyFilter = applyFilter;
+  window.doGlobalSearch = doGlobalSearch;
+  window.initFramework = init;
+  // 兼容原模板的全局DATA引用（所有模块IIFE内引用的DATA）
+  // 必须用赋值而非const，避免遮蔽已存在的全局DATA
+  try { window.DATA = window.DASHBOARD_DATA || {}; } catch(e) {}
+  // 同时尝试赋值给全局词法环境的DATA（如果是var声明的全局变量）
+  if (typeof DATA !== 'undefined') {
+    try { DATA = window.DASHBOARD_DATA || {}; } catch(e) {}
+  }
+  window.currentPlatform = 'all';
+})();
+
+
+/* ===== src/effects/glow.js ===== */
+
+/**
+ * effects/glow.js — UFO动态光晕特效
+ * 自动扫描所有卡片元素，绑定鼠标跟随光晕
+ * 特性：色相循环 + 椭圆轨道漂移 + 呼吸脉动 + 鼠标跟随
+ * 零业务依赖，可独立使用
+ */
+(function() {
+  'use strict';
+
+  // 所有需要光晕的卡片选择器（与modules.css中的::before样式对应）
+  const CARD_SELECTORS = [
+    '.hero-stat', '.bento-card', '.breakdown-card', '.topic-card',
+    '.insight-item', '.action-item', '.matrix-cell', '.small-item',
+    '.formula-item', '.author-item', '.gene-card', '.persona-card',
+    '.tech-card', '.tech-summary-card', '.kanban-card', '.schedule-item',
+    '.checklist-item', '.compare-card', '.sat-item', '.tracker-bar',
+    '.stat-card', '.glass-card', '.work-card', '.hotword-row',
+    '[data-glow]'
+  ].join(',');
+
+  let animationId = null;
+  const activeCards = new Set();
+
+  /** 初始化所有光晕卡片 */
+  function initCardGlow() {
+    document.querySelectorAll(CARD_SELECTORS).forEach(card => {
+      if (card._glowBound) return;
+      // 跳过太小的元素和表格行
+      if (card.offsetWidth < 30 || card.offsetHeight < 20) return;
+      card._glowBound = true;
+      card.setAttribute('data-glow', '');
+      bindGlow(card);
+    });
+
+    if (!animationId) {
+      animationId = requestAnimationFrame(animate);
+    }
+  }
+
+  /** 绑定单个卡片的光晕 */
+  function bindGlow(card) {
+    card._glowState = {
+      targetX: 50, targetY: 50,
+      currentX: 50, currentY: 50,
+      isHovering: false,
+      hue: Math.random() * 360,
+      orbitAngle: Math.random() * Math.PI * 2,
+      breathPhase: Math.random() * Math.PI * 2
+    };
+
+    card.addEventListener('mouseenter', () => {
+      card._glowState.isHovering = true;
+      activeCards.add(card);
+    });
+
+    card.addEventListener('mouseleave', () => {
+      card._glowState.isHovering = false;
+      card._glowState.targetX = 50;
+      card._glowState.targetY = 50;
+    });
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100;
+      const y = ((e.clientY - rect.top) / rect.height) * 100;
+      card._glowState.targetX = Math.max(0, Math.min(100, x));
+      card._glowState.targetY = Math.max(0, Math.min(100, y));
+    });
+  }
+
+  /** 全局动画循环 — 所有卡片共享一个rAF */
+  let lastTime = 0;
+  function animate(timestamp) {
+    const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
+    lastTime = timestamp;
+
+    activeCards.forEach(card => {
+      const s = card._glowState;
+      if (!s) return;
+
+      // 平滑跟随鼠标
+      s.currentX += (s.targetX - s.currentX) * 0.12;
+      s.currentY += (s.targetY - s.currentY) * 0.12;
+
+      // 椭圆轨道漂移（UFO感）
+      s.orbitAngle += dt * 0.5;
+      const orbitX = Math.cos(s.orbitAngle) * 3;
+      const orbitY = Math.sin(s.orbitAngle * 1.3) * 2;
+
+      // 色相循环
+      s.hue = (s.hue + dt * 25) % 360;
+
+      // 呼吸脉动
+      s.breathPhase += dt * 1.5;
+      const breath = 0.85 + Math.sin(s.breathPhase) * 0.15;
+
+      const finalX = s.currentX + orbitX;
+      const finalY = s.currentY + orbitY;
+
+      card.style.setProperty('--mx', finalX.toFixed(2) + '%');
+      card.style.setProperty('--my', finalY.toFixed(2) + '%');
+      card.style.setProperty('--glow-hue', s.hue.toFixed(0));
+      card.style.setProperty('--glow-opacity', breath.toFixed(2));
+
+      // 鼠标离开后，光晕回到中心并淡出
+      if (!s.isHovering && Math.abs(s.currentX - 50) < 0.5 && Math.abs(s.currentY - 50) < 0.5) {
+        activeCards.delete(card);
+      }
+    });
+
+    animationId = requestAnimationFrame(animate);
+  }
+
+  /** 重新扫描（动态添加卡片后调用） */
+  function refreshGlow() {
+    initCardGlow();
+  }
+
+  // 导出
+  window.initCardGlow = initCardGlow;
+  window.refreshGlow = refreshGlow;
+
+  // DOM就绪后自动初始化（延迟等模块渲染完成）
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => setTimeout(initCardGlow, 800));
+  } else {
+    setTimeout(initCardGlow, 800);
+  }
+
+  // 监听DOM变化，自动给新元素绑定光晕
+  const observer = new MutationObserver((mutations) => {
+    let needsRefresh = false;
+    mutations.forEach(m => {
+      m.addedNodes.forEach(node => {
+        if (node.nodeType === 1) {
+          if (node.matches && node.matches(CARD_SELECTORS)) needsRefresh = true;
+          if (node.querySelector && node.querySelector(CARD_SELECTORS)) needsRefresh = true;
+        }
+      });
+    });
+    if (needsRefresh) setTimeout(initCardGlow, 200);
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+})();
+
+
+/* ===== src/effects/login.js ===== */
+
+
+// 登录页Logo动效（独立ID前缀lg-，避免与背景logo冲突）
+
+// 滚动模糊渐显动效
+function initScrollReveal() {
+  var vh = window.innerHeight;
+  function update() {
+    var scrollY = window.scrollY;
+    // 0 at top of login, 1 when scrolled past 80% of login screen
+    var reveal = Math.min(1, Math.max(0, (scrollY - vh * 0.15) / (vh * 0.65)));
+    document.body.setAttribute('data-reveal', reveal.toFixed(2));
+    // Apply gradual blur/opacity/transform to hero and sections
+    var blur = (18 * (1 - reveal)).toFixed(1);
+    var opacity = (0.25 + 0.75 * reveal).toFixed(2);
+    var translateY = (50 * (1 - reveal)).toFixed(1);
+    var els = document.querySelectorAll('.hero, section');
+    for (var i = 0; i < els.length; i++) {
+      els[i].style.filter = reveal >= 0.98 ? 'none' : 'blur(' + blur + 'px)';
+      els[i].style.opacity = opacity;
+      els[i].style.transform = reveal >= 0.98 ? 'none' : 'translateY(' + translateY + 'px)';
+    }
+  }
+  window.addEventListener('scroll', update, {passive: true});
+  window.addEventListener('resize', function() { vh = window.innerHeight; update(); });
+  update();
+}
+
+function initLoginLogo() {
+  var svg = document.querySelector('.login-logo-svg');
+  if (!svg) return;
+  var rgMains = [], rgSubs = [], glassPaths = [];
+  for (var i = 1; i <= 4; i++) {
+    rgMains.push(document.getElementById('lgMain' + i));
+    rgSubs.push(document.getElementById('lgSub' + i));
+  }
+  svg.querySelectorAll('path.login-glass').forEach(function(p) { glassPaths.push(p); });
+  var vb = svg.viewBox.baseVal;
+  var vbX = vb.x, vbY = vb.y, vbW = vb.width, vbH = vb.height;
+  var t = Math.random() * Math.PI * 2;
+  var blocks = [];
+  for (var i = 0; i < 4; i++) {
+    blocks.push({
+      fx: 0.3 + Math.random() * 0.5, fy: 0.25 + Math.random() * 0.4,
+      fx2: 0.1 + Math.random() * 0.2, fy2: 0.15 + Math.random() * 0.25,
+      phase: Math.random() * Math.PI * 2,
+      breathSpeed: 0.012 + Math.random() * 0.004,
+      breathPhase: i * Math.PI / 2,
+      hueSpeed: 0.4 + Math.random() * 0.3,
+      huePhase: Math.random() * 360,
+      cx: 50, cy: 50, mode: 'auto', targetCx: 50, targetCy: 50
+    });
+  }
+  var sparks = [], frameCount = 0, activeSparkCount = 0, MAX_SPARKS = 2, TRAIL_LENGTH = 1;
+  var SVG_NS = 'http://www.w3.org/2000/svg';
+  for (var si = 0; si < 4; si++) {
+    var trailEls = [];
+    for (var ti = 0; ti < TRAIL_LENGTH; ti++) {
+      var c = document.createElementNS(SVG_NS, 'circle');
+      c.setAttribute('fill', 'url(#lgSparkGrad)');
+      c.setAttribute('filter', 'url(#lgSparkBlur)');
+      c.setAttribute('opacity', '0');
+      svg.appendChild(c);
+      trailEls.push(c);
+    }
+    sparks.push({
+      trailEls: trailEls, path: glassPaths[si], pathLen: glassPaths[si].getTotalLength(),
+      active: false, progress: 0, baseSpeed: 0.004,
+      nextFrame: 600 + Math.floor(Math.random() * 600),
+      direction: 1, startOffset: 0, sparkle: 0
+    });
+  }
+  function mouseToSvgPercent(e) {
+    var pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
+    var ctm = svg.getScreenCTM();
+    if (!ctm) return {x:50,y:50};
+    var svgPt = pt.matrixTransform(ctm.inverse());
+    return {x:(svgPt.x-vbX)/vbW*100, y:(svgPt.y-vbY)/vbH*100};
+  }
+  glassPaths.forEach(function(path, idx) {
+    path.addEventListener('mouseenter', function(e) {
+      blocks[idx].mode = 'follow';
+      var p = mouseToSvgPercent(e);
+      blocks[idx].targetCx = p.x; blocks[idx].targetCy = p.y;
+    });
+    path.addEventListener('mousemove', function(e) {
+      if (blocks[idx].mode === 'follow') {
+        var p = mouseToSvgPercent(e);
+        blocks[idx].targetCx = p.x; blocks[idx].targetCy = p.y;
+      }
+    });
+    path.addEventListener('mouseleave', function() { blocks[idx].mode = 'auto'; });
+  });
+  function animate() {
+    t += 0.012;
+    for (var i = 0; i < 4; i++) {
+      var b = blocks[i];
+      var breath = 0.5 + 0.5 * Math.sin(t * b.breathSpeed * 60 + b.breathPhase);
+      var mainR = (40 + breath * 48).toFixed(1) + '%';
+      var subR = (25 + breath * 35).toFixed(1) + '%';
+      var glowOpacity = (0.03 + breath * 0.85).toFixed(2);
+      if (b.mode === 'auto') {
+        b.targetCx = 50 + Math.sin(t*b.fx+b.phase)*20 + Math.sin(t*b.fx2+b.phase*2)*8;
+        b.targetCy = 50 + Math.cos(t*b.fy+b.phase*1.5)*18 + Math.cos(t*b.fy2+b.phase)*6;
+        b.cx += (b.targetCx-b.cx)*0.04; b.cy += (b.targetCy-b.cy)*0.04;
+      } else {
+        b.cx += (b.targetCx-b.cx)*0.15; b.cy += (b.targetCy-b.cy)*0.15;
+      }
+      if (rgMains[i]) { rgMains[i].setAttribute('cx',b.cx.toFixed(2)+'%'); rgMains[i].setAttribute('cy',b.cy.toFixed(2)+'%'); rgMains[i].setAttribute('r',mainR); }
+      if (rgSubs[i]) { rgSubs[i].setAttribute('cx',(b.cx+5).toFixed(2)+'%'); rgSubs[i].setAttribute('cy',(b.cy-3).toFixed(2)+'%'); rgSubs[i].setAttribute('r',subR); }
+      var mainPath = svg.querySelector('.lgm-'+(i+1));
+      var subPath = svg.querySelector('.lgs-'+(i+1));
+      if (mainPath) mainPath.style.opacity = glowOpacity;
+      if (subPath) subPath.style.opacity = (parseFloat(glowOpacity)*0.8).toFixed(2);
+      var hue = (t*b.hueSpeed*60+b.huePhase)%360;
+      if (mainPath) mainPath.style.filter = 'hue-rotate('+hue.toFixed(0)+'deg) url(#lgBlurM)';
+      if (subPath) subPath.style.filter = 'hue-rotate('+hue.toFixed(0)+'deg) url(#lgBlurS)';
+    }
+    frameCount++;
+    for (var si = 0; si < sparks.length; si++) {
+      var s = sparks[si];
+      if (!s.active && frameCount >= s.nextFrame) {
+        if (activeSparkCount < MAX_SPARKS) {
+          s.active = true; s.progress = 0;
+          s.baseSpeed = 0.003 + Math.random()*0.004;
+          s.direction = Math.random()>0.5?1:-1;
+          s.startOffset = Math.random()*s.pathLen;
+          activeSparkCount++;
+        } else {
+          s.nextFrame = frameCount + 200 + Math.floor(Math.random()*300);
+        }
+      }
+      if (s.active) {
+        var easeFactor = 0.25 + 0.75*Math.sin(s.progress*Math.PI);
+        s.progress += s.baseSpeed*easeFactor;
+        if (s.progress >= 1) {
+          s.active = false; activeSparkCount--;
+          s.nextFrame = frameCount + 1500 + Math.floor(Math.random()*2100);
+          for (var ti=0; ti<TRAIL_LENGTH; ti++) s.trailEls[ti].setAttribute('opacity','0');
+        } else {
+          var globalOp;
+          if (s.progress<0.12) globalOp = s.progress/0.12;
+          else if (s.progress>0.88) globalOp = (1-s.progress)/0.12;
+          else globalOp = 1;
+          for (var ti2=0; ti2<TRAIL_LENGTH; ti2++) {
+            var trailProgress = Math.max(0, s.progress-ti2*s.baseSpeed*10);
+            var len = (s.startOffset+trailProgress*s.pathLen*s.direction)%s.pathLen;
+            if (len<0) len += s.pathLen;
+            var pt = s.path.getPointAtLength(len);
+            var sizeFactor = 1-ti2/TRAIL_LENGTH;
+            var pulse = 1+0.15*Math.sin(s.progress*Math.PI*6+si);
+            if (Math.random()<0.008) s.sparkle = 1;
+            s.sparkle *= 0.92;
+            var sparkleBoost = 1+s.sparkle*0.9;
+            var sizeSparkle = 1+s.sparkle*0.35;
+            s.trailEls[ti2].setAttribute('cx',pt.x.toFixed(1));
+            s.trailEls[ti2].setAttribute('cy',pt.y.toFixed(1));
+            s.trailEls[ti2].setAttribute('r',(5.5*sizeFactor*pulse*sizeSparkle+0.8).toFixed(1));
+            var flicker = 0.85+0.15*Math.sin(s.progress*Math.PI*11+si*2.3);
+            s.trailEls[ti2].setAttribute('opacity',(globalOp*sizeFactor*flicker*sparkleBoost).toFixed(2));
+          }
+        }
+      }
+    }
+    requestAnimationFrame(animate);
+  }
+  animate();
+}
+
+// 导航栏首屏隐藏逻辑
+function initNavHide() {
+  var nav = document.getElementById('topNav');
+  if (!nav) return;
+  function check() {
+    if (window.scrollY < window.innerHeight * 0.5) {
+      nav.classList.add('hidden-nav');
+    } else {
+      nav.classList.remove('hidden-nav');
+    }
+  }
+  window.addEventListener('scroll', check, {passive:true});
+  check();
+}
+
+
+
+// 初始化登录页所有特效
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    initLoginLogo();
+    initScrollReveal();
+    initNavHide();
+  });
+} else {
+  initLoginLogo();
+  initScrollReveal();
+  initNavHide();
+}
+
+
+/* ===== src/modules/_helpers.js ===== */
+
+/**
+ * modules/_helpers.js — 通用辅助函数
+ */
+(function() {
+  'use strict';
+
+  // animateNumber
+  function animateNumber(el, target, duration=1200) {
+    const start = performance.now();
+    function tick(now) {
+      const p = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - p, 3);
+      el.textContent = Math.round(target * eased).toLocaleString();
+      if (p < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  // trendClass
+  function trendClass(t){ if(t==='飙升')return'surging'; if(t==='新热')return'new-hot'; if(t==='衰退')return'declining'; return'stable'; }
+
+  // classifyHook
+  function classifyHook(title){ if(/翻车|踩坑|避坑|别再|不要|后悔/.test(title))return'痛点'; if(/对比|vs|VS|区别|哪个好|pk/i.test(title))return'对比'; if(/揭秘|竟然|居然|没想到|真相|内幕/.test(title))return'悬念'; if(/太美了|绝了|惊艳|震撼|效果|大片/.test(title))return'效果'; if(/哭了|感动|暖心|治愈|陪伴/.test(title))return'情感'; return'数字'; }
+
+  // sortTable
+  function sortTable(col){ const tb=document.getElementById('hotwordTable');const tbody=tb.querySelector('tbody');const rows=Array.from(tbody.querySelectorAll('tr'));const dir=sortDir[col]=!sortDir[col];rows.sort((a,b)=>{let va=a.cells[col].textContent.trim(),vb=b.cells[col].textContent.trim();const na=parseFloat(va.replace(/[^0-9.-]/g,'')),nb=parseFloat(vb.replace(/[^0-9.-]/g,''));if(!isNaN(na)&&!isNaN(nb))return dir?na-nb:nb-na;return dir?va.localeCompare(vb):vb.localeCompare(va);});rows.forEach(r=>tbody.appendChild(r)); }
+
+  // getMonetization
+  function getMonetization(topic) {
+    const kw = (topic.keyword || '').toLowerCase();
+    const cat = topic.keyword || '';
+    const rules = cfg('monetization_rules', [
+      { match: ['工具','教程','入门','怎么做','做图','视频','ppt'], type: 'affiliate', score: 85, desc: '带货：工具会员/affiliate佣金' },
+      { match: ['资讯','新闻','发布','agent'], type: 'ad', score: 70, desc: '广告：品牌合作、商单植入' },
+      { match: ['工作流','自动化','效率'], type: 'private', score: 90, desc: '私域：引流微信，卖方案/咨询' },
+      { match: ['提示词','prompt'], type: 'course', score: 75, desc: '知识付费：课程/社群' },
+    ]);
+    let type = 'affiliate', score = 60, desc = '带货：通用工具推荐';
+    for (let i = 0; i < rules.length; i++) {
+      const r = rules[i];
+      if (r.match.some(m => kw.includes(m) || cat.includes(m))) {
+        type = r.type; score = r.score; desc = r.desc; break;
+      }
+    }
+    const typeMap = { affiliate: { name: '带货', cls: 'monetize-affiliate' }, ad: { name: '广告', cls: 'monetize-ad' }, private: { name: '私域', cls: 'monetize-private' }, course: { name: '知识付费', cls: 'monetize-course' } };
+    return { type, score, desc, ...typeMap[type] };
+  }
+
+  // addFreshnessTags
+  function addFreshnessTags() {
+    const updateTime = new Date(DATA.last_update || Date.now());
+    const now = new Date();
+    const hours = (now - updateTime) / (1000 * 60 * 60);
+    let tagClass = 'fresh', tagText = '最新';
+    if (hours > 24) { tagClass = 'old'; tagText = Math.floor(hours/24) + '天前'; }
+    else if (hours > 6) { tagClass = 'stale'; tagText = Math.floor(hours) + '小时前'; }
+    else if (hours > 1) { tagText = Math.floor(hours) + '小时前'; }
+    const timeEl = document.getElementById('updateTime');
+    if (timeEl) {
+      timeEl.innerHTML = (timeEl.textContent || '') + ' <span class="freshness-tag ' + tagClass + '">' + tagText + '</span>';
+    }
+  }
+
+  // updateTracker
+  function updateTracker() {
+    const status = getKanbanStatus();
+    const total = filteredTopics().length;
+    let published=0, shooting=0, pending=0;
+    filteredTopics().forEach(t=>{
+      const s = status[t.title] || 'pending';
+      if (s==='published') published++;
+      else if (s==='shooting') shooting++;
+      else pending++;
+    });
+    document.getElementById('publishedCount').textContent = published;
+    document.getElementById('shootingCount').textContent = shooting;
+    document.getElementById('pendingCount').textContent = pending;
+    document.getElementById('barPublished').style.width = total ? (published/total*100)+'%' : '0%';
+    document.getElementById('barShooting').style.width = total ? (shooting/total*100)+'%' : '0%';
+  }
+
+  // toggleSection
+  function toggleSection(id) {
+    var sec = document.getElementById(id);
+    if (!sec) return;
+    sec.classList.toggle('collapsed');
+    var btn = sec.querySelector('.section-collapse-btn');
+    if (btn) btn.textContent = sec.classList.contains('collapsed') ? '展开' : '收起';
+  }
+
+  // initSectionCollapse
+  function initSectionCollapse() {
+    var sections = document.querySelectorAll('.hero, section');
+    sections.forEach(function(sec, idx) {
+      var header = sec.querySelector('.section-title, h2, .hero-title');
+      if (!header) return;
+      if (header.querySelector('.section-collapse-btn')) return;
+      var btn = document.createElement('span');
+      btn.className = 'section-collapse-btn';
+      btn.textContent = '收起';
+      header.style.display = 'flex';
+      header.style.alignItems = 'center';
+      header.style.flexWrap = 'wrap';
+      header.style.gap = '8px';
+      header.appendChild(btn);
+
+      var isCollapsed = localStorage.getItem('sec_collapse_' + idx) === '1';
+      if (isCollapsed) {
+        sec.classList.add('collapsed');
+        btn.textContent = '展开';
+      }
+
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var collapsed = sec.classList.toggle('collapsed');
+        btn.textContent = collapsed ? '展开' : '收起';
+        localStorage.setItem('sec_collapse_' + idx, collapsed ? '1' : '0');
+      });
+    });
+  }
+
+  // applyFilter
+  function applyFilter() { currentCategory = document.getElementById('categoryFilter').value; renderAll(); }
+
+  // setPlatform
+  function setPlatform(p) {
+    currentPlatform = p;
+    document.querySelectorAll('.platform-btn').forEach(b => b.classList.toggle('active', b.dataset.platform === p));
+    const compareSec = document.getElementById('compareSection');
+    const mainSections = document.querySelectorAll('.section:not(.compare-section)');
+    if (p === 'compare') {
+      compareSec.classList.add('visible');
+      mainSections.forEach(s => s.style.display = 'none');
+      renderComparison();
+    } else {
+      compareSec.classList.remove('visible');
+      mainSections.forEach(s => s.style.display = '');
+      renderAll();
+    }
+  }
+
+  // filterByPlatform
+  function filterByPlatform(arr) {
+    if (!arr) return [];
+    if (currentPlatform === 'all' || currentPlatform === 'compare') return arr;
+    return arr.filter(item => item.platform === currentPlatform);
+  }
+
+  // doGlobalSearch
+  function doGlobalSearch(query) {
+    query = query.trim().toLowerCase();
+    var topicCards = document.querySelectorAll('#topicGrid .topic-card');
+    var hotwordRows = document.querySelectorAll('#hotwordTable tbody tr');
+    var topicCount = 0, hotwordCount = 0;
+
+    if (!query) {
+      topicCards.forEach(function(c) { c.classList.remove('search-hidden'); });
+      hotwordRows.forEach(function(r) { r.classList.remove('search-hidden'); });
+      var sc = document.querySelector('.search-results-count');
+      if (sc) sc.remove();
+      return;
+    }
+
+    // 搜索选题
+    topicCards.forEach(function(card) {
+      var text = card.textContent.toLowerCase();
+      if (text.includes(query)) {
+        card.classList.remove('search-hidden');
+        topicCount++;
+      } else {
+        card.classList.add('search-hidden');
+      }
+    });
+
+    // 搜索热词
+    hotwordRows.forEach(function(row) {
+      var text = row.textContent.toLowerCase();
+      if (text.includes(query)) {
+        row.classList.remove('search-hidden');
+        hotwordCount++;
+      } else {
+        row.classList.add('search-hidden');
+      }
+    });
+
+    // 显示结果数
+    var existing = document.querySelector('.search-results-count');
+    if (existing) existing.remove();
+    var countEl = document.createElement('span');
+    countEl.className = 'search-results-count';
+    countEl.textContent = topicCount + '选题/' + hotwordCount + '热词';
+    document.getElementById('globalSearch').parentNode.appendChild(countEl);
+  }
+
+  // exportTopics
+  function exportTopics() {
+    var topics = filteredTopics();
+    var text = '【' + cfg('name', '热点') + '选题清单】' + new Date().toLocaleDateString() + '\n\n';
+    topics.forEach(function(t, i) {
+      var status = getTopicStatus(t.title);
+      var statusText = status === 'published' ? '已发布' : status === 'shooting' ? '拍摄中' : '待拍摄';
+      text += (i+1) + '. [' + statusText + '] ' + t.title + '\n';
+      text += '   钩子：' + (t.hook || '') + '\n';
+      text += '   平台：' + (t.platform || '双平台') + ' | 优先：' + (t.priority || '') + '\n\n';
+    });
+    var ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('已复制 ' + topics.length + ' 条选题到剪贴板！');
+  }
+
+  window.animateNumber = animateNumber;
+  window.trendClass = trendClass;
+  window.classifyHook = classifyHook;
+  window.sortTable = sortTable;
+  window.getMonetization = getMonetization;
+  window.addFreshnessTags = addFreshnessTags;
+  window.updateTracker = updateTracker;
+  window.toggleSection = toggleSection;
+  window.initSectionCollapse = initSectionCollapse;
+  window.applyFilter = applyFilter;
+  window.setPlatform = setPlatform;
+  window.filterByPlatform = filterByPlatform;
+  window.doGlobalSearch = doGlobalSearch;
+  // CSV导出工具
+  function downloadCSV(filename, rows) {
+    var csv = rows.map(function(r) {
+      return r.map(function(cell) {
+        cell = String(cell == null ? '' : cell);
+        if (cell.indexOf(',') >= 0 || cell.indexOf('"') >= 0 || cell.indexOf('\n') >= 0) {
+          cell = '"' + cell.replace(/"/g, '""') + '"';
+        }
+        return cell;
+      }).join(',');
+    }).join('\n');
+    var blob = new Blob(['\ufeff' + csv], {type: 'text/csv;charset=utf-8;'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function exportHotwordsCSV() {
+    var hw = DATA.hotwords || [];
+    var rows = [['排名','关键词','分类','平台','作品数','最高赞','平均赞','收藏率','增长率','趋势','生命周期']];
+    hw.forEach(function(h, i) {
+      rows.push([
+        i+1, h.keyword || '', h.category || '', h.platform || '',
+        h.total || 0, h.max_like || 0, h.avg_like || 0,
+        (h.collect_rate || 0) + '%', (h.growth || 0) + '%',
+        h.trend || '', h.stage || ''
+      ]);
+    });
+    downloadCSV(cfg('name','热点') + '_热词_' + new Date().toISOString().slice(0,10) + '.csv', rows);
+  }
+
+  function exportTopicsCSV() {
+    var topics = filteredTopics();
+    var rows = [['序号','标题','钩子','平台','优先级','人群','状态','关联热词']];
+    topics.forEach(function(t, i) {
+      var status = getTopicStatus(t.title);
+      var statusText = status === 'published' ? '已发布' : status === 'shooting' ? '拍摄中' : '待拍摄';
+      rows.push([
+        i+1, t.title || '', t.hook || '', t.platform || '双平台',
+        t.priority || '', t.audience || '', statusText, t.keyword || ''
+      ]);
+    });
+    downloadCSV(cfg('name','热点') + '_选题_' + new Date().toISOString().slice(0,10) + '.csv', rows);
+  }
+
+  window.exportTopics = exportTopics;
+  window.exportHotwordsCSV = exportHotwordsCSV;
+  window.exportTopicsCSV = exportTopicsCSV;
+  window.downloadCSV = downloadCSV;
+})();
+
+
+/* ===== src/modules/hero.js ===== */
+
+/**
+ * modules/hero.js
+ * 函数: renderHeroStats, renderActions, renderInsights
+ * 依赖: ['hotwords', 'works', 'topics']
+ */
+(function() {
+  'use strict';
+
+  // renderHeroStats
+  function renderHeroStats(hw, works, topics) {
+    const totalLikes = works.reduce((s,w)=>s+(w.likeCount||0),0);
+    const surging = hw.filter(h=>h.trend==='飙升'||h.trend==='新热').length;
+    const topSurging = hw.filter(h=>h.trend==='飙升').sort((a,b)=>b.total-a.total)[0];
+    document.getElementById('heroStats').innerHTML = `
+      <div class="hero-stat">
+        <div class="hs-label">${topSurging?'今日飙升热词':'追踪关键词'}</div>
+        <div class="hs-value" id="heroMainVal">${topSurging?topSurging.keyword:hw.length}</div>
+        <div class="hs-sub">${topSurging?topSurging.total.toLocaleString()+' 条作品 · '+topSurging.category:new Set(hw.map(h=>h.category)).size+' 个细分赛道'}</div>
+        ${surging>0?`<span class="hs-trend up">▲ ${surging} 个热词异动</span>`:`<span class="hs-trend flat">— 市场平稳</span>`}
+      </div>
+      <div class="hero-stat">
+        <div class="hs-label">采集作品</div>
+        <div class="hs-value green" id="heroWorksVal">${works.length}</div>
+        <div class="hs-sub">总点赞 ${(totalLikes/10000).toFixed(1)} 万</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hs-label">飙升 / 新热</div>
+        <div class="hs-value red" id="heroSurgingVal">${surging}</div>
+        <div class="hs-sub">飙升 ${hw.filter(h=>h.trend==='飙升').length} · 新热 ${hw.filter(h=>h.trend==='新热').length}</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hs-label">选题建议</div>
+        <div class="hs-value orange" id="heroTopicsVal">${topics.length}</div>
+        <div class="hs-sub">标题 + 钩子 + 形式</div><span class="export-btn" onclick="exportTopics()" style="margin-left:12px;">📋 导出选题</span>
+      </div>`;
+    setTimeout(()=>{
+      animateNumber(document.getElementById('heroWorksVal'), works.length);
+      animateNumber(document.getElementById('heroSurgingVal'), surging);
+      animateNumber(document.getElementById('heroTopicsVal'), topics.length);
+    }, 300);
+  }
+
+  // renderActions
+  function renderActions() {
+    const actions = DATA.daily_actions || [];
+    const el = document.getElementById('actionList');
+    if (!actions.length) { el.innerHTML='<div class="empty-state">暂无行动建议</div>'; return; }
+    el.innerHTML = actions.map(a => `
+      <div class="action-item ${a.priority==='高'?'':a.priority==='中'?'medium':'low'}">
+        <div class="action-icon">${a.priority==='高'?'▲':a.priority==='中'?'●':'○'}</div>
+        <div class="action-content">
+          <span class="action-type">${a.type}</span>
+          <div class="action-text">${a.content}</div>
+          ${a.detail?`<div class="action-detail">${a.detail}</div>`:''}
+        </div>
+      </div>`).join('');
+  }
+
+  // renderInsights
+  function renderInsights(hw, works) {
+    const ins = [];
+    const topWork = [...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0))[0];
+    if (topWork) ins.push({type:'hot',text:`单条最高赞 <b>${(topWork.likeCount/10000).toFixed(1)}万</b> — 「${(topWork.title||'').slice(0,16)}…」· ${topWork._keyword}`});
+    const topCollect = [...hw].sort((a,b)=>(b.collect_rate||0)-(a.collect_rate||0))[0];
+    if (topCollect && topCollect.collect_rate>0) ins.push({type:'value',text:`收藏率最高 <b>${topCollect.keyword}</b>（${topCollect.collect_rate}%），适合做教程型内容`});
+    const blueOcean = hw.filter(h=>h.total<1000&&h.max_like>10000).sort((a,b)=>b.max_like-a.max_like)[0];
+    if (blueOcean) ins.push({type:'value',text:`蓝海机会 <b>${blueOcean.keyword}</b> 仅${blueOcean.total}条但最高赞${blueOcean.max_like.toLocaleString()}，优先切入`});
+    const surging = hw.filter(h=>h.trend==='飙升');
+    if (surging.length) ins.push({type:'hot',text:`飙升热词 ${surging.slice(0,3).map(h=>h.keyword).join(' / ')}`});
+    const pt = DATA.publish_time_dist||[];
+    const bestHour = pt.sort((a,b)=>b.count-a.count)[0];
+    if (bestHour && bestHour.count>0) ins.push({type:'warn',text:`最佳发布时段 <b>${bestHour.hour}:00</b>（占比${bestHour.pct}%）`});
+    const sat = DATA.saturation || [];
+    const lowestSat = sat[0];
+    if (lowestSat && lowestSat.saturation < 50) ins.push({type:'value',text:`最低饱和度 <b>${lowestSat.keyword}</b>（${lowestSat.saturation}）· ${lowestSat.stage}`});
+    document.getElementById('insightsGrid').innerHTML = ins.slice(0,6).map(i=>`<div class="insight-item ${i.type}">${i.text}</div>`).join('');
+  }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "hero",
+      requiredFields: ['hotwords', 'works', 'topics'],
+      render: function(data) {
+        try { renderHeroStats(data.hotwords, data.works, data.topics); renderActions(data); renderInsights(data.hotwords, data.works); } catch(e) { console.error("[hero]", e); }
+      }
+    });
+  }
+  window.renderHeroStats = renderHeroStats;
+  window.renderActions = renderActions;
+  window.renderInsights = renderInsights;
+})();
+
+
+/* ===== src/modules/hotwords.js ===== */
+
+/**
+ * modules/hotwords.js
+ * 函数: renderHotwordTable, renderCategory, renderRanking, renderHistory, showKeywordTrend, filteredHotwords
+ * 依赖: ['hotwords']
+ */
+(function() {
+  'use strict';
+
+  // renderHotwordTable
+  function renderHotwordTable(hw) {
+    const sorted=[...hw].sort((a,b)=>b.total-a.total);
+    const satMap = {};
+    (DATA.saturation||[]).forEach(s=>satMap[s.keyword]=s.stage);
+    document.querySelector('#hotwordTable tbody').innerHTML=sorted.map((h,i)=>`
+      <tr><td>${i+1}</td><td><b style="color:var(--text);cursor:pointer;text-decoration:underline dotted" onclick="showKeywordTrend('${h.keyword.replace(/'/g,"\\'")}')" title="点击查看趋势">${h.keyword}</b></td><td>${h.category}</td><td>${h.total.toLocaleString()}</td><td class="like-num">${h.max_like.toLocaleString()}</td><td class="collect-num">${h.collect_rate}%</td><td><span class="tag ${trendClass(h.trend)}">${h.trend||'稳定'}</span></td><td><span class="tag ${satMap[h.keyword]==='萌芽期'?'sprout':satMap[h.keyword]==='上升期'?'rise':satMap[h.keyword]==='爆发期'?'boom':'decline'}">${satMap[h.keyword]||'稳定期'}</span></td><td><span class="tag ${h.efficiency_tag==='蓝海'?'blue-ocean':h.efficiency_tag==='红海'?'red-ocean':'medium'}">${h.efficiency_tag||'适中'}</span></td></tr>`).join('');
+  }
+
+  // renderCategory
+  function renderCategory(hw) {
+    const m={}; hw.forEach(h=>{m[h.category]=(m[h.category]||0)+h.total;});
+    const data=Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([n,v])=>({name:n,value:v}));
+    if (charts.category) charts.category.dispose();
+    charts.category=echarts.init(document.getElementById('chartCategory'));
+    charts.category.setOption({color:PALETTE,tooltip:{trigger:'item',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:'{b}<br/>{c} ({d}%)'},legend:{type:'scroll',orient:'vertical',right:5,top:'center',textStyle:{color:'rgba(255,255,255,0.6)',fontSize:10}},series:[{type:'pie',radius:['38%','65%'],center:['38%','50%'],data,label:{color:'rgba(255,255,255,0.6)',fontSize:10,formatter:'{d}%'},itemStyle:{borderColor:'rgba(10,10,18,0.6)',borderWidth:2},animationDuration:1200}]});
+  }
+
+  // renderRanking
+  function renderRanking(hw) {
+    const sorted=[...hw].sort((a,b)=>b.total-a.total).slice(0,15);
+    if (charts.ranking) charts.ranking.dispose();
+    charts.ranking=echarts.init(document.getElementById('chartRanking'));
+    charts.ranking.setOption({color:PALETTE,grid:{left:90,right:50,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:11},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.total).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#0A84FF'},{offset:1,color:'#BF5AF2'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:p=>p.value>=10000?(p.value/10000).toFixed(1)+'万':p.value,fontSize:10,color:'rgba(255,255,255,0.6)'},animationDuration:1200,animationEasing:'cubicOut'}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}<br/>作品总数 ${p[0].value.toLocaleString()}`}});
+  }
+
+  // renderHistory
+  function renderHistory(hw) {
+    const hist = DATA.historical_trend || [];
+    if (charts.hist) charts.hist.dispose();
+    charts.hist = echarts.init(document.getElementById('chartHistory'));
+    if (hist.length < 2) {
+      charts.hist.setOption({title:{text:'数据积累中，跑满 2 天后显示趋势曲线',left:'center',top:'center',textStyle:{color:AXIS_COLOR,fontSize:13,fontWeight:'normal'}}});
+      return;
+    }
+    // 合并每天的重复关键词（双平台未合并问题）
+    const mergedHist = hist.map(h => {
+      const map = {};
+      h.hotwords.forEach(x => {
+        if (map[x.keyword]) map[x.keyword] += x.total;
+        else map[x.keyword] = x.total;
+      });
+      return { date: h.date, hotwords: Object.keys(map).map(k => ({keyword:k, total:map[k]})) };
+    });
+    const dates = mergedHist.map(h => h.date.slice(5));
+    // 收集所有出现过的关键词，计算波动率（排除超大词AI避免压缩Y轴）
+    const kwSet = new Set();
+    mergedHist.forEach(h => h.hotwords.forEach(x => kwSet.add(x.keyword)));
+    const kwVolatility = [];
+    kwSet.forEach(kw => {
+      if (cfg('exclude_keywords', ['AI']).includes(kw)) return; // 排除超大词
+      const vals = mergedHist.map(h => {
+        const f = h.hotwords.find(x => x.keyword === kw);
+        return f ? f.total : null;
+      }).filter(v => v !== null);
+      if (vals.length < 2) return;
+      const avg = vals.reduce((a,b) => a+b, 0) / vals.length;
+      if (avg < 10) return; // 排除过小词
+      const variance = vals.reduce((s,v) => s + Math.pow(v-avg,2), 0) / vals.length;
+      const cv = Math.sqrt(variance) / avg; // 变异系数
+      kwVolatility.push({ kw, cv, avg, vals });
+    });
+    // 按波动率排序取TOP5，同时确保至少有数据
+    kwVolatility.sort((a,b) => b.cv - a.cv);
+    let topKws = kwVolatility.slice(0,5).map(x => x.kw);
+    // 如果波动率不足5个，补充当前热门词
+    if (topKws.length < 5) {
+      const currentTop = [...hw].sort((a,b) => b.total-a.total).map(h => h.keyword).filter(k => !cfg('exclude_keywords', ['AI']).includes(k) && !topKws.includes(k));
+      topKws = topKws.concat(currentTop).slice(0,5);
+    }
+    const series = topKws.map((kw,i) => {
+      const vals = mergedHist.map(h => {
+        const f = h.hotwords.find(x => x.keyword === kw);
+        return f ? f.total : null;
+      });
+      return {
+        name: kw, type: 'line', smooth: true, symbol: 'circle', symbolSize: 6,
+        data: vals,
+        lineStyle: { width: 2 }, itemStyle: { color: PALETTE[i % PALETTE.length] },
+        connectNulls: true,
+      };
+    });
+    charts.hist.setOption({
+      color: PALETTE,
+      tooltip: { trigger: 'axis', backgroundColor: TOOLTIP_BG, borderColor: TOOLTIP_BORDER, textStyle: { color: TOOLTIP_TEXT } },
+      legend: { data: topKws, textStyle: { color: 'rgba(255,255,255,0.7)', fontSize: 11 }, top: 0 },
+      grid: { left: 60, right: 20, top: 40, bottom: 30 },
+      xAxis: { type: 'category', data: dates, axisLabel: { color: AXIS_COLOR }, axisLine: { lineStyle: { color: AXIS_LINE } } },
+      yAxis: { type: 'value', axisLabel: { color: AXIS_COLOR, formatter: v => v >= 10000 ? (v/10000).toFixed(0) + '万' : v }, splitLine: { lineStyle: { color: SPLIT_COLOR } } },
+      series
+    });
+  }
+
+  // showKeywordTrend
+  function showKeywordTrend(keyword) {
+    const trends = DATA.keyword_trends || {};
+    const t = trends[keyword];
+    const modal = document.getElementById('trendModal');
+    document.getElementById('trendModalTitle').textContent = keyword + ' · 热度趋势';
+    if (!t || !t.data || t.data.length < 2) {
+      document.getElementById('trendModalBody').innerHTML = '<p style="color:var(--text-secondary)">历史数据不足，需积累更多天数据后显示趋势曲线。</p>';
+    } else {
+      const maxVal = Math.max(...t.data.map(d=>d.total), 1);
+      let bars = '<div style="display:flex;align-items:flex-end;gap:6px;height:160px;margin-top:12px">';
+      t.data.forEach(d => {
+        const h = Math.round(d.total/maxVal*100);
+        const dir = t.direction==='up' ? '#4ade80' : t.direction==='down' ? '#f87171' : '#facc15';
+        bars += '<div style="flex:1;text-align:center"><div style="height:'+h+'%;background:linear-gradient(180deg,'+dir+','+dir+'66);border-radius:4px 4px 0 0;min-height:4px" title="'+d.date+': '+d.total.toLocaleString()+'"></div><div style="font-size:10px;color:var(--text-secondary);margin-top:4px">'+d.date.slice(5)+'</div></div>';
+      });
+      bars += '</div>';
+      const growthColor = t.growth>0 ? '#4ade80' : t.growth<0 ? '#f87171' : 'var(--text-secondary)';
+      bars += '<div style="margin-top:12px;font-size:14px">周期变化：<b style="color:'+growthColor+'">'+(t.growth>0?'+':'')+t.growth+'%</b> · '+ (t.direction==='up'?'上升期':t.direction==='down'?'衰退期':'平台期') +'</div>';
+      document.getElementById('trendModalBody').innerHTML = bars;
+    }
+    modal.classList.add('active');
+  }
+
+  // filteredHotwords
+  function filteredHotwords() { const p = filterByPlatform(DATA.hotwords||[]); return currentCategory==='all' ? p : p.filter(h=>h.category===currentCategory); }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "hotwords",
+      requiredFields: ['hotwords'],
+      render: function(data) {
+        try { renderHotwordTable(data); renderCategory(data); renderRanking(data); renderHistory(data); } catch(e) { console.error("[hotwords]", e); }
+      }
+    });
+  }
+  window.renderHotwordTable = renderHotwordTable;
+  window.renderCategory = renderCategory;
+  window.renderRanking = renderRanking;
+  window.renderHistory = renderHistory;
+  window.showKeywordTrend = showKeywordTrend;
+  window.filteredHotwords = filteredHotwords;
+})();
+
+
+/* ===== src/modules/works.js ===== */
+
+/**
+ * modules/works.js
+ * 函数: renderWorksTable, renderSmallViral, renderAuthors, renderCompetitorWorks, renderFormatDist, filteredWorks
+ * 依赖: ['works']
+ */
+(function() {
+  'use strict';
+
+  // renderWorksTable
+  function renderWorksTable(works) {
+    const sorted=[...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0)).slice(0,20);
+    document.querySelector('#worksTable tbody').innerHTML=sorted.map((w,i)=>`
+      <tr><td>${i+1}</td><td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="${w.workUrl||'#'}" target="_blank" class="work-link" title="${w.title||''}">${w.title||''}</a></td><td>${w.accountName||''}</td><td>${(w.followerCount||0).toLocaleString()}</td><td class="like-num">${(w.likeCount||0).toLocaleString()}</td><td class="collect-num">${(w.collectCount||0).toLocaleString()}</td><td class="share-num">${(w.shareCount||0).toLocaleString()}</td><td>${w._keyword||''}</td><td><span class="tag medium">${classifyHook(w.title||'')}</span></td></tr>`).join('');
+  }
+
+  // renderSmallViral
+  function renderSmallViral(works) {
+    const list = DATA.small_account_viral || [];
+    const el = document.getElementById('smallViral');
+    if (!list.length) { el.innerHTML='<div class="empty-state">暂无小账号爆款数据</div>'; return; }
+    el.innerHTML = list.slice(0,6).map(w=>`
+      <div class="small-item">
+        <div class="si-info">
+          <div class="si-title"><a href="${w.workUrl||'#'}" target="_blank" class="work-link">${(w.title||'无标题').slice(0,22)}</a></div>
+          <div class="si-meta">${w.accountName||''} · 粉丝${(w.followerCount/10000).toFixed(1)}万 · ${w._keyword||''}</div>
+        </div>
+        <div class="si-likes">${(w.likeCount/10000).toFixed(1)}万</div>
+      </div>`).join('');
+  }
+
+  // renderAuthors
+  function renderAuthors(works) {
+    const m={}; works.forEach(w=>{
+      const n=w.accountName||'未知';
+      if(!m[n])m[n]={name:n,followers:w.followerCount||0,likes:0,count:0,max:0,titles:[],keywords:{},platforms:{},accountType:w.accountType||'',formats:{},commentKw:{}};
+      m[n].likes+=(w.likeCount||0);
+      m[n].count++;
+      const plat = w.platform||'dy';
+      m[n].platforms[plat]=(m[n].platforms[plat]||0)+1;
+      if(w.accountType) m[n].accountType=w.accountType;
+      if((w.likeCount||0)>m[n].max)m[n].max=w.likeCount||0;
+      if(w.title)m[n].titles.push(w.title);
+      // 评论关键词
+      if(w.commentTopKeywords && typeof w.commentTopKeywords === 'object') {
+        Object.entries(w.commentTopKeywords).forEach(([k,v])=>{ m[n].commentKw[k]=(m[n].commentKw[k]||0)+(v||0); });
+      }
+    });
+    // 提取内容主题关键词
+    const themeKeywords = cfg('works.theme_keywords', ['可灵','即梦','绘画','视频','数字人','工作流','Agent','提示词','教程','实测','对比','免费','神器','效率','自动化','Sora','Midjourney','ComfyUI','Dify','Coze','豆包','GPT','Claude','剪映','PPT','电商','带货','变现','副业','编程','代码','写作','翻译','配音','音乐','图片','头像','壁纸','表情包','游戏','动漫','影视','解说','测评','盘点','干货','避坑','新手','入门','进阶','高阶','开源','GitHub','模型','大模型','LLM','RAG','微调','训练']);
+    // 内容形式标签
+    const formatKeywords = {'教程':['教程','手把手','入门','教学','怎么','如何','步骤'],'实测':['实测','体验','测试','对比','测评','横评'],'盘点':['盘点','排行','TOP','合集','汇总','清单'],'干货':['干货','技巧','方法','攻略','指南','避坑'],'资讯':['最新','发布','上线','更新','新闻','快讯'],'变现':['变现','赚钱','副业','带货','收入','盈利']};
+    Object.values(m).forEach(a=>{
+      a.titles.forEach(t=>{
+        const tl = t.toLowerCase();
+        themeKeywords.forEach(k=>{ if(tl.includes(k.toLowerCase()))a.keywords[k]=(a.keywords[k]||0)+1; });
+        Object.entries(formatKeywords).forEach(([fmt, kws])=>{
+          if(kws.some(k=>tl.includes(k))) a.formats[fmt]=(a.formats[fmt]||0)+1;
+        });
+      });
+    });
+    const top=Object.values(m).sort((a,b)=>b.likes-a.likes).slice(0,10);
+    document.getElementById('authorList').innerHTML=top.map((a,i)=>{
+      const avg=Math.round(a.likes/a.count);
+      const themes=Object.entries(a.keywords).sort((x,y)=>y[1]-x[1]).slice(0,4).map(k=>k[0]);
+      const formats=Object.entries(a.formats).sort((x,y)=>y[1]-x[1]).slice(0,2).map(f=>f[0]);
+      const platDy = a.platforms['dy']||0;
+      const platXhs = a.platforms['xhs']||0;
+      const platLabel = platDy>0 && platXhs>0 ? '双平台' : platDy>0 ? '抖音' : '小红书';
+      const platColor = platDy>0 && platXhs>0 ? '#a78bfa' : platDy>0 ? '#60a5fa' : '#f472b6';
+      const learnNote = avg > 50000 ? '高均赞：内容质量驱动，值得拆解爆款结构' : a.count > 10 ? '高频更新：量产策略，可学习选题节奏' : '单条爆款：钩子+选题精准，可复用其标题公式';
+      const themeTags = themes.length ? themes.map(t=>'<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(139,92,246,0.15);color:#a78bfa;">'+t+'</span>').join('') : '<span style="font-size:10px;color:var(--text-tertiary);">综合AI内容</span>';
+      const formatTags = formats.length ? formats.map(f=>'<span style="font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(52,211,153,0.15);color:#34d399;">'+f+'</span>').join('') : '';
+      return `
+      <div class="author-item" style="flex-direction:column;align-items:stretch;gap:6px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div class="author-rank ${i<3?'r'+(i+1):'other'}">${i+1}</div>
+          <div class="author-info" style="flex:1;">
+            <div class="author-name">${a.name}
+              <span style="font-size:9px;padding:1px 5px;border-radius:3px;background:rgba(251,191,36,0.15);color:#fbbf24;margin-left:6px;">${a.accountType||'未分类'}</span>
+              <span style="font-size:9px;padding:1px 5px;border-radius:3px;background:${platColor}22;color:${platColor};margin-left:4px;">${platLabel}</span>
+            </div>
+            <div class="author-followers">粉丝${(a.followers/10000).toFixed(1)}万 · ${a.count}条作品 · 均赞${(avg/10000).toFixed(1)}万</div>
+          </div>
+          <div class="author-likes">总赞${(a.likes/10000).toFixed(1)}万<div style="font-size:10px;opacity:.6;margin-top:2px;">最高${(a.max/10000).toFixed(1)}万</div></div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;padding-left:36px;align-items:center;">
+          <span style="font-size:10px;color:var(--text-tertiary);">内容标签：</span>${themeTags}
+        </div>
+        ${formatTags ? '<div style="display:flex;flex-wrap:wrap;gap:4px;padding-left:36px;align-items:center;"><span style="font-size:10px;color:var(--text-tertiary);">内容形式：</span>'+formatTags+'</div>' : ''}
+        <div style="font-size:10px;color:#34d399;padding-left:36px;">💡 ${learnNote}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // renderCompetitorWorks
+  function renderCompetitorWorks() {
+    var works = DATA.works || [];
+    if (!works.length) return;
+    // 按账号分组，取每个账号最新的1-2条
+    var byAuthor = {};
+    works.forEach(function(w) {
+      var name = w.accountName || '未知';
+      if (!byAuthor[name]) byAuthor[name] = [];
+      byAuthor[name].push(w);
+    });
+    // 按总点赞排序取top5账号
+    var authors = Object.entries(byAuthor).map(function(entry) {
+      return { name: entry[0], works: entry[1], totalLikes: entry[1].reduce(function(s,w){return s+(w.likeCount||0);},0) };
+    }).sort(function(a,b){return b.totalLikes-a.totalLikes;}).slice(0,5);
+
+    var html = '<div style="margin-top:12px;">';
+    html += '<div style="font-size:11px;color:var(--text-tertiary);margin-bottom:8px;">📡 竞品最新作品（来自搜索数据）</div>';
+    authors.forEach(function(a) {
+      var topWorks = a.works.sort(function(x,y){return (y.likeCount||0)-(x.likeCount||0);}).slice(0,2);
+      topWorks.forEach(function(w) {
+        var title = (w.title || '无标题').slice(0,40);
+        var likes = (w.likeCount||0).toLocaleString();
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">';
+        html += '<div style="flex:1;min-width:0;"><div style="font-size:11px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + title + '</div>';
+        html += '<div style="font-size:10px;color:var(--text-tertiary);">' + a.name + '</div></div>';
+        html += '<div style="font-size:11px;color:#f87171;margin-left:8px;">❤' + likes + '</div>';
+        html += '</div>';
+      });
+    });
+    html += '</div>';
+    var el = document.getElementById('competitorWorks');
+    if (el) el.innerHTML = html;
+  }
+
+  // renderFormatDist
+  function renderFormatDist() {
+    const container = document.getElementById('formatBars');
+    if (!container) return;
+    const formats = DATA.content_formats_dist || [];
+    if (!formats.length) { container.innerHTML = '<div class="empty-state">暂无数据</div>'; return; }
+    const colors = ['#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#6366f1', '#6b7280'];
+    container.innerHTML = formats.map(function(f, i) {
+      return '<div class="format-bar-row">' +
+        '<span class="format-bar-label">' + f.format + '</span>' +
+        '<div class="format-bar-track"><div class="format-bar-fill" style="width:' + Math.min(f.proportion * 2, 100) + '%;background:' + colors[i % colors.length] + '"></div></div>' +
+        '<span class="format-bar-val">' + f.count + '条 · ' + f.proportion + '% · 均赞' + f.avg_likes.toLocaleString() + '</span>' +
+        '</div>';
+    }).join('');
+  }
+
+  // filteredWorks
+  function filteredWorks() {
+    const p = filterByPlatform(DATA.works||[]);
+    if (currentCategory==='all') return p;
+    const kws = new Set(filteredHotwords().map(h=>h.keyword));
+    return p.filter(w=>kws.has(w._keyword));
+  }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "works",
+      requiredFields: ['works'],
+      render: function(data) {
+        try { renderWorksTable(data); renderSmallViral(data); renderAuthors(data); renderCompetitorWorks(data); renderFormatDist(data); } catch(e) { console.error("[works]", e); }
+      }
+    });
+  }
+  window.renderWorksTable = renderWorksTable;
+  window.renderSmallViral = renderSmallViral;
+  window.renderAuthors = renderAuthors;
+  window.renderCompetitorWorks = renderCompetitorWorks;
+  window.renderFormatDist = renderFormatDist;
+  window.filteredWorks = filteredWorks;
+})();
+
+
+/* ===== src/modules/topics.js ===== */
+
+/**
+ * modules/topics.js
+ * 函数: renderTopics, calcTopicScore, generateTitles, getPlatformAdaptation, generateSchedule, renderCommentScripts, renderChecklist, toggleCheck, updateChecklistProgress, filteredTopics, generateShootList
+ * 依赖: ['topics']
+ */
+(function() {
+  'use strict';
+
+  // renderTopics
+  function renderTopics() {
+    const formats = DATA.content_formats || [];
+    const fmtMap = {};
+    formats.forEach(f=>fmtMap[f.title]=f);
+    const topics = filteredTopics();
+    const status = getKanbanStatus();
+    document.getElementById('topicsGrid').innerHTML = topics.map((t,i)=>{
+      const fmt = fmtMap[t.title] || {};
+      const st = status[t.title] || 'pending';
+      const score = calcTopicScore(t);
+      const adapt = getPlatformAdaptation(t);
+      const mon = getMonetization(t);
+      return `<div class="topic-card priority-${t.priority==='高'?'high':t.priority==='中'?'medium':'low'} status-${st}" id="topic-${i}" onclick="cycleKanbanStatus(${i}, '${t.title.replace(/'/g,"\\'")}')">
+        <div class="status-badge">${st==='pending'?'待拍摄':st==='shooting'?'拍摄中':'已发布'}</div>
+        <div class="tc-num">${String(i+1).padStart(2,'0')}</div>
+        <div class="tc-priority">${t.priority}优先</div>
+        ${t.smart_priority ? '<span class="smart-priority ' + (t.smart_priority>=60?'high':t.smart_priority>=40?'mid':'low') + '" title="信息差'+(t.priority_breakdown?.info_gap||0)+' 热度'+(t.priority_breakdown?.heat||0)+' 低竞争'+(t.priority_breakdown?.low_competition||0)+'">智能 ' + t.smart_priority + '</span>' : ''}
+        ${t.content_type ? '<span class="content-type-tag '+t.content_type+'">'+t.content_type+'</span>' : ''}${t.is_info_gap ? '<div class="info-gap-badge">💎 信息差</div>' : (t.is_forecast ? '<div class="forecast-badge">🔮 前瞻</div>' : '')}
+        <div class="tc-title">${t.title}</div>
+        <div class="tc-hook">${t.hook}</div>\n      ${t.guide_comment ? '<div class="guide-comment">💬 小号引导：' + t.guide_comment + '</div>' : ''}
+        <div style="display:flex;align-items:center;gap:12px;margin:6px 0">
+          <div><span class="topic-score">${score.total}</span><span class="topic-score-label"> 综合分</span></div>
+          <div style="flex:1">
+            <div class="score-bar"><div class="score-bar-fill" style="width:${score.heat}%;background:#8b5cf6"></div></div>
+            <div class="score-bar"><div class="score-bar-fill" style="width:${score.competition}%;background:#4ade80"></div></div>
+            <div class="score-bar"><div class="score-bar-fill" style="width:${score.timing}%;background:#facc15"></div></div>
+          </div>
+        </div>
+        <div class="adapt-tags">
+          <span class="adapt-tag">抖音: ${adapt.dy.format}</span>
+          <span class="adapt-tag">小红书: ${adapt.xhs.format}</span>
+        </div>
+        <div style="margin-top:6px">
+          <span class="monetize-tag ${mon.cls}">${mon.name}</span>
+          <span style="font-size:11px;color:var(--text-secondary)">变现潜力 ${mon.score}分 · ${mon.desc}</span>
+        </div>
+        ${t.conversion_path ? `<div class="conv-path">
+          <div class="cp-title">转化路径 <span class="cp-level ${t.conversion_path.conversion_potential==='高'?'high':t.conversion_path.conversion_potential==='中'?'medium':'low'}">${t.conversion_path.conversion_potential}转化</span></div>
+          <div class="cp-row"><span class="cp-label">私域钩子：</span>${t.conversion_path.private_hook}</div>
+          <div class="cp-row"><span class="cp-label">对应产品：</span>${t.conversion_path.product_match}</div>
+          <div class="cp-row"><span class="cp-label">漏斗：</span>${t.conversion_path.funnel_step}</div>
+        </div>` : ''}
+        ${t.target_persona ? `<div class="topic-persona">
+          <div class="tp-name">目标人群：${t.target_persona.name} · ${t.target_persona.age} · ${t.target_persona.gender}</div>
+          <div class="tp-needs">${(t.target_persona.needs||[]).slice(0,4).map(n=>'<span class="tp-need">'+n+'</span>').join('')}</div>
+          <div class="tp-content">偏好：${t.target_persona.content_pref}</div>
+        </div>` : ''}
+        ${fmt.format?`<div class="tc-format"><span>${fmt.format}</span><span>${fmt.suggested_duration||''}</span><span>${fmt.suggested_publish||''}</span></div>`:''}
+        <div class="tc-meta"><span class="audience">${t.audience}</span><span style="color:var(--text-tertiary);">#${t.keyword}</span></div>
+        ${st==='published' ? (function(){
+          var perf = getPerfData();
+          var p = perf[t.title];
+          if (p) {
+            return '<div class="perf-stats">📊 播放'+p.views.toLocaleString()+' · 点赞'+p.likes.toLocaleString()+' · 涨粉'+p.followers+' ('+p.date+')</div>';
+          }
+          return '<div style="margin-top:6px;"><button onclick="event.stopPropagation();recordPerf(\''+t.title.replace(/'/g,"\\'")+'\')" style="font-size:10px;padding:3px 8px;border-radius:5px;border:none;background:rgba(245,158,11,0.15);color:#fbbf24;cursor:pointer;">📊 记录发布效果</button></div>';
+        })() : ''}
+        <div class="title-variants">
+          <div class="tv-label">A/B标题变体（点击复制）：</div>
+          ${genTitleVariants(t.title).map(function(v,vi){
+            return '<div class="tv-item" onclick="event.stopPropagation();navigator.clipboard.writeText(\''+v.replace(/'/g,"\\'")+'\');this.style.color=\'#34d399\';this.textContent=\'✅ 已复制\'">'+(vi+1)+'. '+v+'</div>';
+          }).join('')}
+        </div>
+        ${fmt.ref_url?`<a href="${fmt.ref_url}" target="_blank" class="ref-link">参考视频 — ${fmt.ref_title||'点击查看'}</a>`:''}
+      </div>`;
+    }).join('');
+    updateTracker();
+  }
+
+  // calcTopicScore
+  function calcTopicScore(topic) {
+    const hw = DATA.hotwords.find(h => h.keyword === topic.keyword);
+    if (!hw) return { total: 50, heat: 50, competition: 50, match: 50, timing: 50 };
+    // 热度分：作品数取对数归一化
+    const heat = Math.min(100, Math.round(Math.log10(hw.total || 1) * 20));
+    // 竞争分：蓝海指数越高分越高（竞争小）
+    const bo = hw.blue_ocean_score || 1;
+    const competition = Math.min(100, Math.round(Math.log10(bo + 1) * 15));
+    // 匹配分：默认60，AI大类相关更高
+    const match = hw.category === cfg('name', 'AI') + '大类' ? 75 : 65;
+    // 时效分：飙升>新热>稳定
+    const timing = hw.trend === '飙升' ? 95 : hw.trend === '新热' ? 80 : 55;
+    const total = Math.round(heat * 0.3 + competition * 0.25 + match * 0.2 + timing * 0.25);
+    return { total, heat, competition, match, timing };
+  }
+
+  // generateTitles
+  function generateTitles() {
+    const kw = document.getElementById('titleGenInput').value.trim();
+    if (!kw) { alert('请输入关键词'); return; }
+    const genes = DATA.viral_genes || {};
+    const hooks = genes.hook_distribution || {};
+    const topKws = (genes.top_title_keywords || []).map(k => k[0]);
+  
+    const templates = [
+      { type: '提问式', titles: [kw+'又更新了？这次的功能太离谱了', '为什么高手都在用'+kw+'？3个原因告诉你', kw+'到底怎么选？一篇讲透'] },
+      { type: '数字清单', titles: ['3个'+kw+'隐藏技巧，90%的人不知道', '5个'+kw+'神器，最后一个绝了', kw+'入门必看的7个要点'] },
+      { type: '结果前置', titles: ['用'+kw+'一键搞定，效率提升10倍', kw+'实战教程，看完就会', '我用'+kw+'做了这个，老板惊呆了'] },
+      { type: '反差对比', titles: [kw+'VS传统方式，差距太大了', '别再用老方法了，'+kw+'才是正解', '同样是'+kw+'，为什么别人做的更好？'] },
+      { type: '恐惧焦虑', titles: ['还不会'+kw+'？你已经落后了', kw+'踩坑指南，这些错误别再犯', '再不学'+kw+'就晚了'] },
+      { type: '福利诱惑', titles: [kw+'全套资料整理好了，免费领', '花了3天整理的'+kw+'笔记，分享给你', kw+'资源合集，建议收藏'] },
+    ];
+  
+    const hookLines = {
+      '提问式': '开头直接抛问题，3秒抓住好奇心',
+      '数字清单': '用数字建立预期，清单体完播率高',
+      '结果前置': '先展示效果，再讲方法，转化最强',
+      '反差对比': '制造认知冲突，引发讨论',
+      '恐惧焦虑': '戳中痛点，紧迫感驱动行动',
+      '福利诱惑': '利益点前置，收藏率最高',
+    };
+  
+    // 取前5种类型各1个标题
+    const result = templates.slice(0, 5).map(t => ({
+      type: t.type,
+      title: t.titles[Math.floor(Math.random() * t.titles.length)],
+      hook: hookLines[t.type] || '',
+    }));
+  
+    const html = result.map(r => `
+      <div class="gen-title-item">
+        <div><b>[${r.type}]</b> ${r.title}</div>
+        <div class="hook">${r.hook}</div>
+      </div>
+    `).join('');
+    document.getElementById('titleGenResult').innerHTML = html;
+  }
+
+  // getPlatformAdaptation
+  function getPlatformAdaptation(topic) {
+    const cat = topic.keyword || '';
+    const dy = {
+      title_style: '口语化+悬念，前3秒必须有钩子',
+      cover: '大字报封面，关键词突出',
+      tags: cfg('hashtags.core', '#AI #人工智能 #干货分享').replace('{cat}', '#' + cat.replace(/\s/g,'')),
+      time: '12:00-13:00 或 19:00-21:00',
+      format: cfg('content_format', '15-40秒口播+素材混剪'),
+    };
+    const xhs = {
+      title_style: '干货体+emoji，标题控制在20字内',
+      cover: '精致图文，3-5图轮播',
+      tags: cfg('hashtags.tool', '#AI工具 #效率神器 #新手必看').replace('{cat}', '#' + cat.replace(/\s/g,'')),
+      time: '7:30-9:00 或 20:00-22:30',
+      format: '图文笔记为主，视频为辅',
+    };
+    return { dy, xhs };
+  }
+
+  // generateSchedule
+  function generateSchedule() {
+    const topics = DATA.topics || [];
+    const days = ['周一','周二','周三','周四','周五','周六','周日'];
+    const today = new Date();
+    const publishTimes = ['08:00', '12:00', '19:00', '21:00'];
+    const platforms = ['抖音', '小红书'];
+  
+    let html = '<div class="schedule-grid">';
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      const dateStr = (d.getMonth()+1) + '/' + d.getDate();
+      const topic1 = topics[i % topics.length];
+      const topic2 = topics[(i + 3) % topics.length];
+    
+      html += `<div class="schedule-day">
+        <div class="day-name">${days[i]}</div>
+        <div class="day-date">${dateStr}</div>
+        <div class="schedule-item">
+          <div class="si-platform">抖音 · ${publishTimes[i%4]}</div>
+          <div>${topic1 ? topic1.title.substring(0,24) : '休息'}</div>
+        </div>
+        ${i % 2 === 0 ? `<div class="schedule-item">
+          <div class="si-platform">小红书 · ${publishTimes[(i+2)%4]}</div>
+          <div>${topic2 ? topic2.title.substring(0,24) : '休息'}</div>
+        </div>` : ''}
+      </div>`;
+    }
+    html += '</div>';
+    html += '<div style="margin-top:12px;font-size:12px;color:var(--text-secondary)">排期基于选题库自动生成，可根据实际情况调整。抖音日更，小红书隔日更。</div>';
+    document.getElementById('scheduleContent').innerHTML = html;
+  }
+
+  // renderCommentScripts
+  function renderCommentScripts() {
+    const demands = DATA.comment_demands || [];
+    const topics = DATA.topics || [];
+  
+    // 高赞回复模式
+    const replyPatterns = [
+      { type: '补充干货型', text: '补充一个：用XX工具的XX功能效果更好，亲测有效！' },
+      { type: '提问互动型', text: cfg('cta.question', '你们最想解决什么问题？评论区告诉我，下期安排！') },
+      { type: '共鸣认同型', text: '说到点子上了，我也是踩了无数坑才总结出来的' },
+      { type: '反转惊喜型', text: '其实还有个隐藏功能，90%的人不知道，看我主页' },
+      { type: '福利引导型', text: '整理了全套资料，需要的评论区扣"想要"' },
+    ];
+  
+    let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
+    html += '<div>';
+    html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">高赞回复模式（直接套用）</h4>';
+    replyPatterns.forEach(p => {
+      html += '<div class="comment-tpl"><div class="ct-type">' + p.type + '</div><div class="ct-text">' + p.text + '</div></div>';
+    });
+    html += '</div>';
+  
+    // 置顶评论话术（基于当前TOP选题）
+    html += '<div>';
+    html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">置顶评论引导话术</h4>';
+    const topTopics = topics.slice(0, 3);
+    topTopics.forEach(t => {
+      const kw = t.keyword || '';
+      html += '<div class="pinned-comment">';
+      html += '<div class="pc-label">选题：' + t.title.substring(0, 20) + '</div>';
+      html += '<div class="ct-text">想要' + kw + '全套教程的，评论区扣"1"，我整理好了发你！<br>觉得有用的点个赞，你的支持是我更新的动力</div>';
+      html += '</div>';
+    });
+    html += '</div></div>';
+  
+    // 评论区需求洞察
+    if (demands.length) {
+      html += '<div style="margin-top:16px"><h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">评论区高频需求（下期选题参考）</h4>';
+      html += '<div class="kw-cloud">';
+      demands.slice(0, 10).forEach(d => {
+        html += '<span>' + (d.demand || d.keyword || d) + '</span>';
+      });
+      html += '</div></div>';
+    }
+  
+    document.getElementById('commentScriptsContent').innerHTML = html;
+  }
+
+  // CHECKLIST_ITEMS - 发布前自检清单
+  const CHECKLIST_ITEMS = [
+    { id: 'title', text: '确认选题标题和钩子文案（前3秒留人）' },
+    { id: 'avatar', text: '准备数字人形象和口播文案（语速自然）' },
+    { id: 'footage', text: cfg('tasks.collect_footage', '收集素材并完成混剪（60-90秒）') },
+    { id: 'subtitle', text: '添加字幕、配乐和关键信息高亮' },
+    { id: 'timing', text: '选择最佳发布时间（18:00-21:00）' },
+    { id: 'comment', text: '准备评论区置顶引流话术和小号引导' },
+  ];
+
+  // renderChecklist
+  function renderChecklist() {
+    const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+    let html = '';
+    CHECKLIST_ITEMS.forEach(item => {
+      const checked = saved[item.id] ? 'checked' : '';
+      const mark = saved[item.id] ? '✓' : '';
+      html += '<div class="checklist-item ' + checked + '" onclick="toggleCheck(\'' + item.id + '\')">';
+      html += '<div class="checklist-box">' + mark + '</div>';
+      html += '<div class="checklist-text">' + item.text + '</div>';
+      html += '</div>';
+    });
+    document.getElementById('checklistContent').innerHTML = html;
+    updateChecklistProgress();
+  }
+
+  // toggleCheck
+  function toggleCheck(id) {
+    const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+    saved[id] = !saved[id];
+    localStorage.setItem('publishChecklist', JSON.stringify(saved));
+    renderChecklist();
+  }
+
+  // updateChecklistProgress
+  function updateChecklistProgress() {
+    const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+    const done = Object.values(saved).filter(Boolean).length;
+    document.getElementById('checklistProgress').innerHTML = '已完成 <b>' + done + '</b>/' + CHECKLIST_ITEMS.length + ' 项' + (done === CHECKLIST_ITEMS.length ? ' 可以发布了！' : '');
+  }
+
+  // filteredTopics
+  function filteredTopics() { return filterByPlatform(DATA.topics||[]); }
+
+  // generateShootList
+  function generateShootList(topicIndex) {
+    var topics = filteredTopics();
+    var t = topics[topicIndex];
+    if (!t) return;
+    var items = [
+      '确认选题标题和钩子文案',
+      '准备数字人形象和口播文案',
+      cfg('tasks.collect_footage_short', '收集素材（截图/演示视频）'),
+      '准备参考爆款视频的结构和节奏',
+      '录制数字人口播（注意语速和停顿）',
+      '剪辑：口播+素材混剪，控制在60-90秒',
+      '添加字幕和关键信息高亮',
+      '选择最佳发布时间（18:00-21:00）',
+      '准备评论区引流话术',
+      '发布后30分钟内回复前10条评论',
+    ];
+    var html = '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;">选题：' + t.title + '</div>';
+    html += items.map(function(item, i) {
+      return '<div class="shoot-item"><input type="checkbox" id="shoot-' + i + '"><label for="shoot-' + i + '">' + (i+1) + '. ' + item + '</label></div>';
+    }).join('');
+    document.getElementById('shootModalBody').innerHTML = html;
+    document.getElementById('shootModal').classList.add('active');
+  }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "topics",
+      requiredFields: ['topics'],
+      render: function(data) {
+        try { renderTopics(data); generateSchedule(data); renderCommentScripts(data); renderChecklist(); } catch(e) { console.error("[topics]", e); }
+      }
+    });
+  }
+  window.renderTopics = renderTopics;
+  window.calcTopicScore = calcTopicScore;
+  window.generateTitles = generateTitles;
+  window.getPlatformAdaptation = getPlatformAdaptation;
+  window.generateSchedule = generateSchedule;
+  window.renderCommentScripts = renderCommentScripts;
+  window.renderChecklist = renderChecklist;
+  window.toggleCheck = toggleCheck;
+  window.updateChecklistProgress = updateChecklistProgress;
+  window.filteredTopics = filteredTopics;
+  window.generateShootList = generateShootList;
+})();
+
+
+/* ===== src/modules/techradar.js ===== */
+
+/**
+ * modules/techradar.js
+ * 函数: renderTechRadar
+ * 依赖: ['tech_signals']
+ */
+(function() {
+  'use strict';
+
+  // renderTechRadar
+  function renderTechRadar() {
+    var ts = window.DASHBOARD_DATA && window.DASHBOARD_DATA.tech_signals;
+    if (!ts || !ts.signals || ts.signals.length === 0) {
+      document.getElementById('techradar').parentElement.style.display = 'none';
+      return;
+    }
+    var summary = ts.summary || {};
+    var sumHtml = '';
+    sumHtml += '<div class="tech-summary-card blue"><div class="num">' + (summary.blue_ocean || 0) + '</div><div class="label">🔵 蓝海机会</div></div>';
+    sumHtml += '<div class="tech-summary-card fire"><div class="num">' + (summary.exploding || 0) + '</div><div class="label">🔥 正在爆发</div></div>';
+    sumHtml += '<div class="tech-summary-card rise"><div class="num">' + (summary.rising || 0) + '</div><div class="label">📈 上升期</div></div>';
+    sumHtml += '<div class="tech-summary-card watch"><div class="num">' + (summary.watching || 0) + '</div><div class="label">👀 观察中</div></div>';
+    document.getElementById('techSummary').innerHTML = sumHtml;
+
+    var grid = document.getElementById('techGrid');
+    var html = '';
+    ts.signals.slice(0, 12).forEach(function(sig) {
+      var a = sig.analysis || {};
+      var opp = a.opportunity || '';
+      var badgeClass = 'watch';
+      if (opp.indexOf('蓝海') >= 0) badgeClass = 'blue';
+      else if (opp.indexOf('爆发') >= 0) badgeClass = 'fire';
+      else if (opp.indexOf('上升') >= 0) badgeClass = 'rise';
+      var name = sig.name || '';
+      var shortName = name.indexOf('/') >= 0 ? name.split('/').pop() : name;
+      var meta = '';
+      if (sig.source === 'github') {
+        var daysOld = sig.days_old ? sig.days_old + '天前创建' : '';
+        meta = '<span>⭐ ' + (sig.stars || 0) + '</span><span>🍴 ' + (sig.forks || 0) + '</span><span>📈 ' + (sig.star_growth_per_day || 0) + '/天</span>' + (daysOld ? '<span>🕐 ' + daysOld + '</span>' : '');
+      } else if (sig.source === 'huggingface') {
+        meta = '<span>⬇️ ' + (sig.downloads || 0) + '</span><span>❤️ ' + (sig.likes || 0) + '</span><span>' + (sig.pipeline || '') + '</span>';
+      }
+      var newBadge = sig.is_new ? '<span class="new-badge">NEW</span>' : '';
+      var matchKw = (a.matched_hotwords || []).map(function(k) { return '<span class="match-kw">' + k + '</span>'; }).join('');
+      var techHeat = a.tech_heat || 0;
+      var socialHeat = a.social_heat || 0;
+      html += '<div class="tech-card">';
+      html += '<div class="tech-source">' + (sig.source === 'github' ? 'GitHub' : 'HuggingFace') + '</div>';
+      html += '<div class="tech-header"><div class="tech-name">' + newBadge + shortName + '</div><span class="tech-badge ' + badgeClass + '">' + opp + '</span></div>';
+      var descZh = sig.description_zh || sig.description || '暂无描述';
+      var descEn = sig.description_zh ? sig.description : '';
+      html += '<div class="tech-desc">' + descZh + '</div>';
+      if (descEn) html += '<div class="tech-desc-en">' + descEn + '</div>';
+      html += '<div class="tech-meta">' + meta + '</div>';
+      html += '<div class="tech-heat-bar"><div class="tech-fill t" style="width:' + techHeat + '%"></div></div>';
+      html += '<div class="tech-heat-labels"><span>技术热度 ' + techHeat + '</span><span>社媒热度 ' + socialHeat + '</span></div>';
+      html += '<div class="tech-heat-bar" style="margin-top:4px"><div class="tech-fill s" style="width:' + socialHeat + '%"></div></div>';
+      if (matchKw) html += '<div class="tech-match">关联热词: ' + matchKw + '</div>';
+      html += '<div class="tech-reason">' + (a.reason || '') + '</div>';
+      html += '</div>';
+    });
+    grid.innerHTML = html;
+  }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "techradar",
+      requiredFields: ['tech_signals'],
+      render: domainGuard("techradar", function(data) {
+        try { renderTechRadar(data); } catch(e) { console.error("[techradar]", e); }
+      })
+    });
+  }
+  window.renderTechRadar = renderTechRadar;
+})();
+
+
+/* ===== src/modules/breakdown.js ===== */
+
+/**
+ * modules/breakdown.js
+ * 函数: renderBreakdowns, renderMatrix, renderFormulas, renderCollect, renderScatter, renderSaturation, renderCommentDemands, renderCommentKw, renderHook, renderDuration, renderPublishTime
+ * 依赖: ['works', 'hot_breakdowns']
+ */
+(function() {
+  'use strict';
+
+  // renderBreakdowns
+  function renderBreakdowns() {
+    const list = DATA.hot_breakdowns || [];
+    const el = document.getElementById('breakdownGrid');
+    if (!list.length) { el.innerHTML='<div class="empty-state">暂无爆款拆解数据</div>'; return; }
+    el.innerHTML = list.map((b,i)=>`
+      <div class="breakdown-card">
+        <div class="bd-header">
+          <div class="bd-title">${i+1}. ${b.title}</div>
+          <div style="display:flex;align-items:center;gap:6px;"><button class="fav-btn ${isFavorite(i) ? 'active' : ''}" onclick="toggleFavorite(${i})" title="收藏">${isFavorite(i) ? '⭐' : '☆'}</button><div class="bd-likes">${(b.likes/10000).toFixed(1)}万</div></div>
+        </div>
+        <div class="bd-row"><span class="bd-label">钩子</span><span class="bd-val">${b.hook}型</span></div>
+        <div class="bd-row"><span class="bd-label">结构</span><span class="bd-val">${b.structure}</span></div>
+        <div class="bd-row"><span class="bd-label">CTA</span><span class="bd-val">${b.cta}</span></div>
+        ${b.target_persona ? `<div class="bd-row"><span class="bd-label">人群</span><span class="bd-val"><span style="color:#22d3ee;font-weight:600">${b.target_persona.name}</span> · ${b.target_persona.age} · ${(b.target_persona.needs||[]).slice(0,2).join(' / ')}</span></div>` : ''}
+        <div class="bd-meta">
+          <span>${b.author} · ${b.duration}</span>
+          <span>${b.interaction} · <a href="${b.work_url||'#'}" target="_blank" class="work-link">原视频</a></span>
+        </div>
+      </div>`).join('');
+  }
+
+  // renderMatrix
+  function renderMatrix() {
+    const matrix = DATA.keyword_matrix || [];
+    const el = document.getElementById('matrixGrid');
+    if (!matrix.length) { el.innerHTML='<div class="empty-state">暂无矩阵数据</div>'; return; }
+    el.innerHTML = matrix.map(m=>{
+      const cls = m.level.includes('超热')?'super':m.level.includes('热门')?'hot':m.level.includes('上升')?'rise':'blue';
+      return `<div class="matrix-cell ${cls}">
+        <div class="mc-cat">${m.category}</div>
+        <div class="mc-level">${m.level}</div>
+        <div class="mc-stats">${m.count}关键词 · ${m.total.toLocaleString()}作品 · 最高赞${(m.max_like/10000).toFixed(1)}万</div>
+        <div class="mc-kws">${m.keywords.join(' · ')}</div>
+      </div>`;
+    }).join('');
+  }
+
+  // renderFormulas
+  function renderFormulas() {
+    const list = DATA.title_formulas || [];
+    const el = document.getElementById('formulaList');
+    if (!list.length) { el.innerHTML='<div class="empty-state">暂无标题公式</div>'; return; }
+    el.innerHTML = list.map(f=>`
+      <div class="formula-item">
+        <div class="f-name">${f.formula}</div>
+        <div class="f-example">${f.example}</div>
+        <div class="f-stats">命中 ${f.count} 条 · 平均点赞 ${f.avg_likes.toLocaleString()}</div>
+      </div>`).join('');
+  }
+
+  // renderCollect
+  function renderCollect(hw) {
+    const sorted=[...hw].filter(h=>h.collect_rate>0).sort((a,b)=>b.collect_rate-a.collect_rate).slice(0,10);
+    if (charts.collect) charts.collect.dispose();
+    charts.collect=echarts.init(document.getElementById('chartCollect'));
+    charts.collect.setOption({color:PALETTE,grid:{left:75,right:30,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:'{value}%'},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.collect_rate).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#30D158'},{offset:1,color:'#64D2FF'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:'{c}%',fontSize:10,color:'rgba(48,209,88,0.8)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:'rgba(48,209,88,0.3)',textStyle:{color:TOOLTIP_TEXT}}});
+  }
+
+  // renderScatter
+  function renderScatter(works) {
+    const top=[...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0)).slice(0,30);
+    const data=top.map(w=>[w.likeCount||0,w.collectCount||0,w.title||'']);
+    if (charts.scatter) charts.scatter.dispose();
+    charts.scatter=echarts.init(document.getElementById('chartScatter'));
+    charts.scatter.setOption({color:PALETTE,grid:{left:50,right:15,top:15,bottom:30},xAxis:{name:'点赞',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{name:'收藏',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'scatter',data,symbolSize:d=>Math.max(8,Math.min(28,Math.sqrt(d[0])/12)),itemStyle:{color:'rgba(10,132,255,0.5)',borderColor:'#64D2FF',borderWidth:1}}],tooltip:{backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${(p.data[2]||'').slice(0,25)}<br/>点赞 ${p.data[0].toLocaleString()}<br/>收藏 ${p.data[1].toLocaleString()}`}});
+  }
+
+  // renderSaturation
+  function renderSaturation(hw) {
+    const sat = DATA.saturation || [];
+    const filtered = currentCategory==='all' ? sat : sat.filter(s=>hw.some(h=>h.keyword===s.keyword));
+    const el = document.getElementById('saturationList');
+    if (!filtered.length) { el.innerHTML='<div class="empty-state">暂无饱和度数据</div>'; return; }
+    // 合并重复关键词（双平台数据去重）
+    const merged = {};
+    filtered.forEach(s=>{
+      if (!merged[s.keyword]) { merged[s.keyword] = {keyword:s.keyword, saturation:0, stage:s.stage}; }
+      merged[s.keyword].saturation += (s.saturation || 0);
+      const stageOrder = {'萌芽期':1,'上升期':2,'爆发期':3,'衰退期':4};
+      if (stageOrder[s.stage] > stageOrder[merged[s.keyword].stage]) merged[s.keyword].stage = s.stage;
+    });
+    const mergedList = Object.values(merged);
+    // 按饱和度升序（蓝海优先），取前12
+    const sorted = mergedList.sort((a,b)=>a.saturation-b.saturation).slice(0,12);
+    const maxSat = Math.max(...sorted.map(s=>s.saturation), 1);
+    el.innerHTML = sorted.map(s=>{
+      const pct = Math.max(2, Math.min(100, s.saturation/maxSat*100));
+      const color = s.saturation<50?'#30D158':s.saturation<150?'#64D2FF':s.saturation<300?'#FF9F0A':'#FF453A';
+      const satDisplay = s.saturation >= 10000 ? (s.saturation/10000).toFixed(1)+'万' : Math.round(s.saturation);
+      return `<div class="sat-item">
+        <div class="sat-name">${s.keyword}</div>
+        <div class="sat-bar"><div class="sat-fill" style="width:${pct}%;background:${color};"></div></div>
+        <div class="sat-val">${satDisplay}</div>
+        <div class="sat-advice"><span class="tag ${s.stage==='萌芽期'?'sprout':s.stage==='上升期'?'rise':s.stage==='爆发期'?'boom':'decline'}">${s.stage}</span></div>
+      </div>`;
+    }).join('');
+  }
+
+  // renderCommentDemands
+  function renderCommentDemands() {
+    const d = DATA.comment_demands || {};
+    const el = document.getElementById('commentDemands');
+    let html = '';
+    if (d.questions && d.questions.length) {
+      html += '<div class="demand-section"><div class="demand-label q">用户在问</div><div class="demand-tags">';
+      html += d.questions.map(q=>`<span class="demand-tag">${q.demand}<span class="dc">${q.count}</span></span>`).join('');
+      html += '</div></div>';
+    }
+    if (d.complaints && d.complaints.length) {
+      html += '<div class="demand-section"><div class="demand-label c">用户在吐槽</div><div class="demand-tags">';
+      html += d.complaints.map(q=>`<span class="demand-tag">${q.demand}<span class="dc">${q.count}</span></span>`).join('');
+      html += '</div></div>';
+    }
+    if (d.needs && d.needs.length) {
+      html += '<div class="demand-section"><div class="demand-label n">用户在求</div><div class="demand-tags">';
+      html += d.needs.map(q=>`<span class="demand-tag">${q.demand}<span class="dc">${q.count}</span></span>`).join('');
+      html += '</div></div>';
+    }
+    el.innerHTML = html || '<div class="empty-state">暂无评论需求数据</div>';
+  }
+
+  // renderCommentKw
+  function renderCommentKw(works) {
+    const kws = DATA.comment_keywords || [];
+    const el = document.getElementById('commentKw');
+    if (!kws.length) { el.innerHTML='<div class="empty-state">暂无评论关键词数据</div>'; return; }
+    el.innerHTML = kws.slice(0,20).map((k,i)=>`<span class="kw-tag ${i<5?'hot':''}" style="font-size:${Math.max(11,16-i*0.4)}px;">${k.keyword} <span style="opacity:.5;font-size:10px;">${k.count}</span></span>`).join('');
+  }
+
+  // renderHook
+  function renderHook(works) {
+    const hs={}; works.forEach(w=>{const h=classifyHook(w.title||'');if(!hs[h])hs[h]={count:0,likes:0};hs[h].count++;hs[h].likes+=(w.likeCount||0);});
+    const data=Object.entries(hs).map(([n,v])=>({name:n,value:Math.round(v.likes/v.count)}));
+    if (charts.hook) charts.hook.dispose();
+    charts.hook=echarts.init(document.getElementById('chartHook'));
+    charts.hook.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:data.map(d=>d.name),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:data.map(d=>d.value),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#FF9F0A'},{offset:1,color:'#FF453A'}]),borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:'rgba(255,255,255,0.5)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}型<br/>平均点赞 ${p[0].value.toLocaleString()}`}});
+  }
+
+  // renderDuration
+  function renderDuration(works) {
+    const ranges = [
+      { range: '0-15秒', min: 0, max: 15 },
+      { range: '15-30秒', min: 15, max: 30 },
+      { range: '30-60秒', min: 30, max: 60 },
+      { range: '1-3分钟', min: 60, max: 180 },
+      { range: '3分钟+', min: 180, max: Infinity },
+    ];
+    const counts = ranges.map(() => 0);
+    const likes = ranges.map(() => 0);
+    (works || []).forEach(w => {
+      const durMs = w.duration || 0;
+      if (durMs <= 0) return;
+      const sec = durMs / 1000;
+      for (let i = 0; i < ranges.length; i++) {
+        if (sec >= ranges[i].min && sec < ranges[i].max) {
+          counts[i]++;
+          likes[i] += (w.likeCount || 0);
+          break;
+        }
+      }
+    });
+    const dist = ranges.map((r, i) => ({
+      range: r.range, count: counts[i],
+      avg_likes: counts[i] > 0 ? Math.round(likes[i] / counts[i]) : 0
+    }));
+    if (charts.dur) charts.dur.dispose();
+    charts.dur = echarts.init(document.getElementById('chartDuration'));
+    charts.dur.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:dist.map(d=>d.range),axisLabel:{color:AXIS_COLOR,fontSize:9,interval:0,rotate:15},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:dist.map(d=>({value:d.count,itemStyle:{color:d.avg_likes>5000?'#30D158':'#0A84FF'}})),label:{show:true,position:'top',fontSize:9,color:'rgba(255,255,255,0.5)',formatter:p=>`${p.value}条`},barWidth:'50%',animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>{const d=dist[p[0].dataIndex];return `${d.range}<br/>作品数 ${d.count}<br/>平均点赞 ${d.avg_likes.toLocaleString()}`;}}});
+  }
+
+  // renderPublishTime
+  function renderPublishTime(works) {
+    // 从works实时计算发布时间分布
+    const hourCount = new Array(24).fill(0);
+    const hourLikes = new Array(24).fill(0);
+    const hourViral = new Array(24).fill(0);
+    (works || []).forEach(w => {
+      const pt = w.publishTime;
+      if (!pt) return;
+      const m = pt.match(/ (\d{2}):/);
+      if (!m) return;
+      const h = parseInt(m[1]);
+      hourCount[h]++;
+      hourLikes[h] += (w.likeCount || 0);
+      if ((w.likeCount || 0) >= 10000) hourViral[h]++;
+    });
+    const dist = hourCount.map((cnt, h) => ({
+      hour: h,
+      count: cnt,
+      avg_likes: cnt > 0 ? Math.round(hourLikes[h] / cnt) : 0,
+      viral_count: hourViral[h],
+      viral_rate: cnt > 0 ? Math.round(hourViral[h] / cnt * 100) : 0
+    }));
+    if (charts.pt) charts.pt.dispose();
+    charts.pt = echarts.init(document.getElementById('chartPublishTime'));
+    charts.pt.setOption({
+      color: PALETTE,
+      grid: { left: 40, right: 15, top: 25, bottom: 25 },
+      xAxis: {
+        type: 'category',
+        data: dist.map(d => d.hour + '时'),
+        axisLabel: { color: AXIS_COLOR, fontSize: 9, interval: 2 },
+        axisLine: { lineStyle: { color: AXIS_LINE } }
+      },
+      yAxis: {
+        type: 'value',
+        axisLabel: { color: AXIS_COLOR },
+        splitLine: { lineStyle: { color: SPLIT_COLOR } }
+      },
+      series: [{
+        type: 'bar',
+        data: dist.map(d => ({
+          value: d.count,
+          itemStyle: {
+            color: d.viral_rate >= 10
+              ? new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#FFD60A' }, { offset: 1, color: '#FF9F0A' }])
+              : new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#0A84FF' }, { offset: 1, color: '#5E5CE6' }]),
+            borderRadius: [4, 4, 0, 0]
+          }
+        })),
+        animationDuration: 1000
+      }],
+      tooltip: {
+        trigger: 'axis',
+        backgroundColor: TOOLTIP_BG,
+        borderColor: TOOLTIP_BORDER,
+        textStyle: { color: TOOLTIP_TEXT },
+        formatter: p => {
+          const d = dist[p[0].dataIndex];
+          return `${d.hour}时<br/>作品数 ${d.count}<br/>平均点赞 ${d.avg_likes.toLocaleString()}<br/>爆款数 ${d.viral_count}（${d.viral_rate}%）`;
+        }
+      }
+    });
+  }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "breakdown",
+      requiredFields: ['works'],
+      render: function(data) {
+        try { renderBreakdowns(); renderMatrix(); renderFormulas(); renderCollect(DATA.hotwords); renderScatter(data); renderSaturation(DATA.hotwords); renderCommentDemands(); renderCommentKw(); renderHook(data); renderDuration(data); renderPublishTime(data); } catch(e) { console.error("[breakdown]", e); }
+      }
+    });
+  }
+  window.renderBreakdowns = renderBreakdowns;
+  window.renderMatrix = renderMatrix;
+  window.renderFormulas = renderFormulas;
+  window.renderCollect = renderCollect;
+  window.renderScatter = renderScatter;
+  window.renderSaturation = renderSaturation;
+  window.renderCommentDemands = renderCommentDemands;
+  window.renderCommentKw = renderCommentKw;
+  window.renderHook = renderHook;
+  window.renderDuration = renderDuration;
+  window.renderPublishTime = renderPublishTime;
+})();
+
+
+/* ===== src/modules/viralGenes.js ===== */
+
+/**
+ * modules/viralGenes.js
+ * 函数: renderViralGenes
+ * 依赖: ['viral_genes']
+ */
+(function() {
+  'use strict';
+
+  // renderViralGenes
+  function renderViralGenes() {
+    const genes = DATA.viral_genes;
+    if (!genes) { document.getElementById('viralGenesContent').innerHTML='<p style="color:var(--text-secondary)">暂无数据</p>'; return; }
+    let html = '<div class="gene-grid">';
+    // 钩子分布
+    const hooks = genes.hook_distribution || {};
+    const maxHook = Math.max(...Object.values(hooks), 1);
+    for (const [name, count] of Object.entries(hooks)) {
+      const pct = Math.round(count/maxHook*100);
+      html += '<div class="gene-card"><h4>'+name+'</h4><div class="gene-val">'+count+'<span style="font-size:12px;color:var(--text-secondary)"> 条</span></div><div class="gene-bar"><div class="gene-bar-fill" style="width:'+pct+'%"></div></div></div>';
+    }
+    html += '</div>';
+    // 平均标题长度
+    html += '<div style="margin-top:16px;font-size:13px;color:var(--text-secondary)">爆款平均标题长度：<b style="color:var(--text)">'+genes.avg_title_length+'</b> 字 | 样本：'+genes.sample_size+'条</div>';
+    // 高频关键词
+    const kws = genes.top_title_keywords || [];
+    if (kws.length) {
+      html += '<div class="kw-cloud">';
+      kws.forEach(([kw, freq]) => { html += '<span>'+kw+' <small style="opacity:0.6">×'+freq+'</small></span>'; });
+      html += '</div>';
+    }
+    // 结构示例
+    const examples = genes.structure_examples || [];
+    if (examples.length) {
+      html += '<div style="margin-top:16px"><h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">爆款结构示例</h4>';
+      examples.forEach(e => {
+        html += '<div style="padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:6px;font-size:13px"><span class="tag medium" style="margin-right:8px">'+e.structure+'</span>'+e.title+' <span style="color:var(--text-secondary);float:right">'+(e.likes||0).toLocaleString()+'赞</span></div>';
+      });
+      html += '</div>';
+    }
+    document.getElementById('viralGenesContent').innerHTML = html;
+  }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "viralGenes",
+      requiredFields: ['viral_genes'],
+      render: domainGuard("viralGenes", function(data) {
+        try { renderViralGenes(data); } catch(e) { console.error("[viralGenes]", e); }
+      })
+    });
+  }
+  window.renderViralGenes = renderViralGenes;
+})();
+
+
+/* ===== src/modules/publishTime.js ===== */
+
+/**
+ * modules/publishTime.js
+ * 函数: renderPublishTimeDetail
+ * 依赖: ['publish_time_dist']
+ */
+(function() {
+  'use strict';
+
+  // renderPublishTimeDetail
+  function renderPublishTimeDetail() {
+    var works = DATA.works || [];
+    if (!works.length) return;
+    var hourData = {};
+    for (var h = 0; h < 24; h++) {
+      hourData[h] = { count: 0, totalLikes: 0, viralCount: 0, highLikeCount: 0 };
+    }
+    var platformHour = { douyin: {}, xiaohongshu: {} };
+    for (var p in platformHour) {
+      for (var h2 = 0; h2 < 24; h2++) platformHour[p][h2] = { count: 0, viralCount: 0, totalLikes: 0 };
+    }
+
+    works.forEach(function(w) {
+      var pt = w.publishTime;
+      if (!pt) return;
+      var m = pt.match(/ (\d{2}):/);
+      if (!m) return;
+      var hour = parseInt(m[1]);
+      var likes = w.likeCount || 0;
+      var hd = hourData[hour];
+      hd.count++;
+      hd.totalLikes += likes;
+      if (likes >= 10000) hd.viralCount++;
+      if (likes >= 5000) hd.highLikeCount++;
+      var plat = w.platform === 'xiaohongshu' ? 'xiaohongshu' : 'douyin';
+      if (platformHour[plat]) {
+        platformHour[plat][hour].count++;
+        platformHour[plat][hour].totalLikes += likes;
+        if (likes >= 10000) platformHour[plat][hour].viralCount++;
+      }
+    });
+
+    // 计算爆款率，找出TOP3时段（样本量>=10）
+    var hoursWithData = [];
+    for (var h3 = 0; h3 < 24; h3++) {
+      var d = hourData[h3];
+      if (d.count >= 5) {
+        var viralRate = d.viralCount / d.count * 100;
+        var avgLikes = d.totalLikes / d.count;
+        var score = viralRate * 0.5 + (d.highLikeCount / d.count * 100) * 0.3 + Math.min(avgLikes / 500, 100) * 0.2;
+        hoursWithData.push({ hour: h3, count: d.count, avgLikes: avgLikes, viralRate: viralRate, score: score });
+      }
+    }
+    hoursWithData.sort(function(a, b) { return b.score - a.score; });
+    var bestHours = hoursWithData.slice(0, 3);
+    var bestHourSet = {};
+    bestHours.forEach(function(b) { bestHourSet[b.hour] = true; });
+
+    // 渲染柱状图
+    var maxCount = 0;
+    for (var h4 = 0; h4 < 24; h4++) maxCount = Math.max(maxCount, hourData[h4].count);
+    var chartHtml = '';
+    for (var h5 = 0; h5 < 24; h5++) {
+      var d5 = hourData[h5];
+      var heightPct = maxCount > 0 ? (d5.count / maxCount * 100) : 0;
+      var isBest = bestHourSet[h5];
+      var viralLabel = (d5.count >= 5 && d5.viralCount > 0) ? (d5.viralCount / d5.count * 100).toFixed(0) + '%' : '';
+      chartHtml += '<div class="pt-bar-wrap">';
+      if (viralLabel) chartHtml += '<div class="pt-bar-viral">' + viralLabel + '</div>';
+      chartHtml += '<div class="pt-bar' + (isBest ? ' best' : '') + '" style="height:' + Math.max(heightPct, 1) + '%" title="' + h5 + ':00 - ' + d5.count + '条作品, 平均点赞' + Math.round(d5.totalLikes / Math.max(d5.count,1)) + '"></div>';
+      chartHtml += '<div class="pt-bar-label">' + h5 + '</div>';
+      chartHtml += '</div>';
+    }
+    document.getElementById('ptChart').innerHTML = chartHtml;
+
+    // 渲染TOP3最佳时段
+    var rankEmoji = ['🥇', '🥈', '🥉'];
+    var bestHtml = '';
+    bestHours.forEach(function(b, i) {
+      bestHtml += '<div class="pt-best-card">';
+      bestHtml += '<div class="rank">' + rankEmoji[i] + '</div>';
+      bestHtml += '<div class="time">' + b.hour + ':00 - ' + (b.hour + 1) + ':00</div>';
+      bestHtml += '<div class="stats">样本<b>' + b.count + '</b>条<br>平均点赞<b>' + Math.round(b.avgLikes).toLocaleString() + '</b><br>爆款率<span class="viral-rate">' + b.viralRate.toFixed(1) + '%</span></div>';
+      bestHtml += '</div>';
+    });
+    document.getElementById('ptBestCards').innerHTML = bestHtml;
+
+    // 分平台最佳时段
+    var platHtml = '';
+    var platNames = { douyin: '抖音', xiaohongshu: '小红书' };
+    for (var p2 in platformHour) {
+      var bestH = -1, bestVR = -1, bestCount = 0, bestAvg = 0;
+      for (var h6 = 0; h6 < 24; h6++) {
+        var ph = platformHour[p2][h6];
+        if (ph.count >= 5) {
+          var vr = ph.viralCount / ph.count * 100;
+          if (vr > bestVR) { bestVR = vr; bestH = h6; bestCount = ph.count; bestAvg = ph.totalLikes / ph.count; }
+        }
+      }
+      if (bestH >= 0) {
+        platHtml += '<div class="pt-platform-item">';
+        platHtml += '<div class="plat-name">' + platNames[p2] + '最佳时段</div>';
+        platHtml += '<div class="plat-best">' + bestH + ':00 - ' + (bestH + 1) + ':00</div>';
+        platHtml += '<div style="color:var(--text-tertiary);font-size:11px;margin-top:2px;">爆款率' + bestVR.toFixed(1) + '% · 平均点赞' + Math.round(bestAvg).toLocaleString() + '</div>';
+        platHtml += '</div>';
+      }
+    }
+    document.getElementById('ptPlatform').innerHTML = platHtml;
+
+    // 实操建议
+    var tipsHtml = '<strong>💡 实操建议：</strong>';
+    if (bestHours.length > 0) {
+      tipsHtml += '优先在<strong>' + bestHours[0].hour + ':00前后</strong>发布，爆款率是平均水平的' + (bestHours[0].viralRate / Math.max(hoursWithData.reduce(function(s, x) { return s + x.viralRate; }, 0) / Math.max(hoursWithData.length, 1), 0.1)).toFixed(1) + '倍。';
+    }
+    tipsHtml += ' 避开<strong>13:00-14:00午间</strong>（'+cfg('name','该领域')+'内容互动最差）。';
+    tipsHtml += ' 若一天发2条，选<strong>18点 + 20点</strong>覆盖晚高峰双波峰。';
+    document.getElementById('ptTips').innerHTML = tipsHtml;
+  }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "publishTime",
+      requiredFields: ['works'],
+      render: function(data) {
+        try { renderPublishTimeDetail(data); } catch(e) { console.error("[publishTime]", e); }
+      }
+    });
+  }
+  window.renderPublishTimeDetail = renderPublishTimeDetail;
+})();
+
+
+/* ===== src/modules/titleFormulas.js ===== */
+
+/**
+ * modules/titleFormulas.js
+ * 函数: renderTitleFormulas, copyFormula, genTitleVariants
+ * 依赖: ['title_formulas_extracted']
+ */
+(function() {
+  'use strict';
+
+  // renderTitleFormulas
+  function renderTitleFormulas() {
+    var formulas = DATA.title_formulas || [];
+    var examples = cfg('title_formula_examples', {
+      '感叹句': '太绝了！这个工具让我效率提升10倍',
+      '教程型': '手把手教你做XX，3分钟上手',
+      '疑问句': '还在手动调参？这个方法90%的人不知道',
+      '否定警告': '千万别再用XX了，这3个坑踩过的人都哭了',
+      '极限词': '2026最强工具排行，第一名居然是它',
+      '实测型': '我用这套工作流跑了一周，效率提升了200%',
+      '免费型': '免费白嫖！这款工具比付费的还好用',
+    });
+    var html = formulas.map(function(f) {
+      var name = f[0], count = f[1];
+      var ex = examples[name] || '点击查看套用示例';
+      return '<div class="formula-item" onclick="copyFormula(\'' + name + '\')"><div class="fi-name">' + name + '</div><div class="fi-count">爆款中出现 ' + count + ' 次</div><div class="fi-example">示例：' + ex + '</div></div>';
+    }).join('');
+    var fg = document.getElementById('formulaGrid'); if (fg) fg.innerHTML = html || '<div style="color:var(--text-tertiary);">暂无数据</div>';
+  }
+
+  // copyFormula
+  function copyFormula(name) {
+    alert('已复制【' + name + '】标题公式，可在选题标题中套用');
+  }
+
+  // genTitleVariants
+  function genTitleVariants(title) {
+    var variants = [title];
+    var core = title.replace(/^[^：:]*[：:]\s*/, '');
+    variants.push('3个方法搞定：' + core);
+    variants.push(core + '？90%的人不知道');
+    return variants.slice(0, 3);
+  }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "titleFormulas",
+      requiredFields: ['title_formulas'],
+      render: function(data) {
+        try { renderTitleFormulas(data); } catch(e) { console.error("[titleFormulas]", e); }
+      }
+    });
+  }
+  // 智能标题生成器（基于爆款公式）
+  function generateTitles(keyword) {
+    if (!keyword || !keyword.trim()) return [];
+    keyword = keyword.trim();
+    var formulas = DATA.title_formulas || [];
+    // 按出现次数排序，取Top5公式
+    var topFormulas = formulas.slice().sort(function(a,b){return b[1]-a[1];}).slice(0,5).map(function(f){return f[0];});
+    if (topFormulas.length === 0) topFormulas = ['数字型','悬念型','痛点型','对比型','教程型'];
+
+    // 公式模板库
+    var templates = {
+      '数字型': [
+        '3个方法搞定' + keyword + '，第2个绝了',
+        keyword + '的5个隐藏用法，90%的人不知道',
+        '用了' + keyword + '一周，效率提升了300%',
+        keyword + '入门必看：4步从0到1',
+      ],
+      '悬念型': [
+        keyword + '居然还能这么用？看完惊呆了',
+        '我为什么放弃了付费工具，选择了' + keyword,
+        keyword + '背后的秘密，圈内人都不说',
+        '别再瞎用' + keyword + '了，正确姿势是这样',
+      ],
+      '痛点型': [
+        '还在手动做' + keyword + '？这个方法救了我',
+        keyword + '总是做不好？因为你漏了这一步',
+        '踩了无数坑后，我终于搞懂了' + keyword,
+        keyword + '最难的部分，我用10分钟讲清楚',
+      ],
+      '对比型': [
+        keyword + ' vs 传统方法，差距有多大？',
+        '同样是' + keyword + '，为什么别人爆款你扑街',
+        keyword + '免费版vs付费版，差的不止是钱',
+        '3款' + keyword + '工具横评，这款最值得入',
+      ],
+      '教程型': [
+        '手把手教你用' + keyword + '，3分钟上手',
+        keyword + '完整教程，从安装到出片全流程',
+        '零基础学' + keyword + '，这一篇就够了',
+        keyword + '实操演示，跟着做就能出效果',
+      ],
+      '感叹句': [
+        '太绝了！' + keyword + '这个功能我怎么才发现',
+        keyword + 'yyds！用一次就回不去了',
+        '炸裂！' + keyword + '又更新了，这次是王炸',
+      ],
+      '疑问句': [
+        keyword + '到底值不值得学？用了3个月说真话',
+        '为什么大佬都在用' + keyword + '？',
+        keyword + '真的能替代人工吗？实测告诉你',
+      ],
+      '否定警告': [
+        '千万别再这样用' + keyword + '了，全是坑',
+        '别再花钱学' + keyword + '了，这篇免费教你',
+        keyword + '这3个错误，90%的新手都在犯',
+      ],
+      '极限词': [
+        '2026最强' + keyword + '工具，没有之一',
+        keyword + '天花板级教程，建议收藏',
+        '目前最完整的' + keyword + '指南，全网首发',
+      ],
+      '实测型': [
+        '我用' + keyword + '跑了30天，结果出乎意料',
+        keyword + '深度实测：优点缺点全告诉你',
+        '连续7天用' + keyword + '，说说真实感受',
+      ],
+      '免费型': [
+        '免费白嫖！这款' + keyword + '工具比付费还香',
+        keyword + '免费替代品，功能一样强',
+        '不用花钱！' + keyword + '开源方案分享',
+      ],
+    };
+
+    var results = [];
+    var used = {};
+    // 从Top公式中各取1-2个
+    topFormulas.forEach(function(fname, idx) {
+      var tpls = templates[fname] || templates['数字型'];
+      var count = idx < 2 ? 2 : 1;  // Top2公式各取2个
+      for (var i = 0; i < count && results.length < 8; i++) {
+        var t = tpls[i % tpls.length];
+        if (!used[t]) {
+          used[t] = true;
+          results.push({title: t, formula: fname});
+        }
+      }
+    });
+    // 补足到8个
+    var allTpls = Object.values(templates).flat();
+    for (var j = 0; j < allTpls.length && results.length < 8; j++) {
+      if (!used[allTpls[j]]) {
+        used[allTpls[j]] = true;
+        results.push({title: allTpls[j], formula: '综合'});
+      }
+    }
+    return results.slice(0, 8);
+  }
+
+  function renderGeneratedTitles(keyword) {
+    var titles = generateTitles(keyword);
+    var el = document.getElementById('titleGenResult');
+    if (!el) return;
+    if (titles.length === 0) {
+      el.innerHTML = '<div style="color:var(--text-tertiary);padding:10px;">请输入关键词</div>';
+      return;
+    }
+    el.innerHTML = titles.map(function(t, i) {
+      return '<div class="gen-title-item" onclick="copyText(\'' + t.title.replace(/'/g, "\\'") + '\')">' +
+        '<span class="gen-title-num">' + (i+1) + '</span>' +
+        '<span class="gen-title-text">' + t.title + '</span>' +
+        '<span class="gen-title-formula">' + t.formula + '</span>' +
+        '<span class="gen-copy-btn">复制</span></div>';
+    }).join('');
+  }
+
+  function copyText(text) {
+    navigator.clipboard.writeText(text).then(function() {
+      // 视觉反馈
+      document.querySelectorAll('.gen-title-item').forEach(function(el) {
+        if (el.querySelector('.gen-title-text').textContent === text) {
+          el.querySelector('.gen-copy-btn').textContent = '已复制';
+          setTimeout(function(){ el.querySelector('.gen-copy-btn').textContent = '复制'; }, 1500);
+        }
+      });
+    });
+  }
+
+  // 绑定输入框回车事件
+  function initTitleGen() {
+    var input = document.getElementById('titleGenInput');
+    if (input && !input._bound) {
+      input._bound = true;
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') renderGeneratedTitles(input.value);
+      });
+    }
+  }
+
+  window.renderTitleFormulas = renderTitleFormulas;
+  window.copyFormula = copyFormula;
+  window.genTitleVariants = genTitleVariants;
+  window.generateTitles = generateTitles;
+  window.renderGeneratedTitles = renderGeneratedTitles;
+  window.copyText = copyText;
+  window.initTitleGen = initTitleGen;
+})();
+
+// 页面加载后初始化标题生成器
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initTitleGen);
+} else {
+  initTitleGen();
+}
+
+
+/* ===== src/modules/leadScripts.js ===== */
+
+/**
+ * modules/leadScripts.js
+ * 函数: renderLeadScripts
+ * 依赖: 无
+ */
+(function() {
+  'use strict';
+
+  // renderLeadScripts
+  function renderLeadScripts() {
+    var scripts = cfg('lead_scripts_detail', []);
+    var html = scripts.map(function(s) {
+      return '<div class="script-card"><div class="sc-target">' + s.target + '</div><div class="sc-text">' + s.text + '</div><span class="sc-copy" onclick="copyScript(this)">📋 复制话术</span></div>';
+    }).join('');
+    var sc = document.getElementById('scriptContainer'); if (sc) sc.innerHTML = html;
+  }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "leadScripts",
+      requiredFields: [],
+      render: function(data) {
+        try { renderLeadScripts(data); } catch(e) { console.error("[leadScripts]", e); }
+      }
+    });
+  }
+  window.renderLeadScripts = renderLeadScripts;
+})();
+
+
+/* ===== src/modules/launchOps.js ===== */
+
+/**
+ * modules/launchOps.js
+ * 函数: renderLaunchOps
+ * 从hotwords/topics/works实时生成起号运营追踪数据
+ */
+(function() {
+  'use strict';
+
+  function renderLaunchOps() {
+    // 如果有预计算的launch_ops则直接用，否则从数据生成
+    var lo = DATA.launch_ops;
+    if (!lo) {
+      lo = generateLaunchOps();
+    }
+    if (!lo) return;
+
+    // 阶段横幅
+    var phaseColors = {'打标期':'#fbbf24','验证期':'#60a5fa','放大期':'#30D158'};
+    var pc = phaseColors[lo.phase] || '#a78bfa';
+    var bannerEl = document.getElementById('launchBanner');
+    if (bannerEl) bannerEl.innerHTML =
+      '<div class="launch-phase-icon">' + (lo.phase==='打标期'?'🏷️':lo.phase==='验证期'?'📊':'🚀') + '</div>' +
+      '<div class="launch-phase-info"><div class="launch-phase-name" style="color:'+pc+'">' + lo.phase + '</div>' +
+      '<div class="launch-phase-desc">' + lo.desc + ' · 起号日 ' + lo.start_date + '</div></div>' +
+      '<div class="launch-phase-day">第' + lo.days + '天<span>of 14天打标</span></div>';
+
+    // 健康度
+    var hs = lo.tag_health || 0;
+    var hsEl = document.getElementById('healthScore');
+    if (hsEl) {
+      hsEl.textContent = hs;
+      hsEl.className = 'health-score ' + (hs>=60?'':hs>=40?'mid':'low');
+    }
+    var ccEl = document.getElementById('coreCoverage');
+    if (ccEl) ccEl.textContent = lo.core_coverage + '%';
+    var hb = document.getElementById('healthBar');
+    if (hb) {
+      hb.style.width = hs + '%';
+      hb.style.background = hs>=60 ? 'linear-gradient(90deg,#30D158,#4ade80)' : hs>=40 ? 'linear-gradient(90deg,#fbbf24,#f97316)' : 'linear-gradient(90deg,#f87171,#ef4444)';
+    }
+    var htEl = document.getElementById('healthTip');
+    if (htEl) htEl.textContent = hs>=60 ? '标签健康，算法可精准推流' : hs>=40 ? '标签正在形成，继续保持垂直输出' : '标签混乱，建议减少泛内容，聚焦核心领域';
+
+    // 关键词云
+    var kws = lo.core_keywords || [];
+    var kwEl = document.getElementById('coreKwCloud');
+    if (kwEl) kwEl.innerHTML = kws.length ? kws.map(function(k){return '<span class="kw-chip">'+k+'</span>';}).join('') : '<span style="font-size:11px;color:var(--text-tertiary);">暂无核心关键词覆盖</span>';
+
+    // 内容配比
+    var r = lo.content_ratio || {};
+    var total = (r.core||0)+(r.related||0)+(r.general||0) || 1;
+    var corePct = Math.round((r.core||0)/total*100);
+    var relPct = Math.round((r.related||0)/total*100);
+    var genPct = 100-corePct-relPct;
+    var rbEl = document.getElementById('ratioBar');
+    if (rbEl) rbEl.innerHTML =
+      '<div class="ratio-seg" style="width:'+corePct+'%;background:#30D158;">'+(corePct>10?corePct+'%':'')+'</div>' +
+      '<div class="ratio-seg" style="width:'+relPct+'%;background:#60a5fa;">'+(relPct>10?relPct+'%':'')+'</div>' +
+      '<div class="ratio-seg" style="width:'+genPct+'%;background:rgba(255,255,255,0.15);">'+(genPct>10?genPct+'%':'')+'</div>';
+    var rlEl = document.getElementById('ratioLegend');
+    if (rlEl) rlEl.innerHTML =
+      '<span><span class="ratio-dot" style="background:#30D158;"></span>核心 '+corePct+'% (目标70%)</span>' +
+      '<span><span class="ratio-dot" style="background:#60a5fa;"></span>关联 '+relPct+'% (目标20%)</span>' +
+      '<span><span class="ratio-dot" style="background:rgba(255,255,255,0.15);"></span>泛内容 '+genPct+'% (目标10%)</span>';
+    var rtEl = document.getElementById('ratioTip');
+    if (rtEl) rtEl.textContent = corePct < 50 ? '⚠️ 核心内容占比过低，打标期建议核心内容>70%，否则算法无法识别账号标签' : corePct >= 70 ? '✅ 核心占比达标，标签识别良好' : '核心占比接近目标，继续保持';
+
+    // 任务清单
+    var tasks = lo.tasks || [];
+    var ltEl = document.getElementById('launchTasks');
+    if (ltEl) ltEl.innerHTML = tasks.map(function(t,i){
+      return '<div class="task-item"><div class="task-check"></div><span>'+t+'</span></div>';
+    }).join('');
+
+    // 避坑提醒
+    var pitfalls = (lo.pitfalls||[]).filter(function(p){return p.active;});
+    var pfEl = document.getElementById('pitfallList');
+    if (pfEl) pfEl.innerHTML = pitfalls.map(function(p){
+      return '<div class="pitfall-item '+p.level+'"><span>'+(p.level==='high'?'🔴':p.level==='mid'?'🟡':'⚪')+'</span><span>'+p.text+'</span></div>';
+    }).join('');
+  }
+
+  // 从现有数据生成起号运营信息
+  function generateLaunchOps() {
+    var hotwords = DATA.hotwords || [];
+    var topics = DATA.topics || [];
+    var works = DATA.works || [];
+
+    // 核心关键词 = TOP10热词
+    var coreKws = hotwords.slice(0, 10).map(function(h) { return h.keyword; });
+
+    // 标签健康度 = 选题中覆盖核心关键词的比例
+    var coreCoverage = 0;
+    if (topics.length && coreKws.length) {
+      var covered = topics.filter(function(t) {
+        return coreKws.some(function(kw) { return (t.title || '').indexOf(kw) >= 0; });
+      }).length;
+      coreCoverage = Math.round(covered / topics.length * 100);
+    }
+    var tagHealth = Math.min(95, Math.round(coreCoverage * 0.7 + 20));
+
+    // 内容配比 = 基于选题分类
+    var coreCount = 0, relCount = 0, genCount = 0;
+    topics.forEach(function(t) {
+      var cat = t.category || '';
+      if (cat.indexOf(cfg('name','AI')) >= 0 || cat.indexOf('工具') >= 0 || cat.indexOf('工作流') >= 0) coreCount++;
+      else if (cat.indexOf('教程') >= 0 || cat.indexOf('测评') >= 0) relCount++;
+      else genCount++;
+    });
+    if (topics.length === 0) { coreCount = 14; relCount = 4; genCount = 2; }
+
+    // 起号日 = 数据采集日
+    var startDate = (DATA.last_update || '2026-09-01').slice(0, 10);
+    var today = new Date();
+    var start = new Date(startDate);
+    var days = Math.max(1, Math.floor((today - start) / 86400000) + 1);
+
+    return {
+      phase: days <= 7 ? '打标期' : days <= 14 ? '验证期' : '放大期',
+      desc: days <= 7 ? '聚焦垂直内容，让算法识别账号标签' : days <= 14 ? '验证标签精准度，测试爆款选题' : '放大爆款，矩阵化运营',
+      start_date: startDate,
+      days: Math.min(days, 14),
+      tag_health: tagHealth,
+      core_coverage: coreCoverage,
+      core_keywords: coreKws,
+      content_ratio: { core: coreCount, related: relCount, general: genCount },
+      tasks: [
+        cfg('launch.daily_content', '每日发布1条核心领域垂直内容（口播+素材混剪）'),
+        '选题覆盖TOP5飙升热词，标题包含关键词',
+        '发布时间选择18:00-21:00黄金时段',
+        '前3秒钩子用数字/痛点/对比型',
+        '评论区置顶引流话术，引导扣"1"领资料',
+        '发布后30分钟内回复前10条评论',
+        '关注5个对标账号，拆解其爆款结构'
+      ],
+      pitfalls: [
+        { level: 'high', active: true, text: '不要发泛娱乐/蹭热点内容，会打乱账号标签' },
+        { level: 'high', active: true, text: '不要频繁删视频/隐藏视频，影响账号权重' },
+        { level: 'mid', active: true, text: '不要买粉/买赞，算法会识别异常流量' },
+        { level: 'mid', active: true, text: '打标期不要接广告/带货，保持内容纯净度' },
+        { level: 'low', active: true, text: '视频时长控制在60-90秒，完播率更优' }
+      ]
+    };
+  }
+
+  if (window.Module) {
+    Module.register({
+      id: "launchOps",
+      render: function() {
+        try { renderLaunchOps(); } catch(e) { console.error("[launchOps]", e); }
+      }
+    });
+  }
+  window.renderLaunchOps = renderLaunchOps;
+  window.generateLaunchOps = generateLaunchOps;
+})();
+
+
+/* ===== src/modules/audience.js ===== */
+
+/**
+ * modules/audience.js
+ * 函数: renderAudience
+ * 依赖: ['audience_personas']
+ */
+(function() {
+  'use strict';
+
+  // renderAudience
+  function renderAudience() {
+    const personas = DATA.audience_personas || [];
+    if (!personas.length) {
+      document.getElementById('personaGrid').innerHTML = '<p style="color:var(--text-secondary)">暂无人群画像数据</p>';
+      return;
+    }
+  
+    // 分布柱状图
+    const chartDom = document.getElementById('audienceChart');
+    if (chartDom && typeof echarts !== 'undefined') {
+      const chart = echarts.init(chartDom);
+      chart.setOption({
+        grid: { left: 80, right: 20, top: 10, bottom: 20 },
+        xAxis: { type: 'value', axisLabel: { color: '#9ca3af', fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
+        yAxis: { type: 'category', data: personas.map(p => p.name).reverse(), axisLabel: { color: '#d1d5db', fontSize: 12 } },
+        series: [{
+          type: 'bar',
+          data: personas.map(p => Math.max(p.proportion, 0.5)).reverse(),
+          itemStyle: { color: new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#8b5cf6'},{offset:1,color:'#ec4899'}]), borderRadius: [0,4,4,0] },
+          barWidth: 16,
+          label: { show: true, position: 'right', color: '#c4b5fd', fontSize: 11, formatter: '{c}%' }
+        }]
+      });
+    }
+  
+    // 画像卡片
+    const grid = document.getElementById('personaGrid');
+    grid.innerHTML = personas.map(p => `
+      <div class="persona-card">
+        <div class="persona-name">${p.name}</div>
+        <div class="persona-cat">${p.category} · 占比 ${Math.max(p.proportion,0.1)}%</div>
+        <div class="persona-meta">
+          <span>${p.age}</span>
+          <span>${p.gender}</span>
+        </div>
+        <div class="persona-tags">
+          ${(p.traits||[]).map(t => '<span class="persona-tag">'+t+'</span>').join('')}
+        </div>
+        <div class="persona-section">
+          <div class="persona-label">核心需求</div>
+          <div class="persona-needs">
+            ${(p.needs||[]).map(n => '<span class="need-tag">'+n+'</span>').join('')}
+          </div>
+        </div>
+        <div class="persona-section">
+          <div class="persona-label">内容偏好</div>
+          <div class="persona-value">${p.content_pref}</div>
+        </div>
+        <div class="persona-section">
+          <div class="persona-label">活跃时间</div>
+          <div class="persona-value">${p.active_time}</div>
+        </div>
+        <div class="persona-section">
+          <div class="persona-label">变现方式</div>
+          <div class="persona-value" style="color:#c4b5fd">${p.monetization}</div>
+        </div>
+        <div class="persona-section">
+          <div class="persona-label">痛点</div>
+          <div class="persona-needs">
+            ${(p.pain_points||[]).map(pp => '<span class="pain-tag">'+pp+'</span>').join('')}
+          </div>
+        </div>
+        <div class="persona-bar"><div class="persona-bar-fill" style="width:${Math.min(Math.max(p.proportion,1),100)}%"></div></div>
+      </div>
+    `).join('');
+  }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "audience",
+      requiredFields: ['audience_personas'],
+      render: function(data) {
+        try { renderAudience(data); } catch(e) { console.error("[audience]", e); }
+      }
+    });
+  }
+  window.renderAudience = renderAudience;
+})();
+
+
+/* ===== src/modules/engagement.js ===== */
+
+/**
+ * modules/engagement.js
+ * 函数: renderEngagement
+ * 从works数据直接计算互动质量
+ */
+(function() {
+  'use strict';
+
+  function renderEngagement() {
+    var works = (DATA.works || []).filter(function(w) { return (w.likeCount || 0) > 0; });
+    if (!works.length) {
+      var el1 = document.getElementById('avgCommentRate');
+      if (el1) el1.textContent = '0%';
+      var el2 = document.getElementById('avgCollectRate');
+      if (el2) el2.textContent = '0%';
+      var listEl = document.getElementById('highCommentList');
+      if (listEl) listEl.innerHTML = '<div style="font-size:11px;color:var(--text-tertiary);">暂无数据</div>';
+      return;
+    }
+    // 计算每条作品的评论率和收藏率（以点赞数为分母）
+    var withRates = works.map(function(w) {
+      var likes = w.likeCount || 1;
+      return {
+        title: w.title || '无标题',
+        platform: w.platform || 'douyin',
+        comment_rate: Math.round((w.commentCount || 0) / likes * 1000) / 10,
+        collect_rate: Math.round((w.collectCount || 0) / likes * 1000) / 10,
+        comments: w.commentCount || 0,
+        collects: w.collectCount || 0,
+        likes: likes
+      };
+    });
+    var avgComment = Math.round(withRates.reduce(function(s, w) { return s + w.comment_rate; }, 0) / withRates.length * 10) / 10;
+    var avgCollect = Math.round(withRates.reduce(function(s, w) { return s + w.collect_rate; }, 0) / withRates.length * 10) / 10;
+
+    var el1 = document.getElementById('avgCommentRate');
+    if (el1) el1.textContent = avgComment + '%';
+    var el2 = document.getElementById('avgCollectRate');
+    if (el2) el2.textContent = avgCollect + '%';
+
+    var listEl = document.getElementById('highCommentList');
+    if (!listEl) return;
+    var top = withRates.sort(function(a, b) { return b.comment_rate - a.comment_rate; }).slice(0, 5);
+    var html = top.map(function(w) {
+      var shortTitle = w.title.length > 22 ? w.title.substring(0, 22) + '…' : w.title;
+      var platLabel = w.platform === 'xiaohongshu' ? '小红书' : '抖音';
+      return '<div class="engage-item"><span class="ei-title">' + shortTitle + '</span><span class="ei-rate">' + w.comment_rate + '%</span><span class="ei-plat">' + platLabel + '</span></div>';
+    }).join('');
+    listEl.innerHTML = html || '<div style="font-size:11px;color:var(--text-tertiary);">暂无数据</div>';
+  }
+
+  if (window.Module) {
+    Module.register({
+      id: "engagement",
+      render: function() {
+        try { renderEngagement(); } catch(e) { console.error("[engagement]", e); }
+      }
+    });
+  }
+  window.renderEngagement = renderEngagement;
+})();
+
+
+/* ===== src/modules/topicPerf.js ===== */
+
+/**
+ * modules/topicPerf.js
+ * 函数: renderTopicPerf, recordPerf, calcHitRate, getPerfData, savePerfData
+ * 依赖: ['topic_performance']
+ */
+(function() {
+  'use strict';
+
+  // renderTopicPerf
+  function renderTopicPerf() {
+    const perf = DATA.topic_performance;
+    if (!perf) { document.getElementById('topicPerfContent').innerHTML='<p style="color:var(--text-secondary)">暂无数据</p>'; return; }
+    let html = '<div class="gene-grid">';
+    html += '<div class="gene-card"><h4>选题总数</h4><div class="gene-val">'+(perf.total_topics||0)+'</div></div>';
+    html += '<div class="gene-card"><h4>已发布</h4><div class="gene-val">'+(perf.published||0)+'</div></div>';
+    html += '<div class="gene-card"><h4>命中率</h4><div class="gene-val">'+(perf.hit_rate||0)+'%</div></div>';
+    html += '</div>';
+    if (perf.note) { html += '<p style="margin-top:12px;font-size:13px;color:var(--text-secondary)">'+perf.note+'</p>'; }
+    document.getElementById('topicPerfContent').innerHTML = html;
+  }
+
+  // recordPerf
+  function recordPerf(title) {
+    var views = prompt('请输入播放量（数字）：', '');
+    if (views === null) return;
+    var likes = prompt('请输入点赞数（数字）：', '');
+    if (likes === null) return;
+    var followers = prompt('请输入涨粉数（数字）：', '');
+    if (followers === null) return;
+    var perf = getPerfData();
+    perf[title] = { views: parseInt(views)||0, likes: parseInt(likes)||0, followers: parseInt(followers)||0, date: new Date().toLocaleDateString() };
+    savePerfData(perf);
+    renderTopics();
+    updateTracker();
+    alert('效果数据已保存！');
+  }
+
+  // calcHitRate
+  function calcHitRate() {
+    var perf = getPerfData();
+    var published = Object.keys(perf).length;
+    if (published === 0) return { rate: 0, avgViews: 0, avgLikes: 0, total: 0 };
+    var totalViews = 0, totalLikes = 0, hits = 0;
+    Object.values(perf).forEach(function(p) {
+      totalViews += p.views; totalLikes += p.likes;
+      if (p.views >= 10000) hits++;
+    });
+    return { rate: Math.round(hits/published*100), avgViews: Math.round(totalViews/published), avgLikes: Math.round(totalLikes/published), total: published };
+  }
+
+  // getPerfData
+  function getPerfData() {
+    try { return JSON.parse(localStorage.getItem('topic_perf') || '{}'); } catch(e) { return {}; }
+  }
+
+  // savePerfData
+  function savePerfData(d) { localStorage.setItem('topic_perf', JSON.stringify(d)); }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "topicPerf",
+      requiredFields: [],
+      render: function(data) {
+        try { renderTopicPerf(data); } catch(e) { console.error("[topicPerf]", e); }
+      }
+    });
+  }
+  window.renderTopicPerf = renderTopicPerf;
+  window.recordPerf = recordPerf;
+  window.calcHitRate = calcHitRate;
+  window.getPerfData = getPerfData;
+  window.savePerfData = savePerfData;
+})();
+
+
+/* ===== src/modules/kanban.js ===== */
+
+/**
+ * modules/kanban.js
+ * 函数: renderKanban, getAllKanbanStatus, getTopicStatus, setTopicStatus, cycleKanbanStatus, cycleKanbanStatusByTitle, getKanbanStatus, resetKanbanStatus
+ * 依赖: ['topics']
+ */
+(function() {
+  'use strict';
+
+  // renderKanban
+  function renderKanban() {
+    const board = document.getElementById('kanbanBoard');
+    if (!board) return;
+    const topics = DATA.topics || [];
+    const cols = { pending: [], shooting: [], published: [] };
+    const allStatus = getAllKanbanStatus();
+    topics.forEach(function(t) {
+      const s = allStatus[t.title] || 'pending';
+      if (!cols[s]) cols[s] = [];
+      cols[s].push(t);
+    });
+    const colConfig = [
+      { key: 'pending', title: '待拍摄', color: '#f59e0b' },
+      { key: 'shooting', title: '拍摄中', color: '#3b82f6' },
+      { key: 'published', title: '已发布', color: '#10b981' }
+    ];
+    board.innerHTML = colConfig.map(function(c) {
+      const items = (cols[c.key] || []).map(function(t) {
+        const pname = (t.target_persona && t.target_persona.name) ? t.target_persona.name : '通用';
+        const plat = t.platform === 'douyin' ? '抖音' : '小红书';
+        return '<div class="kanban-card ' + c.key + '">' +
+          '<div class="kanban-card-title">' + t.title + '</div>' +
+          '<div class="kanban-card-meta"><span>' + pname + '</span><span>' + t.priority + '优先</span><span>' + plat + '</span></div>' +
+          '<div class="kanban-card-actions">' +
+          '<button class="kanban-btn" onclick="cycleKanbanStatusByTitle(\'' + t.title.replace(/'/g, "\\'") + '\')">切换状态</button>' +
+          '<button class="kanban-btn" onclick="generateScript(\'' + t.title.replace(/'/g, "\\'") + '\')">生成脚本</button>' +
+          '</div></div>';
+      }).join('');
+      return '<div class="kanban-column">' +
+        '<div class="kanban-col-head"><span class="kanban-col-title" style="color:' + c.color + '">' + c.title + '</span>' +
+        '<span class="kanban-col-count">' + (cols[c.key] || []).length + '</span></div>' +
+        (items || '<div style="font-size:11px;color:var(--text-tertiary);text-align:center;padding:20px;">暂无</div>') +
+        '</div>';
+    }).join('');
+  }
+
+  // getAllKanbanStatus
+  function getAllKanbanStatus() {
+    try { return JSON.parse(localStorage.getItem('ai_hotspot_status') || '{}'); } catch(e) { return {}; }
+  }
+
+  // getTopicStatus
+  function getTopicStatus(title) {
+    const all = getAllKanbanStatus();
+    return all[title] || 'pending';
+  }
+
+  // setTopicStatus
+  function setTopicStatus(title, status) {
+    const all = getAllKanbanStatus();
+    all[title] = status;
+    localStorage.setItem('ai_hotspot_status', JSON.stringify(all));
+    renderKanban();
+    renderTopics();
+  }
+
+  // cycleKanbanStatus
+  function cycleKanbanStatus(i, title) {
+    const status = getKanbanStatus();
+    const cur = status[title] || 'pending';
+    const next = cur==='pending'?'shooting':cur==='shooting'?'published':'pending';
+    if (next==='pending') delete status[title]; else status[title]=next;
+    localStorage.setItem('ai_hotspot_status', JSON.stringify(status));
+    const card = document.getElementById('topic-'+i);
+    card.className = card.className.replace(/status-\w+/, 'status-'+next);
+    card.querySelector('.status-badge').textContent = next==='pending'?'待拍摄':next==='shooting'?'拍摄中':'已发布';
+    updateTracker();
+  }
+
+  // cycleKanbanStatusByTitle
+  function cycleKanbanStatusByTitle(title) {
+    const topic = DATA.topics.find(function(t) { return t.title === title; });
+    if (!topic) return;
+    const idx = DATA.topics.indexOf(topic);
+    cycleKanbanStatus(idx, title);
+  }
+
+  // getKanbanStatus
+  function getKanbanStatus() { try { return JSON.parse(localStorage.getItem('ai_hotspot_status')||'{}'); } catch(e) { return {}; } }
+
+  // resetKanbanStatus
+  function resetKanbanStatus() { localStorage.removeItem('ai_hotspot_status'); renderTopics(); }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "kanban",
+      requiredFields: ['topics'],
+      render: function(data) {
+        try { renderKanban(data); } catch(e) { console.error("[kanban]", e); }
+      }
+    });
+  }
+  window.renderKanban = renderKanban;
+  window.getAllKanbanStatus = getAllKanbanStatus;
+  window.getTopicStatus = getTopicStatus;
+  window.setTopicStatus = setTopicStatus;
+  window.cycleKanbanStatus = cycleKanbanStatus;
+  window.cycleKanbanStatusByTitle = cycleKanbanStatusByTitle;
+  window.getKanbanStatus = getKanbanStatus;
+  window.resetKanbanStatus = resetKanbanStatus;
+})();
+
+
+/* ===== src/modules/favorites.js ===== */
+
+/**
+ * modules/favorites.js
+ * 函数: getFavorites, isFavorite, toggleFavorite, renderFavorites, removeFavorite
+ * 依赖: 无
+ */
+(function() {
+  'use strict';
+
+  // getFavorites
+  function getFavorites() {
+    return JSON.parse(localStorage.getItem('viral_favorites') || '[]');
+  }
+
+  // isFavorite
+  function isFavorite(i) { const favs = JSON.parse(localStorage.getItem("viral_favorites") || "[]"); return favs.some(f => f.title === DATA.hot_breakdowns[i]?.title); }
+
+  // toggleFavorite
+  function toggleFavorite(index) {
+    const favs = getFavorites();
+    const work = DATA.hot_breakdowns[index];
+    const exists = favs.findIndex(function(f) { return f.title === work.title; });
+    if (exists >= 0) { favs.splice(exists, 1); } else { favs.push(work); }
+    localStorage.setItem('viral_favorites', JSON.stringify(favs));
+    renderBreakdowns();
+    renderFavorites();
+  }
+
+  // renderFavorites
+  function renderFavorites() {
+    const grid = document.getElementById('favoritesGrid');
+    if (!grid) return;
+    const favs = getFavorites();
+    if (!favs.length) {
+      grid.innerHTML = '<div class="empty-state">还没有收藏，点击爆款拆解卡片右上角的☆收藏</div>';
+      return;
+    }
+    grid.innerHTML = favs.map(function(b, i) {
+      const pname = (b.target_persona && b.target_persona.name) ? b.target_persona.name : '';
+      return '<div class="breakdown-card">' +
+        '<div class="bd-header"><div class="bd-title">' + (i+1) + '. ' + b.title + '</div>' +
+        '<div style="display:flex;align-items:center;gap:8px;">' +
+        '<button class="fav-btn active" onclick="removeFavorite(' + i + ')" title="取消收藏">⭐</button>' +
+        '<div class="bd-likes">' + (b.likes/10000).toFixed(1) + '万</div></div></div>' +
+        '<div class="bd-row"><span class="bd-label">钩子</span><span class="bd-val">' + b.hook + '型</span></div>' +
+        '<div class="bd-row"><span class="bd-label">结构</span><span class="bd-val">' + b.structure + '</span></div>' +
+        '<div class="bd-row"><span class="bd-label">CTA</span><span class="bd-val">' + b.cta + '</span></div>' +
+        (pname ? '<div class="bd-row"><span class="bd-label">人群</span><span class="bd-val"><span style="color:#22d3ee;font-weight:600">' + pname + '</span></span></div>' : '') +
+        '<div class="bd-meta"><span>' + b.author + '</span><span><a href="' + (b.work_url || '#') + '" target="_blank" class="work-link">原视频</a></span></div>' +
+        '</div>';
+    }).join('');
+  }
+
+  // removeFavorite
+  function removeFavorite(index) {
+    const favs = getFavorites();
+    favs.splice(index, 1);
+    localStorage.setItem('viral_favorites', JSON.stringify(favs));
+    renderFavorites();
+    renderBreakdowns();
+  }
+
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "favorites",
+      render: function() {
+        try { renderFavorites(); } catch(e) { console.error("[favorites]", e); }
+      }
+    });
+  }
+
+  window.getFavorites = getFavorites;
+  window.isFavorite = isFavorite;
+  window.toggleFavorite = toggleFavorite;
+  window.renderFavorites = renderFavorites;
+  window.removeFavorite = removeFavorite;
+})();
+
+
+/* ===== src/modules/credit.js ===== */
+
+/**
+ * modules/credit.js
+ * 函数: renderCreditMonitor
+ * 依赖: 无
+ */
+(function() {
+  'use strict';
+
+  // renderCreditMonitor
+  function renderCreditMonitor() {
+    // 估算：每天约13次API调用，每次0.4积分 = 每天5.2积分
+    var dailyCost = 5.2;
+    var today = new Date();
+    var dayOfMonth = today.getDate();
+    var estimatedMonthly = dailyCost * 30;
+    var usedSoFar = dailyCost * dayOfMonth;
+    var pct = Math.min(usedSoFar / 1000 * 100, 100);
+    var html = '<span>💰 积分</span>';
+    html += '<div class="cm-bar"><div class="cm-fill" style="width:' + pct + '%"></div></div>';
+    html += '<span>已用' + Math.round(usedSoFar) + '/1000</span>';
+    // 插入到hero区域或导航栏
+    var heroStats = document.querySelector('.hero-stats');
+    if (heroStats && !document.getElementById('creditMonitor') && heroStats.parentNode) {
+      var monitor = document.createElement('div');
+      monitor.id = 'creditMonitor';
+      monitor.className = 'credit-monitor';
+      monitor.innerHTML = html;
+      heroStats.parentNode.insertBefore(monitor, heroStats.nextSibling);
+    }
+  }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "credit",
+      requiredFields: [],
+      render: function(data) {
+        try { renderCreditMonitor(data); } catch(e) { console.error("[credit]", e); }
+      }
+    });
+  }
+  window.renderCreditMonitor = renderCreditMonitor;
+})();
+
+
+/* ===== src/modules/scriptGen.js ===== */
+
+/**
+ * modules/scriptGen.js
+ * 函数: generateScript, closeScriptModal, copyScript
+ * 依赖: 无
+ */
+(function() {
+  'use strict';
+
+  // generateScript
+  function generateScript(title) {
+    const topic = DATA.topics.find(function(t) { return t.title === title; });
+    if (!topic) return;
+    const persona = topic.target_persona || {};
+    const needs = (persona.needs || []).slice(0, 2).join('、');
+    const script = {
+      opening: '【0-3秒】' + topic.hook + '\n画面：数字人正面出镜，背景用' + cfg('script_templates.bg_desc', '生成的') + topic.keyword + '相关场景\n字幕：大字突出关键词',
+      body: '【3-30秒】核心内容\n1. 痛点引入：' + (needs ? '你是不是也在为"' + needs + '"发愁？' : '很多人不知道这个技巧') + '\n2. 方法拆解：分3步讲清楚' + topic.keyword + '的核心用法\n3. 案例展示：用AI生成的实际效果画面佐证\n画面：数字人口播+AI素材混剪，每5秒切一次画面',
+      cta: '【最后5秒】引导行动\n"' + cfg('script_templates.follow_cta', '关注我，每天分享一个实用技巧') + '"\n"' + cfg('script_templates.comment_cta', '评论区扣1，发你完整工具包') + '"\n画面：数字人指向关注按钮+账号二维码',
+      subtitles: '字幕要点：' + topic.keyword + '、' + (needs || '实用技巧') + '、关注领取\nBGM：轻快科技感纯音乐，音量-15db',
+      seo: '标签：' + cfg('script_templates.hashtag_prefix', '#') + topic.keyword.replace(/\s/g, '') + ' #AI工具 #干货分享\n发布时间：' + (persona.active_time || '19:00-21:00')
+    };
+    const modal = document.getElementById('scriptModal');
+    document.getElementById('scriptModalTitle').textContent = '脚本：' + topic.title.slice(0, 20);
+    document.getElementById('scriptModalContent').innerHTML =
+      '<div class="script-section"><div class="script-section-label">钩子标题</div><div class="script-section-content">' + topic.hook + '</div></div>' +
+      '<div class="script-section"><div class="script-section-label">开头（0-3秒）</div><div class="script-section-content">' + script.opening + '</div></div>' +
+      '<div class="script-section"><div class="script-section-label">正文（3-30秒）</div><div class="script-section-content">' + script.body + '</div></div>' +
+      '<div class="script-section"><div class="script-section-label">结尾CTA</div><div class="script-section-content">' + script.cta + '</div></div>' +
+      '<div class="script-section"><div class="script-section-label">字幕/BGM</div><div class="script-section-content">' + script.subtitles + '</div></div>' +
+      '<div class="script-section"><div class="script-section-label">标签/发布</div><div class="script-section-content">' + script.seo + '</div></div>';
+    modal.classList.add('active');
+    window._currentScript = '【钩子】' + topic.hook + '\n\n【开头】' + script.opening + '\n\n【正文】' + script.body + '\n\n【结尾】' + script.cta + '\n\n【字幕/BGM】' + script.subtitles + '\n\n【标签/发布】' + script.seo;
+  }
+
+  // closeScriptModal
+  function closeScriptModal() {
+    document.getElementById('scriptModal').classList.remove('active');
+  }
+
+  // copyScript
+  function copyScript(el) {
+    var text = el.previousElementSibling.textContent;
+    var ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    el.textContent = '✅ 已复制';
+    setTimeout(function(){ el.textContent = '📋 复制话术'; }, 2000);
+  }
+
+  window.generateScript = generateScript;
+  window.closeScriptModal = closeScriptModal;
+  window.copyScript = copyScript;
+})();
+
+
+/* ===== src/modules/comparison.js ===== */
+
+/**
+ * modules/comparison.js
+ * 函数: renderComparison
+ * 依赖: ['comparison']
+ */
+(function() {
+  'use strict';
+
+  // renderComparison
+  function renderComparison() {
+    const comp = DATA.comparison || {};
+    const ps = comp.platform_summary || {};
+    const dy = ps.douyin || {};
+    const xhs = ps.xiaohongshu || {};
+    function fmt(n) { return n >= 10000 ? (n/10000).toFixed(1) + '万' : n.toLocaleString(); }
+    document.getElementById('compareSummary').innerHTML = `
+      <div class="compare-card douyin"><h4><span class="compare-tag dy">抖音</span>平台概览</h4>
+        <div class="stat-row"><span class="stat-label">覆盖关键词</span><span class="stat-value">${dy.total_keywords || 0} 个</span></div>
+        <div class="stat-row"><span class="stat-label">作品总量</span><span class="stat-value">${fmt(dy.total_works || 0)}</span></div>
+        <div class="stat-row"><span class="stat-label">平均点赞</span><span class="stat-value">${fmt(dy.avg_like || 0)}</span></div>
+      </div>
+      <div class="compare-card xiaohongshu"><h4><span class="compare-tag xhs">小红书</span>平台概览</h4>
+        <div class="stat-row"><span class="stat-label">覆盖关键词</span><span class="stat-value">${xhs.total_keywords || 0} 个</span></div>
+        <div class="stat-row"><span class="stat-label">笔记总量</span><span class="stat-value">${fmt(xhs.total_works || 0)}</span></div>
+        <div class="stat-row"><span class="stat-label">平均点赞</span><span class="stat-value">${fmt(xhs.avg_like || 0)}</span></div>
+      </div>`;
+    const tbody = document.querySelector('#overlapTable tbody');
+    tbody.innerHTML = (comp.overlapping || []).map(o => `<tr>
+      <td><strong>${o.keyword}</strong></td><td>${o.category || ''}</td>
+      <td>${fmt(o.douyin_total)}</td><td>${fmt(o.xhs_total)}</td>
+      <td>${fmt(o.douyin_max_like)}</td><td>${fmt(o.xhs_max_like)}</td>
+      <td><span class="compare-tag ${o.hotter_platform === 'douyin' ? 'dy' : 'xhs'}">${o.hotter_platform === 'douyin' ? '抖音' : '小红书'}</span></td>
+    </tr>`).join('');
+    document.getElementById('dyOnlyList').innerHTML = (comp.douyin_only || []).map(i => `<div class="stat-row"><span class="stat-label">${i.keyword}</span><span class="stat-value">${fmt(i.total)}</span></div>`).join('');
+    document.getElementById('xhsOnlyList').innerHTML = (comp.xhs_only || []).map(i => `<div class="stat-row"><span class="stat-label">${i.keyword}</span><span class="stat-value">${fmt(i.total)}</span></div>`).join('');
+  }
+
+  // 模块注册
+  if (window.Module) {
+    Module.register({
+      id: "comparison",
+      requiredFields: ['comparison'],
+      render: function(data) {
+        try { renderComparison(data); } catch(e) { console.error("[comparison]", e); }
+      }
+    });
+  }
+  window.renderComparison = renderComparison;
+})();
