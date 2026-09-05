@@ -82,8 +82,11 @@
       id: "hero",
       requiredFields: ['hotwords', 'works', 'topics'],
       render: function(data) {
-        try { renderHeroStats(data.hotwords, data.works, data.topics); renderActions(data); renderInsights(data); } catch(e) { console.error("[hero]", e); }
+        try { renderHeroStats(data.hotwords, data.works, data.topics); renderActions(data); renderInsights(data.hotwords, data.works); } catch(e) { console.error("[hero]", e); }
       }
     });
   }
+  window.renderHeroStats = renderHeroStats;
+  window.renderActions = renderActions;
+  window.renderInsights = renderInsights;
 })();
