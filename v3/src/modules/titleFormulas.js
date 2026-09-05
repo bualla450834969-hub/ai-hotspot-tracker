@@ -8,7 +8,7 @@
 
   // renderTitleFormulas
   function renderTitleFormulas() {
-    var formulas = DATA.title_formulas_extracted || [];
+    var formulas = DATA.title_formulas || [];
     var examples = {
       '感叹句': '太绝了！这个AI工具让我效率提升10倍',
       '教程型': '手把手教你用AI做XX，3分钟上手',
@@ -44,7 +44,7 @@
   if (window.Module) {
     Module.register({
       id: "titleFormulas",
-      requiredFields: ['title_formulas_extracted'],
+      requiredFields: ['title_formulas'],
       render: function(data) {
         try { renderTitleFormulas(data); } catch(e) { console.error("[titleFormulas]", e); }
       }
