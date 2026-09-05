@@ -157,7 +157,7 @@
       id: "works",
       requiredFields: ['works'],
       render: function(data) {
-        try { renderWorksTable(data); renderSmallViral(data); renderAuthors(data); renderCompetitorWorks(data); } catch(e) { console.error("[works]", e); }
+        try { renderWorksTable(data); renderSmallViral(data); renderAuthors(data); renderCompetitorWorks(data); renderFormatDist(data); } catch(e) { console.error("[works]", e); }
       }
     });
   }
