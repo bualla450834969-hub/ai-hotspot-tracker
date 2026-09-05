@@ -1,41 +1,51 @@
 {
-  "domain": "ai",
-  "name": "AI热点追踪",
-  "keywords": ["AI", "AI工具", "AI做图", "AI视频", "AI编程", "Agent", "自动化", "工作流", "提示词", "数字人"],
-  "platforms": ["douyin", "xiaohongshu"],
-  "modules": {
-    "hero": true,
-    "hotwords": true,
-    "works": true,
-    "topics": true,
-    "techradar": true,
-    "breakdown": true,
-    "viralGenes": true,
-    "publishTime": true,
-    "titleFormulas": true,
-    "leadScripts": true,
-    "launchOps": true,
-    "audience": true,
-    "engagement": true,
-    "topicPerf": true,
-    "kanban": true,
-    "credit": true,
-    "comparison": true
-  },
+  "id": "ai",
+  "name": "AI",
+  "display_name": "AI热点追踪",
+  "collect_keywords": [
+    ["AI", "AI大类"],
+    ["AI工具", "AI工具"],
+    ["AI做图", "AI做图"],
+    ["AI修图", "AI修图"],
+    ["AI绘画", "AI做图"],
+    ["AI视频", "AI视频"],
+    ["AI数字人", "AI数字人"],
+    ["AI写作", "AI写作"],
+    ["AI办公", "AI办公"],
+    ["AI工作流", "AI工作流"],
+    ["AI自动化", "AI自动化"],
+    ["AI编程", "AI编程"],
+    ["AI PPT", "AI PPT"],
+    ["AI音乐", "AI音乐"],
+    ["AI搜索", "AI搜索"],
+    ["AI Agent", "AI Agent"],
+    ["AI提示词", "AI大类"],
+    ["扣子", "Coze扣子"],
+    ["Coze", "Coze扣子"],
+    ["WorkBuddy", "WorkBuddy"],
+    ["n8n", "n8n"],
+    ["Dify", "Dify"],
+    ["即梦AI", "AI做图"],
+    ["可灵AI", "AI视频"],
+    ["豆包AI", "AI大类"]
+  ],
+  "core_keywords": ["AI工具", "AI工作流", "AI数字人", "AI Agent", "WorkBuddy", "Dify", "Coze", "n8n"],
+  "exclude_keywords": ["AI"],
   "brand": {
     "name_en": "PYRALUMA",
     "name_cn": "璃火矩创",
     "slogan": "AI Intelligence"
   },
-  "colors": {
-    "primary": "#8b5cf6",
-    "accent": "#30D158",
-    "bg": "#0a0a0f"
+  "collect_schedule": {
+    "s_level_days": 1,
+    "a_level_days": 2,
+    "b_level_days": 3,
+    "c_level_days": 7,
+    "new_word_protection_days": 7
   },
-  "audience_personas": [
-    {"name": "技术极客", "ratio": 65.9, "needs": "高效工作流、进阶技巧、信息差"},
-    {"name": "职场效率党", "ratio": 20.3, "needs": "办公提效、快速上手"},
-    {"name": "内容创作者", "ratio": 10.2, "needs": "AI绘画、视频生成、数字人"},
-    {"name": "泛娱乐用户", "ratio": 3.6, "needs": "好玩、猎奇、视觉冲击"}
-  ]
+  "tech_radar": {
+    "github_days": 7,
+    "min_stars": 10,
+    "topics": ["ai", "llm", "agent", "generative-ai", "machine-learning"]
+  }
 }
