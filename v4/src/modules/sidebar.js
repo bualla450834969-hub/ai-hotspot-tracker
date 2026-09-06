@@ -128,7 +128,7 @@
     // 初始化侧边栏Logo（复用登录页Logo特效）
     var logoContainer = document.getElementById('sbLogoContainer');
     if (logoContainer && typeof createLogoSVG === 'function') {
-      logoContainer.innerHTML = createLogoSVG('sb', 36, 36);
+      logoContainer.innerHTML = createLogoSVG('sb', 36, 36, 1.5);
       var sbLogoSvg = logoContainer.querySelector('svg');
       if (sbLogoSvg && typeof initLogoEffect === 'function') {
         initLogoEffect(sbLogoSvg, 'sb');
