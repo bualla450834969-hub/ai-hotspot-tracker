@@ -20,8 +20,8 @@
       const chart = echarts.init(chartDom);
       chart.setOption({
         grid: { left: 80, right: 20, top: 10, bottom: 20 },
-        xAxis: { type: 'value', axisLabel: { color: '#9ca3af', fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
-        yAxis: { type: 'category', data: personas.map(p => p.name).reverse(), axisLabel: { color: '#d1d5db', fontSize: 12 } },
+        xAxis: { type: 'value', axisLabel: { color: '#6b5d4f', fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(139,90,43,0.06)' } } },
+        yAxis: { type: 'category', data: personas.map(p => p.name).reverse(), axisLabel: { color: '#4a3f35', fontSize: 12 } },
         series: [{
           type: 'bar',
           data: personas.map(p => Math.max(p.proportion, 0.5)).reverse(),
