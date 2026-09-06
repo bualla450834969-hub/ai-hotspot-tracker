@@ -11,21 +11,34 @@
     const list = DATA.hot_breakdowns || [];
     const el = document.getElementById('breakdownGrid');
     if (!list.length) { el.innerHTML='<div class="empty-state">暂无爆款拆解数据</div>'; return; }
-    el.innerHTML = list.map((b,i)=>`
-      <div class="breakdown-card">
-        <div class="bd-header">
-          <div class="bd-title">${i+1}. ${b.title}</div>
-          <div style="display:flex;align-items:center;gap:6px;"><button class="fav-btn ${isFavorite(i) ? 'active' : ''}" onclick="toggleFavorite(${i})" title="收藏">${isFavorite(i) ? '⭐' : '☆'}</button><div class="bd-likes">${(b.likes/10000).toFixed(1)}万</div></div>
-        </div>
-        <div class="bd-row"><span class="bd-label">钩子</span><span class="bd-val">${b.hook}型</span></div>
-        <div class="bd-row"><span class="bd-label">结构</span><span class="bd-val">${b.structure}</span></div>
-        <div class="bd-row"><span class="bd-label">CTA</span><span class="bd-val">${b.cta}</span></div>
-        ${b.target_persona ? `<div class="bd-row"><span class="bd-label">人群</span><span class="bd-val"><span style="color:#22d3ee;font-weight:600">${b.target_persona.name}</span> · ${b.target_persona.age} · ${(b.target_persona.needs||[]).slice(0,2).join(' / ')}</span></div>` : ''}
-        <div class="bd-meta">
-          <span>${b.author} · ${b.duration}</span>
-          <span>${b.interaction} · <a href="${b.work_url||'#'}" target="_blank" class="work-link">原视频</a></span>
-        </div>
-      </div>`).join('');
+    const isNotAI = cfg('id') !== 'ai';
+    const personas = cfg('audience_personas', []);
+    const defaultCTA = cfg('default_cta', '关注我，每天分享实用干货');
+    el.innerHTML = list.map(function(b,i) {
+      var cta = b.cta;
+      var persona = b.target_persona;
+      if (isNotAI) {
+        cta = defaultCTA;
+        if (personas.length) {
+          var p = personas[i % personas.length];
+          persona = { name: p.name, age: p.age, needs: p.needs || p.traits || [] };
+        }
+      }
+      return '<div class="breakdown-card">' +
+        '<div class="bd-header">' +
+          '<div class="bd-title">' + (i+1) + '. ' + b.title + '</div>' +
+          '<div style="display:flex;align-items:center;gap:6px;"><button class="fav-btn ' + (isFavorite(i) ? 'active' : '') + '" onclick="toggleFavorite(' + i + ')" title="收藏">' + (isFavorite(i) ? '⭐' : '☆') + '</button><div class="bd-likes">' + (b.likes/10000).toFixed(1) + '万</div></div>' +
+        '</div>' +
+        '<div class="bd-row"><span class="bd-label">钩子</span><span class="bd-val">' + b.hook + '型</span></div>' +
+        '<div class="bd-row"><span class="bd-label">结构</span><span class="bd-val">' + b.structure + '</span></div>' +
+        '<div class="bd-row"><span class="bd-label">CTA</span><span class="bd-val">' + cta + '</span></div>' +
+        (persona ? '<div class="bd-row"><span class="bd-label">人群</span><span class="bd-val"><span style="color:#22d3ee;font-weight:600">' + persona.name + '</span> · ' + persona.age + ' · ' + (persona.needs||[]).slice(0,2).join(' / ') + '</span></div>' : '') +
+        '<div class="bd-meta">' +
+          '<span>' + b.author + ' · ' + b.duration + '</span>' +
+          '<span>' + b.interaction + ' · <a href="' + (b.work_url||'#') + '" target="_blank" class="work-link">原视频</a></span>' +
+        '</div>' +
+      '</div>';
+    }).join('');
   }
 
   // renderMatrix
