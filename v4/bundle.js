@@ -3948,6 +3948,20 @@ if (document.readyState === 'loading') {
 
     document.body.appendChild(sidebar);
 
+    // 品牌轮播：logo与文字交替显示
+    var carousel = document.getElementById('brandCarousel');
+    var slideLogo = document.getElementById('brandSlideLogo');
+    var slideText = document.getElementById('brandSlideText');
+    if (carousel && slideLogo && slideText) {
+      var currentSlide = 0;
+      var slides = [slideLogo, slideText];
+      setInterval(function() {
+        slides[currentSlide].classList.remove('active');
+        currentSlide = (currentSlide + 1) % slides.length;
+        slides[currentSlide].classList.add('active');
+      }, 4000);
+    }
+
     // 初始化侧边栏Logo（复用登录页Logo特效）
     var logoContainer = document.getElementById('sbLogoContainer');
     if (logoContainer && typeof createLogoSVG === 'function') {
@@ -4103,4 +4117,16 @@ if (document.readyState === 'loading') {
   } else {
     initSidebar();
   }
-})();
+})();<div class="sidebar-brand">
+      <div class="brand-carousel" id="brandCarousel">
+        <div class="brand-slide brand-slide-logo active" id="brandSlideLogo">
+          <div class="sidebar-logo" id="sbLogoContainer"></div>
+        </div>
+        <div class="brand-slide brand-slide-text" id="brandSlideText">
+          <div class="sidebar-brand-text">
+            <div class="sb-brand-name">PYRALUMA</div>
+            <div class="sb-brand-tag">热点追踪工作台</div>
+          </div>
+        </div>
+      </div>
+    </div>
