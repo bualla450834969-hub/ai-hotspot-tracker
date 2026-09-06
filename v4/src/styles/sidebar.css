@@ -159,10 +159,21 @@ body.has-sidebar .back-to-top {
 /* 内容区调整 */
 body.has-sidebar .hero {
   padding: 32px 28px 24px;
+  filter: none !important;
+  opacity: 1 !important;
+  transform: none !important;
 }
 
-body.has-sidebar .section {
+body.has-sidebar section {
   padding: 24px 28px;
+  filter: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* 登录页在sidebar创建后永久隐藏 */
+body.has-sidebar .login-screen {
+  display: none !important;
 }
 
 body.has-sidebar .bento {
