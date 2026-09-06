@@ -295,3 +295,145 @@ hr, .divider {
 @media (max-width: 768px) {
   .hero-title { font-size: 28px !important; }
 }
+
+
+/* ===== 补充覆盖：修复残留暗色 ===== */
+
+/* Hero标题确保深色 */
+.hero-title, .hero-title * {
+  color: #1a1a1a !important;
+  text-shadow: none !important;
+}
+
+/* Hero大卡片 - 宣纸白 */
+.hero-card, .hero-stats, [class*="hero-card"], [class*="hero-stat"] {
+  background: rgba(255, 252, 245, 0.9) !important;
+  background-image: none !important;
+  border: 1px solid rgba(139, 90, 43, 0.2) !important;
+  box-shadow: 0 2px 12px rgba(80, 50, 20, 0.08) !important;
+}
+
+/* Hero大数字 */
+.hero-card .big-number, .hero-stats .big-number,
+.hero-card [class*="number"], .hero-stats [class*="number"] {
+  color: #8b0000 !important;
+  font-family: var(--font-calligraphy) !important;
+}
+
+/* Hero卡片文字 */
+.hero-card *, .hero-stats * {
+  color: var(--text) !important;
+}
+
+/* 所有渐变背景去除 */
+[style*="gradient"], [class*="gradient"] {
+  background-image: none !important;
+}
+
+/* 确保所有卡片文字深色 */
+.card *, .glass-card *, [class*="card"]:not(.sidebar-nav-item):not(.fav-btn) * {
+  color: var(--text) !important;
+}
+
+/* 标签内文字 */
+.tag * {
+  color: inherit !important;
+}
+
+/* 副标题/描述文字 */
+.subtitle, .desc, .description, [class*="subtitle"], [class*="desc"] {
+  color: var(--text-secondary) !important;
+}
+
+/* 英文副标题 */
+.hero-subtitle, [class*="hero-sub"] {
+  color: var(--text-tertiary) !important;
+  font-family: 'Georgia', serif;
+  letter-spacing: 3px;
+}
+
+/* 数据标签 */
+.stat-label, [class*="stat-label"] {
+  color: var(--text-secondary) !important;
+  font-size: 13px;
+}
+
+/* 按钮文字 */
+button *, .btn * {
+  color: inherit !important;
+}
+
+/* 平台筛选按钮 */
+.platform-btn.active * {
+  color: #fff !important;
+}
+
+/* 表格中的链接 */
+table a {
+  color: #8b0000 !important;
+}
+
+/* ECharts容器背景透明 */
+[class*="chart"], [id*="chart"], [id*="Chart"] {
+  background: transparent !important;
+}
+
+/* 积分条 */
+.credit-bar, [class*="credit"] {
+  background: rgba(139, 90, 43, 0.08) !important;
+}
+.credit-bar-fill, [class*="credit-fill"] {
+  background: linear-gradient(90deg, #b8860b, #daa520) !important;
+}
+
+/* Section标题 */
+.section-title {
+  color: #1a1a1a !important;
+  border-bottom: 2px solid rgba(139, 0, 0, 0.15);
+  padding-bottom: 8px;
+}
+
+.section-number {
+  color: #8b0000 !important;
+  font-family: var(--font-calligraphy);
+}
+
+/* 看板列 */
+.kanban-column, [class*="kanban-col"] {
+  background: rgba(255, 252, 245, 0.7) !important;
+  border: 1px solid rgba(139, 90, 43, 0.12) !important;
+}
+
+.kanban-item, [class*="kanban-item"] {
+  background: #fffdf7 !important;
+  border: 1px solid rgba(139, 90, 43, 0.1) !important;
+  box-shadow: 0 1px 4px rgba(80, 50, 20, 0.05) !important;
+}
+
+/* 爆款拆解卡片 */
+.breakdown-card {
+  background: #fffdf7 !important;
+  border-left: 3px solid #8b0000 !important;
+}
+
+.bd-label {
+  color: var(--text-tertiary) !important;
+}
+
+.bd-val {
+  color: var(--text) !important;
+}
+
+/* 人群画像卡片 */
+.persona-card, [class*="persona"] {
+  background: #fffdf7 !important;
+  border: 1px solid rgba(139, 90, 43, 0.15) !important;
+}
+
+/* 输入框/下拉框 */
+select, input, textarea {
+  background: rgba(255, 252, 245, 0.9) !important;
+  color: var(--text) !important;
+  border: 1px solid rgba(139, 90, 43, 0.2) !important;
+  border-radius: 2px !important;
+}
