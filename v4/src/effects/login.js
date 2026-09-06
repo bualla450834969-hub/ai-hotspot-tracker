@@ -5,6 +5,17 @@
 function initScrollReveal() {
   var vh = window.innerHeight;
   function update() {
+    // sidebar已创建（进入工作台）时，强制内容完全清晰显示
+    if (document.getElementById('appSidebar')) {
+      document.body.setAttribute('data-reveal', '1');
+      var els = document.querySelectorAll('.hero, section');
+      for (var i = 0; i < els.length; i++) {
+        els[i].style.filter = 'none';
+        els[i].style.opacity = '1';
+        els[i].style.transform = 'none';
+      }
+      return;
+    }
     var scrollY = window.scrollY;
     // 0 at top of login, 1 when scrolled past 80% of login screen
     var reveal = Math.min(1, Math.max(0, (scrollY - vh * 0.15) / (vh * 0.65)));
