@@ -10,11 +10,11 @@
   window.charts = {};
 
   // ===== ECharts 配色与样式常量 =====
-  window.PALETTE = ['#0A84FF', '#BF5AF2', '#FF375F', '#FF9F0A', '#30D158', '#64D2FF', '#FFD60A', '#FF6482', '#5E5CE6', '#C08FC0'];
-  window.TOOLTIP_BG = 'rgba(20,20,30,0.92)';
-  window.TOOLTIP_BORDER = 'rgba(100,100,140,0.3)';
-  window.TOOLTIP_TEXT = 'rgba(255,255,255,0.9)';
-  window.AXIS_COLOR = 'rgba(255,255,255,0.45)';
+  window.PALETTE = ['#8b0000', '#2c5f7c', '#b8860b', '#3d6b4f', '#6b4423', '#a0522d', '#4a4a4a', '#8b4513', '#556b2f', '#704214'];
+  window.TOOLTIP_BG = 'rgba(255, 252, 245, 0.96)';
+  window.TOOLTIP_BORDER = 'rgba(139, 90, 43, 0.3)';
+  window.TOOLTIP_TEXT = '#2c2416';
+  window.AXIS_COLOR = 'rgba(60, 45, 30, 0.65)';
   window.AXIS_LINE = 'rgba(139,90,43,0.2)';
   window.SPLIT_COLOR = 'rgba(139,90,43,0.08)';
 
