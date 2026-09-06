@@ -89,10 +89,16 @@
     const brand = document.createElement('div');
     brand.className = 'sidebar-brand';
     brand.innerHTML = `
-      <div class="sidebar-logo" id="sbLogoContainer"></div>
-      <div class="sidebar-brand-text">
-        <div class="sb-brand-name" id="sbBrandName">PYRALUMA</div>
-        <div class="sb-brand-tag">热点追踪工作台</div>
+      <div class="brand-carousel" id="brandCarousel">
+        <div class="brand-slide brand-slide-logo active" id="brandSlideLogo">
+          <div class="sidebar-logo" id="sbLogoContainer"></div>
+        </div>
+        <div class="brand-slide brand-slide-text" id="brandSlideText">
+          <div class="sidebar-brand-text">
+            <div class="sb-brand-name">PYRALUMA</div>
+            <div class="sb-brand-tag">热点追踪工作台</div>
+          </div>
+        </div>
       </div>
     `;
     sidebar.appendChild(brand);
@@ -295,15 +301,3 @@
     initSidebar();
   }
 })();<div class="sidebar-brand">
-      <div class="brand-carousel" id="brandCarousel">
-        <div class="brand-slide brand-slide-logo active" id="brandSlideLogo">
-          <div class="sidebar-logo" id="sbLogoContainer"></div>
-        </div>
-        <div class="brand-slide brand-slide-text" id="brandSlideText">
-          <div class="sidebar-brand-text">
-            <div class="sb-brand-name">PYRALUMA</div>
-            <div class="sb-brand-tag">热点追踪工作台</div>
-          </div>
-        </div>
-      </div>
-    </div>
