@@ -38,7 +38,7 @@
     /** 生成标签chip */
     chip(text, color = 'default') {
       const colors = {
-        default: 'rgba(255,255,255,0.08)',
+        default: 'rgba(139,90,43,0.1)',
         primary: 'rgba(139,92,246,0.15)',
         success: 'rgba(48,209,88,0.15)',
         warning: 'rgba(251,191,36,0.15)',
