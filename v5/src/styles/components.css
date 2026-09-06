@@ -1,0 +1,117 @@
+/* ===== components.css — 通用组件 ===== */
+
+/* ===== 按钮 ===== */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; border-radius: 8px; border: 1px solid var(--glass-border);
+  background: var(--glass-bg); color: var(--text); font-size: 12px;
+  cursor: pointer; transition: all 0.2s; backdrop-filter: blur(10px);
+}
+.btn:hover { background: rgba(255,255,255,0.1); transform: translateY(-1px); }
+.btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-light); }
+.btn-success { background: rgba(48,209,88,0.15); border-color: rgba(48,209,88,0.3); color: var(--accent); }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+
+/* ===== 标签/Chip ===== */
+.tag {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 10px; font-weight: 600;
+}
+.tag-primary { background: rgba(139,92,246,0.15); color: var(--primary-light); }
+.tag-success { background: rgba(48,209,88,0.15); color: var(--accent); }
+.tag-warning { background: rgba(251,191,36,0.15); color: var(--warning); }
+.tag-danger { background: rgba(248,113,113,0.15); color: var(--danger); }
+.tag-info { background: rgba(96,165,250,0.15); color: var(--info); }
+.tag-muted { background: rgba(255,255,255,0.06); color: var(--text-tertiary); }
+.kw-chip {
+  display: inline-block; font-size: 10px; padding: 2px 6px;
+  border-radius: 3px; background: rgba(139,92,246,0.12); color: var(--primary-light);
+  margin: 1px;
+}
+
+/* ===== 表格 ===== */
+.data-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.data-table th {
+  text-align: left; padding: 10px 12px; color: var(--text-tertiary);
+  font-weight: 600; font-size: 11px; border-bottom: 1px solid var(--glass-border);
+  cursor: pointer; user-select: none; white-space: nowrap;
+}
+.data-table th:hover { color: var(--text); }
+.data-table td {
+  padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: var(--text-secondary);
+}
+.data-table tr:hover td { background: rgba(255,255,255,0.02); }
+.data-table .num { font-family: 'JetBrains Mono', monospace; text-align: right; }
+
+/* ===== 模态框 ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px); z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.2s;
+}
+.modal {
+  background: var(--bg); border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg); padding: 24px; max-width: 600px;
+  width: 90%; max-height: 80vh; overflow-y: auto;
+  animation: slideUp 0.3s;
+}
+.modal-header {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;
+}
+.modal-close {
+  background: none; border: none; color: var(--text-tertiary);
+  font-size: 20px; cursor: pointer; padding: 4px 8px;
+}
+.modal-close:hover { color: var(--text); }
+
+/* ===== 进度条 ===== */
+.progress-bar {
+  height: 6px; background: rgba(255,255,255,0.08);
+  border-radius: 3px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: 3px; transition: width 0.5s;
+}
+
+/* ===== 输入框 ===== */
+.input, .select {
+  background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border);
+  color: var(--text); padding: 8px 12px; border-radius: 8px;
+  font-size: 12px; outline: none; transition: border-color 0.2s;
+}
+.input:focus, .select:focus { border-color: var(--primary); }
+.select { cursor: pointer; }
+
+/* ===== 徽章 ===== */
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 600;
+}
+.badge-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+/* ===== 卡片头部 ===== */
+.card-head {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+}
+.card-head .ch-bar {
+  width: 3px; height: 14px; background: var(--primary); border-radius: 2px;
+}
+.card-head .ch-title { font-size: 13px; font-weight: 600; }
+
+/* ===== 平台按钮 ===== */
+.platform-btn {
+  padding: 6px 14px; border-radius: 20px; border: 1px solid var(--glass-border);
+  background: transparent; color: var(--text-secondary); font-size: 11px;
+  cursor: pointer; transition: all 0.2s;
+}
+.platform-btn.active {
+  background: var(--primary); border-color: var(--primary); color: #fff;
+}
+
+/* ===== 空状态 ===== */
+.empty-state {
+  text-align: center; padding: 40px 20px; color: var(--text-tertiary); font-size: 13px;
+}
