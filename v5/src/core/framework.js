@@ -24,6 +24,7 @@
         console.warn('[Module] 注册失败，缺少id或render:', mod);
         return;
       }
+      if (modules[mod.id]) return; // 去重
       modules[mod.id] = mod;
       moduleOrder.push(mod.id);
       if (mod.init) mod.init();
