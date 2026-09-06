@@ -108,6 +108,7 @@
     nav.className = 'sidebar-nav';
 
     NAV_GROUPS.forEach(function(group) {
+      if (group.id === 'techradar' && cfg('id') !== 'ai') return;
       const item = document.createElement('div');
       item.className = 'sidebar-nav-item' + (group.id === currentPage ? ' active' : '');
       item.dataset.page = group.id;
