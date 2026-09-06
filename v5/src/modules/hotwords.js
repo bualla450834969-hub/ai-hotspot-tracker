@@ -124,7 +124,22 @@
   }
 
   // filteredHotwords
-  function filteredHotwords() { const p = filterByPlatform(DATA.hotwords||[]); return currentCategory==='all' ? p : p.filter(h=>h.category===currentCategory); }
+  // 去重合并同关键词（抖音+小红书）
+  function mergeHotwords(list) {
+    const map = {};
+    list.forEach(function(h) {
+      if (!map[h.keyword]) { map[h.keyword] = Object.assign({}, h); return; }
+      const m = map[h.keyword];
+      m.total = (m.total||0) + (h.total||0);
+      m.max_like = Math.max(m.max_like||0, h.max_like||0);
+      m.collect_rate = Math.round(((m.collect_rate||0) + (h.collect_rate||0)) / 2);
+      if (h.trend && (!m.trend || h.trend === '飙升')) m.trend = h.trend;
+      if (h.efficiency_tag && (!m.efficiency_tag || h.efficiency_tag === '蓝海')) m.efficiency_tag = h.efficiency_tag;
+    });
+    return Object.values(map);
+  }
+
+  function filteredHotwords() { const p = filterByPlatform(DATA.hotwords||[]); const merged = mergeHotwords(p); return currentCategory==='all' ? merged : merged.filter(h=>h.category===currentCategory); }
 
   // 模块注册
   if (window.Module) {
