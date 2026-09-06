@@ -666,6 +666,7 @@
   </script>
   <script src="data/data.min.js"></script>
   <script>
+    window.DATA = window.DASHBOARD_DATA || {};
     if (window.initFramework) window.initFramework();
     else window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework());
   </script>
