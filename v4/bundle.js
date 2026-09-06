@@ -1024,7 +1024,8 @@ window.domainGuard = function(moduleId, renderFn) {
 // 登录页Logo动效（通用版，支持多实例）
 
 // 生成完整的Logo SVG HTML（包含defs、渐变、滤镜、玻璃路径、光晕层）
-function createLogoSVG(prefix, width, height) {
+function createLogoSVG(prefix, width, height, brightness) {
+  brightness = brightness || 1;
   var p = prefix;
   var paths = [
     'M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z',
@@ -1036,14 +1037,14 @@ function createLogoSVG(prefix, width, height) {
   var defs = '<defs>';
   for (var i = 1; i <= 4; i++) {
     defs += '<radialGradient id="' + p + 'Main' + i + '" cx="50%" cy="50%" r="75%">' +
-      '<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>' +
-      '<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>' +
-      '<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>' +
+      '<stop offset="0%" stop-color="#409cff" stop-opacity="' + (0.45*brightness).toFixed(2) + '"/>' +
+      '<stop offset="35%" stop-color="#af52de" stop-opacity="' + (0.28*brightness).toFixed(2) + '"/>' +
+      '<stop offset="65%" stop-color="#af52de" stop-opacity="' + (0.08*brightness).toFixed(2) + '"/>' +
       '<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>' +
       '</radialGradient>' +
       '<radialGradient id="' + p + 'Sub' + i + '" cx="50%" cy="50%" r="50%">' +
-      '<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>' +
-      '<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>' +
+      '<stop offset="0%" stop-color="#ff64aa" stop-opacity="' + (0.26*brightness).toFixed(2) + '"/>' +
+      '<stop offset="40%" stop-color="#64d2ff" stop-opacity="' + (0.14*brightness).toFixed(2) + '"/>' +
       '<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>' +
       '</radialGradient>';
   }
@@ -3950,7 +3951,7 @@ if (document.readyState === 'loading') {
     // 初始化侧边栏Logo（复用登录页Logo特效）
     var logoContainer = document.getElementById('sbLogoContainer');
     if (logoContainer && typeof createLogoSVG === 'function') {
-      logoContainer.innerHTML = createLogoSVG('sb', 36, 36);
+      logoContainer.innerHTML = createLogoSVG('sb', 36, 36, 1.5);
       var sbLogoSvg = logoContainer.querySelector('svg');
       if (sbLogoSvg && typeof initLogoEffect === 'function') {
         initLogoEffect(sbLogoSvg, 'sb');
