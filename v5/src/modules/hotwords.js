@@ -31,14 +31,26 @@
       <tr><td>${i+1}</td><td><b style="color:var(--text);cursor:pointer;text-decoration:underline dotted" onclick="showKeywordTrend('${h.keyword.replace(/'/g,"\\'")}')" title="点击查看趋势">${h.keyword}</b></td><td>${h.category}</td><td>${h.total.toLocaleString()}</td><td class="like-num">${h.max_like.toLocaleString()}</td><td class="collect-num">${h.collect_rate}%</td><td><span class="tag ${trendClass(h.trend)}">${h.trend||'稳定'}</span></td><td><span class="tag ${satMap[h.keyword]==='萌芽期'?'sprout':satMap[h.keyword]==='上升期'?'rise':satMap[h.keyword]==='爆发期'?'boom':'decline'}">${satMap[h.keyword]||'稳定期'}</span></td><td><span class="tag ${h.efficiency_tag==='蓝海'?'blue-ocean':h.efficiency_tag==='红海'?'red-ocean':'medium'}">${h.efficiency_tag||'适中'}</span></td></tr>`).join('');
   }
 
-  // renderCategory
+  // renderCategory — 关键词优先级分布
   function renderCategory(hw) {
     hw = dedupHotwords(hw);
+    const catLabel = {
+      'S': 'S级·核心热词(每日)',
+      'A': 'A级·重要热词(隔日)',
+      'B': 'B级·一般热词(每3日)',
+      'C': 'C级·长尾冷词(每周)'
+    };
     const m={}; hw.forEach(h=>{m[h.category]=(m[h.category]||0)+h.total;});
-    const data=Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([n,v])=>({name:n,value:v}));
+    const data=Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([n,v])=>({name:catLabel[n]||n,value:v}));
     if (charts.category) charts.category.dispose();
     charts.category=echarts.init(document.getElementById('chartCategory'));
-    charts.category.setOption({color:PALETTE,tooltip:{trigger:'item',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:'{b}<br/>{c} ({d}%)'},legend:{type:'scroll',orient:'vertical',right:5,top:'center',textStyle:{color:'rgba(60,45,30,0.7)',fontSize:10}},series:[{type:'pie',radius:['38%','65%'],center:['38%','50%'],data,label:{color:'rgba(60,45,30,0.7)',fontSize:10,formatter:'{d}%'},itemStyle:{borderColor:'rgba(240,232,213,0.8)',borderWidth:2},animationDuration:1200}]});
+    charts.category.setOption({
+      color:PALETTE,
+      title:{text:'关键词优先级分布',subtext:'S/A/B/C = 采集频率分级',left:'center',top:5,textStyle:{color:'rgba(44,36,22,0.9)',fontSize:13,fontFamily:'serif'},subtextStyle:{color:'rgba(60,45,30,0.5)',fontSize:10}},
+      tooltip:{trigger:'item',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:'{b}<br/>作品数 {c} ({d}%)'},
+      legend:{type:'scroll',orient:'vertical',right:5,top:'center',textStyle:{color:'rgba(60,45,30,0.7)',fontSize:10}},
+      series:[{type:'pie',radius:['38%','62%'],center:['38%','55%'],data,label:{color:'rgba(60,45,30,0.7)',fontSize:10,formatter:'{d}%'},itemStyle:{borderColor:'rgba(240,232,213,0.8)',borderWidth:2},animationDuration:1200}]
+    });
   }
 
   // renderRanking
