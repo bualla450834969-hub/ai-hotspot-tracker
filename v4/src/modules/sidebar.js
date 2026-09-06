@@ -300,4 +300,4 @@
   } else {
     initSidebar();
   }
-})();<div class="sidebar-brand">
+})();
