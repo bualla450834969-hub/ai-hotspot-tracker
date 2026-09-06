@@ -1,0 +1,297 @@
+/* ===== calligraphy.css — 书法水墨主题 ===== */
+/* 覆盖base.css变量，结构数据不变，仅换视觉 */
+
+@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+XiaoWei&family=Noto+Serif+SC:wght@400;600;700;900&display=swap');
+
+:root {
+  /* 宣纸底色 */
+  --bg: #f0e8d5;
+  --bg-gradient: linear-gradient(135deg, #f5edd8 0%, #ede3c8 50%, #f0e8d5 100%);
+  --paper-texture: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+
+  /* 墨色体系 */
+  --primary: #8b0000;
+  --primary-light: #a52a2a;
+  --accent: #c41e3a;
+  --warning: #b8860b;
+  --danger: #8b0000;
+  --info: #2c5f7c;
+
+  /* 文字 */
+  --text: #2c2416;
+  --text-secondary: #5c4d3a;
+  --text-tertiary: #8a7a63;
+
+  /* 卡片 - 宣纸白 */
+  --glass-bg: rgba(255, 252, 245, 0.85);
+  --glass-border: rgba(139, 90, 43, 0.18);
+  --card-shadow: 0 2px 12px rgba(80, 50, 20, 0.08), 0 1px 3px rgba(80, 50, 20, 0.06);
+
+  --radius: 4px;
+  --radius-sm: 2px;
+  --radius-lg: 6px;
+
+  /* 书法字体 */
+  --font-calligraphy: 'Ma Shan Zheng', 'ZCOOL XiaoWei', 'STKaiti', 'KaiTi', serif;
+  --font-serif: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+}
+
+/* ===== 全局 ===== */
+body {
+  font-family: var(--font-serif);
+  background: var(--bg);
+  background-image: var(--bg-gradient), var(--paper-texture);
+  color: var(--text);
+  position: relative;
+}
+
+/* 宣纸纹理叠加 */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--paper-texture);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.5;
+}
+
+/* ===== 标题字体 ===== */
+h1, h2, h3, .section-title, .hero-title {
+  font-family: var(--font-calligraphy);
+  font-weight: normal;
+  letter-spacing: 2px;
+}
+
+.hero-title {
+  font-size: 42px !important;
+  color: #1a1a1a;
+  text-shadow: 1px 1px 0 rgba(139, 0, 0, 0.1);
+}
+
+.hero-title em {
+  color: var(--accent);
+  font-style: normal;
+}
+
+/* ===== 卡片 ===== */
+.card, .glass-card, [class*="card"]:not(.sidebar-nav-item):not(.fav-btn) {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--glass-border) !important;
+  border-radius: var(--radius) !important;
+  box-shadow: var(--card-shadow) !important;
+  position: relative;
+}
+
+/* 卡片右上角印章装饰 */
+.card::after, .glass-card::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  background: var(--accent);
+  opacity: 0.08;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+/* ===== 侧边栏 ===== */
+.sidebar, .app-sidebar {
+  background: linear-gradient(180deg, #2c2416 0%, #1a1510 100%) !important;
+  border-right: 2px solid var(--accent) !important;
+}
+
+.sidebar-brand, .sidebar-brand-text {
+  color: #f0e8d5 !important;
+}
+
+.sidebar-nav-item {
+  color: #c4b896 !important;
+  border-radius: 2px !important;
+  transition: all 0.2s;
+  font-family: var(--font-serif);
+}
+
+.sidebar-nav-item:hover {
+  background: rgba(196, 30, 58, 0.15) !important;
+  color: #f0e8d5 !important;
+}
+
+.sidebar-nav-item.active {
+  background: linear-gradient(90deg, rgba(196, 30, 58, 0.25), transparent) !important;
+  color: #f0e8d5 !important;
+  border-left: 3px solid var(--accent);
+}
+
+.sidebar-footer {
+  color: #8a7a63 !important;
+  border-top: 1px solid rgba(196, 30, 58, 0.2) !important;
+}
+
+/* ===== 数据数字 ===== */
+.stat-number, .big-number, [class*="number"] {
+  font-family: var(--font-calligraphy);
+  color: var(--accent);
+  font-weight: normal;
+}
+
+/* ===== 标签/Tag ===== */
+.tag {
+  background: rgba(196, 30, 58, 0.08) !important;
+  color: #8b0000 !important;
+  border: 1px solid rgba(196, 30, 58, 0.2) !important;
+  border-radius: 2px !important;
+  font-size: 11px;
+  padding: 2px 8px;
+}
+
+.tag.sprout, .tag.rise, .tag.boom, .tag.decline {
+  background: rgba(44, 95, 124, 0.08) !important;
+  color: #2c5f7c !important;
+  border-color: rgba(44, 95, 124, 0.2) !important;
+}
+
+.tag.blue-ocean {
+  background: rgba(44, 95, 124, 0.1) !important;
+  color: #1a4a66 !important;
+}
+
+.tag.red-ocean {
+  background: rgba(139, 0, 0, 0.1) !important;
+  color: #8b0000 !important;
+}
+
+/* ===== 表格 ===== */
+table {
+  color: var(--text) !important;
+}
+
+table th {
+  background: rgba(139, 90, 43, 0.06) !important;
+  color: var(--text-secondary) !important;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  border-bottom: 2px solid rgba(139, 90, 43, 0.15) !important;
+}
+
+table td {
+  border-bottom: 1px solid rgba(139, 90, 43, 0.08) !important;
+}
+
+table tbody tr:hover {
+  background: rgba(196, 30, 58, 0.03) !important;
+}
+
+.like-num { color: #8b0000 !important; }
+.collect-num { color: #2c5f7c !important; }
+
+/* ===== 按钮 ===== */
+button, .btn, [class*="button"] {
+  font-family: var(--font-serif);
+  border-radius: var(--radius-sm) !important;
+}
+
+.platform-btn {
+  background: rgba(255, 252, 245, 0.6) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--glass-border) !important;
+}
+
+.platform-btn.active {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border-color: var(--accent) !important;
+}
+
+/* ===== 进度条 ===== */
+.progress-bar, [class*="progress"] {
+  background: rgba(139, 90, 43, 0.1) !important;
+  border-radius: 2px !important;
+}
+
+.progress-bar-fill, [class*="progress-fill"] {
+  background: linear-gradient(90deg, #8b0000, #c41e3a) !important;
+}
+
+/* ===== 背景Logo ===== */
+.bg-logo {
+  opacity: 0.06 !important;
+}
+
+.bg-glass {
+  fill: rgba(139, 0, 0, 0.03) !important;
+  stroke: rgba(139, 0, 0, 0.08) !important;
+}
+
+/* ===== 登录页 ===== */
+.login-screen {
+  background: linear-gradient(135deg, #f5edd8 0%, #ede3c8 100%) !important;
+}
+
+.login-logo-svg {
+  filter: drop-shadow(0 4px 20px rgba(139, 0, 0, 0.15));
+}
+
+/* ===== 滚动条 ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(139, 90, 43, 0.05);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(139, 90, 43, 0.2);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(139, 0, 0, 0.3);
+}
+
+/* ===== ECharts文字颜色覆盖 ===== */
+[data-mate-widget-id] text,
+.echarts-container text {
+  fill: var(--text-secondary) !important;
+}
+
+/* ===== 选中文字 ===== */
+::selection {
+  background: rgba(196, 30, 58, 0.2);
+  color: #1a1a1a;
+}
+
+/* ===== 链接 ===== */
+a {
+  color: #8b0000;
+}
+a:hover {
+  color: #c41e3a;
+}
+
+/* ===== 印章风格的重要标记 ===== */
+.seal-stamp {
+  display: inline-block;
+  padding: 2px 8px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-calligraphy);
+  font-size: 12px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  transform: rotate(-2deg);
+}
+
+/* ===== 分隔线 - 水墨风格 ===== */
+hr, .divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(139, 90, 43, 0.3), transparent);
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+  .hero-title { font-size: 28px !important; }
+}
