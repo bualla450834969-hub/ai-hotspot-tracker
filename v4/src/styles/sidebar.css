@@ -74,16 +74,16 @@ body.has-sidebar .back-to-top {
 }
 
 .brand-slide-logo .sidebar-logo {
-  width: 72px;
-  height: 72px;
+  width: 84px;
+  height: 84px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .brand-slide-logo .sidebar-logo svg {
-  width: 72px !important;
-  height: 72px !important;
+  width: 84px !important;
+  height: 84px !important;
 }
 
 .brand-slide-text {
