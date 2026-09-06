@@ -148,6 +148,11 @@
       loginScreen.style.display = 'none';
     }
 
+    // 立即重置滚动位置到顶部（登录页隐藏后内容从顶部开始）
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
     // 同步更新时间到侧边栏底部
     const updateTime = document.getElementById('updateTime');
     const sbUpdateTime = document.getElementById('sbUpdateTime');
