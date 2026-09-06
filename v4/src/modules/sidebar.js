@@ -153,6 +153,14 @@
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
 
+    // 禁用登录页的滚动渐显效果（强制内容完全清晰显示）
+    document.body.setAttribute('data-reveal', '1');
+    document.querySelectorAll('.hero, section').forEach(function(el) {
+      el.style.filter = 'none';
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    });
+
     // 同步更新时间到侧边栏底部
     const updateTime = document.getElementById('updateTime');
     const sbUpdateTime = document.getElementById('sbUpdateTime');
