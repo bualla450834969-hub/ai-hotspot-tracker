@@ -141,6 +141,19 @@
 
     // 给body加class
     document.body.classList.add('has-sidebar');
+
+    // 隐藏登录页（只首次显示，进入工作台后永久隐藏）
+    const loginScreen = document.getElementById('loginScreen');
+    if (loginScreen) {
+      loginScreen.style.display = 'none';
+    }
+
+    // 同步更新时间到侧边栏底部
+    const updateTime = document.getElementById('updateTime');
+    const sbUpdateTime = document.getElementById('sbUpdateTime');
+    if (updateTime && sbUpdateTime) {
+      sbUpdateTime.textContent = updateTime.textContent;
+    }
   }
 
   // 切换页面
