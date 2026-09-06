@@ -1,0 +1,136 @@
+  width: 100%;
+  height: calc(100vh + 52px);
+  margin-top: -52px;
+  overflow: hidden;
+  background: #0a0a12;
+  z-index: 100;
+}
+.login-screen .login-orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.4;
+  pointer-events: none;
+}
+.login-screen .login-orb-1 {
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(64,156,255,0.3), transparent 70%);
+  top: -100px; left: -100px;
+  animation: loginOrb1 20s ease-in-out infinite;
+}
+.login-screen .login-orb-2 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(175,82,222,0.25), transparent 70%);
+  bottom: -80px; right: -80px;
+  animation: loginOrb2 25s ease-in-out infinite;
+}
+.login-screen .login-orb-3 {
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(255,100,170,0.15), transparent 70%);
+  top: 40%; left: 60%;
+  animation: loginOrb3 18s ease-in-out infinite;
+}
+@keyframes loginOrb1 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(80px,60px);} }
+@keyframes loginOrb2 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(-60px,-80px);} }
+@keyframes loginOrb3 { 0%,100%{transform:translate(0,0);} 50%{transform:translate(-40px,50px);} }
+
+.login-screen .login-logo-wrap {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -55%);
+  width: 55vmin; height: 55vmin;
+}
+.login-screen .login-logo-svg {
+  width: 100%; height: 100%;
+  overflow: visible;
+}
+.login-screen .login-glass {
+  fill: rgba(255,255,255,0.04);
+  stroke: rgba(255,255,255,0.12);
+  stroke-width: 1.5;
+  cursor: pointer;
+  transition: stroke 0.3s ease;
+}
+.login-screen .login-glass:hover {
+  stroke: rgba(255,255,255,0.3);
+}
+.login-screen .login-glow {
+  opacity: 0.7;
+  transform-origin: center;
+  pointer-events: none;
+}
+.login-screen .login-brand {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+.login-screen .login-brand-name {
+  font-size: clamp(24px, 4vw, 42px);
+  font-weight: 200;
+  letter-spacing: 0.3em;
+  color: rgba(255,255,255,0.85);
+  margin-bottom: 8px;
+}
+.login-screen .login-brand-tag {
+  font-size: clamp(11px, 1.5vw, 14px);
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: rgba(255,255,255,0.35);
+  text-transform: uppercase;
+}
+
+/* 上滑进入提示 */
+.scroll-hint {
+  position: absolute;
+  bottom: 4%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+  animation: scrollHintPulse 2.5s ease-in-out infinite;
+}
+.scroll-hint .scroll-arrow {
+  width: 24px; height: 24px;
+  margin: 0 auto 6px;
+  border-left: 2px solid rgba(255,255,255,0.4);
+  border-bottom: 2px solid rgba(255,255,255,0.4);
+  transform: rotate(-45deg);
+  animation: scrollArrowBounce 2.5s ease-in-out infinite;
+}
+.scroll-hint .scroll-text {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: rgba(255,255,255,0.3);
+  text-transform: uppercase;
+}
+@keyframes scrollHintPulse {
+  0%,100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+@keyframes scrollArrowBounce {
+  0%,100% { transform: rotate(-45deg) translate(0,0); }
+  50% { transform: rotate(-45deg) translate(-4px,4px); }
+}
+
+/* 导航栏在首屏时隐藏 */
+.top-nav.hidden-nav {
+  transform: translateY(-100%);
+  opacity: 0;
+  pointer-events: none;
+}
+.top-nav {
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+@media (max-width: 768px) {
+  .login-screen .login-logo-wrap { width: 65vmin; height: 65vmin; }
+}
+@media (max-width: 480px) {
+  .login-screen .login-logo-wrap { width: 75vmin; height: 75vmin; }
+  .login-screen .login-glow { opacity: 0.6; }
+}
+
+
+/* 滚动模糊渐显动效 */
+.hero, section {
