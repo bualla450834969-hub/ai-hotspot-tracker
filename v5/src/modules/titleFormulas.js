@@ -19,8 +19,9 @@
       '免费型': '免费白嫖！这款工具比付费的还好用',
     });
     var html = formulas.map(function(f) {
-      var name = f[0], count = f[1];
-      var ex = examples[name] || '点击查看套用示例';
+      var name = typeof f === 'object' && f !== null ? (f.formula || f.name || f[0] || '未知') : (f[0] || '未知');
+      var count = typeof f === 'object' && f !== null ? (f.count || f[1] || 0) : (f[1] || 0);
+      var ex = examples[name] || (typeof f === 'object' && f.example ? f.example : '点击查看套用示例');
       return '<div class="formula-item" onclick="copyFormula(\'' + name + '\')"><div class="fi-name">' + name + '</div><div class="fi-count">爆款中出现 ' + count + ' 次</div><div class="fi-example">示例：' + ex + '</div></div>';
     }).join('');
     var fg = document.getElementById('formulaGrid'); if (fg) fg.innerHTML = html || '<div style="color:var(--text-tertiary);">暂无数据</div>';
