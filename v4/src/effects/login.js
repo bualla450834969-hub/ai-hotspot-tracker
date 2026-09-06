@@ -1,77 +1,103 @@
 
-// 登录页Logo动效（独立ID前缀lg-，避免与背景logo冲突）
+// 登录页Logo动效（通用版，支持多实例）
 
-// 滚动模糊渐显动效
-function initScrollReveal() {
-  var vh = window.innerHeight;
-  function update() {
-    // sidebar已创建（进入工作台）时，强制内容完全清晰显示
-    if (document.getElementById('appSidebar')) {
-      document.body.setAttribute('data-reveal', '1');
-      var els = document.querySelectorAll('.hero, section');
-      for (var i = 0; i < els.length; i++) {
-        els[i].style.filter = 'none';
-        els[i].style.opacity = '1';
-        els[i].style.transform = 'none';
-      }
-      return;
-    }
-    var scrollY = window.scrollY;
-    // 0 at top of login, 1 when scrolled past 80% of login screen
-    var reveal = Math.min(1, Math.max(0, (scrollY - vh * 0.15) / (vh * 0.65)));
-    document.body.setAttribute('data-reveal', reveal.toFixed(2));
-    // Apply gradual blur/opacity/transform to hero and sections
-    var blur = (18 * (1 - reveal)).toFixed(1);
-    var opacity = (0.25 + 0.75 * reveal).toFixed(2);
-    var translateY = (50 * (1 - reveal)).toFixed(1);
-    var els = document.querySelectorAll('.hero, section');
-    for (var i = 0; i < els.length; i++) {
-      els[i].style.filter = reveal >= 0.98 ? 'none' : 'blur(' + blur + 'px)';
-      els[i].style.opacity = opacity;
-      els[i].style.transform = reveal >= 0.98 ? 'none' : 'translateY(' + translateY + 'px)';
-    }
+// 生成完整的Logo SVG HTML（包含defs、渐变、滤镜、玻璃路径、光晕层）
+function createLogoSVG(prefix, width, height) {
+  var p = prefix;
+  var paths = [
+    'M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z',
+    'M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z',
+    'M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z',
+    'M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z'
+  ];
+
+  var defs = '<defs>';
+  for (var i = 1; i <= 4; i++) {
+    defs += '<radialGradient id="' + p + 'Main' + i + '" cx="50%" cy="50%" r="75%">' +
+      '<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>' +
+      '<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>' +
+      '<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>' +
+      '<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>' +
+      '</radialGradient>' +
+      '<radialGradient id="' + p + 'Sub' + i + '" cx="50%" cy="50%" r="50%">' +
+      '<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>' +
+      '<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>' +
+      '<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>' +
+      '</radialGradient>';
   }
-  window.addEventListener('scroll', update, {passive: true});
-  window.addEventListener('resize', function() { vh = window.innerHeight; update(); });
-  update();
+  defs += '<radialGradient id="' + p + 'SparkGrad" cx="50%" cy="50%" r="50%">' +
+    '<stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>' +
+    '<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.8"/>' +
+    '<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>' +
+    '</radialGradient>' +
+    '<filter id="' + p + 'SparkBlur" x="-50%" y="-50%" width="200%" height="200%">' +
+    '<feGaussianBlur stdDeviation="2.5"/>' +
+    '</filter>' +
+    '<filter id="' + p + 'BlurM" x="-30%" y="-30%" width="160%" height="160%">' +
+    '<feGaussianBlur stdDeviation="8"/>' +
+    '</filter>' +
+    '<filter id="' + p + 'BlurS" x="-30%" y="-30%" width="160%" height="160%">' +
+    '<feGaussianBlur stdDeviation="5"/>' +
+    '</filter>' +
+    '</defs>';
+
+  var body = '';
+  // 主光晕层
+  for (var j = 0; j < 4; j++) {
+    body += '<path d="' + paths[j] + '" class="' + p + 'm-' + (j+1) + '" fill="url(#' + p + 'Main' + (j+1) + ')" opacity="0.5"/>';
+  }
+  // 次光晕层
+  for (var k = 0; k < 4; k++) {
+    body += '<path d="' + paths[k] + '" class="' + p + 's-' + (k+1) + '" fill="url(#' + p + 'Sub' + (k+1) + ')" opacity="0.4"/>';
+  }
+  // 玻璃路径（可见形状+鼠标事件）
+  for (var m = 0; m < 4; m++) {
+    body += '<path d="' + paths[m] + '" class="login-glass" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>';
+  }
+
+  return '<svg viewBox="212.9 89.4 403.6 287.9" width="' + width + '" height="' + height + '" xmlns="http://www.w3.org/2000/svg">' + defs + body + '</svg>';
 }
 
-function initLoginLogo() {
-  var svg = document.querySelector('.login-logo-svg');
+// 通用Logo特效初始化（呼吸、随机移动、鼠标跟随、颜色变化、边缘光点）
+function initLogoEffect(svg, prefix) {
   if (!svg) return;
+  var p = prefix || 'lg';
   var rgMains = [], rgSubs = [], glassPaths = [];
   for (var i = 1; i <= 4; i++) {
-    rgMains.push(document.getElementById('lgMain' + i));
-    rgSubs.push(document.getElementById('lgSub' + i));
+    rgMains.push(document.getElementById(p + 'Main' + i));
+    rgSubs.push(document.getElementById(p + 'Sub' + i));
   }
-  svg.querySelectorAll('path.login-glass').forEach(function(p) { glassPaths.push(p); });
+  svg.querySelectorAll('path.login-glass').forEach(function(pp) { glassPaths.push(pp); });
+  if (glassPaths.length === 0) return;
+
   var vb = svg.viewBox.baseVal;
   var vbX = vb.x, vbY = vb.y, vbW = vb.width, vbH = vb.height;
   var t = Math.random() * Math.PI * 2;
   var blocks = [];
-  for (var i = 0; i < 4; i++) {
+  for (var bi = 0; bi < 4; bi++) {
     blocks.push({
       fx: 0.3 + Math.random() * 0.5, fy: 0.25 + Math.random() * 0.4,
       fx2: 0.1 + Math.random() * 0.2, fy2: 0.15 + Math.random() * 0.25,
       phase: Math.random() * Math.PI * 2,
       breathSpeed: 0.012 + Math.random() * 0.004,
-      breathPhase: i * Math.PI / 2,
+      breathPhase: bi * Math.PI / 2,
       hueSpeed: 0.4 + Math.random() * 0.3,
       huePhase: Math.random() * 360,
       cx: 50, cy: 50, mode: 'auto', targetCx: 50, targetCy: 50
     });
   }
+
   var sparks = [], frameCount = 0, activeSparkCount = 0, MAX_SPARKS = 2, TRAIL_LENGTH = 1;
   var SVG_NS = 'http://www.w3.org/2000/svg';
   for (var si = 0; si < 4; si++) {
     var trailEls = [];
     for (var ti = 0; ti < TRAIL_LENGTH; ti++) {
-      var c = document.createElementNS(SVG_NS, 'circle');
-      c.setAttribute('fill', 'url(#lgSparkGrad)');
-      c.setAttribute('filter', 'url(#lgSparkBlur)');
-      c.setAttribute('opacity', '0');
-      svg.appendChild(c);
-      trailEls.push(c);
+      var cc = document.createElementNS(SVG_NS, 'circle');
+      cc.setAttribute('fill', 'url(#' + p + 'SparkGrad)');
+      cc.setAttribute('filter', 'url(#' + p + 'SparkBlur)');
+      cc.setAttribute('opacity', '0');
+      svg.appendChild(cc);
+      trailEls.push(cc);
     }
     sparks.push({
       trailEls: trailEls, path: glassPaths[si], pathLen: glassPaths[si].getTotalLength(),
@@ -80,6 +106,7 @@ function initLoginLogo() {
       direction: 1, startOffset: 0, sparkle: 0
     });
   }
+
   function mouseToSvgPercent(e) {
     var pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
     var ctm = svg.getScreenCTM();
@@ -87,24 +114,26 @@ function initLoginLogo() {
     var svgPt = pt.matrixTransform(ctm.inverse());
     return {x:(svgPt.x-vbX)/vbW*100, y:(svgPt.y-vbY)/vbH*100};
   }
+
   glassPaths.forEach(function(path, idx) {
     path.addEventListener('mouseenter', function(e) {
       blocks[idx].mode = 'follow';
-      var p = mouseToSvgPercent(e);
-      blocks[idx].targetCx = p.x; blocks[idx].targetCy = p.y;
+      var pp = mouseToSvgPercent(e);
+      blocks[idx].targetCx = pp.x; blocks[idx].targetCy = pp.y;
     });
     path.addEventListener('mousemove', function(e) {
       if (blocks[idx].mode === 'follow') {
-        var p = mouseToSvgPercent(e);
-        blocks[idx].targetCx = p.x; blocks[idx].targetCy = p.y;
+        var pp = mouseToSvgPercent(e);
+        blocks[idx].targetCx = pp.x; blocks[idx].targetCy = pp.y;
       }
     });
     path.addEventListener('mouseleave', function() { blocks[idx].mode = 'auto'; });
   });
+
   function animate() {
     t += 0.012;
-    for (var i = 0; i < 4; i++) {
-      var b = blocks[i];
+    for (var ai = 0; ai < 4; ai++) {
+      var b = blocks[ai];
       var breath = 0.5 + 0.5 * Math.sin(t * b.breathSpeed * 60 + b.breathPhase);
       var mainR = (40 + breath * 48).toFixed(1) + '%';
       var subR = (25 + breath * 35).toFixed(1) + '%';
@@ -116,19 +145,19 @@ function initLoginLogo() {
       } else {
         b.cx += (b.targetCx-b.cx)*0.15; b.cy += (b.targetCy-b.cy)*0.15;
       }
-      if (rgMains[i]) { rgMains[i].setAttribute('cx',b.cx.toFixed(2)+'%'); rgMains[i].setAttribute('cy',b.cy.toFixed(2)+'%'); rgMains[i].setAttribute('r',mainR); }
-      if (rgSubs[i]) { rgSubs[i].setAttribute('cx',(b.cx+5).toFixed(2)+'%'); rgSubs[i].setAttribute('cy',(b.cy-3).toFixed(2)+'%'); rgSubs[i].setAttribute('r',subR); }
-      var mainPath = svg.querySelector('.lgm-'+(i+1));
-      var subPath = svg.querySelector('.lgs-'+(i+1));
+      if (rgMains[ai]) { rgMains[ai].setAttribute('cx',b.cx.toFixed(2)+'%'); rgMains[ai].setAttribute('cy',b.cy.toFixed(2)+'%'); rgMains[ai].setAttribute('r',mainR); }
+      if (rgSubs[ai]) { rgSubs[ai].setAttribute('cx',(b.cx+5).toFixed(2)+'%'); rgSubs[ai].setAttribute('cy',(b.cy-3).toFixed(2)+'%'); rgSubs[ai].setAttribute('r',subR); }
+      var mainPath = svg.querySelector('.' + p + 'm-' + (ai+1));
+      var subPath = svg.querySelector('.' + p + 's-' + (ai+1));
       if (mainPath) mainPath.style.opacity = glowOpacity;
       if (subPath) subPath.style.opacity = (parseFloat(glowOpacity)*0.8).toFixed(2);
       var hue = (t*b.hueSpeed*60+b.huePhase)%360;
-      if (mainPath) mainPath.style.filter = 'hue-rotate('+hue.toFixed(0)+'deg) url(#lgBlurM)';
-      if (subPath) subPath.style.filter = 'hue-rotate('+hue.toFixed(0)+'deg) url(#lgBlurS)';
+      if (mainPath) mainPath.style.filter = 'hue-rotate('+hue.toFixed(0)+'deg) url(#' + p + 'BlurM)';
+      if (subPath) subPath.style.filter = 'hue-rotate('+hue.toFixed(0)+'deg) url(#' + p + 'BlurS)';
     }
     frameCount++;
-    for (var si = 0; si < sparks.length; si++) {
-      var s = sparks[si];
+    for (var sj = 0; sj < sparks.length; sj++) {
+      var s = sparks[sj];
       if (!s.active && frameCount >= s.nextFrame) {
         if (activeSparkCount < MAX_SPARKS) {
           s.active = true; s.progress = 0;
@@ -146,28 +175,28 @@ function initLoginLogo() {
         if (s.progress >= 1) {
           s.active = false; activeSparkCount--;
           s.nextFrame = frameCount + 1500 + Math.floor(Math.random()*2100);
-          for (var ti=0; ti<TRAIL_LENGTH; ti++) s.trailEls[ti].setAttribute('opacity','0');
+          for (var tk=0; tk<TRAIL_LENGTH; tk++) s.trailEls[tk].setAttribute('opacity','0');
         } else {
           var globalOp;
           if (s.progress<0.12) globalOp = s.progress/0.12;
           else if (s.progress>0.88) globalOp = (1-s.progress)/0.12;
           else globalOp = 1;
-          for (var ti2=0; ti2<TRAIL_LENGTH; ti2++) {
-            var trailProgress = Math.max(0, s.progress-ti2*s.baseSpeed*10);
+          for (var tl=0; tl<TRAIL_LENGTH; tl++) {
+            var trailProgress = Math.max(0, s.progress-tl*s.baseSpeed*10);
             var len = (s.startOffset+trailProgress*s.pathLen*s.direction)%s.pathLen;
             if (len<0) len += s.pathLen;
-            var pt = s.path.getPointAtLength(len);
-            var sizeFactor = 1-ti2/TRAIL_LENGTH;
-            var pulse = 1+0.15*Math.sin(s.progress*Math.PI*6+si);
+            var pt2 = s.path.getPointAtLength(len);
+            var sizeFactor = 1-tl/TRAIL_LENGTH;
+            var pulse = 1+0.15*Math.sin(s.progress*Math.PI*6+sj);
             if (Math.random()<0.008) s.sparkle = 1;
             s.sparkle *= 0.92;
             var sparkleBoost = 1+s.sparkle*0.9;
             var sizeSparkle = 1+s.sparkle*0.35;
-            s.trailEls[ti2].setAttribute('cx',pt.x.toFixed(1));
-            s.trailEls[ti2].setAttribute('cy',pt.y.toFixed(1));
-            s.trailEls[ti2].setAttribute('r',(5.5*sizeFactor*pulse*sizeSparkle+0.8).toFixed(1));
-            var flicker = 0.85+0.15*Math.sin(s.progress*Math.PI*11+si*2.3);
-            s.trailEls[ti2].setAttribute('opacity',(globalOp*sizeFactor*flicker*sparkleBoost).toFixed(2));
+            s.trailEls[tl].setAttribute('cx',pt2.x.toFixed(1));
+            s.trailEls[tl].setAttribute('cy',pt2.y.toFixed(1));
+            s.trailEls[tl].setAttribute('r',(5.5*sizeFactor*pulse*sizeSparkle+0.8).toFixed(1));
+            var flicker = 0.85+0.15*Math.sin(s.progress*Math.PI*11+sj*2.3);
+            s.trailEls[tl].setAttribute('opacity',(globalOp*sizeFactor*flicker*sparkleBoost).toFixed(2));
           }
         }
       }
@@ -175,6 +204,44 @@ function initLoginLogo() {
     requestAnimationFrame(animate);
   }
   animate();
+}
+
+// 登录页Logo初始化（兼容旧调用）
+function initLoginLogo() {
+  var svg = document.querySelector('.login-logo-svg');
+  if (svg) initLogoEffect(svg, 'lg');
+}
+
+// 滚动模糊渐显动效
+function initScrollReveal() {
+  var vh = window.innerHeight;
+  function update() {
+    if (document.getElementById('appSidebar')) {
+      document.body.setAttribute('data-reveal', '1');
+      var els = document.querySelectorAll('.hero, section');
+      for (var i = 0; i < els.length; i++) {
+        els[i].style.filter = 'none';
+        els[i].style.opacity = '1';
+        els[i].style.transform = 'none';
+      }
+      return;
+    }
+    var scrollY = window.scrollY;
+    var reveal = Math.min(1, Math.max(0, (scrollY - vh * 0.15) / (vh * 0.65)));
+    document.body.setAttribute('data-reveal', reveal.toFixed(2));
+    var blur = (18 * (1 - reveal)).toFixed(1);
+    var opacity = (0.25 + 0.75 * reveal).toFixed(2);
+    var translateY = (50 * (1 - reveal)).toFixed(1);
+    var els2 = document.querySelectorAll('.hero, section');
+    for (var j = 0; j < els2.length; j++) {
+      els2[j].style.filter = reveal >= 0.98 ? 'none' : 'blur(' + blur + 'px)';
+      els2[j].style.opacity = opacity;
+      els2[j].style.transform = reveal >= 0.98 ? 'none' : 'translateY(' + translateY + 'px)';
+    }
+  }
+  window.addEventListener('scroll', update, {passive: true});
+  window.addEventListener('resize', function() { vh = window.innerHeight; update(); });
+  update();
 }
 
 // 导航栏首屏隐藏逻辑
@@ -191,8 +258,6 @@ function initNavHide() {
   window.addEventListener('scroll', check, {passive:true});
   check();
 }
-
-
 
 // 初始化登录页所有特效
 if (document.readyState === 'loading') {
