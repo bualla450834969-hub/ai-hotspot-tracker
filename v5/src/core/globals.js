@@ -95,4 +95,7 @@
     return arr.filter(function(item) { return item.platform === window.currentPlatform; });
   };
 
+  // ===== domainGuard 兜底（domain.js加载后会覆盖） =====
+  window.domainGuard = window.domainGuard || function(moduleId, renderFn) { return renderFn; };
+
 })();
