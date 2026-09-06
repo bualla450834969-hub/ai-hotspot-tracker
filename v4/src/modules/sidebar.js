@@ -89,29 +89,7 @@
     const brand = document.createElement('div');
     brand.className = 'sidebar-brand';
     brand.innerHTML = `
-      <div class="sidebar-logo">
-        <svg viewBox="212.9 89.4 403.6 287.9" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="sbMain1" cx="50%" cy="50%" r="75%">
-              <stop offset="0%" stop-color="#409cff" stop-opacity="0.9"/>
-              <stop offset="50%" stop-color="#af52de" stop-opacity="0.7"/>
-              <stop offset="100%" stop-color="#af52de" stop-opacity="0.4"/>
-            </radialGradient>
-            <radialGradient id="sbSub1" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#ff64aa" stop-opacity="0.5"/>
-              <stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
-            </radialGradient>
-          </defs>
-          <path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" fill="url(#sbMain1)"/>
-          <path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" fill="url(#sbMain1)"/>
-          <path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" fill="url(#sbMain1)"/>
-          <path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" fill="url(#sbMain1)"/>
-          <path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" fill="url(#sbSub1)"/>
-          <path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" fill="url(#sbSub1)"/>
-          <path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" fill="url(#sbSub1)"/>
-          <path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" fill="url(#sbSub1)"/>
-        </svg>
-      </div>
+      <div class="sidebar-logo" id="sbLogoContainer"></div>
       <div class="sidebar-brand-text">
         <div class="sb-brand-name" id="sbBrandName">PYRALUMA</div>
         <div class="sb-brand-tag">热点追踪工作台</div>
@@ -146,6 +124,16 @@
     sidebar.appendChild(footer);
 
     document.body.appendChild(sidebar);
+
+    // 初始化侧边栏Logo（复用登录页Logo特效）
+    var logoContainer = document.getElementById('sbLogoContainer');
+    if (logoContainer && typeof createLogoSVG === 'function') {
+      logoContainer.innerHTML = createLogoSVG('sb', 36, 36);
+      var sbLogoSvg = logoContainer.querySelector('svg');
+      if (sbLogoSvg && typeof initLogoEffect === 'function') {
+        initLogoEffect(sbLogoSvg, 'sb');
+      }
+    }
     sidebarEl = sidebar;
 
     // 给body加class
