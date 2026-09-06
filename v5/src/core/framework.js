@@ -204,6 +204,10 @@
     // 渲染所有模块
     renderAll();
 
+    // 延迟重渲染：捕获异步加载的模块
+    setTimeout(function() { renderAll(); }, 1000);
+    setTimeout(function() { renderAll(); }, 3000);
+
     // 滚动动画
     initScrollReveal();
 
