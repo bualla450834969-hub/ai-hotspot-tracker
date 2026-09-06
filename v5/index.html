@@ -695,6 +695,33 @@
     window.DATA = window.DASHBOARD_DATA || {};
     if (window.initFramework) window.initFramework();
     else window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework());
+
+    // 动态模块加载器：兜底加载未注册的模块
+    (function() {
+      var expected = ['audience','breakdown','comparison','credit','engagement','favorites','hero','hotwords','kanban','launchOps','leadScripts','publishTime','scriptGen','techradar','titleFormulas','topicPerf','topics','viralGenes','works','sidebar'];
+      var base = 'src/modules/';
+      var v = '1788700718';
+      function checkAndLoad() {
+        if (!window.Module) return;
+        var registered = {};
+        window.Module.all().forEach(function(m) { registered[m.id] = true; });
+        var missing = expected.filter(function(id) { return !registered[id]; });
+        if (missing.length === 0) return;
+        missing.forEach(function(id) {
+          var file = id === 'sidebar' ? 'sidebar.js' : id + '.js';
+          fetch(base + file + '?v=' + v + '&dyn=' + Date.now())
+            .then(function(r) { return r.text(); })
+            .then(function(code) {
+              try { eval(code); } catch(e) { console.error('动态加载失败', id, e); }
+            })
+            .catch(function(e) { console.error('动态加载失败', id, e); });
+        });
+        // 加载完成后重新渲染
+        setTimeout(function() { if (window.renderAll) window.renderAll(); }, 1500);
+      }
+      setTimeout(checkAndLoad, 2000);
+      setTimeout(checkAndLoad, 5000);
+    })();
   </script>
 </body>
 </html>
