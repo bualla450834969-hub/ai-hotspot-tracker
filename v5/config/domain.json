@@ -1,0 +1,35 @@
+{
+  "id": "calligraphy",
+  "name": "书法",
+  "display_name": "书法热点追踪",
+  "collect_keywords": [
+    ["书法", "S"], ["毛笔字", "A"], ["硬笔书法", "A"], ["楷书", "A"], ["行书", "A"],
+    ["草书", "B"], ["隶书", "B"], ["篆书", "B"], ["书法教学", "S"], ["练字", "A"],
+    ["字帖", "B"], ["书法作品", "A"], ["书法入门", "A"], ["毛笔", "B"], ["钢笔字", "B"],
+    ["书法考级", "C"], ["书法比赛", "C"], ["书法欣赏", "B"], ["书法技巧", "A"], ["临帖", "B"]
+  ],
+  "core_keywords": [
+    "书法教学", "练字技巧", "楷书入门", "行书教程", "毛笔字",
+    "硬笔书法", "临帖方法", "书法考级", "书法作品", "书法名家",
+    "笔画教学", "结构讲解", "握笔姿势", "宣纸", "墨汁"
+  ],
+  "exclude_keywords": ["书法"],
+  "brand": {
+    "name_en": "PYRALUMA",
+    "name_cn": "璃火矩创",
+    "slogan": "Calligraphy Intelligence"
+  },
+  "scheduling": {
+    "s_level_days": 1,
+    "a_level_days": 2,
+    "b_level_days": 3,
+    "c_level_days": 7,
+    "new_word_protection_days": 7
+  },
+  "tech_radar": {
+    "enabled": false,
+    "github_days": 7,
+    "min_stars": 10
+  },
+  "platforms": ["douyin", "xiaohongshu"]
+}
