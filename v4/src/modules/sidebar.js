@@ -163,6 +163,12 @@
 
     currentPage = pageId;
 
+    // 确保登录页已隐藏（进入工作台后不再显示）
+    const loginScreen = document.getElementById('loginScreen');
+    if (loginScreen && loginScreen.style.display !== 'none') {
+      loginScreen.style.display = 'none';
+    }
+
     // 更新导航激活状态
     document.querySelectorAll('.sidebar-nav-item').forEach(function(item) {
       item.classList.toggle('active', item.dataset.page === pageId);
