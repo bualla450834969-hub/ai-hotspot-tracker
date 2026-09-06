@@ -133,7 +133,7 @@
     if (!container) return;
     const formats = DATA.content_formats_dist || [];
     if (!formats.length) { container.innerHTML = '<div class="empty-state">暂无数据</div>'; return; }
-    const colors = ['#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#6366f1', '#6b7280'];
+    const colors = ['#8b5cf6', '#06b6d4', '#f59e0b', '#10b981', '#ef4444', '#ec4899', '#6366f1', '#5c4d3a'];
     container.innerHTML = formats.map(function(f, i) {
       return '<div class="format-bar-row">' +
         '<span class="format-bar-label">' + f.format + '</span>' +
