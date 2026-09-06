@@ -1,4 +1,3 @@
-/* config/domain.js */
 /**
  * 领域配置 — 换领域时唯一需要修改的文件
  * 所有业务文案、关键词、模块开关、配色都从这里读取
@@ -257,7 +256,6 @@ window.domainGuard = function(moduleId, renderFn) {
 };
 
 
-/* src/core/state.js */
 /**
  * 状态管理 — localStorage持久化
  * 看板状态、收藏、选题性能追踪、清单进度
@@ -366,7 +364,6 @@ window.domainGuard = function(moduleId, renderFn) {
 })();
 
 
-/* src/core/renderer.js */
 /**
  * 通用渲染器 — 表格、卡片、图表、数字动画、标签
  * 所有业务模块共用，不包含领域逻辑
@@ -492,7 +489,6 @@ window.domainGuard = function(moduleId, renderFn) {
 })();
 
 
-/* src/core/globals.js */
 /**
  * core/globals.js — 全局共享变量与常量
  * 所有模块共用的全局状态、ECharts配置、辅助函数
@@ -593,7 +589,6 @@ window.domainGuard = function(moduleId, renderFn) {
 })();
 
 
-/* src/core/framework.js */
 /**
  * 核心框架 — 模块注册、初始化、导航、筛选
  * 所有业务模块通过 Module.register() 注册，框架自动管理生命周期
@@ -879,7 +874,6 @@ window.domainGuard = function(moduleId, renderFn) {
 })();
 
 
-/* src/effects/glow.js */
 /**
  * effects/glow.js — UFO动态光晕特效
  * 自动扫描所有卡片元素，绑定鼠标跟随光晕
@@ -1026,7 +1020,6 @@ window.domainGuard = function(moduleId, renderFn) {
 })();
 
 
-/* src/effects/login.js */
 
 // 登录页Logo动效（独立ID前缀lg-，避免与背景logo冲突）
 
@@ -1226,7 +1219,6 @@ if (document.readyState === 'loading') {
 }
 
 
-/* src/modules/_helpers.js */
 /**
  * modules/_helpers.js — 通用辅助函数
  */
@@ -1505,7 +1497,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/hero.js */
 /**
  * modules/hero.js
  * 函数: renderHeroStats, renderActions, renderInsights
@@ -1600,7 +1591,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/hotwords.js */
 /**
  * modules/hotwords.js
  * 函数: renderHotwordTable, renderCategory, renderRanking, renderHistory, showKeywordTrend, filteredHotwords
@@ -1748,7 +1738,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/works.js */
 /**
  * modules/works.js
  * 函数: renderWorksTable, renderSmallViral, renderAuthors, renderCompetitorWorks, renderFormatDist, filteredWorks
@@ -1921,7 +1910,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/topics.js */
 /**
  * modules/topics.js
  * 函数: renderTopics, calcTopicScore, generateTitles, getPlatformAdaptation, generateSchedule, renderCommentScripts, renderChecklist, toggleCheck, updateChecklistProgress, filteredTopics, generateShootList
@@ -2254,7 +2242,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/techradar.js */
 /**
  * modules/techradar.js
  * 函数: renderTechRadar
@@ -2332,7 +2319,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/breakdown.js */
 /**
  * modules/breakdown.js
  * 函数: renderBreakdowns, renderMatrix, renderFormulas, renderCollect, renderScatter, renderSaturation, renderCommentDemands, renderCommentKw, renderHook, renderDuration, renderPublishTime
@@ -2601,7 +2587,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/viralGenes.js */
 /**
  * modules/viralGenes.js
  * 函数: renderViralGenes
@@ -2658,7 +2643,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/publishTime.js */
 /**
  * modules/publishTime.js
  * 函数: renderPublishTimeDetail
@@ -2791,7 +2775,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/titleFormulas.js */
 /**
  * modules/titleFormulas.js
  * 函数: renderTitleFormulas, copyFormula, genTitleVariants
@@ -2999,7 +2982,6 @@ if (document.readyState === 'loading') {
 }
 
 
-/* src/modules/leadScripts.js */
 /**
  * modules/leadScripts.js
  * 函数: renderLeadScripts
@@ -3031,7 +3013,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/launchOps.js */
 /**
  * modules/launchOps.js
  * 函数: renderLaunchOps
@@ -3190,7 +3171,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/audience.js */
 /**
  * modules/audience.js
  * 函数: renderAudience
@@ -3281,7 +3261,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/engagement.js */
 /**
  * modules/engagement.js
  * 函数: renderEngagement
@@ -3345,7 +3324,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/topicPerf.js */
 /**
  * modules/topicPerf.js
  * 函数: renderTopicPerf, recordPerf, calcHitRate, getPerfData, savePerfData
@@ -3422,7 +3400,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/kanban.js */
 /**
  * modules/kanban.js
  * 函数: renderKanban, getAllKanbanStatus, getTopicStatus, setTopicStatus, cycleKanbanStatus, cycleKanbanStatusByTitle, getKanbanStatus, resetKanbanStatus
@@ -3536,7 +3513,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/favorites.js */
 /**
  * modules/favorites.js
  * 函数: getFavorites, isFavorite, toggleFavorite, renderFavorites, removeFavorite
@@ -3617,7 +3593,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/credit.js */
 /**
  * modules/credit.js
  * 函数: renderCreditMonitor
@@ -3663,7 +3638,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/scriptGen.js */
 /**
  * modules/scriptGen.js
  * 函数: generateScript, closeScriptModal, copyScript
@@ -3719,7 +3693,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/comparison.js */
 /**
  * modules/comparison.js
  * 函数: renderComparison
@@ -3771,7 +3744,6 @@ if (document.readyState === 'loading') {
 })();
 
 
-/* src/modules/sidebar.js */
 /**
  * modules/sidebar.js
  * 左侧导航栏模块 - 动态创建sidebar，按分组切换显示section
@@ -3936,6 +3908,12 @@ if (document.readyState === 'loading') {
     if (!group) return;
 
     currentPage = pageId;
+
+    // 确保登录页已隐藏（进入工作台后不再显示）
+    const loginScreen = document.getElementById('loginScreen');
+    if (loginScreen && loginScreen.style.display !== 'none') {
+      loginScreen.style.display = 'none';
+    }
 
     // 更新导航激活状态
     document.querySelectorAll('.sidebar-nav-item').forEach(function(item) {
