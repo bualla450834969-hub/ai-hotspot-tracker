@@ -617,6 +617,9 @@
     return arr.filter(function(item) { return item.platform === window.currentPlatform; });
   };
 
+  // ===== domainGuard 兜底（domain.js加载后会覆盖） =====
+  window.domainGuard = window.domainGuard || function(moduleId, renderFn) { return renderFn; };
+
 })();
 
 
@@ -1428,21 +1431,34 @@ if (document.readyState === 'loading') {
     const list = DATA.hot_breakdowns || [];
     const el = document.getElementById('breakdownGrid');
     if (!list.length) { el.innerHTML='<div class="empty-state">暂无爆款拆解数据</div>'; return; }
-    el.innerHTML = list.map((b,i)=>`
-      <div class="breakdown-card">
-        <div class="bd-header">
-          <div class="bd-title">${i+1}. ${b.title}</div>
-          <div style="display:flex;align-items:center;gap:6px;"><button class="fav-btn ${isFavorite(i) ? 'active' : ''}" onclick="toggleFavorite(${i})" title="收藏">${isFavorite(i) ? '⭐' : '☆'}</button><div class="bd-likes">${(b.likes/10000).toFixed(1)}万</div></div>
-        </div>
-        <div class="bd-row"><span class="bd-label">钩子</span><span class="bd-val">${b.hook}型</span></div>
-        <div class="bd-row"><span class="bd-label">结构</span><span class="bd-val">${b.structure}</span></div>
-        <div class="bd-row"><span class="bd-label">CTA</span><span class="bd-val">${b.cta}</span></div>
-        ${b.target_persona ? `<div class="bd-row"><span class="bd-label">人群</span><span class="bd-val"><span style="color:#22d3ee;font-weight:600">${b.target_persona.name}</span> · ${b.target_persona.age} · ${(b.target_persona.needs||[]).slice(0,2).join(' / ')}</span></div>` : ''}
-        <div class="bd-meta">
-          <span>${b.author} · ${b.duration}</span>
-          <span>${b.interaction} · <a href="${b.work_url||'#'}" target="_blank" class="work-link">原视频</a></span>
-        </div>
-      </div>`).join('');
+    const isNotAI = cfg('id') !== 'ai';
+    const personas = cfg('audience_personas', []);
+    const defaultCTA = cfg('default_cta', '关注我，每天分享实用干货');
+    el.innerHTML = list.map(function(b,i) {
+      var cta = b.cta;
+      var persona = b.target_persona;
+      if (isNotAI) {
+        cta = defaultCTA;
+        if (personas.length) {
+          var p = personas[i % personas.length];
+          persona = { name: p.name, age: p.age, needs: p.needs || p.traits || [] };
+        }
+      }
+      return '<div class="breakdown-card">' +
+        '<div class="bd-header">' +
+          '<div class="bd-title">' + (i+1) + '. ' + b.title + '</div>' +
+          '<div style="display:flex;align-items:center;gap:6px;"><button class="fav-btn ' + (isFavorite(i) ? 'active' : '') + '" onclick="toggleFavorite(' + i + ')" title="收藏">' + (isFavorite(i) ? '⭐' : '☆') + '</button><div class="bd-likes">' + (b.likes/10000).toFixed(1) + '万</div></div>' +
+        '</div>' +
+        '<div class="bd-row"><span class="bd-label">钩子</span><span class="bd-val">' + b.hook + '型</span></div>' +
+        '<div class="bd-row"><span class="bd-label">结构</span><span class="bd-val">' + b.structure + '</span></div>' +
+        '<div class="bd-row"><span class="bd-label">CTA</span><span class="bd-val">' + cta + '</span></div>' +
+        (persona ? '<div class="bd-row"><span class="bd-label">人群</span><span class="bd-val"><span style="color:#22d3ee;font-weight:600">' + persona.name + '</span> · ' + persona.age + ' · ' + (persona.needs||[]).slice(0,2).join(' / ') + '</span></div>' : '') +
+        '<div class="bd-meta">' +
+          '<span>' + b.author + ' · ' + b.duration + '</span>' +
+          '<span>' + b.interaction + ' · <a href="' + (b.work_url||'#') + '" target="_blank" class="work-link">原视频</a></span>' +
+        '</div>' +
+      '</div>';
+    }).join('');
   }
 
   // renderMatrix
@@ -2148,7 +2164,22 @@ if (document.readyState === 'loading') {
   }
 
   // filteredHotwords
-  function filteredHotwords() { const p = filterByPlatform(DATA.hotwords||[]); return currentCategory==='all' ? p : p.filter(h=>h.category===currentCategory); }
+  // 去重合并同关键词（抖音+小红书）
+  function mergeHotwords(list) {
+    const map = {};
+    list.forEach(function(h) {
+      if (!map[h.keyword]) { map[h.keyword] = Object.assign({}, h); return; }
+      const m = map[h.keyword];
+      m.total = (m.total||0) + (h.total||0);
+      m.max_like = Math.max(m.max_like||0, h.max_like||0);
+      m.collect_rate = Math.round(((m.collect_rate||0) + (h.collect_rate||0)) / 2);
+      if (h.trend && (!m.trend || h.trend === '飙升')) m.trend = h.trend;
+      if (h.efficiency_tag && (!m.efficiency_tag || h.efficiency_tag === '蓝海')) m.efficiency_tag = h.efficiency_tag;
+    });
+    return Object.values(map);
+  }
+
+  function filteredHotwords() { const p = filterByPlatform(DATA.hotwords||[]); const merged = mergeHotwords(p); return currentCategory==='all' ? merged : merged.filter(h=>h.category===currentCategory); }
 
   // 模块注册
   if (window.Module) {
@@ -2774,6 +2805,7 @@ if (document.readyState === 'loading') {
     nav.className = 'sidebar-nav';
 
     NAV_GROUPS.forEach(function(group) {
+      if (group.id === 'techradar' && cfg('id') !== 'ai') return;
       const item = document.createElement('div');
       item.className = 'sidebar-nav-item' + (group.id === currentPage ? ' active' : '');
       item.dataset.page = group.id;
@@ -4007,6 +4039,7 @@ if (document.readyState === 'loading') {
     nav.className = 'sidebar-nav';
 
     NAV_GROUPS.forEach(function(group) {
+      if (group.id === 'techradar' && cfg('id') !== 'ai') return;
       const item = document.createElement('div');
       item.className = 'sidebar-nav-item' + (group.id === currentPage ? ' active' : '');
       item.dataset.page = group.id;
