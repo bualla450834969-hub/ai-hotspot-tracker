@@ -4123,4 +4123,4 @@ if (document.readyState === 'loading') {
   } else {
     initSidebar();
   }
-})();<div class="sidebar-brand">
+})();
