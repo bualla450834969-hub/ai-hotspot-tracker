@@ -15,8 +15,8 @@
   window.TOOLTIP_BORDER = 'rgba(100,100,140,0.3)';
   window.TOOLTIP_TEXT = 'rgba(255,255,255,0.9)';
   window.AXIS_COLOR = 'rgba(255,255,255,0.45)';
-  window.AXIS_LINE = 'rgba(255,255,255,0.15)';
-  window.SPLIT_COLOR = 'rgba(255,255,255,0.06)';
+  window.AXIS_LINE = 'rgba(139,90,43,0.2)';
+  window.SPLIT_COLOR = 'rgba(139,90,43,0.08)';
 
   // ===== 筛选状态 =====
   window.currentCategory = 'all';
