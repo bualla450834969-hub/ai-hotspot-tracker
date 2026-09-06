@@ -8,7 +8,7 @@
 
   // renderAudience
   function renderAudience() {
-    const personas = DATA.audience_personas || [];
+    const personas = cfg('audience_personas', []) || DATA.audience_personas || [];
     if (!personas.length) {
       document.getElementById('personaGrid').innerHTML = '<p style="color:var(--text-secondary)">暂无人群画像数据</p>';
       return;
