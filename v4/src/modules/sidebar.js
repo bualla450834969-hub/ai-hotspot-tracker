@@ -222,7 +222,15 @@
       if (window.initGlow) window.initGlow();
     }, 150);
 
-    window.scrollTo({top: 0, behavior: 'smooth'});
+    window.scrollTo(0, 0);
+
+    // 强制anim元素完成动画（避免隐藏/显示后停留在初始状态）
+    setTimeout(function() {
+      document.querySelectorAll('.anim').forEach(function(el) {
+        el.style.opacity = '1';
+        el.style.transform = 'none';
+      });
+    }, 50);
   }
 
   // 检查是否已滚过登录页
