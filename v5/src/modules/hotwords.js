@@ -6,8 +6,24 @@
 (function() {
   'use strict';
 
+  // 去重：双平台合并导致同一关键词出现多次
+  function dedupHotwords(hw) {
+    const map = {};
+    (hw || []).forEach(function(h) {
+      if (map[h.keyword]) {
+        map[h.keyword].total += h.total;
+        map[h.keyword].max_like = Math.max(map[h.keyword].max_like, h.max_like);
+        map[h.keyword].collect_rate = Math.max(map[h.keyword].collect_rate, h.collect_rate);
+      } else {
+        map[h.keyword] = Object.assign({}, h);
+      }
+    });
+    return Object.values(map);
+  }
+
   // renderHotwordTable
   function renderHotwordTable(hw) {
+    hw = dedupHotwords(hw);
     const sorted=[...hw].sort((a,b)=>b.total-a.total);
     const satMap = {};
     (DATA.saturation||[]).forEach(s=>satMap[s.keyword]=s.stage);
@@ -17,6 +33,7 @@
 
   // renderCategory
   function renderCategory(hw) {
+    hw = dedupHotwords(hw);
     const m={}; hw.forEach(h=>{m[h.category]=(m[h.category]||0)+h.total;});
     const data=Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([n,v])=>({name:n,value:v}));
     if (charts.category) charts.category.dispose();
@@ -26,6 +43,7 @@
 
   // renderRanking
   function renderRanking(hw) {
+    hw = dedupHotwords(hw);
     const sorted=[...hw].sort((a,b)=>b.total-a.total).slice(0,15);
     if (charts.ranking) charts.ranking.dispose();
     charts.ranking=echarts.init(document.getElementById('chartRanking'));
