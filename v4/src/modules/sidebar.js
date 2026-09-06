@@ -90,17 +90,17 @@
     brand.className = 'sidebar-brand';
     brand.innerHTML = `
       <div class="sidebar-logo">
-        <svg viewBox="0 0 100 100" width="32" height="32">
-          <path d="M20,80 L40,80 L60,40 L40,40 Z" fill="url(#sbg1)" opacity="0.9"/>
-          <path d="M50,90 L70,90 L80,70 L60,70 Z" fill="url(#sbg2)" opacity="0.9"/>
-          <path d="M60,30 L80,30 L90,10 L70,10 Z" fill="url(#sbg3)" opacity="0.9"/>
-          <path d="M30,50 L50,50 L60,30 L40,30 Z" fill="url(#sbg4)" opacity="0.9"/>
+        <svg viewBox="212.9 89.4 403.6 287.9" width="36" height="36" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <linearGradient id="sbg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#409cff"/><stop offset="100%" stop-color="#af52de"/></linearGradient>
             <linearGradient id="sbg2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff64aa"/><stop offset="100%" stop-color="#ff9f0a"/></linearGradient>
             <linearGradient id="sbg3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#30d158"/><stop offset="100%" stop-color="#64d2ff"/></linearGradient>
-            <linearGradient id="sbg4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#bf5af2"/><stop offset="100%" stop-color="#ff64aa"/></linearGradient>
+            <linearGradient id="sbg4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ff9f0a"/><stop offset="100%" stop-color="#ff64aa"/></linearGradient>
           </defs>
+          <path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" fill="url(#sbg1)" opacity="0.92"/>
+          <path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" fill="url(#sbg2)" opacity="0.92"/>
+          <path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" fill="url(#sbg3)" opacity="0.92"/>
+          <path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" fill="url(#sbg4)" opacity="0.92"/>
         </svg>
       </div>
       <div class="sidebar-brand-text">
