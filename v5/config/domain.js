@@ -6,6 +6,7 @@ window.DOMAIN_CONFIG = {
   // ===== 基础信息 =====
   id: 'calligraphy',
   name: '书法',
+  default_cta: '关注我，每天分享书法干货',
   display_name: '书法热点追踪',
   tagline: '书法内容运营 · 数据驱动起号',
   language: 'zh-CN',
