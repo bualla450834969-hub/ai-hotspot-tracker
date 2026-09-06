@@ -206,23 +206,29 @@
     window.scrollTo({top: 0, behavior: 'smooth'});
   }
 
+  // 检查是否已滚过登录页
+  function isPastLogin() {
+    return window.scrollY > window.innerHeight * 0.4;
+  }
+
   // 初始化
   function initSidebar() {
-    // 等待登录完成后再创建
-    const loginScreen = document.getElementById('loginScreen');
-    if (loginScreen && loginScreen.style.display !== 'none') {
-      // 监听登录完成
-      const observer = new MutationObserver(function() {
-        if (loginScreen.style.display === 'none' || loginScreen.classList.contains('hidden')) {
-          createSidebar();
-          setTimeout(function() { switchPage('overview'); }, 300);
-          observer.disconnect();
-        }
-      });
-      observer.observe(loginScreen, {attributes: true, attributeFilter: ['style', 'class']});
-    } else {
+    if (isPastLogin()) {
+      // 已滚过登录页，直接创建
       createSidebar();
-      setTimeout(function() { switchPage('overview'); }, 300);
+      setTimeout(function() { switchPage('overview'); }, 200);
+    } else {
+      // 等待滚动过登录页
+      let created = false;
+      function onScroll() {
+        if (!created && isPastLogin()) {
+          created = true;
+          createSidebar();
+          setTimeout(function() { switchPage('overview'); }, 200);
+          window.removeEventListener('scroll', onScroll);
+        }
+      }
+      window.addEventListener('scroll', onScroll, {passive: true});
     }
   }
 
