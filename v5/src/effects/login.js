@@ -96,8 +96,8 @@ function initLogoEffect(svg, prefix) {
       cx: 50, cy: 50, mode: 'auto', targetCx: 50, targetCy: 50,
       flash: 0, flashCooldown: 100 + bi * 80 + Math.floor(Math.random() * 200),
       borderPhase: Math.random() * Math.PI * 2,
-      borderSpeed: 0.4 + Math.random() * 0.5,
-      borderPulse: 0
+      borderSpeed: 0.04 + Math.random() * 0.06,
+      borderDrift: Math.random() * 0.3
     });
   }
 
@@ -178,12 +178,13 @@ function initLogoEffect(svg, prefix) {
       var hue = (t*b.hueSpeed*60+b.huePhase)%360;
       if (mainPath) mainPath.style.filter = (isCallig ? '' : 'hue-rotate('+hue.toFixed(0)+'deg) ') + 'url(#' + p + 'BlurM)';
       if (subPath) subPath.style.filter = (isCallig ? '' : 'hue-rotate('+hue.toFixed(0)+'deg) ') + 'url(#' + p + 'BlurS)';
-      // 金色边框随机呼吸
-      var borderBreath = 0.5 + 0.5 * Math.sin(t * b.borderSpeed * 60 + b.borderPhase);
-      var borderPulseTarget = (Math.random() < 0.003) ? 1 : 0;
-      b.borderPulse += (borderPulseTarget - b.borderPulse) * 0.08;
-      var borderOpacity = 0.35 + borderBreath * 0.35 + b.borderPulse * 0.3;
-      var borderWidth = 1.0 + borderBreath * 0.6 + b.borderPulse * 0.8;
+      // 金色边框缓慢呼吸浮现：大部分时间很淡，随机缓缓亮起再消退
+      b.borderDrift += (Math.random() - 0.48) * 0.008;
+      b.borderDrift = Math.max(-0.15, Math.min(1, b.borderDrift));
+      var borderWave = 0.5 + 0.5 * Math.sin(t * b.borderSpeed * 60 + b.borderPhase);
+      var borderEmerge = Math.max(0, b.borderDrift) * borderWave;
+      var borderOpacity = 0.12 + borderEmerge * 0.65;
+      var borderWidth = 0.8 + borderEmerge * 1.0;
       var glassPath = svg.querySelectorAll('.login-glass')[ai];
       if (glassPath) {
         glassPath.style.strokeOpacity = borderOpacity.toFixed(2);
