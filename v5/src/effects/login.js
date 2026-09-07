@@ -179,12 +179,12 @@ function initLogoEffect(svg, prefix) {
       if (mainPath) mainPath.style.filter = (isCallig ? '' : 'hue-rotate('+hue.toFixed(0)+'deg) ') + 'url(#' + p + 'BlurM)';
       if (subPath) subPath.style.filter = (isCallig ? '' : 'hue-rotate('+hue.toFixed(0)+'deg) ') + 'url(#' + p + 'BlurS)';
       // 金色边框缓慢呼吸浮现：大部分时间很淡，随机缓缓亮起再消退
-      b.borderDrift += (Math.random() - 0.48) * 0.008;
-      b.borderDrift = Math.max(-0.15, Math.min(1, b.borderDrift));
+      b.borderDrift += (Math.random() - 0.495) * 0.0025;
+      b.borderDrift = Math.max(-0.2, Math.min(1, b.borderDrift));
       var borderWave = 0.5 + 0.5 * Math.sin(t * b.borderSpeed * 60 + b.borderPhase);
       var borderEmerge = Math.max(0, b.borderDrift) * borderWave;
-      var borderOpacity = 0.12 + borderEmerge * 0.65;
-      var borderWidth = 0.8 + borderEmerge * 1.0;
+      var borderOpacity = 0.1 + borderEmerge * 0.6;
+      var borderWidth = 0.7 + borderEmerge * 0.9;
       var glassPath = svg.querySelectorAll('.login-glass')[ai];
       if (glassPath) {
         glassPath.style.strokeOpacity = borderOpacity.toFixed(2);
