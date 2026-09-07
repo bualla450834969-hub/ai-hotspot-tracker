@@ -152,13 +152,13 @@ function initLogoEffect(svg, prefix) {
       var mainR = (40 + breath * 48).toFixed(1) + '%';
       var subR = (25 + breath * 35).toFixed(1) + '%';
       var glowOpacity = (0.03 + breath * 0.85);
-      // 白色光晕随机闪现
+      // 白色光晕随机闪现（缓慢柔和）
       if (b.flash > 0) {
-        b.flash *= 0.94;
-        glowOpacity = Math.min(1, glowOpacity + b.flash * 0.6);
-      } else if (frameCount > b.flashCooldown && Math.random() < 0.004) {
+        b.flash *= 0.985;
+        glowOpacity = Math.min(1, glowOpacity + b.flash * 0.5);
+      } else if (frameCount > b.flashCooldown && Math.random() < 0.0008) {
         b.flash = 1;
-        b.flashCooldown = frameCount + 300 + Math.floor(Math.random()*500);
+        b.flashCooldown = frameCount + 600 + Math.floor(Math.random()*900);
       }
       glowOpacity = glowOpacity.toFixed(2);
       if (b.mode === 'auto') {
