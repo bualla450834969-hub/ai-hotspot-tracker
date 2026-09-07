@@ -235,8 +235,8 @@
           value: d.count,
           itemStyle: {
             color: d.viral_rate >= 10
-              ? new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#FFD60A' }, { offset: 1, color: '#FF9F0A' }])
-              : new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#0A84FF' }, { offset: 1, color: '#5E5CE6' }]),
+              ? new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#b8860b' }, { offset: 1, color: '#8b0000' }])
+              : new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: '#5a6b7c' }, { offset: 1, color: '#3d4f5f' }]),
             borderRadius: [4, 4, 0, 0]
           }
         })),
