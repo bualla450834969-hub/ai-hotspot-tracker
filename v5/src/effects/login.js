@@ -161,9 +161,10 @@ function initLogoEffect(svg, prefix) {
       var subPath = svg.querySelector('.' + p + 's-' + (ai+1));
       if (mainPath) mainPath.style.opacity = glowOpacity;
       if (subPath) subPath.style.opacity = (parseFloat(glowOpacity)*0.8).toFixed(2);
+      var isCallig = (typeof cfg === 'function' && cfg('id') === 'calligraphy');
       var hue = (t*b.hueSpeed*60+b.huePhase)%360;
-      if (mainPath) mainPath.style.filter = 'hue-rotate('+hue.toFixed(0)+'deg) url(#' + p + 'BlurM)';
-      if (subPath) subPath.style.filter = 'hue-rotate('+hue.toFixed(0)+'deg) url(#' + p + 'BlurS)';
+      if (mainPath) mainPath.style.filter = (isCallig ? '' : 'hue-rotate('+hue.toFixed(0)+'deg) ') + 'url(#' + p + 'BlurM)';
+      if (subPath) subPath.style.filter = (isCallig ? '' : 'hue-rotate('+hue.toFixed(0)+'deg) ') + 'url(#' + p + 'BlurS)';
     }
     frameCount++;
     for (var sj = 0; sj < sparks.length; sj++) {
