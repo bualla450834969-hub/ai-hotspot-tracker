@@ -27,7 +27,7 @@ window.safeCall = function(fn, ctx) {
   <link rel="stylesheet" href="src/styles/login.css?v=1788677800">
   <link rel="stylesheet" href="src/styles/modules.css?v=1788677800">
 <link rel="stylesheet" href="src/styles/sidebar.css?v=1788751398">
-  <link rel="stylesheet" href="src/styles/advanced.css?v=1788757173">
+  <link rel="stylesheet" href="src/styles/advanced.css?v=1788757957">
   <!-- ECharts -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
@@ -772,9 +772,9 @@ window.safeCall = function(fn, ctx) {
   </script>
 
   <script src="data/data.min.js"></script>
-    <script src="bundle.js?v=1788757418"></script>
-  <script src="src/modules/opsStatus.js?v=1788757173"></script>
-  <script src="src/modules/advancedAnalytics.js?v=1788757418"></script><!-- 所有模块加载完毕后启动框架 -->
+    <script src="bundle.js?v=1788757957"></script>
+  <script src="src/modules/opsStatus.js?v=1788757957"></script>
+  <script src="src/modules/advancedAnalytics.js?v=1788757957"></script><!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
     else window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework());
@@ -792,6 +792,7 @@ window.safeCall = function(fn, ctx) {
       if (window.renderBestPostingCombo) renderBestPostingCombo();
       if (window.renderPostingReminder) renderPostingReminder();
       if (window.renderAnomalyDetection) renderAnomalyDetection();
+      if (window.renderOwnPerformance) renderOwnPerformance();
     }, 800);
   </script>
 
@@ -812,6 +813,12 @@ window.safeCall = function(fn, ctx) {
     <section class="section" id="anomalyDetection">
       <div class="section-title"><span class="section-num">09</span><h2>数据异常检测</h2><span class="section-sub">自动标记异常涨跌 · 抓住机会规避风险</span></div>
       <div class="card glass-card" id="anomalyList"></div>
+    </section>
+
+
+    <section class="section" id="ownPerformance">
+      <div class="section-title"><span class="section-num">10</span><h2>自有数据回传</h2><span class="section-sub">飞书多维表格同步 · 发布后真实表现追踪</span></div>
+      <div class="card glass-card" id="ownPerfList"></div>
     </section>
 
 </body>
