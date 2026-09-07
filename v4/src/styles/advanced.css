@@ -150,3 +150,38 @@
   .ops-divider { display: none; }
   .bpc-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+
+/* 一键复制按钮 */
+.copy-topic-btn {
+  padding: 6px 12px; font-size: 11px; border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7);
+  cursor: pointer; transition: all 0.2s; width: 100%;
+}
+.copy-topic-btn:hover { background: rgba(255,255,255,0.12); color: white; }
+
+/* 热度阶段标签 */
+.heat-phase-badge {
+  display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 8px;
+  margin-left: 6px; font-weight: 600;
+}
+.heat-phase-badge.上升期 { background: rgba(16,185,129,0.15); color: #34d399; }
+.heat-phase-badge.爆发期 { background: rgba(239,68,68,0.15); color: #f87171; }
+.heat-phase-badge.衰退期 { background: rgba(156,163,175,0.15); color: #9ca3af; }
+.heat-phase-badge.稳定期 { background: rgba(59,130,246,0.15); color: #60a5fa; }
+
+/* 差异化角度 */
+.differentiated-angles { margin-top: 8px; padding: 8px 10px; background: rgba(139,92,246,0.08); border-radius: 8px; border: 1px solid rgba(139,92,246,0.15); }
+.da-label { font-size: 10px; color: #a78bfa; font-weight: 600; margin-bottom: 4px; }
+.da-item { font-size: 11px; color: rgba(255,255,255,0.7); margin: 2px 0; padding-left: 16px; position: relative; }
+.da-num { position: absolute; left: 0; color: #a78bfa; font-weight: 700; }
+
+/* 异常检测 */
+.anomaly-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 8px; }
+.anomaly-rank { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; min-width: 40px; text-align: center; }
+.anomaly-rank.surging { background: rgba(239,68,68,0.15); color: #f87171; }
+.anomaly-rank.declining { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.anomaly-main { flex: 1; }
+.anomaly-keyword { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); }
+.anomaly-meta { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.anomaly-suggestion { font-size: 11px; color: #fbbf24; text-align: right; max-width: 140px; }
