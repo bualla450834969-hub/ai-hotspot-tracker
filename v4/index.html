@@ -10,7 +10,8 @@
   <link rel="stylesheet" href="src/styles/glass.css?v=1788677800">
   <link rel="stylesheet" href="src/styles/login.css?v=1788677800">
   <link rel="stylesheet" href="src/styles/modules.css?v=1788677800">
-<link rel="stylesheet" href="src/styles/sidebar.css?v=1788684977">
+<link rel="stylesheet" href="src/styles/sidebar.css?v=1788751398">
+  <link rel="stylesheet" href="src/styles/advanced.css?v=1788751398">
   <!-- ECharts -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
@@ -193,6 +194,11 @@
 
 <div class="blob-3"></div>
 
+
+  <!-- 运营状态条 -->
+  <div id="opsStatusBar" style="margin:16px 20px 0;"></div>
+  <!-- 发布时间提醒 -->
+  <div id="postingReminder" style="margin:0 20px;"></div>
 <div class="hero">
   <div class="hero-top anim anim-d1">
     <div>
@@ -633,6 +639,87 @@
 </div>
 
 
+
+  <!-- 蓝海关键词 -->
+  <div id="blueOcean" class="section">
+    <h2 class="section-title">🌊 蓝海关键词 <span class="section-sub">高需求低竞争，优先做</span></h2>
+    <div id="blueOceanList"></div>
+  </div>
+
+  <!-- 跨平台选题迁移 -->
+  <div id="crossPlatform" class="section">
+    <h2 class="section-title">🔄 跨平台选题迁移 <span class="section-sub">小红书已验证，抖音还没爆</span></h2>
+    <div id="crossPlatformList"></div>
+  </div>
+
+  <!-- 标题基因库 -->
+  <div id="titleGenes" class="section">
+    <h2 class="section-title">🧬 爆款标题基因库 <span class="section-sub">拆解Top标题模式，直接套用</span></h2>
+    <div id="titleGeneList"></div>
+  </div>
+
+  <!-- 评论语义挖掘 -->
+  <div id="commentSemantic" class="section">
+    <h2 class="section-title">💬 评论语义挖掘 <span class="section-sub">用户痛点/提问/购买意向</span></h2>
+    <div id="commentSemanticContent"></div>
+  </div>
+
+  <!-- 转化信号 -->
+  <div id="conversionSignals" class="section">
+    <h2 class="section-title">💰 转化信号识别 <span class="section-sub">评论中含购买意向的作品</span></h2>
+    <div id="conversionSignalList"></div>
+  </div>
+
+  <!-- 完播率分析 -->
+  <div id="completionRate" class="section">
+    <h2 class="section-title">⏱️ 完播率推断 <span class="section-sub">不同时长的预估完播率</span></h2>
+    <div id="completionRateChart"></div>
+  </div>
+
+  <!-- 关键词上升速率 -->
+  <div id="growthRanking" class="section">
+    <h2 class="section-title">📈 关键词上升速率榜 <span class="section-sub">按增长速度排序，捕捉早期热点</span></h2>
+    <div id="growthRankingList"></div>
+  </div>
+
+  <!-- 内容形式ROI -->
+  <div id="formatROI" class="section">
+    <h2 class="section-title">📊 内容形式ROI <span class="section-sub">哪种形式互动效率最高</span></h2>
+    <div id="formatROIList"></div>
+  </div>
+
+  <!-- 对标账号策略 -->
+  <div id="competitorStrategy" class="section">
+    <h2 class="section-title">🎯 对标账号策略拆解 <span class="section-sub">Top5账号的内容配比与更新节奏</span></h2>
+    <div id="competitorList"></div>
+  </div>
+
+  <!-- 最佳发布组合 -->
+  <div id="bestPostingCombo" class="section">
+    <h2 class="section-title">📅 最佳发布组合 <span class="section-sub">星期×时段最优解</span></h2>
+    <div id="bestPostingComboContent"></div>
+  </div>
+
+  <!-- 内容日历 -->
+  <div id="contentCalendar" class="section">
+    <h2 class="section-title">🗓️ 内容日历 <span class="section-sub">选题排期与发布计划</span></h2>
+    <div style="padding:20px;">
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:12px;">
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#6b7280;">周一</div>
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#6b7280;">周二</div>
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#6b7280;">周三</div>
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#6b7280;">周四</div>
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#6b7280;">周五</div>
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#f59e0b;">周六</div>
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#f59e0b;">周日</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;" id="calendarGrid"></div>
+      <div style="margin-top:16px;padding:12px;background:#f0fdf4;border-radius:8px;font-size:13px;color:#166534;">
+        💡 建议：每周发布4-5条，周二/四/六晚20:00为最佳发布时段。工具教程类安排在工作日，热点追更类安排在周末。
+      </div>
+    </div>
+  </div>
+
 <div class="shoot-modal" id="shootModal" onclick="if(event.target===this)this.classList.remove('active')">
   <div class="shoot-modal-content">
     <h3>🎬 拍摄清单</h3>
@@ -669,10 +756,40 @@
   </script>
 
   <script src="data/data.min.js"></script>
-    <script src="bundle.js?v=1788684977"></script><!-- 所有模块加载完毕后启动框架 -->
+    <script src="bundle.js?v=1788751398"></script>
+  <script src="src/modules/opsStatus.js?v=1788751398"></script>
+  <script src="src/modules/advancedAnalytics.js?v=1788751398"></script><!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
     else window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework());
+    setTimeout(function() {
+      if (window.renderOpsStatus) renderOpsStatus();
+      if (window.renderBlueOcean) renderBlueOcean();
+      if (window.renderCrossPlatform) renderCrossPlatform();
+      if (window.renderTitleGenes) renderTitleGenes();
+      if (window.renderCommentSemantic) renderCommentSemantic();
+      if (window.renderConversionSignals) renderConversionSignals();
+      if (window.renderCompletionRate) renderCompletionRate();
+      if (window.renderGrowthRanking) renderGrowthRanking();
+      if (window.renderFormatROI) renderFormatROI();
+      if (window.renderCompetitorStrategy) renderCompetitorStrategy();
+      if (window.renderBestPostingCombo) renderBestPostingCombo();
+      if (window.renderPostingReminder) renderPostingReminder();
+    }, 800);
+  </script>
+
+  <script>
+  setTimeout(function() {
+    var grid = document.getElementById('calendarGrid');
+    if (grid) {
+      var topics = (window.DATA && DATA.topics) ? DATA.topics.slice(0, 7) : [];
+      var days = ['工具教程','热点追更','深度测评','效果展示','工具教程','合集整理','休息/储备'];
+      for (var i = 0; i < 7; i++) {
+        var t = topics[i] || {title: days[i]};
+        grid.innerHTML += '<div style="min-height:80px;padding:8px;border:1px solid #e5e7eb;border-radius:8px;background:white;font-size:11px;"><div style="font-weight:600;color:#374151;margin-bottom:4px;">' + days[i] + '</div><div style="color:#6b7280;line-height:1.4;">' + (t.title || '').substring(0, 30) + '</div></div>';
+      }
+    }
+  }, 1000);
   </script>
 </body>
 </html>
