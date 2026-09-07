@@ -94,7 +94,10 @@ function initLogoEffect(svg, prefix) {
       hueSpeed: 0.4 + Math.random() * 0.3,
       huePhase: Math.random() * 360,
       cx: 50, cy: 50, mode: 'auto', targetCx: 50, targetCy: 50,
-      flash: 0, flashCooldown: 100 + bi * 80 + Math.floor(Math.random() * 200)
+      flash: 0, flashCooldown: 100 + bi * 80 + Math.floor(Math.random() * 200),
+      borderPhase: Math.random() * Math.PI * 2,
+      borderSpeed: 0.4 + Math.random() * 0.5,
+      borderPulse: 0
     });
   }
 
@@ -175,6 +178,17 @@ function initLogoEffect(svg, prefix) {
       var hue = (t*b.hueSpeed*60+b.huePhase)%360;
       if (mainPath) mainPath.style.filter = (isCallig ? '' : 'hue-rotate('+hue.toFixed(0)+'deg) ') + 'url(#' + p + 'BlurM)';
       if (subPath) subPath.style.filter = (isCallig ? '' : 'hue-rotate('+hue.toFixed(0)+'deg) ') + 'url(#' + p + 'BlurS)';
+      // 金色边框随机呼吸
+      var borderBreath = 0.5 + 0.5 * Math.sin(t * b.borderSpeed * 60 + b.borderPhase);
+      var borderPulseTarget = (Math.random() < 0.003) ? 1 : 0;
+      b.borderPulse += (borderPulseTarget - b.borderPulse) * 0.08;
+      var borderOpacity = 0.35 + borderBreath * 0.35 + b.borderPulse * 0.3;
+      var borderWidth = 1.0 + borderBreath * 0.6 + b.borderPulse * 0.8;
+      var glassPath = svg.querySelectorAll('.login-glass')[ai];
+      if (glassPath) {
+        glassPath.style.strokeOpacity = borderOpacity.toFixed(2);
+        glassPath.style.strokeWidth = borderWidth.toFixed(1);
+      }
     }
     frameCount++;
     for (var sj = 0; sj < sparks.length; sj++) {
