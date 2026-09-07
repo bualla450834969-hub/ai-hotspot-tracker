@@ -772,9 +772,9 @@ window.safeCall = function(fn, ctx) {
   </script>
 
   <script src="data/data.min.js"></script>
-    <script src="bundle.js?v=1788757173"></script>
+    <script src="bundle.js?v=1788757418"></script>
   <script src="src/modules/opsStatus.js?v=1788757173"></script>
-  <script src="src/modules/advancedAnalytics.js?v=1788757173"></script><!-- 所有模块加载完毕后启动框架 -->
+  <script src="src/modules/advancedAnalytics.js?v=1788757418"></script><!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
     else window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework());
@@ -791,6 +791,7 @@ window.safeCall = function(fn, ctx) {
       if (window.renderCompetitorStrategy) renderCompetitorStrategy();
       if (window.renderBestPostingCombo) renderBestPostingCombo();
       if (window.renderPostingReminder) renderPostingReminder();
+      if (window.renderAnomalyDetection) renderAnomalyDetection();
     }, 800);
   </script>
 
