@@ -1368,6 +1368,7 @@ if (document.readyState === 'loading') {
 
   // updateTracker
   function updateTracker() {
+    try {
     const status = getKanbanStatus();
     const total = filteredTopics().length;
     let published=0, shooting=0, pending=0;
@@ -1385,6 +1386,8 @@ if (document.readyState === 'loading') {
   }
 
   // toggleSection
+  } catch(e) { console.warn('[Helpers] updateTracker:', e); }
+  }
   function toggleSection(id) {
     var sec = document.getElementById(id);
     if (!sec) return;
@@ -1395,6 +1398,7 @@ if (document.readyState === 'loading') {
 
   // initSectionCollapse
   function initSectionCollapse() {
+    try {
     var sections = document.querySelectorAll('.hero, section');
     sections.forEach(function(sec, idx) {
       var header = sec.querySelector('.section-title, h2, .hero-title');
@@ -1425,6 +1429,8 @@ if (document.readyState === 'loading') {
   }
 
   // applyFilter
+  } catch(e) { console.warn('[Helpers] initSectionCollapse:', e); }
+  }
   function applyFilter() { currentCategory = document.getElementById('categoryFilter').value; renderAll(); }
 
   // setPlatform
@@ -1453,6 +1459,7 @@ if (document.readyState === 'loading') {
 
   // doGlobalSearch
   function doGlobalSearch(query) {
+    try {
     query = query.trim().toLowerCase();
     var topicCards = document.querySelectorAll('#topicGrid .topic-card');
     var hotwordRows = document.querySelectorAll('#hotwordTable tbody tr');
@@ -1498,6 +1505,8 @@ if (document.readyState === 'loading') {
   }
 
   // exportTopics
+  } catch(e) { console.warn('[Helpers] doGlobalSearch:', e); }
+  }
   function exportTopics() {
     var topics = filteredTopics();
     var text = '【' + cfg('name', '热点') + '选题清单】' + new Date().toLocaleDateString() + '\n\n';
@@ -2026,6 +2035,7 @@ if (document.readyState === 'loading') {
         ${t.smart_priority ? '<span class="smart-priority ' + (t.smart_priority>=60?'high':t.smart_priority>=40?'mid':'low') + '" title="信息差'+(t.priority_breakdown?.info_gap||0)+' 热度'+(t.priority_breakdown?.heat||0)+' 低竞争'+(t.priority_breakdown?.low_competition||0)+'">智能 ' + t.smart_priority + '</span>' : ''}
         ${t.content_type ? '<span class="content-type-tag '+t.content_type+'">'+t.content_type+'</span>' : ''}${t.is_info_gap ? '<div class="info-gap-badge">💎 信息差</div>' : (t.is_forecast ? '<div class="forecast-badge">🔮 前瞻</div>' : '')}
         <div class="tc-title">${t.title}</div>
+        ${t.heat_phase ? '<span class="heat-phase-badge ' + (t.heat_phase_color || '') + '">' + t.heat_phase + '</span>' : ''}
         <div class="tc-hook">${t.hook}</div>\n      ${t.guide_comment ? '<div class="guide-comment">💬 小号引导：' + t.guide_comment + '</div>' : ''}
         <div style="display:flex;align-items:center;gap:12px;margin:6px 0">
           <div><span class="topic-score">${score.total}</span><span class="topic-score-label"> 综合分</span></div>
@@ -2049,6 +2059,7 @@ if (document.readyState === 'loading') {
           <div class="cp-row"><span class="cp-label">对应产品：</span>${t.conversion_path.product_match}</div>
           <div class="cp-row"><span class="cp-label">漏斗：</span>${t.conversion_path.funnel_step}</div>
         </div>` : ''}
+        ${t.differentiated_angles && t.differentiated_angles.length ? '<div class="differentiated-angles"><div class="da-label">差异化角度</div>' + t.differentiated_angles.slice(0,3).map(function(a,ai){return '<div class="da-item"><span class="da-num">'+(ai+1)+'</span>'+a+'</div>'}).join('') + '</div>' : ''}
         ${t.target_persona ? `<div class="topic-persona">
           <div class="tp-name">目标人群：${t.target_persona.name} · ${t.target_persona.age} · ${t.target_persona.gender}</div>
           <div class="tp-needs">${(t.target_persona.needs||[]).slice(0,4).map(n=>'<span class="tp-need">'+n+'</span>').join('')}</div>
@@ -2064,6 +2075,7 @@ if (document.readyState === 'loading') {
           }
           return '<div style="margin-top:6px;"><button onclick="event.stopPropagation();recordPerf(\''+t.title.replace(/'/g,"\\'")+'\')" style="font-size:10px;padding:3px 8px;border-radius:5px;border:none;background:rgba(245,158,11,0.15);color:#fbbf24;cursor:pointer;">📊 记录发布效果</button></div>';
         })() : ''}
+        <button class="copy-topic-btn" onclick="event.stopPropagation();copyTopicText(''${t.title.replace(/'/g,'\\'')}','${t.hook.replace(/'/g,'\\'')}')">📋 复制标题+钩子</button>
         <div class="title-variants">
           <div class="tv-label">A/B标题变体（点击复制）：</div>
           ${genTitleVariants(t.title).map(function(v,vi){
@@ -3750,6 +3762,7 @@ if (document.readyState === 'loading') {
 
   // generateScript
   function generateScript(title) {
+    try {
     const topic = DATA.topics.find(function(t) { return t.title === title; });
     if (!topic) return;
     const persona = topic.target_persona || {};
@@ -3789,6 +3802,7 @@ if (document.readyState === 'loading') {
     setTimeout(function(){ el.textContent = '📋 复制话术'; }, 2000);
   }
 
+  } catch(e) { console.warn('[scriptGen]', e); }
   window.generateScript = generateScript;
   window.closeScriptModal = closeScriptModal;
   window.copyScript = copyScript;
@@ -3869,7 +3883,7 @@ if (document.readyState === 'loading') {
       id: 'hotspots',
       icon: '🔥',
       label: '热点追踪',
-      sections: ['works', 'hotwords', 'history', 'hotwordTable', 'worksTable', 'chartRanking', 'chartCategory', 'chartPublishTime', 'chartDuration', 'chartHook', 'insightsGrid', 'growthRanking', 'blueOcean'],
+      sections: ['works', 'hotwords', 'history', 'hotwordTable', 'worksTable', 'chartRanking', 'chartCategory', 'chartPublishTime', 'chartDuration', 'chartHook', 'insightsGrid', 'growthRanking', 'blueOcean', 'anomalyDetection'],
       title: '热点追踪'
     },
     {
@@ -3929,6 +3943,7 @@ if (document.readyState === 'loading') {
 
   // 创建sidebar
   function createSidebar() {
+    try {
     if (document.getElementById('appSidebar')) return;
 
     const sidebar = document.createElement('aside');
@@ -4037,7 +4052,10 @@ if (document.readyState === 'loading') {
   }
 
   // 切换页面
+  } catch(e) { console.warn('[Sidebar] createSidebar:', e); }
+  }
   function switchPage(pageId) {
+    try {
     const group = NAV_GROUPS.find(function(g) { return g.id === pageId; });
     if (!group) return;
 
@@ -4119,7 +4137,10 @@ if (document.readyState === 'loading') {
   }
 
   // 初始化
+  } catch(e) { console.warn('[Sidebar] switchPage:', e); }
+  }
   function initSidebar() {
+    try {
     if (isPastLogin()) {
       // 已滚过登录页，直接创建
       createSidebar();
@@ -4140,6 +4161,8 @@ if (document.readyState === 'loading') {
   }
 
   // 暴露到window
+  } catch(e) { console.warn('[Sidebar] initSidebar:', e); }
+  }
   window.initSidebar = initSidebar;
   window.switchPage = switchPage;
   window.NAV_GROUPS = NAV_GROUPS;
