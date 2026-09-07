@@ -185,3 +185,12 @@
 .anomaly-keyword { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); }
 .anomaly-meta { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
 .anomaly-suggestion { font-size: 11px; color: #fbbf24; text-align: right; max-width: 140px; }
+
+/* 自有数据回传 */
+.own-perf-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 8px; }
+.own-perf-rank { width: 28px; height: 28px; border-radius: 50%; background: rgba(139,92,246,0.2); color: #a78bfa; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+.own-perf-main { flex: 1; min-width: 0; }
+.own-perf-title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.own-perf-meta { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.own-perf-stats { display: flex; gap: 16px; }
+.empty-state { text-align: center; padding: 40px 20px; }
