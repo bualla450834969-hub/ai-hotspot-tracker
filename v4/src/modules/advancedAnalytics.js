@@ -229,5 +229,26 @@
   window.renderFormatROI = renderFormatROI;
   window.renderCompetitorStrategy = renderCompetitorStrategy;
   window.renderBestPostingCombo = renderBestPostingCombo;
+  window.renderAnomalyDetection = renderAnomalyDetection;
   window.renderPostingReminder = renderPostingReminder;
+
+  // 数据异常检测
+  function renderAnomalyDetection() {
+    try {
+      const el = document.getElementById('anomalyList');
+      if (!el) return;
+      const list = DASHBOARD_DATA.data_anomalies || [];
+      if (!list.length) { el.innerHTML = '<div class="empty-state">暂无异常数据</div>'; return; }
+      el.innerHTML = list.map((a, i) => `
+        <div class="anomaly-item glass-card">
+          <div class="anomaly-rank ${a.type === '暴涨' ? 'surging' : 'declining'}">${a.type}</div>
+          <div class="anomaly-main">
+            <div class="anomaly-keyword">${a.keyword} <span class="bo-platform ${a.platform}">${a.platform==='douyin'?'抖音':'小红书'}</span></div>
+            <div class="anomaly-meta">增长率 ${a.growth}% (均值 ${a.avg_growth}%) · Z值 ${a.z_score} · ${a.works_count}作品 · 均赞${a.avg_like}</div>
+          </div>
+          <div class="anomaly-suggestion">${a.suggestion}</div>
+        </div>`).join('');
+    } catch(e) { console.warn('[AA] anomaly:', e); }
+  }
+
 })();
