@@ -1,6 +1,22 @@
 ﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+<script>
+// Superpowers verification-before-completion: 全局错误兜底
+// 任何模块报错只影响自身，不拖垮整页
+window.addEventListener('error', function(e) {
+  console.warn('[SafeGuard]', e.message, e.filename + ':' + e.lineno);
+  return true;
+});
+window.addEventListener('unhandledrejection', function(e) {
+  console.warn('[SafeGuard] Promise:', e.reason);
+  return true;
+});
+// 安全调用包装器
+window.safeCall = function(fn, ctx) {
+  try { return fn.call(ctx); } catch(err) { console.warn('[SafeCall]', err); return null; }
+};
+</script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="pageTitle">热点追踪工作台</title>
@@ -11,7 +27,7 @@
   <link rel="stylesheet" href="src/styles/login.css?v=1788677800">
   <link rel="stylesheet" href="src/styles/modules.css?v=1788677800">
 <link rel="stylesheet" href="src/styles/sidebar.css?v=1788751398">
-  <link rel="stylesheet" href="src/styles/advanced.css?v=1788753235">
+  <link rel="stylesheet" href="src/styles/advanced.css?v=1788756767">
   <!-- ECharts -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
@@ -756,9 +772,9 @@
   </script>
 
   <script src="data/data.min.js"></script>
-    <script src="bundle.js?v=1788752579"></script>
-  <script src="src/modules/opsStatus.js?v=1788752079"></script>
-  <script src="src/modules/advancedAnalytics.js?v=1788752079"></script><!-- 所有模块加载完毕后启动框架 -->
+    <script src="bundle.js?v=1788756767"></script>
+  <script src="src/modules/opsStatus.js?v=1788756767"></script>
+  <script src="src/modules/advancedAnalytics.js?v=1788756767"></script><!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
     else window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework());
@@ -791,5 +807,11 @@
     }
   }, 1000);
   </script>
+
+    <section class="section" id="anomalyDetection">
+      <div class="section-title"><span class="section-num">09</span><h2>数据异常检测</h2><span class="section-sub">自动标记异常涨跌 · 抓住机会规避风险</span></div>
+      <div class="card glass-card" id="anomalyList"></div>
+    </section>
+
 </body>
 </html>
