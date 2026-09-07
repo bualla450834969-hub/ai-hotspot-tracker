@@ -180,8 +180,8 @@ function initLogoEffect(svg, prefix) {
       if (subPath) subPath.style.filter = (isCallig ? '' : 'hue-rotate('+hue.toFixed(0)+'deg) ') + 'url(#' + p + 'BlurS)';
       // 金色边框呼吸：跟人呼吸频率一致，固定最低浮现亮度
       var breathCycle = 0.5 + 0.5 * Math.sin(t * 1.6 + b.borderPhase);
-      var borderOpacity = 0.5 + breathCycle * 0.3;
-      var borderWidth = 1.0 + breathCycle * 0.4;
+      var borderOpacity = 0.5 + breathCycle * 0.5;
+      var borderWidth = 1.5 + breathCycle * 0.5;
       var glassPath = svg.querySelectorAll('.login-glass')[ai];
       if (glassPath) {
         glassPath.style.strokeOpacity = borderOpacity.toFixed(2);
