@@ -236,6 +236,16 @@ button, .btn, [class*="button"] {
   filter: drop-shadow(0 4px 20px rgba(139, 0, 0, 0.15));
 }
 
+/* 登录页logo玻璃块底色加深 — 墨色半透明 */
+.login-screen .login-glass {
+  fill: rgba(44, 36, 22, 0.14) !important;
+  stroke: rgba(44, 36, 22, 0.25) !important;
+}
+.login-screen .login-glass:hover {
+  stroke: rgba(139, 0, 0, 0.5) !important;
+  fill: rgba(44, 36, 22, 0.2) !important;
+}
+
 /* ===== 滚动条 ===== */
 ::-webkit-scrollbar {
   width: 8px;
