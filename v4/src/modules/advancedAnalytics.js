@@ -9,7 +9,7 @@
   function renderBlueOcean() {
     const el = document.getElementById('blueOceanList');
     if (!el) return;
-    const list = DATA.blue_ocean_keywords || [];
+    const list = DASHBOARD_DATA.blue_ocean_keywords || [];
     if (!list.length) { el.innerHTML = '<div class="empty-state">暂无蓝海关键词</div>'; return; }
     el.innerHTML = list.map((k, i) => `
       <div class="bo-item glass-card">
@@ -30,7 +30,7 @@
   function renderCrossPlatform() {
     const el = document.getElementById('crossPlatformList');
     if (!el) return;
-    const list = DATA.cross_platform_gaps || [];
+    const list = DASHBOARD_DATA.cross_platform_gaps || [];
     if (!list.length) { el.innerHTML = '<div class="empty-state">暂无跨平台迁移机会（两平台热度接近）</div>'; return; }
     el.innerHTML = list.map(g => `
       <div class="cp-item glass-card">
@@ -54,7 +54,7 @@
   function renderTitleGenes() {
     const el = document.getElementById('titleGeneList');
     if (!el) return;
-    const list = DATA.title_gene_library || [];
+    const list = DASHBOARD_DATA.title_gene_library || [];
     if (!list.length) { el.innerHTML = '<div class="empty-state">暂无数据</div>'; return; }
     el.innerHTML = list.map(g => `
       <div class="tg-item glass-card">
@@ -72,7 +72,7 @@
   function renderCommentSemantic() {
     const el = document.getElementById('commentSemanticContent');
     if (!el) return;
-    const cs = DATA.comment_semantic || {};
+    const cs = DASHBOARD_DATA.comment_semantic || {};
     el.innerHTML = `
       <div class="cs-section">
         <div class="cs-title">😣 用户痛点 <span class="cs-count">${(cs.pain_points||[]).length}</span></div>
@@ -92,7 +92,7 @@
   function renderConversionSignals() {
     const el = document.getElementById('conversionSignalList');
     if (!el) return;
-    const list = DATA.conversion_signals || [];
+    const list = DASHBOARD_DATA.conversion_signals || [];
     if (!list.length) { el.innerHTML = '<div class="empty-state">暂无明显转化信号作品（评论中未检测到购买意向关键词）</div>'; return; }
     el.innerHTML = list.map(s => `
       <div class="cv-item glass-card">
@@ -110,7 +110,7 @@
   function renderCompletionRate() {
     const el = document.getElementById('completionRateChart');
     if (!el) return;
-    const list = DATA.completion_rate_analysis || [];
+    const list = DASHBOARD_DATA.completion_rate_analysis || [];
     if (!list.length) { el.innerHTML = '<div class="empty-state">暂无数据</div>'; return; }
     const max = Math.max(...list.map(d=>d.avg_completion));
     el.innerHTML = list.map(d => `
@@ -125,7 +125,7 @@
   function renderGrowthRanking() {
     const el = document.getElementById('growthRankingList');
     if (!el) return;
-    const list = DATA.keyword_growth_ranking || [];
+    const list = DASHBOARD_DATA.keyword_growth_ranking || [];
     if (!list.length) { el.innerHTML = '<div class="empty-state">暂无增长数据</div>'; return; }
     el.innerHTML = list.slice(0,15).map(k => `
       <div class="gr-row">
@@ -141,7 +141,7 @@
   function renderFormatROI() {
     const el = document.getElementById('formatROIList');
     if (!el) return;
-    const list = DATA.content_format_roi || [];
+    const list = DASHBOARD_DATA.content_format_roi || [];
     if (!list.length) { el.innerHTML = '<div class="empty-state">暂无数据</div>'; return; }
     const max = Math.max(...list.map(d=>d.engagement_score));
     el.innerHTML = list.map(f => `
@@ -161,7 +161,7 @@
   function renderCompetitorStrategy() {
     const el = document.getElementById('competitorList');
     if (!el) return;
-    const list = DATA.competitor_strategy || [];
+    const list = DASHBOARD_DATA.competitor_strategy || [];
     if (!list.length) { el.innerHTML = '<div class="empty-state">暂无对标数据</div>'; return; }
     el.innerHTML = list.map((c, i) => `
       <div class="comp-item glass-card">
@@ -180,7 +180,7 @@
   function renderBestPostingCombo() {
     const el = document.getElementById('bestPostingComboContent');
     if (!el) return;
-    const list = DATA.best_posting_combo || [];
+    const list = DASHBOARD_DATA.best_posting_combo || [];
     if (!list.length) { el.innerHTML = '<div class="empty-state">暂无数据</div>'; return; }
     el.innerHTML = `<div class="bpc-grid">${list.map(c => `
       <div class="bpc-item ${c.score>=85?'best':c.score>=70?'good':''}">
@@ -198,7 +198,7 @@
     const hour = now.getHours();
     const dayNames = ['周日','周一','周二','周三','周四','周五','周六'];
     const today = dayNames[now.getDay()];
-    const best = (DATA.best_posting_combo||[]).find(c => c.day === today);
+    const best = (DASHBOARD_DATA.best_posting_combo||[]).find(c => c.day === today);
     let msg, status;
     if (best) {
       const bestHour = parseInt(best.hour);
