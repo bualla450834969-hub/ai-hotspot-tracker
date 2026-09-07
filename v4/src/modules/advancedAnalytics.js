@@ -230,6 +230,7 @@
   window.renderCompetitorStrategy = renderCompetitorStrategy;
   window.renderBestPostingCombo = renderBestPostingCombo;
   window.renderAnomalyDetection = renderAnomalyDetection;
+  window.renderOwnPerformance = renderOwnPerformance;
   window.renderPostingReminder = renderPostingReminder;
 
   // 数据异常检测
@@ -249,6 +250,35 @@
           <div class="anomaly-suggestion">${a.suggestion}</div>
         </div>`).join('');
     } catch(e) { console.warn('[AA] anomaly:', e); }
+  }
+
+
+  // 自有数据回传（飞书多维表格）
+  function renderOwnPerformance() {
+    try {
+      const el = document.getElementById('ownPerfList');
+      if (!el) return;
+      const list = DASHBOARD_DATA.own_performance || [];
+      const summary = DASHBOARD_DATA.own_performance_summary || {};
+      if (!list.length) {
+        el.innerHTML = '<div class="empty-state"><div style="font-size:32px;margin-bottom:8px">📊</div><div style="color:rgba(255,255,255,0.5);font-size:13px">暂无发布数据</div><div style="color:rgba(255,255,255,0.3);font-size:11px;margin-top:4px">在飞书多维表格"选题建议表"中将状态改为"已发布"并填写播放量等数据</div></div>';
+        return;
+      }
+      el.innerHTML = list.map((p, i) => `
+        <div class="own-perf-item glass-card">
+          <div class="own-perf-rank">${i+1}</div>
+          <div class="own-perf-main">
+            <div class="own-perf-title">${p.title}</div>
+            <div class="own-perf-meta">${p.platform||'抖音'} · ${p.publish_date||'-'} · ${p.keyword||''}</div>
+          </div>
+          <div class="own-perf-stats">
+            <div class="ops-stat"><span class="ops-num">${(p.views||0).toLocaleString()}</span><span class="ops-label">播放</span></div>
+            <div class="ops-stat"><span class="ops-num">${(p.likes||0).toLocaleString()}</span><span class="ops-label">点赞</span></div>
+            <div class="ops-stat"><span class="ops-num">${(p.collects||0).toLocaleString()}</span><span class="ops-label">收藏</span></div>
+            <div class="ops-stat"><span class="ops-num">${p.completion_rate? (p.completion_rate*100).toFixed(1)+'%' : '-'}</span><span class="ops-label">完播</span></div>
+          </div>
+        </div>`).join('');
+    } catch(e) { console.warn('[AA] ownPerf:', e); }
   }
 
 })();
