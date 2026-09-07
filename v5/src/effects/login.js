@@ -93,7 +93,8 @@ function initLogoEffect(svg, prefix) {
       breathPhase: bi * Math.PI / 2,
       hueSpeed: 0.4 + Math.random() * 0.3,
       huePhase: Math.random() * 360,
-      cx: 50, cy: 50, mode: 'auto', targetCx: 50, targetCy: 50
+      cx: 50, cy: 50, mode: 'auto', targetCx: 50, targetCy: 50,
+      flash: 0, flashCooldown: 100 + bi * 80 + Math.floor(Math.random() * 200)
     });
   }
 
@@ -147,7 +148,16 @@ function initLogoEffect(svg, prefix) {
       var breath = 0.5 + 0.5 * Math.sin(t * b.breathSpeed * 60 + b.breathPhase);
       var mainR = (40 + breath * 48).toFixed(1) + '%';
       var subR = (25 + breath * 35).toFixed(1) + '%';
-      var glowOpacity = (0.03 + breath * 0.85).toFixed(2);
+      var glowOpacity = (0.03 + breath * 0.85);
+      // 白色光晕随机闪现
+      if (b.flash > 0) {
+        b.flash *= 0.94;
+        glowOpacity = Math.min(1, glowOpacity + b.flash * 0.6);
+      } else if (frameCount > b.flashCooldown && Math.random() < 0.004) {
+        b.flash = 1;
+        b.flashCooldown = frameCount + 300 + Math.floor(Math.random()*500);
+      }
+      glowOpacity = glowOpacity.toFixed(2);
       if (b.mode === 'auto') {
         b.targetCx = 50 + Math.sin(t*b.fx+b.phase)*20 + Math.sin(t*b.fx2+b.phase*2)*8;
         b.targetCy = 50 + Math.cos(t*b.fy+b.phase*1.5)*18 + Math.cos(t*b.fy2+b.phase)*6;
