@@ -8,9 +8,9 @@
   function renderOpsStatus() {
     const el = document.getElementById('opsStatusBar');
     if (!el) return;
-    const cs = DATA.collection_status || {};
-    const pb = DATA.points_balance || {};
-    const lastUpdate = cs.last_run || DATA.last_update || '未知';
+    const cs = DASHBOARD_DATA.collection_status || {};
+    const pb = DASHBOARD_DATA.points_balance || {};
+    const lastUpdate = cs.last_run || DASHBOARD_DATA.last_update || '未知';
 
     // 计算数据新鲜度
     let freshness = '新鲜', freshnessColor = '#10b981', freshnessIcon = '●';
