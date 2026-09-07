@@ -299,10 +299,19 @@ hr, .divider {
 
 /* ===== 补充覆盖：修复残留暗色 ===== */
 
-/* Hero标题确保深色 */
+/* Hero标题确保深色 — 覆盖暗色主题的渐变文字效果 */
 .hero-title, .hero-title * {
   color: #1a1a1a !important;
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
   text-shadow: none !important;
+  -webkit-text-fill-color: #1a1a1a !important;
+}
+.hero-title em {
+  color: #8b0000 !important;
+  -webkit-text-fill-color: #8b0000 !important;
+  background: none !important;
 }
 
 /* Hero大卡片 - 宣纸白 */
@@ -436,4 +445,57 @@ select, input, textarea {
   color: var(--text) !important;
   border: 1px solid rgba(139, 90, 43, 0.2) !important;
   border-radius: 2px !important;
+}
+
+
+/* ===== 侧边栏中文数字图标 ===== */
+.sb-icon {
+  font-family: 'Ma Shan Zheng', 'STKaiti', 'KaiTi', serif !important;
+  font-size: 16px !important;
+  width: 24px !important;
+  height: 24px !important;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(196, 30, 58, 0.3);
+  border-radius: 2px;
+  color: #c4b896 !important;
+  background: rgba(196, 30, 58, 0.05);
+  flex-shrink: 0;
+}
+
+.sidebar-nav-item.active .sb-icon {
+  color: #f0e8d5 !important;
+  background: rgba(196, 30, 58, 0.3);
+  border-color: rgba(196, 30, 58, 0.5);
+}
+
+/* ===== 印章风格标记 ===== */
+.seal-mark {
+  display: inline-block;
+  padding: 1px 6px;
+  background: #8b0000;
+  color: #fff !important;
+  font-family: 'Ma Shan Zheng', 'STKaiti', serif;
+  font-size: 11px;
+  border-radius: 2px;
+  letter-spacing: 1px;
+  transform: rotate(-1deg);
+  margin-left: 6px;
+}
+
+/* ===== 热词可点击提示 ===== */
+#hotwordTable b {
+  border-bottom: 1px dashed rgba(139, 0, 0, 0.3);
+  transition: all 0.2s;
+}
+#hotwordTable b:hover {
+  color: #8b0000 !important;
+  border-bottom-color: #8b0000;
+}
+#hotwordTable b::after {
+  content: '↗';
+  font-size: 9px;
+  margin-left: 2px;
+  opacity: 0.4;
 }
