@@ -236,27 +236,33 @@ button, .btn, [class*="button"] {
   filter: drop-shadow(0 4px 20px rgba(139, 0, 0, 0.15));
 }
 
-/* 登录页logo — 金色边框 + 金色光晕 + 金色光点 */
+/* 登录页logo — 泛金光效果 */
+.login-screen .login-logo-svg {
+  filter: drop-shadow(0 0 25px rgba(255, 200, 60, 0.25)) drop-shadow(0 0 50px rgba(255, 180, 40, 0.12));
+}
+/* 玻璃块：细金线边框 + 极淡金底 */
 .login-screen .login-glass {
-  fill: rgba(212, 168, 75, 0.1) !important;
-  stroke: #d4a84b !important;
-  stroke-width: 1.5 !important;
+  fill: rgba(255, 215, 0, 0.04) !important;
+  stroke: rgba(232, 197, 71, 0.7) !important;
+  stroke-width: 1.2 !important;
 }
 .login-screen .login-glass:hover {
   stroke: #ffd700 !important;
-  fill: rgba(212, 168, 75, 0.18) !important;
+  fill: rgba(255, 215, 0, 0.08) !important;
 }
-/* 主光晕 → 金色 */
+/* 主光晕：亮金中心 + 金色外发光 */
 .login-screen .login-logo-svg path[class*="m-"] {
-  fill: rgba(232, 197, 71, 0.55) !important;
+  fill: rgba(255, 220, 100, 0.45) !important;
+  filter: drop-shadow(0 0 15px rgba(255, 200, 60, 0.7)) drop-shadow(0 0 30px rgba(255, 180, 40, 0.35)) !important;
 }
-/* 次光晕 → 金色 */
+/* 次光晕：淡金 + 柔和发光 */
 .login-screen .login-logo-svg path[class*="s-"] {
-  fill: rgba(212, 168, 75, 0.35) !important;
+  fill: rgba(255, 200, 80, 0.25) !important;
+  filter: drop-shadow(0 0 10px rgba(255, 190, 60, 0.4)) !important;
 }
-/* 边缘光点 → 金色 */
+/* 边缘光点：纯金 + 已自带blur滤镜 */
 .login-screen .login-logo-svg circle {
-  fill: #ffd700 !important;
+  fill: #ffe680 !important;
 }
 
 /* ===== 滚动条 ===== */
