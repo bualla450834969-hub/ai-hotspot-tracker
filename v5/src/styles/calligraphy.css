@@ -236,14 +236,27 @@ button, .btn, [class*="button"] {
   filter: drop-shadow(0 4px 20px rgba(139, 0, 0, 0.15));
 }
 
-/* 登录页logo玻璃块底色加深 — 墨色半透明 */
+/* 登录页logo — 金色边框 + 金色光晕 + 金色光点 */
 .login-screen .login-glass {
-  fill: rgba(44, 36, 22, 0.14) !important;
-  stroke: rgba(44, 36, 22, 0.25) !important;
+  fill: rgba(212, 168, 75, 0.1) !important;
+  stroke: #d4a84b !important;
+  stroke-width: 1.5 !important;
 }
 .login-screen .login-glass:hover {
-  stroke: rgba(139, 0, 0, 0.5) !important;
-  fill: rgba(44, 36, 22, 0.2) !important;
+  stroke: #ffd700 !important;
+  fill: rgba(212, 168, 75, 0.18) !important;
+}
+/* 主光晕 → 金色 */
+.login-screen .login-logo-svg path[class*="m-"] {
+  fill: rgba(232, 197, 71, 0.55) !important;
+}
+/* 次光晕 → 金色 */
+.login-screen .login-logo-svg path[class*="s-"] {
+  fill: rgba(212, 168, 75, 0.35) !important;
+}
+/* 边缘光点 → 金色 */
+.login-screen .login-logo-svg circle {
+  fill: #ffd700 !important;
 }
 
 /* ===== 滚动条 ===== */
