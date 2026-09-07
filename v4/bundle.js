@@ -3894,7 +3894,7 @@ if (document.readyState === 'loading') {
       id: 'hotspots',
       icon: '🔥',
       label: '热点追踪',
-      sections: ['works', 'hotwords', 'history', 'hotwordTable', 'worksTable', 'chartRanking', 'chartCategory', 'chartPublishTime', 'chartDuration', 'chartHook', 'insightsGrid', 'growthRanking', 'blueOcean', 'anomalyDetection'],
+      sections: ['works', 'hotwords', 'history', 'hotwordTable', 'worksTable', 'chartRanking', 'chartCategory', 'chartPublishTime', 'chartDuration', 'chartHook', 'insightsGrid', 'growthRanking', 'blueOcean', 'anomalyDetection', 'ownPerformance'],
       title: '热点追踪'
     },
     {
