@@ -122,6 +122,10 @@
         <input type="text" id="globalSearch" placeholder="搜索选题/热词..." oninput="doGlobalSearch(this.value)">
       </div>
 </div>
+<!-- 运营状态条 -->
+<div id="opsStatusBar" style="margin:16px 20px 0;max-width:1400px;margin-left:auto;margin-right:auto;"></div>
+<!-- 发布时间提醒 -->
+<div id="postingReminder" style="margin:8px 20px 0;max-width:1400px;margin-left:auto;margin-right:auto;"></div>
 <div class="scroll-progress" id="scrollProgress"></div>
 <div class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
 <div class="bg-logo">
@@ -195,10 +199,6 @@
 <div class="blob-3"></div>
 
 
-  <!-- 运营状态条 -->
-  <div id="opsStatusBar" style="margin:16px 20px 0;"></div>
-  <!-- 发布时间提醒 -->
-  <div id="postingReminder" style="margin:0 20px;"></div>
 <div class="hero">
   <div class="hero-top anim anim-d1">
     <div>
@@ -782,7 +782,7 @@
   setTimeout(function() {
     var grid = document.getElementById('calendarGrid');
     if (grid) {
-      var topics = (window.DATA && DATA.topics) ? DATA.topics.slice(0, 7) : [];
+      var topics = (window.DATA && DASHBOARD_DATA.topics) ? DASHBOARD_DATA.topics.slice(0, 7) : [];
       var days = ['工具教程','热点追更','深度测评','效果展示','工具教程','合集整理','休息/储备'];
       for (var i = 0; i < 7; i++) {
         var t = topics[i] || {title: days[i]};
