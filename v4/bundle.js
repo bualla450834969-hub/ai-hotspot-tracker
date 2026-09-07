@@ -256,1046 +256,7 @@ window.domainGuard = function(moduleId, renderFn) {
 };
 
 
-/**
- * 状态管理 — localStorage持久化
- * 看板状态、收藏、选题性能追踪、清单进度
- */
-(function() {
-  'use strict';
-
-  const PREFIX = 'hotspot_';
-
-  const State = {
-    get(key, def) {
-      try {
-        const raw = localStorage.getItem(PREFIX + key);
-        return raw ? JSON.parse(raw) : def;
-      } catch (e) { return def; }
-    },
-    set(key, val) {
-      try { localStorage.setItem(PREFIX + key, JSON.stringify(val)); } catch (e) {}
-    },
-
-    // ===== 选题看板状态 =====
-    getTopicStatus(title) {
-      const all = this.get('topic_status', {});
-      return all[title] || '待拍摄';
-    },
-    setTopicStatus(title, status) {
-      const all = this.get('topic_status', {});
-      all[title] = status;
-      this.set('topic_status', all);
-    },
-    cycleTopicStatus(title) {
-      const order = ['待拍摄', '拍摄中', '已发布', '已归档'];
-      const cur = this.getTopicStatus(title);
-      const next = order[(order.indexOf(cur) + 1) % order.length];
-      this.setTopicStatus(title, next);
-      return next;
-    },
-    getAllTopicStatus() {
-      return this.get('topic_status', {});
-    },
-
-    // ===== 收藏 =====
-    getFavorites() {
-      return this.get('favorites', []);
-    },
-    isFavorite(workId) {
-      return this.getFavorites().includes(workId);
-    },
-    toggleFavorite(workId) {
-      const favs = this.getFavorites();
-      const idx = favs.indexOf(workId);
-      if (idx >= 0) favs.splice(idx, 1);
-      else favs.push(workId);
-      this.set('favorites', favs);
-      return idx < 0;
-    },
-
-    // ===== 选题性能追踪 =====
-    getPerfData() {
-      return this.get('topic_perf', {});
-    },
-    recordPerf(title, data) {
-      const all = this.getPerfData();
-      all[title] = { ...all[title], ...data, recorded_at: new Date().toISOString() };
-      this.set('topic_perf', all);
-    },
-    calcHitRate() {
-      const perf = this.getPerfData();
-      const total = Object.keys(perf).length;
-      const hits = Object.values(perf).filter(p => p.views > 10000).length;
-      return total ? Math.round(hits / total * 100) : 0;
-    },
-
-    // ===== 拍摄清单进度 =====
-    getChecklist() {
-      return this.get('checklist', {});
-    },
-    toggleCheck(topicTitle, itemIndex) {
-      const all = this.getChecklist();
-      if (!all[topicTitle]) all[topicTitle] = {};
-      all[topicTitle][itemIndex] = !all[topicTitle][itemIndex];
-      this.set('checklist', all);
-      return all[topicTitle][itemIndex];
-    },
-    getChecklistProgress(topicTitle) {
-      const data = this.getChecklist()[topicTitle] || {};
-      const done = Object.values(data).filter(Boolean).length;
-      const total = 10; // 固定10步
-      return { done, total, percent: Math.round(done / total * 100) };
-    },
-
-    // ===== 积分追踪 =====
-    getCreditUsage() {
-      return this.get('credit_usage', { used: 0, total: 1000, history: [] });
-    },
-    addCreditUsage(points) {
-      const data = this.getCreditUsage();
-      data.used += points;
-      data.history.push({ date: new Date().toISOString(), points });
-      this.set('credit_usage', data);
-      return data;
-    },
-  };
-
-  window.State = State;
-})();
-
-
-/**
- * 通用渲染器 — 表格、卡片、图表、数字动画、标签
- * 所有业务模块共用，不包含领域逻辑
- */
-(function() {
-  'use strict';
-
-  const Renderer = {
-    /** 数字动画 */
-    animateNumber(el, target, duration = 800) {
-      if (!el) return;
-      const start = 0;
-      const startTime = performance.now();
-      function update(now) {
-        const progress = Math.min((now - startTime) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        el.textContent = Math.round(start + (target - start) * eased).toLocaleString();
-        if (progress < 1) requestAnimationFrame(update);
-      }
-      requestAnimationFrame(update);
-    },
-
-    /** 格式化大数字 */
-    formatNum(n) {
-      if (n >= 10000) return (n / 10000).toFixed(1) + '万';
-      if (n >= 1000) return (n / 1000).toFixed(1) + 'k';
-      return n?.toLocaleString() || '0';
-    },
-
-    /** 趋势标签 */
-    trendClass(trend) {
-      if (!trend) return '';
-      if (trend > 0) return 'trend-up';
-      if (trend < 0) return 'trend-down';
-      return 'trend-flat';
-    },
-
-    /** 生成标签chip */
-    chip(text, color = 'default') {
-      const colors = {
-        default: 'rgba(255,255,255,0.08)',
-        primary: 'rgba(139,92,246,0.15)',
-        success: 'rgba(48,209,88,0.15)',
-        warning: 'rgba(251,191,36,0.15)',
-        danger: 'rgba(248,113,113,0.15)',
-        info: 'rgba(96,165,250,0.15)',
-      };
-      const textColors = {
-        default: '#94a3b8', primary: '#a78bfa', success: '#30D158',
-        warning: '#fbbf24', danger: '#f87171', info: '#60a5fa',
-      };
-      return `<span class="kw-chip" style="background:${colors[color]};color:${textColors[color]}">${text}</span>`;
-    },
-
-    /** 通用卡片容器 */
-    card(content, extraClass = '') {
-      return `<div class="glass-card ${extraClass}" data-glow>${content}</div>`;
-    },
-
-    /** 进度条 */
-    progressBar(percent, color = '#8b5cf6', height = 6) {
-      return `<div class="progress-bar" style="height:${height}px;background:rgba(255,255,255,0.08);border-radius:${height/2}px;overflow:hidden;">
-        <div style="width:${percent}%;height:100%;background:${color};border-radius:${height/2}px;transition:width 0.5s;"></div>
-      </div>`;
-    },
-
-    /** 空状态 */
-    emptyState(message = '暂无数据') {
-      return `<div style="text-align:center;padding:40px 20px;color:var(--text-tertiary);font-size:13px;">
-        <div style="font-size:32px;margin-bottom:8px;opacity:0.3;">📭</div>${message}
-      </div>`;
-    },
-
-    /** 复制到剪贴板 */
-    copyToClipboard(text, btnEl) {
-      navigator.clipboard.writeText(text).then(() => {
-        if (btnEl) {
-          const orig = btnEl.textContent;
-          btnEl.textContent = '✓ 已复制';
-          setTimeout(() => btnEl.textContent = orig, 1500);
-        }
-      });
-    },
-
-    /** 表格排序 */
-    sortTable(tableEl, colIndex, asc = true) {
-      const tbody = tableEl.querySelector('tbody');
-      if (!tbody) return;
-      const rows = Array.from(tbody.querySelectorAll('tr'));
-      rows.sort((a, b) => {
-        const aVal = parseFloat(a.cells[colIndex]?.textContent?.replace(/[^0-9.]/g, '')) || 0;
-        const bVal = parseFloat(b.cells[colIndex]?.textContent?.replace(/[^0-9.]/g, '')) || 0;
-        return asc ? aVal - bVal : bVal - aVal;
-      });
-      rows.forEach(r => tbody.appendChild(r));
-    },
-
-    /** 折叠section */
-    toggleSection(id) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const content = el.querySelector('.section-content') || el;
-      const btn = el.querySelector('.section-collapse-btn');
-      const isHidden = content.style.display === 'none';
-      content.style.display = isHidden ? '' : 'none';
-      if (btn) btn.textContent = isHidden ? '收起' : '展开';
-    },
-
-    /** 初始化折叠功能 */
-    initCollapse() {
-      document.querySelectorAll('.section-collapse-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const section = btn.closest('.section');
-          if (section) this.toggleSection(section.id);
-        });
-      });
-    },
-  };
-
-  window.Renderer = Renderer;
-  window.animateNumber = Renderer.animateNumber;
-  window.toggleSection = Renderer.toggleSection;
-})();
-
-
-/**
- * core/globals.js — 全局共享变量与常量
- * 所有模块共用的全局状态、ECharts配置、辅助函数
- * 必须在模块之前加载
- */
-(function() {
-  'use strict';
-
-  // ===== ECharts 实例容器 =====
-  window.charts = {};
-
-  // ===== ECharts 配色与样式常量 =====
-  window.PALETTE = ['#0A84FF', '#BF5AF2', '#FF375F', '#FF9F0A', '#30D158', '#64D2FF', '#FFD60A', '#FF6482', '#5E5CE6', '#C08FC0'];
-  window.TOOLTIP_BG = 'rgba(20,20,30,0.92)';
-  window.TOOLTIP_BORDER = 'rgba(100,100,140,0.3)';
-  window.TOOLTIP_TEXT = 'rgba(255,255,255,0.9)';
-  window.AXIS_COLOR = 'rgba(255,255,255,0.45)';
-  window.AXIS_LINE = 'rgba(255,255,255,0.15)';
-  window.SPLIT_COLOR = 'rgba(255,255,255,0.06)';
-
-  // ===== 筛选状态 =====
-  window.currentCategory = 'all';
-  window.currentPlatform = 'all';
-  window.sortDir = {};
-
-  // ===== 辅助函数（暴露到全局） =====
-  window.trendClass = function(t) {
-    if (t === '飙升') return 'surging';
-    if (t === '新热') return 'new-hot';
-    if (t === '衰退') return 'declining';
-    return 'stable';
-  };
-
-  window.classifyHook = function(title) {
-    if (/翻车|踩坑|避坑|别再|不要|后悔/.test(title)) return '痛点';
-    if (/对比|vs|VS|区别|哪个好|pk/i.test(title)) return '对比';
-    if (/揭秘|竟然|居然|没想到|真相|内幕/.test(title)) return '悬念';
-    if (/太美了|绝了|惊艳|震撼|效果|大片/.test(title)) return '效果';
-    if (/哭了|感动|暖心|治愈|陪伴/.test(title)) return '情感';
-    return '数字';
-  };
-
-  window.animateNumber = function(el, target, duration) {
-    duration = duration || 1200;
-    var start = performance.now();
-    function tick(now) {
-      var p = Math.min((now - start) / duration, 1);
-      var eased = 1 - Math.pow(1 - p, 3);
-      el.textContent = Math.round(target * eased).toLocaleString();
-      if (p < 1) requestAnimationFrame(tick);
-    }
-    requestAnimationFrame(tick);
-  };
-
-  // ===== renderAll — 重新渲染所有已注册模块 =====
-  window.renderAll = function() {
-    if (window.Module && window.Module.all) {
-      var data = window.DASHBOARD_DATA || window.DATA || {};
-      window.Module.all().forEach(function(m) {
-        if (m.render) {
-          try {
-            var renderData = data;
-            if (m.requiredFields && m.requiredFields.length === 1) {
-              renderData = data[m.requiredFields[0]] || data;
-            }
-            m.render(renderData);
-          } catch (e) {
-            console.error('[renderAll:' + m.id + ']', e);
-          }
-        }
-      });
-    }
-  };
-
-  // ===== applyFilter — 分类筛选 =====
-  window.applyFilter = function() {
-    var sel = document.getElementById('categoryFilter');
-    if (sel) window.currentCategory = sel.value;
-    window.renderAll();
-  };
-
-  // ===== setPlatform — 平台切换 =====
-  window.setPlatform = function(p) {
-    window.currentPlatform = p;
-    document.querySelectorAll('.platform-btn').forEach(function(b) {
-      b.classList.toggle('active', b.dataset.platform === p);
-    });
-    window.renderAll();
-  };
-
-  // ===== filterByPlatform =====
-  window.filterByPlatform = function(arr) {
-    if (!arr) return [];
-    if (window.currentPlatform === 'all' || window.currentPlatform === 'compare') return arr;
-    return arr.filter(function(item) { return item.platform === window.currentPlatform; });
-  };
-
-})();
-
-
-/**
- * 核心框架 — 模块注册、初始化、导航、筛选
- * 所有业务模块通过 Module.register() 注册，框架自动管理生命周期
- */
-(function() {
-  'use strict';
-
-  // ===== 模块注册表 =====
-  const modules = {};
-  const moduleOrder = [];
-
-  const Module = {
-    /**
-     * 注册一个业务模块
-     * @param {Object} mod - 模块定义
-     * @param {string} mod.id - 模块唯一ID（对应section的id）
-     * @param {string[]} mod.requiredFields - 依赖的DATA字段，缺数据自动隐藏
-     * @param {Function} mod.render - 渲染函数(data)
-     * @param {Function} [mod.init] - 初始化函数（只执行一次）
-     * @param {Function} [mod.destroy] - 销毁函数
-     */
-    register(mod) {
-      if (!mod.id || !mod.render) {
-        console.warn('[Module] 注册失败，缺少id或render:', mod);
-        return;
-      }
-      modules[mod.id] = mod;
-      moduleOrder.push(mod.id);
-      if (mod.init) mod.init();
-    },
-
-    get(id) { return modules[id]; },
-    all() { return moduleOrder.map(id => modules[id]); },
-
-    /** 检查模块所需数据是否存在 */
-    hasData(mod) {
-      if (!mod.requiredFields) return true;
-      const DATA = window.DASHBOARD_DATA || {};
-      return mod.requiredFields.every(f => {
-        const val = DATA[f];
-        return val !== undefined && val !== null &&
-               !(Array.isArray(val) && val.length === 0);
-      });
-    },
-  };
-
-  // ===== 安全数据访问 =====
-  const Safe = {
-    /** 安全获取嵌套字段，不存在返回默认值 */
-    get(obj, path, def) {
-      if (!obj) return def;
-      const keys = path.split('.');
-      let cur = obj;
-      for (const k of keys) {
-        if (cur == null || cur[k] === undefined) return def;
-        cur = cur[k];
-      }
-      return cur === undefined ? def : cur;
-    },
-    arr(val) { return Array.isArray(val) ? val : []; },
-    num(val, def) { return typeof val === 'number' ? val : (def || 0); },
-    str(val, def) { return typeof val === 'string' ? val : (def || ''); },
-  };
-
-  // ===== 渲染调度 =====
-  function renderAll() {
-    const DATA = window.DASHBOARD_DATA || {};
-    const config = window.DOMAIN_CONFIG || {};
-    const mods = config.modules || {};
-
-    moduleOrder.forEach(id => {
-      const mod = modules[id];
-      if (!mod) return;
-
-      // 模块开关检查
-      if (mods[id] === false) {
-        hideSection(id);
-        return;
-      }
-
-      // 数据依赖检查
-      if (!Module.hasData(mod)) {
-        hideSection(id);
-        return;
-      }
-
-      // 渲染 — 根据requiredFields传递子数据，单字段传子数据，多字段/无字段传完整DATA
-      try {
-        showSection(id);
-        var renderData = DATA;
-        if (mod.requiredFields && mod.requiredFields.length === 1) {
-          renderData = DATA[mod.requiredFields[0]] || DATA;
-        }
-        mod.render(renderData);
-      } catch (e) {
-        console.error(`[Module] ${id} 渲染失败:`, e);
-        // 单个模块崩溃不影响其他模块
-      }
-    });
-
-    // 更新导航
-    updateNav();
-  }
-
-  function hideSection(id) {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  }
-  function showSection(id) {
-    const el = document.getElementById(id);
-    if (el) el.style.display = '';
-  }
-
-  function updateNav() {
-    const config = window.DOMAIN_CONFIG || {};
-    const order = config.nav_order || [];
-    const mods = config.modules || {};
-    const nav = document.getElementById('mainNav');
-    if (!nav) return;
-
-    nav.innerHTML = order.filter(id => {
-      if (mods[id] === false) return false;
-      const mod = modules[id];
-      return mod ? Module.hasData(mod) : true;
-    }).map(id => {
-      const label = getSectionLabel(id);
-      return `<a class="nav-link" data-target="${id}">${label}</a>`;
-    }).join('');
-
-    // 绑定导航点击
-    nav.querySelectorAll('.nav-link').forEach(link => {
-      link.addEventListener('click', () => {
-        const target = document.getElementById(link.dataset.target);
-        if (target) target.scrollIntoView({ behavior: 'smooth' });
-      });
-    });
-  }
-
-  function getSectionLabel(id) {
-    const labels = {
-      hero: '工作台', techradar: '技术雷达', hotwords: '热点',
-      breakdown: '爆款', topics: '选题', topicPerf: '效果',
-      publishTime: '发布时间', titleFormulas: '标题公式',
-      leadScripts: '引流话术', launchOps: '起号运营', audience: '受众',
-      works: '作品', viralGenes: '爆款基因', insights: '洞察',
-      schedule: '排期', commentScripts: '评论话术', checklist: '清单',
-    };
-    return labels[id] || id;
-  }
-
-  // ===== 平台筛选 =====
-  let currentPlatform = 'all';
-  function setPlatform(p) {
-    currentPlatform = p;
-    document.querySelectorAll('.platform-btn').forEach(b => {
-      b.classList.toggle('active', b.dataset.platform === p);
-    });
-    renderAll();
-  }
-  function filterByPlatform(arr) {
-    if (!arr) return [];
-    if (currentPlatform === 'all' || currentPlatform === 'compare') return arr;
-    return arr.filter(item => item.platform === currentPlatform);
-  }
-
-  // ===== 分类筛选 =====
-  let currentCategory = '';
-  function applyFilter() {
-    const sel = document.getElementById('categoryFilter');
-    currentCategory = sel ? sel.value : '';
-    renderAll();
-  }
-
-  // ===== 初始化 =====
-  function init() {
-    const DATA = window.DASHBOARD_DATA || {};
-    const config = window.DOMAIN_CONFIG || {};
-
-    // 更新时间
-    const updateEl = document.getElementById('updateTime');
-    if (updateEl) {
-      updateEl.textContent = Safe.str(DATA.last_update, '暂无数据');
-      // 数据新鲜度
-      if (DATA.last_update) {
-        const hours = (new Date() - new Date(DATA.last_update.replace(/-/g, '/'))) / 3600000;
-        if (hours > 24) {
-          updateEl.style.color = config.theme?.danger || '#f87171';
-          updateEl.innerHTML = DATA.last_update + ' <span style="color:#f87171;font-size:11px;">⚠️ ' + (config.copy?.data_fresh_warning || '数据超过24小时未更新') + '</span>';
-        }
-      }
-    }
-
-    // 分类筛选器
-    const cats = [...new Set(Safe.arr(DATA.hotwords).map(h => h.category).filter(Boolean))];
-    const sel = document.getElementById('categoryFilter');
-    if (sel) {
-      sel.innerHTML = '<option value="">全部分类</option>' +
-        cats.map(c => `<option value="${c}">${c}</option>`).join('');
-    }
-
-    // 页面标题
-    document.title = config.display_name || '热点追踪工作台';
-
-    // 渲染所有模块
-    renderAll();
-
-    // 滚动动画
-    initScrollReveal();
-
-    // 导航隐藏
-    initNavHide();
-
-    // 延迟初始化
-    setTimeout(() => { if (typeof initSectionCollapse === 'function') initSectionCollapse(); }, 1500);
-    setTimeout(() => { if (typeof checkDataFreshness === 'function') checkDataFreshness(); }, 2000);
-    setTimeout(() => { if (typeof initCardGlow === 'function') initCardGlow(); }, 500);
-  }
-
-  // ===== 滚动显现动画 =====
-  function initScrollReveal() {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-        }
-      });
-    }, { threshold: 0.1 });
-    document.querySelectorAll('.section, .glass-card, .hero-stat').forEach(el => {
-      el.classList.add('anim-item');
-      observer.observe(el);
-    });
-  }
-
-  // ===== 导航栏滚动隐藏 =====
-  function initNavHide() {
-    let lastScroll = 0;
-    const nav = document.querySelector('.top-nav');
-    if (!nav) return;
-    window.addEventListener('scroll', () => {
-      const cur = window.scrollY;
-      nav.style.transform = cur > lastScroll && cur > 100 ? 'translateY(-100%)' : 'translateY(0)';
-      lastScroll = cur;
-    });
-  }
-
-  // ===== 全局搜索 =====
-  function doGlobalSearch(query) {
-    if (!query) { renderAll(); return; }
-    const q = query.toLowerCase();
-    const DATA = window.DASHBOARD_DATA || {};
-    // 筛选选题
-    const topics = Safe.arr(DATA.topics).filter(t =>
-      Safe.str(t.title).toLowerCase().includes(q) ||
-      Safe.str(t.hook).toLowerCase().includes(q) ||
-      Safe.str(t.keyword).toLowerCase().includes(q)
-    );
-    // 筛选热词
-    const hotwords = Safe.arr(DATA.hotwords).filter(h =>
-      Safe.str(h.keyword).toLowerCase().includes(q)
-    );
-    // 只渲染筛选结果（简化版）
-    console.log('[Search] 选题:', topics.length, '热词:', hotwords.length);
-    return { topics, hotwords };
-  }
-
-  // ===== 导出到全局（不自动init，由页面末尾在所有模块加载后调用initFramework()）=====
-  window.Module = Module;
-  window.Safe = Safe;
-  window.renderAll = renderAll;
-  window.setPlatform = setPlatform;
-  window.filterByPlatform = filterByPlatform;
-  window.applyFilter = applyFilter;
-  window.doGlobalSearch = doGlobalSearch;
-  window.initFramework = init;
-  // 兼容原模板的全局DATA引用（所有模块IIFE内引用的DATA）
-  // 必须用赋值而非const，避免遮蔽已存在的全局DATA
-  try { window.DATA = window.DASHBOARD_DATA || {}; } catch(e) {}
-  // 同时尝试赋值给全局词法环境的DATA（如果是var声明的全局变量）
-  if (typeof DATA !== 'undefined') {
-    try { DATA = window.DASHBOARD_DATA || {}; } catch(e) {}
-  }
-  window.currentPlatform = 'all';
-})();
-
-
-/**
- * effects/glow.js — UFO动态光晕特效
- * 自动扫描所有卡片元素，绑定鼠标跟随光晕
- * 特性：色相循环 + 椭圆轨道漂移 + 呼吸脉动 + 鼠标跟随
- * 零业务依赖，可独立使用
- */
-(function() {
-  'use strict';
-
-  // 所有需要光晕的卡片选择器（与modules.css中的::before样式对应）
-  const CARD_SELECTORS = [
-    '.hero-stat', '.bento-card', '.breakdown-card', '.topic-card',
-    '.insight-item', '.action-item', '.matrix-cell', '.small-item',
-    '.formula-item', '.author-item', '.gene-card', '.persona-card',
-    '.tech-card', '.tech-summary-card', '.kanban-card', '.schedule-item',
-    '.checklist-item', '.compare-card', '.sat-item', '.tracker-bar',
-    '.stat-card', '.glass-card', '.work-card', '.hotword-row',
-    '[data-glow]'
-  ].join(',');
-
-  let animationId = null;
-  const activeCards = new Set();
-
-  /** 初始化所有光晕卡片 */
-  function initCardGlow() {
-    document.querySelectorAll(CARD_SELECTORS).forEach(card => {
-      if (card._glowBound) return;
-      // 跳过太小的元素和表格行
-      if (card.offsetWidth < 30 || card.offsetHeight < 20) return;
-      card._glowBound = true;
-      card.setAttribute('data-glow', '');
-      bindGlow(card);
-    });
-
-    if (!animationId) {
-      animationId = requestAnimationFrame(animate);
-    }
-  }
-
-  /** 绑定单个卡片的光晕 */
-  function bindGlow(card) {
-    card._glowState = {
-      targetX: 50, targetY: 50,
-      currentX: 50, currentY: 50,
-      isHovering: false,
-      hue: Math.random() * 360,
-      orbitAngle: Math.random() * Math.PI * 2,
-      breathPhase: Math.random() * Math.PI * 2
-    };
-
-    card.addEventListener('mouseenter', () => {
-      card._glowState.isHovering = true;
-      activeCards.add(card);
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card._glowState.isHovering = false;
-      card._glowState.targetX = 50;
-      card._glowState.targetY = 50;
-    });
-
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      card._glowState.targetX = Math.max(0, Math.min(100, x));
-      card._glowState.targetY = Math.max(0, Math.min(100, y));
-    });
-  }
-
-  /** 全局动画循环 — 所有卡片共享一个rAF */
-  let lastTime = 0;
-  function animate(timestamp) {
-    const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
-    lastTime = timestamp;
-
-    activeCards.forEach(card => {
-      const s = card._glowState;
-      if (!s) return;
-
-      // 平滑跟随鼠标
-      s.currentX += (s.targetX - s.currentX) * 0.12;
-      s.currentY += (s.targetY - s.currentY) * 0.12;
-
-      // 椭圆轨道漂移（UFO感）
-      s.orbitAngle += dt * 0.5;
-      const orbitX = Math.cos(s.orbitAngle) * 3;
-      const orbitY = Math.sin(s.orbitAngle * 1.3) * 2;
-
-      // 色相循环
-      s.hue = (s.hue + dt * 25) % 360;
-
-      // 呼吸脉动
-      s.breathPhase += dt * 1.5;
-      const breath = 0.85 + Math.sin(s.breathPhase) * 0.15;
-
-      const finalX = s.currentX + orbitX;
-      const finalY = s.currentY + orbitY;
-
-      card.style.setProperty('--mx', finalX.toFixed(2) + '%');
-      card.style.setProperty('--my', finalY.toFixed(2) + '%');
-      card.style.setProperty('--glow-hue', s.hue.toFixed(0));
-      card.style.setProperty('--glow-opacity', breath.toFixed(2));
-
-      // 鼠标离开后，光晕回到中心并淡出
-      if (!s.isHovering && Math.abs(s.currentX - 50) < 0.5 && Math.abs(s.currentY - 50) < 0.5) {
-        activeCards.delete(card);
-      }
-    });
-
-    animationId = requestAnimationFrame(animate);
-  }
-
-  /** 重新扫描（动态添加卡片后调用） */
-  function refreshGlow() {
-    initCardGlow();
-  }
-
-  // 导出
-  window.initCardGlow = initCardGlow;
-  window.refreshGlow = refreshGlow;
-
-  // DOM就绪后自动初始化（延迟等模块渲染完成）
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(initCardGlow, 800));
-  } else {
-    setTimeout(initCardGlow, 800);
-  }
-
-  // 监听DOM变化，自动给新元素绑定光晕
-  const observer = new MutationObserver((mutations) => {
-    let needsRefresh = false;
-    mutations.forEach(m => {
-      m.addedNodes.forEach(node => {
-        if (node.nodeType === 1) {
-          if (node.matches && node.matches(CARD_SELECTORS)) needsRefresh = true;
-          if (node.querySelector && node.querySelector(CARD_SELECTORS)) needsRefresh = true;
-        }
-      });
-    });
-    if (needsRefresh) setTimeout(initCardGlow, 200);
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-})();
-
-
-
-// 登录页Logo动效（通用版，支持多实例）
-
-// 生成完整的Logo SVG HTML（包含defs、渐变、滤镜、玻璃路径、光晕层）
-function createLogoSVG(prefix, width, height, brightness) {
-  brightness = brightness || 1;
-  var p = prefix;
-  var paths = [
-    'M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z',
-    'M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z',
-    'M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z',
-    'M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z'
-  ];
-
-  var defs = '<defs>';
-  for (var i = 1; i <= 4; i++) {
-    defs += '<radialGradient id="' + p + 'Main' + i + '" cx="50%" cy="50%" r="75%">' +
-      '<stop offset="0%" stop-color="#409cff" stop-opacity="' + (0.45*brightness).toFixed(2) + '"/>' +
-      '<stop offset="35%" stop-color="#af52de" stop-opacity="' + (0.28*brightness).toFixed(2) + '"/>' +
-      '<stop offset="65%" stop-color="#af52de" stop-opacity="' + (0.08*brightness).toFixed(2) + '"/>' +
-      '<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>' +
-      '</radialGradient>' +
-      '<radialGradient id="' + p + 'Sub' + i + '" cx="50%" cy="50%" r="50%">' +
-      '<stop offset="0%" stop-color="#ff64aa" stop-opacity="' + (0.26*brightness).toFixed(2) + '"/>' +
-      '<stop offset="40%" stop-color="#64d2ff" stop-opacity="' + (0.14*brightness).toFixed(2) + '"/>' +
-      '<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>' +
-      '</radialGradient>';
-  }
-  defs += '<radialGradient id="' + p + 'SparkGrad" cx="50%" cy="50%" r="50%">' +
-    '<stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>' +
-    '<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.8"/>' +
-    '<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>' +
-    '</radialGradient>' +
-    '<filter id="' + p + 'SparkBlur" x="-50%" y="-50%" width="200%" height="200%">' +
-    '<feGaussianBlur stdDeviation="2.5"/>' +
-    '</filter>' +
-    '<filter id="' + p + 'BlurM" x="-30%" y="-30%" width="160%" height="160%">' +
-    '<feGaussianBlur stdDeviation="8"/>' +
-    '</filter>' +
-    '<filter id="' + p + 'BlurS" x="-30%" y="-30%" width="160%" height="160%">' +
-    '<feGaussianBlur stdDeviation="5"/>' +
-    '</filter>' +
-    '</defs>';
-
-  var body = '';
-  // 主光晕层
-  for (var j = 0; j < 4; j++) {
-    body += '<path d="' + paths[j] + '" class="' + p + 'm-' + (j+1) + '" fill="url(#' + p + 'Main' + (j+1) + ')" opacity="0.5"/>';
-  }
-  // 次光晕层
-  for (var k = 0; k < 4; k++) {
-    body += '<path d="' + paths[k] + '" class="' + p + 's-' + (k+1) + '" fill="url(#' + p + 'Sub' + (k+1) + ')" opacity="0.4"/>';
-  }
-  // 玻璃路径（可见形状+鼠标事件）
-  for (var m = 0; m < 4; m++) {
-    body += '<path d="' + paths[m] + '" class="login-glass" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>';
-  }
-
-  return '<svg viewBox="212.9 89.4 403.6 287.9" width="' + width + '" height="' + height + '" xmlns="http://www.w3.org/2000/svg">' + defs + body + '</svg>';
-}
-
-// 通用Logo特效初始化（呼吸、随机移动、鼠标跟随、颜色变化、边缘光点）
-function initLogoEffect(svg, prefix) {
-  if (!svg) return;
-  var p = prefix || 'lg';
-  var rgMains = [], rgSubs = [], glassPaths = [];
-  for (var i = 1; i <= 4; i++) {
-    rgMains.push(document.getElementById(p + 'Main' + i));
-    rgSubs.push(document.getElementById(p + 'Sub' + i));
-  }
-  svg.querySelectorAll('path.login-glass').forEach(function(pp) { glassPaths.push(pp); });
-  if (glassPaths.length === 0) return;
-
-  var vb = svg.viewBox.baseVal;
-  var vbX = vb.x, vbY = vb.y, vbW = vb.width, vbH = vb.height;
-  var t = Math.random() * Math.PI * 2;
-  var blocks = [];
-  for (var bi = 0; bi < 4; bi++) {
-    blocks.push({
-      fx: 0.3 + Math.random() * 0.5, fy: 0.25 + Math.random() * 0.4,
-      fx2: 0.1 + Math.random() * 0.2, fy2: 0.15 + Math.random() * 0.25,
-      phase: Math.random() * Math.PI * 2,
-      breathSpeed: 0.012 + Math.random() * 0.004,
-      breathPhase: bi * Math.PI / 2,
-      hueSpeed: 0.4 + Math.random() * 0.3,
-      huePhase: Math.random() * 360,
-      cx: 50, cy: 50, mode: 'auto', targetCx: 50, targetCy: 50
-    });
-  }
-
-  var sparks = [], frameCount = 0, activeSparkCount = 0, MAX_SPARKS = 2, TRAIL_LENGTH = 1;
-  var SVG_NS = 'http://www.w3.org/2000/svg';
-  for (var si = 0; si < 4; si++) {
-    var trailEls = [];
-    for (var ti = 0; ti < TRAIL_LENGTH; ti++) {
-      var cc = document.createElementNS(SVG_NS, 'circle');
-      cc.setAttribute('fill', 'url(#' + p + 'SparkGrad)');
-      cc.setAttribute('filter', 'url(#' + p + 'SparkBlur)');
-      cc.setAttribute('opacity', '0');
-      svg.appendChild(cc);
-      trailEls.push(cc);
-    }
-    sparks.push({
-      trailEls: trailEls, path: glassPaths[si], pathLen: glassPaths[si].getTotalLength(),
-      active: false, progress: 0, baseSpeed: 0.004,
-      nextFrame: 600 + Math.floor(Math.random() * 600),
-      direction: 1, startOffset: 0, sparkle: 0
-    });
-  }
-
-  function mouseToSvgPercent(e) {
-    var pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY;
-    var ctm = svg.getScreenCTM();
-    if (!ctm) return {x:50,y:50};
-    var svgPt = pt.matrixTransform(ctm.inverse());
-    return {x:(svgPt.x-vbX)/vbW*100, y:(svgPt.y-vbY)/vbH*100};
-  }
-
-  glassPaths.forEach(function(path, idx) {
-    path.addEventListener('mouseenter', function(e) {
-      blocks[idx].mode = 'follow';
-      var pp = mouseToSvgPercent(e);
-      blocks[idx].targetCx = pp.x; blocks[idx].targetCy = pp.y;
-    });
-    path.addEventListener('mousemove', function(e) {
-      if (blocks[idx].mode === 'follow') {
-        var pp = mouseToSvgPercent(e);
-        blocks[idx].targetCx = pp.x; blocks[idx].targetCy = pp.y;
-      }
-    });
-    path.addEventListener('mouseleave', function() { blocks[idx].mode = 'auto'; });
-  });
-
-  function animate() {
-    t += 0.012;
-    for (var ai = 0; ai < 4; ai++) {
-      var b = blocks[ai];
-      var breath = 0.5 + 0.5 * Math.sin(t * b.breathSpeed * 60 + b.breathPhase);
-      var mainR = (40 + breath * 48).toFixed(1) + '%';
-      var subR = (25 + breath * 35).toFixed(1) + '%';
-      var glowOpacity = (0.03 + breath * 0.85).toFixed(2);
-      if (b.mode === 'auto') {
-        b.targetCx = 50 + Math.sin(t*b.fx+b.phase)*20 + Math.sin(t*b.fx2+b.phase*2)*8;
-        b.targetCy = 50 + Math.cos(t*b.fy+b.phase*1.5)*18 + Math.cos(t*b.fy2+b.phase)*6;
-        b.cx += (b.targetCx-b.cx)*0.04; b.cy += (b.targetCy-b.cy)*0.04;
-      } else {
-        b.cx += (b.targetCx-b.cx)*0.15; b.cy += (b.targetCy-b.cy)*0.15;
-      }
-      if (rgMains[ai]) { rgMains[ai].setAttribute('cx',b.cx.toFixed(2)+'%'); rgMains[ai].setAttribute('cy',b.cy.toFixed(2)+'%'); rgMains[ai].setAttribute('r',mainR); }
-      if (rgSubs[ai]) { rgSubs[ai].setAttribute('cx',(b.cx+5).toFixed(2)+'%'); rgSubs[ai].setAttribute('cy',(b.cy-3).toFixed(2)+'%'); rgSubs[ai].setAttribute('r',subR); }
-      var mainPath = svg.querySelector('.' + p + 'm-' + (ai+1));
-      var subPath = svg.querySelector('.' + p + 's-' + (ai+1));
-      if (mainPath) mainPath.style.opacity = glowOpacity;
-      if (subPath) subPath.style.opacity = (parseFloat(glowOpacity)*0.8).toFixed(2);
-      var hue = (t*b.hueSpeed*60+b.huePhase)%360;
-      if (mainPath) mainPath.style.filter = 'hue-rotate('+hue.toFixed(0)+'deg) url(#' + p + 'BlurM)';
-      if (subPath) subPath.style.filter = 'hue-rotate('+hue.toFixed(0)+'deg) url(#' + p + 'BlurS)';
-    }
-    frameCount++;
-    for (var sj = 0; sj < sparks.length; sj++) {
-      var s = sparks[sj];
-      if (!s.active && frameCount >= s.nextFrame) {
-        if (activeSparkCount < MAX_SPARKS) {
-          s.active = true; s.progress = 0;
-          s.baseSpeed = 0.003 + Math.random()*0.004;
-          s.direction = Math.random()>0.5?1:-1;
-          s.startOffset = Math.random()*s.pathLen;
-          activeSparkCount++;
-        } else {
-          s.nextFrame = frameCount + 200 + Math.floor(Math.random()*300);
-        }
-      }
-      if (s.active) {
-        var easeFactor = 0.25 + 0.75*Math.sin(s.progress*Math.PI);
-        s.progress += s.baseSpeed*easeFactor;
-        if (s.progress >= 1) {
-          s.active = false; activeSparkCount--;
-          s.nextFrame = frameCount + 1500 + Math.floor(Math.random()*2100);
-          for (var tk=0; tk<TRAIL_LENGTH; tk++) s.trailEls[tk].setAttribute('opacity','0');
-        } else {
-          var globalOp;
-          if (s.progress<0.12) globalOp = s.progress/0.12;
-          else if (s.progress>0.88) globalOp = (1-s.progress)/0.12;
-          else globalOp = 1;
-          for (var tl=0; tl<TRAIL_LENGTH; tl++) {
-            var trailProgress = Math.max(0, s.progress-tl*s.baseSpeed*10);
-            var len = (s.startOffset+trailProgress*s.pathLen*s.direction)%s.pathLen;
-            if (len<0) len += s.pathLen;
-            var pt2 = s.path.getPointAtLength(len);
-            var sizeFactor = 1-tl/TRAIL_LENGTH;
-            var pulse = 1+0.15*Math.sin(s.progress*Math.PI*6+sj);
-            if (Math.random()<0.008) s.sparkle = 1;
-            s.sparkle *= 0.92;
-            var sparkleBoost = 1+s.sparkle*0.9;
-            var sizeSparkle = 1+s.sparkle*0.35;
-            s.trailEls[tl].setAttribute('cx',pt2.x.toFixed(1));
-            s.trailEls[tl].setAttribute('cy',pt2.y.toFixed(1));
-            s.trailEls[tl].setAttribute('r',(5.5*sizeFactor*pulse*sizeSparkle+0.8).toFixed(1));
-            var flicker = 0.85+0.15*Math.sin(s.progress*Math.PI*11+sj*2.3);
-            s.trailEls[tl].setAttribute('opacity',(globalOp*sizeFactor*flicker*sparkleBoost).toFixed(2));
-          }
-        }
-      }
-    }
-    requestAnimationFrame(animate);
-  }
-  animate();
-}
-
-// 登录页Logo初始化（兼容旧调用）
-function initLoginLogo() {
-  var svg = document.querySelector('.login-logo-svg');
-  if (svg) initLogoEffect(svg, 'lg');
-}
-
-// 滚动模糊渐显动效
-function initScrollReveal() {
-  var vh = window.innerHeight;
-  function update() {
-    if (document.getElementById('appSidebar')) {
-      document.body.setAttribute('data-reveal', '1');
-      var els = document.querySelectorAll('.hero, section');
-      for (var i = 0; i < els.length; i++) {
-        els[i].style.filter = 'none';
-        els[i].style.opacity = '1';
-        els[i].style.transform = 'none';
-      }
-      return;
-    }
-    var scrollY = window.scrollY;
-    var reveal = Math.min(1, Math.max(0, (scrollY - vh * 0.15) / (vh * 0.65)));
-    document.body.setAttribute('data-reveal', reveal.toFixed(2));
-    var blur = (18 * (1 - reveal)).toFixed(1);
-    var opacity = (0.25 + 0.75 * reveal).toFixed(2);
-    var translateY = (50 * (1 - reveal)).toFixed(1);
-    var els2 = document.querySelectorAll('.hero, section');
-    for (var j = 0; j < els2.length; j++) {
-      els2[j].style.filter = reveal >= 0.98 ? 'none' : 'blur(' + blur + 'px)';
-      els2[j].style.opacity = opacity;
-      els2[j].style.transform = reveal >= 0.98 ? 'none' : 'translateY(' + translateY + 'px)';
-    }
-  }
-  window.addEventListener('scroll', update, {passive: true});
-  window.addEventListener('resize', function() { vh = window.innerHeight; update(); });
-  update();
-}
-
-// 导航栏首屏隐藏逻辑
-function initNavHide() {
-  var nav = document.getElementById('topNav');
-  if (!nav) return;
-  function check() {
-    if (window.scrollY < window.innerHeight * 0.5) {
-      nav.classList.add('hidden-nav');
-    } else {
-      nav.classList.remove('hidden-nav');
-    }
-  }
-  window.addEventListener('scroll', check, {passive:true});
-  check();
-}
-
-// 初始化登录页所有特效
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', function() {
-    initLoginLogo();
-    initScrollReveal();
-    initNavHide();
-  });
-} else {
-  initLoginLogo();
-  initScrollReveal();
-  initNavHide();
-}
-
-
+/* ===== _helpers.js ===== */
 /**
  * modules/_helpers.js — 通用辅助函数
  */
@@ -1574,6 +535,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== hero.js ===== */
 /**
  * modules/hero.js
  * 函数: renderHeroStats, renderActions, renderInsights
@@ -1668,6 +630,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== hotwords.js ===== */
 /**
  * modules/hotwords.js
  * 函数: renderHotwordTable, renderCategory, renderRanking, renderHistory, showKeywordTrend, filteredHotwords
@@ -1815,6 +778,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== works.js ===== */
 /**
  * modules/works.js
  * 函数: renderWorksTable, renderSmallViral, renderAuthors, renderCompetitorWorks, renderFormatDist, filteredWorks
@@ -1987,6 +951,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== topics.js ===== */
 /**
  * modules/topics.js
  * 函数: renderTopics, calcTopicScore, generateTitles, getPlatformAdaptation, generateSchedule, renderCommentScripts, renderChecklist, toggleCheck, updateChecklistProgress, filteredTopics, generateShootList
@@ -2319,6 +1284,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== techradar.js ===== */
 /**
  * modules/techradar.js
  * 函数: renderTechRadar
@@ -2396,6 +1362,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== breakdown.js ===== */
 /**
  * modules/breakdown.js
  * 函数: renderBreakdowns, renderMatrix, renderFormulas, renderCollect, renderScatter, renderSaturation, renderCommentDemands, renderCommentKw, renderHook, renderDuration, renderPublishTime
@@ -2664,6 +1631,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== viralGenes.js ===== */
 /**
  * modules/viralGenes.js
  * 函数: renderViralGenes
@@ -2720,6 +1688,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== publishTime.js ===== */
 /**
  * modules/publishTime.js
  * 函数: renderPublishTimeDetail
@@ -2852,6 +1821,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== titleFormulas.js ===== */
 /**
  * modules/titleFormulas.js
  * 函数: renderTitleFormulas, copyFormula, genTitleVariants
@@ -3059,6 +2029,7 @@ if (document.readyState === 'loading') {
 }
 
 
+/* ===== leadScripts.js ===== */
 /**
  * modules/leadScripts.js
  * 函数: renderLeadScripts
@@ -3090,6 +2061,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== launchOps.js ===== */
 /**
  * modules/launchOps.js
  * 函数: renderLaunchOps
@@ -3248,6 +2220,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== audience.js ===== */
 /**
  * modules/audience.js
  * 函数: renderAudience
@@ -3338,6 +2311,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== engagement.js ===== */
 /**
  * modules/engagement.js
  * 函数: renderEngagement
@@ -3401,6 +2375,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== topicPerf.js ===== */
 /**
  * modules/topicPerf.js
  * 函数: renderTopicPerf, recordPerf, calcHitRate, getPerfData, savePerfData
@@ -3477,6 +2452,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== kanban.js ===== */
 /**
  * modules/kanban.js
  * 函数: renderKanban, getAllKanbanStatus, getTopicStatus, setTopicStatus, cycleKanbanStatus, cycleKanbanStatusByTitle, getKanbanStatus, resetKanbanStatus
@@ -3590,6 +2566,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== favorites.js ===== */
 /**
  * modules/favorites.js
  * 函数: getFavorites, isFavorite, toggleFavorite, renderFavorites, removeFavorite
@@ -3670,6 +2647,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== credit.js ===== */
 /**
  * modules/credit.js
  * 函数: renderCreditMonitor
@@ -3715,6 +2693,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== scriptGen.js ===== */
 /**
  * modules/scriptGen.js
  * 函数: generateScript, closeScriptModal, copyScript
@@ -3770,6 +2749,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== comparison.js ===== */
 /**
  * modules/comparison.js
  * 函数: renderComparison
@@ -3821,6 +2801,7 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== sidebar.js ===== */
 /**
  * modules/sidebar.js
  * 左侧导航栏模块 - 动态创建sidebar，按分组切换显示section
@@ -3842,28 +2823,28 @@ if (document.readyState === 'loading') {
       id: 'hotspots',
       icon: '🔥',
       label: '热点追踪',
-      sections: ['works', 'hotwords', 'history', 'hotwordTable', 'worksTable', 'chartRanking', 'chartCategory', 'chartPublishTime', 'chartDuration', 'chartHook', 'insightsGrid'],
+      sections: ['works', 'hotwords', 'history', 'hotwordTable', 'worksTable', 'chartRanking', 'chartCategory', 'chartPublishTime', 'chartDuration', 'chartHook', 'insightsGrid', 'growthRanking', 'blueOcean'],
       title: '热点追踪'
     },
     {
       id: 'breakdown',
       icon: '💥',
       label: '爆款拆解',
-      sections: ['breakdown', 'breakdownGrid', 'saturationList', 'commentDemands', 'commentKw', 'chartScatter', 'chartCollect', 'matrixGrid'],
+      sections: ['breakdown', 'breakdownGrid', 'saturationList', 'commentDemands', 'commentKw', 'chartScatter', 'chartCollect', 'matrixGrid', 'commentSemantic', 'conversionSignals'],
       title: '爆款拆解'
     },
     {
       id: 'content',
       icon: '✍️',
       label: '内容创作',
-      sections: ['titleGen', 'titleFormulas', 'formulaGrid', 'leadScripts', 'scriptContainer', 'publishTime', 'ptChart', 'ptBestCards', 'ptPlatform', 'ptTips'],
+      sections: ['titleGen', 'titleFormulas', 'formulaGrid', 'leadScripts', 'scriptContainer', 'publishTime', 'ptChart', 'ptBestCards', 'ptPlatform', 'ptTips', 'titleGenes', 'bestPostingCombo', 'postingReminder', 'completionRate'],
       title: '内容创作'
     },
     {
       id: 'topics',
       icon: '📋',
       label: '选题管理',
-      sections: ['topics', 'topicsGrid', 'topicTracker', 'kanbanBoard', 'topicPerf', 'topicPerfContent'],
+      sections: ['topics', 'topicsGrid', 'topicTracker', 'kanbanBoard', 'topicPerf', 'topicPerfContent', 'crossPlatform'],
       title: '选题管理'
     },
     {
@@ -3891,7 +2872,7 @@ if (document.readyState === 'loading') {
       id: 'benchmark',
       icon: '📚',
       label: '对标与发布',
-      sections: ['compareSection', 'compareSummary', 'overlapTable', 'dyOnlyList', 'xhsOnlyList', 'authorList', 'competitorWorks', 'smallViral', 'formatBars', 'schedule', 'scheduleContent', 'commentScripts', 'commentScriptsContent', 'checklist', 'checklistContent', 'checklistProgress', 'favoritesGrid'],
+      sections: ['compareSection', 'compareSummary', 'overlapTable', 'dyOnlyList', 'xhsOnlyList', 'authorList', 'competitorWorks', 'smallViral', 'formatBars', 'schedule', 'scheduleContent', 'commentScripts', 'commentScriptsContent', 'checklist', 'checklistContent', 'checklistProgress', 'favoritesGrid', 'formatROI', 'competitorStrategy', 'contentCalendar'],
       title: '对标与发布'
     }
   ];
