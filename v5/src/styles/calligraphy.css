@@ -260,9 +260,9 @@ button, .btn, [class*="button"] {
   fill: rgba(255, 200, 80, 0.25) !important;
   filter: drop-shadow(0 0 10px rgba(255, 190, 60, 0.4)) !important;
 }
-/* 边缘光点：纯金 + 已自带blur滤镜 */
+/* 边缘光点：接近白光 + 已自带blur滤镜 */
 .login-screen .login-logo-svg circle {
-  fill: #ffe680 !important;
+  fill: #fffaf0 !important;
 }
 
 /* ===== 滚动条 ===== */
