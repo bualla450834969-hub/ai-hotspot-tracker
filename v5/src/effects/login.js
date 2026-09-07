@@ -5,6 +5,15 @@
 function createLogoSVG(prefix, width, height, brightness) {
   brightness = brightness || 1;
   var p = prefix;
+  // 领域主题感知：书法领域用金色系渐变
+  var isCalligraphy = (typeof cfg === 'function' && cfg('id') === 'calligraphy');
+  var mainC0 = isCalligraphy ? '#ffd700' : '#409cff';
+  var mainC1 = isCalligraphy ? '#d4a84b' : '#af52de';
+  var subC0 = isCalligraphy ? '#fff8dc' : '#ff64aa';
+  var subC1 = isCalligraphy ? '#e8c547' : '#64d2ff';
+  var sparkC1 = isCalligraphy ? '#ffd700' : '#64d2ff';
+  var glassFill = isCalligraphy ? 'rgba(255,215,0,0.04)' : 'rgba(255,255,255,0.06)';
+  var glassStroke = isCalligraphy ? 'rgba(232,197,71,0.7)' : 'rgba(255,255,255,0.25)';
   var paths = [
     'M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z',
     'M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z',
@@ -15,21 +24,21 @@ function createLogoSVG(prefix, width, height, brightness) {
   var defs = '<defs>';
   for (var i = 1; i <= 4; i++) {
     defs += '<radialGradient id="' + p + 'Main' + i + '" cx="50%" cy="50%" r="75%">' +
-      '<stop offset="0%" stop-color="#409cff" stop-opacity="' + (0.45*brightness).toFixed(2) + '"/>' +
-      '<stop offset="35%" stop-color="#af52de" stop-opacity="' + (0.28*brightness).toFixed(2) + '"/>' +
-      '<stop offset="65%" stop-color="#af52de" stop-opacity="' + (0.08*brightness).toFixed(2) + '"/>' +
-      '<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>' +
+      '<stop offset="0%" stop-color="' + mainC0 + '" stop-opacity="' + (0.45*brightness).toFixed(2) + '"/>' +
+      '<stop offset="35%" stop-color="' + mainC1 + '" stop-opacity="' + (0.28*brightness).toFixed(2) + '"/>' +
+      '<stop offset="65%" stop-color="' + mainC1 + '" stop-opacity="' + (0.08*brightness).toFixed(2) + '"/>' +
+      '<stop offset="100%" stop-color="' + mainC1 + '" stop-opacity="0"/>' +
       '</radialGradient>' +
       '<radialGradient id="' + p + 'Sub' + i + '" cx="50%" cy="50%" r="50%">' +
-      '<stop offset="0%" stop-color="#ff64aa" stop-opacity="' + (0.26*brightness).toFixed(2) + '"/>' +
-      '<stop offset="40%" stop-color="#64d2ff" stop-opacity="' + (0.14*brightness).toFixed(2) + '"/>' +
-      '<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>' +
+      '<stop offset="0%" stop-color="' + subC0 + '" stop-opacity="' + (0.26*brightness).toFixed(2) + '"/>' +
+      '<stop offset="40%" stop-color="' + subC1 + '" stop-opacity="' + (0.14*brightness).toFixed(2) + '"/>' +
+      '<stop offset="100%" stop-color="' + subC1 + '" stop-opacity="0"/>' +
       '</radialGradient>';
   }
   defs += '<radialGradient id="' + p + 'SparkGrad" cx="50%" cy="50%" r="50%">' +
     '<stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>' +
-    '<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.8"/>' +
-    '<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>' +
+    '<stop offset="40%" stop-color="' + sparkC1 + '" stop-opacity="0.8"/>' +
+    '<stop offset="100%" stop-color="' + sparkC1 + '" stop-opacity="0"/>' +
     '</radialGradient>' +
     '<filter id="' + p + 'SparkBlur" x="-50%" y="-50%" width="200%" height="200%">' +
     '<feGaussianBlur stdDeviation="2.5"/>' +
@@ -53,7 +62,7 @@ function createLogoSVG(prefix, width, height, brightness) {
   }
   // 玻璃路径（可见形状+鼠标事件）
   for (var m = 0; m < 4; m++) {
-    body += '<path d="' + paths[m] + '" class="login-glass" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5"/>';
+    body += '<path d="' + paths[m] + '" class="login-glass" fill="' + glassFill + '" stroke="' + glassStroke + '" stroke-width="1.5"/>';
   }
 
   return '<svg viewBox="212.9 89.4 403.6 287.9" width="' + width + '" height="' + height + '" xmlns="http://www.w3.org/2000/svg">' + defs + body + '</svg>';
