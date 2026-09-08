@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>佛山茶台 · 高意向客户线索</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #16213e 100%);
+  min-height: 100vh;
+  color: #e0e0e0;
+  padding: 20px;
+}
+.container { max-width: 1400px; margin: 0 auto; }
+
+/* 头部 */
+.header {
+  text-align: center;
+  padding: 40px 20px 30px;
+  position: relative;
+}
+.header h1 {
+  font-size: 2.2em;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  background: linear-gradient(135deg, #ffd700, #f5c842, #daa520);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+.header .subtitle {
+  color: rgba(255,215,0,0.5);
+  font-size: 0.95em;
+  letter-spacing: 0.1em;
+}
+.header .source {
+  color: rgba(255,255,255,0.35);
+  font-size: 0.85em;
+  margin-top: 10px;
+}
+
+/* 统计卡片 */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.stat-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,215,0,0.15);
+  border-radius: 16px;
+  padding: 24px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.stat-card:hover {
+  border-color: rgba(255,215,0,0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(255,215,0,0.1);
+}
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(255,215,0,0.5), transparent);
+}
+.stat-number {
+  font-size: 2.4em;
+  font-weight: 200;
+  color: #ffd700;
+  margin-bottom: 6px;
+}
+.stat-label {
+  font-size: 0.85em;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.05em;
+}
+
+/* 图表区 */
+.charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.chart-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+}
+.chart-title {
+  font-size: 1em;
+  color: rgba(255,215,0,0.8);
+  margin-bottom: 18px;
+  letter-spacing: 0.05em;
+}
+.bar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 10px;
+}
+.bar-label {
+  width: 60px;
+  text-align: right;
+  font-size: 0.85em;
+  color: rgba(255,255,255,0.6);
+  flex-shrink: 0;
+}
+.bar-track {
+  flex: 1;
+  height: 22px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 11px;
+  overflow: hidden;
+  position: relative;
+}
+.bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255,215,0,0.3), rgba(255,215,0,0.7));
+  border-radius: 11px;
+  transition: width 0.8s ease;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+}
+.bar-value {
+  font-size: 0.75em;
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
+/* 筛选区 */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.search-box {
+  flex: 1;
+  min-width: 200px;
+  position: relative;
+}
+.search-box input {
+  width: 100%;
+  padding: 12px 16px 12px 40px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 0.9em;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.search-box input:focus {
+  border-color: rgba(255,215,0,0.5);
+}
+.search-box input::placeholder { color: rgba(255,255,255,0.3); }
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255,215,0,0.5);
+  font-size: 1em;
+}
+.filter-select {
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 12px;
+  color: #fff;
+  font-size: 0.9em;
+  outline: none;
+  cursor: pointer;
+}
+.filter-select option { background: #1a1a2e; }
+
+/* 线索列表 */
+.leads-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 14px;
+}
+.lead-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 18px;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.lead-card:hover {
+  border-color: rgba(255,215,0,0.3);
+  background: rgba(255,215,0,0.03);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(255,215,0,0.08);
+}
+.lead-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.lead-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(255,215,0,0.3), rgba(255,215,0,0.1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1em;
+  color: #ffd700;
+  font-weight: 500;
+  flex-shrink: 0;
+  border: 1px solid rgba(255,215,0,0.3);
+}
+.lead-name {
+  font-size: 0.95em;
+  color: #fff;
+  font-weight: 500;
+}
+.lead-meta {
+  display: flex;
+  gap: 10px;
+  font-size: 0.78em;
+  color: rgba(255,255,255,0.4);
+  margin-top: 2px;
+}
+.lead-comment {
+  font-size: 0.9em;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.5;
+  padding: 10px 14px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 10px;
+  border-left: 3px solid rgba(255,215,0,0.4);
+  margin-bottom: 10px;
+}
+.lead-tags {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.tag {
+  padding: 3px 10px;
+  background: rgba(255,215,0,0.1);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 20px;
+  font-size: 0.75em;
+  color: rgba(255,215,0,0.8);
+}
+.tag.region { background: rgba(100,180,255,0.1); border-color: rgba(100,180,255,0.2); color: rgba(100,180,255,0.8); }
+.tag.urgent { background: rgba(255,100,100,0.1); border-color: rgba(255,100,100,0.2); color: rgba(255,120,120,0.9); }
+
+/* 底部 */
+.footer {
+  text-align: center;
+  padding: 30px;
+  color: rgba(255,255,255,0.25);
+  font-size: 0.8em;
+}
+.no-results {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(255,255,255,0.3);
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .charts-row { grid-template-columns: 1fr; }
+  .leads-grid { grid-template-columns: 1fr; }
+  .header h1 { font-size: 1.6em; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>佛山茶台 · 高意向客户线索</h1>
+    <div class="subtitle">评论区询价用户精准提取</div>
+    <div class="source">数据来源：抖音 @佛山茶桌茶台（源头工厂）评论区 | 采集时间：2026-09-08</div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-number" id="statTotal">45</div>
+      <div class="stat-label">询价线索总数</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="statRegion">18</div>
+      <div class="stat-label">覆盖省份</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="statRate">18.9%</div>
+      <div class="stat-label">评论询价率</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-number" id="statGD">11</div>
+      <div class="stat-label">广东客户数</div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <div class="chart-title">地区分布 TOP10</div>
+      <div id="regionChart"></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">尺寸需求分布</div>
+      <div id="sizeChart"></div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="搜索账号名或评论内容...">
+    </div>
+    <select class="filter-select" id="regionFilter">
+      <option value="">全部地区</option>
+    </select>
+    <select class="filter-select" id="sizeFilter">
+      <option value="">全部尺寸</option>
+      <option value="1.6">1.6米</option>
+      <option value="1.8">1.8米</option>
+      <option value="2">2米</option>
+      <option value="2.4">2.4米</option>
+      <option value="2.5">2.5米</option>
+      <option value="3">3米+</option>
+    </select>
+  </div>
+
+  <div class="leads-grid" id="leadsGrid"></div>
+
+  <div class="footer">
+    PYRALUMA · 璃火矩创 | 数据驱动的客户线索系统
+  </div>
+</div>
+
+<script>
+const leads = [
+  {name:"冷链物流", comment:"干茶分离的2个茶桌多少钱？不要椅子！180*90", region:"宁夏", time:"2天前", size:"1.8"},
+  {name:"沉默-是金", comment:"房间宽8米 买多少尺寸呢", region:"重庆", time:"1月前", size:""},
+  {name:"简单的幸福", comment:"很有道理，1.8米的推荐一套，多少钱", region:"广东", time:"1月前", size:"1.8"},
+  {name:"土工格栅进出口", comment:"三米二的桌子＋五把椅子多少钱", region:"山东", time:"5天前", size:"3"},
+  {name:"小刺心、", comment:"二米五5掎多少钱", region:"江西", time:"1月前", size:"2.5"},
+  {name:"☆繁华の丽☆", comment:"1.6一套多少米", region:"陕西", time:"1月前", size:"1.6"},
+  {name:"郑志龙", comment:"这款多少钱？", region:"湖北", time:"2月前", size:""},
+  {name:"旭", comment:"多少钱", region:"广东", time:"2天前", size:""},
+  {name:"莲子", comment:"2.4，多少钱", region:"广东", time:"1月前", size:"2.4"},
+  {name:"小西", comment:"2.4多少钱", region:"四川", time:"2周前", size:"2.4"},
+  {name:"名哲", comment:"长1.8的一套多少钱", region:"山东", time:"1月前", size:"1.8"},
+  {name:"邻家妹", comment:"这套多少", region:"福建", time:"6天前", size:""},
+  {name:"☆繁华の丽☆", comment:"1.6多少米", region:"陕西", time:"1月前", size:"1.6"},
+  {name:"清玥知澜", comment:"1.6米3把椅子多少钱？怎么联系", region:"天津", time:"1周前", size:"1.6"},
+  {name:"优信精品车行", comment:"多少钱一套", region:"浙江", time:"3周前", size:""},
+  {name:"深圳二当家", comment:"多少钱一套", region:"广东", time:"4周前", size:""},
+  {name:"碧海丹心", comment:"多少钱", region:"山东", time:"2周前", size:""},
+  {name:"Ai诺瑶瑜伽官方号", comment:"2米长多少钱", region:"河南", time:"2月前", size:"2"},
+  {name:"旧瑾", comment:"这张多少米", region:"贵州", time:"1月前", size:""},
+  {name:"用户9921749575823", comment:"多少钱？", region:"广东", time:"2月前", size:""},
+  {name:"@静", comment:"2.4米多少钱", region:"云南", time:"1月前", size:"2.4"},
+  {name:"临清风", comment:"一套多少钱？1.8米", region:"广东", time:"2月前", size:"1.8"},
+  {name:"CET中恒-济南佰盈办公", comment:"这一套多少钱", region:"山东", time:"2周前", size:""},
+  {name:"星星点点", comment:"一套多少钱？", region:"广东", time:"1周前", size:""},
+  {name:"戒不钓.", comment:"这套多少米", region:"广东", time:"4周前", size:""},
+  {name:"佛冈雷士照明霞姐", comment:"多少钱", region:"广东", time:"4周前", size:""},
+  {name:"大亚鲁丽夏特精板楚哥", comment:"要2.2长的多少钱？", region:"河南", time:"1周前", size:"2.2"},
+  {name:"洪培坤", comment:"这套多少", region:"福建", time:"1月前", size:""},
+  {name:"刘，，，", comment:"2.4米的多少钱", region:"山东", time:"1月前", size:"2.4"},
+  {name:"随风而靡", comment:"多少钱", region:"河南", time:"1周前", size:""},
+  {name:"知行合一", comment:"视频这种多少钱一套", region:"河北", time:"4天前", size:""},
+  {name:"道法自然", comment:"关键是多少钱", region:"江西", time:"1月前", size:""},
+  {name:"晨希0506", comment:"这套多少钱？", region:"广东", time:"2周前", size:""},
+  {name:"西藏旅游———扎西顿珠", comment:"这套多少钱", region:"西藏", time:"2月前", size:""},
+  {name:"北纬33度", comment:"2.4米左右多少钱呢，实木的吧", region:"四川", time:"2月前", size:"2.4"},
+  {name:">！", comment:"这一套多少卖", region:"广西", time:"4天前", size:""},
+  {name:"孤独的人", comment:"多少钱", region:"福建", time:"2月前", size:""},
+  {name:"鸿驹塑胶材料", comment:"多少一套", region:"广东", time:"2月前", size:""},
+  {name:"jysy0001", comment:"多少钱", region:"重庆", time:"2月前", size:""},
+  {name:"而已", comment:"多少钱", region:"江西", time:"1月前", size:""},
+  {name:"A96", comment:"多少价，怎么下单", region:"云南", time:"1月前", size:""},
+  {name:"未来…", comment:"多少价，怎么下单", region:"河北", time:"1月前", size:""},
+  {name:"咸蛋", comment:"1.6米多少钱", region:"山西", time:"2月前", size:"1.6"},
+  {name:"雷曼", comment:"请问2米8的多少钱？", region:"广西", time:"2月前", size:"2.8"},
+  {name:"手握挂舵闯八方", comment:"3米多少", region:"浙江", time:"2月前", size:"3"},
+];
+
+// 地区统计
+const regionCount = {};
+leads.forEach(l => { regionCount[l.region] = (regionCount[l.region] || 0) + 1; });
+const sortedRegions = Object.entries(regionCount).sort((a,b) => b[1]-a[1]);
+
+// 尺寸统计
+const sizeCount = {};
+leads.forEach(l => {
+  if (l.size) {
+    let s = l.size;
+    if (parseFloat(s) >= 3) s = "3米+";
+    else if (parseFloat(s) >= 2.4) s = "2.4米";
+    else if (parseFloat(s) >= 2) s = "2米";
+    else if (parseFloat(s) >= 1.8) s = "1.8米";
+    else s = "1.6米";
+    sizeCount[s] = (sizeCount[s] || 0) + 1;
+  }
+});
+const sortedSizes = Object.entries(sizeCount).sort((a,b) => b[1]-a[1]);
+
+// 渲染地区图表
+const maxRegion = sortedRegions[0][1];
+document.getElementById('regionChart').innerHTML = sortedRegions.slice(0,10).map(([r,c]) => `
+  <div class="bar-row">
+    <div class="bar-label">${r}</div>
+    <div class="bar-track"><div class="bar-fill" style="width:${c/maxRegion*100}%"><span class="bar-value">${c}</span></div></div>
+  </div>
+`).join('');
+
+// 渲染尺寸图表
+const maxSize = sortedSizes[0][1];
+document.getElementById('sizeChart').innerHTML = sortedSizes.map(([s,c]) => `
+  <div class="bar-row">
+    <div class="bar-label">${s}</div>
+    <div class="bar-track"><div class="bar-fill" style="width:${c/maxSize*100}%"><span class="bar-value">${c}</span></div></div>
+  </div>
+`).join('');
+
+// 填充地区筛选
+const regionSelect = document.getElementById('regionFilter');
+sortedRegions.forEach(([r]) => {
+  const opt = document.createElement('option');
+  opt.value = r; opt.textContent = r;
+  regionSelect.appendChild(opt);
+});
+
+// 渲染线索
+function renderLeads() {
+  const search = document.getElementById('searchInput').value.toLowerCase();
+  const region = document.getElementById('regionFilter').value;
+  const size = document.getElementById('sizeFilter').value;
+  
+  let filtered = leads.filter(l => {
+    if (search && !l.name.toLowerCase().includes(search) && !l.comment.toLowerCase().includes(search)) return false;
+    if (region && l.region !== region) return false;
+    if (size) {
+      if (size === '3' && parseFloat(l.size) < 3) return false;
+      else if (size !== '3' && (!l.size || Math.abs(parseFloat(l.size) - parseFloat(size)) > 0.2)) return false;
+    }
+    return true;
+  });
+
+  const grid = document.getElementById('leadsGrid');
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="no-results">没有找到匹配的线索</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(l => {
+    const isUrgent = ['2天前','5天前','4天前','6天前','1周前'].includes(l.time);
+    const initial = l.name.charAt(0);
+    const sizeTag = l.size ? `<span class="tag">${l.size}米需求</span>` : '';
+    const urgentTag = isUrgent ? `<span class="tag urgent">近期活跃</span>` : '';
+    return `
+      <div class="lead-card">
+        <div class="lead-header">
+          <div class="lead-avatar">${initial}</div>
+          <div>
+            <div class="lead-name">${l.name}</div>
+            <div class="lead-meta"><span>📍 ${l.region}</span><span>🕐 ${l.time}</span></div>
+          </div>
+        </div>
+        <div class="lead-comment">${l.comment}</div>
+        <div class="lead-tags">
+          <span class="tag region">${l.region}</span>
+          ${sizeTag}
+          ${urgentTag}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+document.getElementById('searchInput').addEventListener('input', renderLeads);
+document.getElementById('regionFilter').addEventListener('change', renderLeads);
+document.getElementById('sizeFilter').addEventListener('change', renderLeads);
+
+renderLeads();
+</script>
+</body>
+</html>
