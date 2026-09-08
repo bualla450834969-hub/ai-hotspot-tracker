@@ -210,10 +210,10 @@ body.has-sidebar .bento {
   gap: 14px;
 }
 
-/* 背景logo调整 */
+/* 背景logo调整 — 居中于内容区（侧边栏右侧） */
 body.has-sidebar .bg-logo {
-  left: calc(220px + 50%);
-  transform: translateX(-50%);
+  left: calc(50% + 110px);
+  transform: translate(-50%, -50%);
 }
 
 /* 登录页不受sidebar影响 */
