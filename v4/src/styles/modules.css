@@ -176,7 +176,7 @@ body::after {
   font-weight: 600;
   margin-bottom: 4px;
 }
-.hero-filter { margin-top: 10px; }
+.hero-filter { margin-top: 10px; margin-bottom: 18px; }
 .hero-filter select {
   background: var(--glass-bg);
   backdrop-filter: blur(20px) saturate(180%);
@@ -893,7 +893,7 @@ a.work-link:hover { opacity: 0.7; }
 .kw-chip { display:inline-block; font-size:9px; padding:1px 5px; border-radius:3px; background:rgba(139,92,246,0.12); color:#a78bfa; margin:1px; }
 
 /* ===== 积分监控 ===== */
-.credit-monitor { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); border-radius: 20px; font-size: 11px; color: #fbbf24; }
+.credit-monitor { display: flex; align-items: center; gap: 8px; padding: 6px 12px; margin-top: 14px; background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.2); border-radius: 20px; font-size: 11px; color: #fbbf24; }
 .credit-monitor .cm-bar { width: 60px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
 .credit-monitor .cm-fill { height: 100%; background: linear-gradient(90deg, #fbbf24, #f97316); border-radius: 2px; transition: width 0.5s; }
 
