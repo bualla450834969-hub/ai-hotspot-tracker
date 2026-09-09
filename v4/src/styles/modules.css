@@ -176,8 +176,9 @@ body::after {
   font-weight: 600;
   margin-bottom: 4px;
 }
-.hero-filter { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 10px; margin-bottom: 18px; }
+.hero-filter { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 10px; margin-bottom: 18px; }
 .hero-filter select {
+  margin-top: 4px;
   background: var(--glass-bg);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -1178,7 +1179,7 @@ section.collapsed > *:not(:first-child) {
 }
 
 /* Platform Switcher */
-.platform-switch { display: flex; gap: 4px; background: rgba(255,255,255,0.06); border-radius: 10px; padding: 3px; backdrop-filter: blur(10px); }
+.platform-switch { display: inline-flex; gap: 4px; background: rgba(255,255,255,0.06); border-radius: 10px; padding: 3px; backdrop-filter: blur(10px); flex-shrink: 0; }
 .platform-btn { background: transparent; border: none; color: rgba(255,255,255,0.5); padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.25s ease; font-family: inherit; }
 .platform-btn:hover { color: rgba(255,255,255,0.8); }
 .platform-btn.active { background: linear-gradient(135deg, #0A84FF, #BF5AF2); color: #fff; box-shadow: 0 2px 12px rgba(10,132,255,0.3); }
