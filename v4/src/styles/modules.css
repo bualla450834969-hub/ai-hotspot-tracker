@@ -176,7 +176,7 @@ body::after {
   font-weight: 600;
   margin-bottom: 4px;
 }
-.hero-filter { margin-top: 10px; margin-bottom: 18px; }
+.hero-filter { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 10px; margin-bottom: 18px; }
 .hero-filter select {
   background: var(--glass-bg);
   backdrop-filter: blur(20px) saturate(180%);
