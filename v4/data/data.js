@@ -1,5 +1,5 @@
 window.DASHBOARD_DATA = {
-  "last_update": "2026-09-12 08:01:25",
+  "last_update": "2026-09-13 08:01:17",
   "hotwords": [
     {
       "keyword": "AI",
@@ -11,7 +11,7 @@ window.DASHBOARD_DATA = {
       "collect_rate": 11.3,
       "works_count": 20,
       "category": "AI大类",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
       "growth": -4.7,
       "trend": "稳定",
@@ -119,9 +119,9 @@ window.DASHBOARD_DATA = {
       "collect_rate": 15.0,
       "works_count": 20,
       "category": "AI修图",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
-      "growth": -59.7,
+      "growth": -59.9,
       "trend": "衰退",
       "blue_ocean_score": 661200.0,
       "competition_score": 0.02,
@@ -139,7 +139,7 @@ window.DASHBOARD_DATA = {
       "category": "AI修图",
       "_cached": true,
       "_collected_date": "2026-09-11",
-      "growth": -39.7,
+      "growth": -40.1,
       "trend": "衰退",
       "blue_ocean_score": 44508.62,
       "competition_score": 0.22,
@@ -155,9 +155,9 @@ window.DASHBOARD_DATA = {
       "collect_rate": 10.8,
       "works_count": 20,
       "category": "AI做图",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
-      "growth": -79.2,
+      "growth": -79.1,
       "trend": "衰退",
       "blue_ocean_score": 449819.1,
       "competition_score": 0.02,
@@ -166,19 +166,19 @@ window.DASHBOARD_DATA = {
     {
       "keyword": "AI绘画",
       "platform": "xiaohongshu",
-      "total": 1506,
-      "max_like": 23925,
-      "avg_like": 1556,
-      "avg_collect": 176,
-      "collect_rate": 11.4,
+      "total": 1454,
+      "max_like": 3902,
+      "avg_like": 318,
+      "avg_collect": 55,
+      "collect_rate": 17.4,
       "works_count": 20,
       "category": "AI做图",
-      "_cached": true,
-      "_collected_date": "2026-09-10",
-      "growth": -21.3,
+      "_cached": false,
+      "_collected_date": "2026-09-13",
+      "growth": -23.6,
       "trend": "衰退",
-      "blue_ocean_score": 23829.68,
-      "competition_score": 0.42,
+      "blue_ocean_score": 4025.45,
+      "competition_score": 2.48,
       "efficiency_tag": "蓝海"
     },
     {
@@ -191,7 +191,7 @@ window.DASHBOARD_DATA = {
       "collect_rate": 2.4,
       "works_count": 20,
       "category": "AI视频",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
       "growth": -41.6,
       "trend": "衰退",
@@ -211,7 +211,7 @@ window.DASHBOARD_DATA = {
       "category": "AI视频",
       "_cached": true,
       "_collected_date": "2026-09-11",
-      "growth": -58.3,
+      "growth": -58.4,
       "trend": "衰退",
       "blue_ocean_score": 135.33,
       "competition_score": 72.66,
@@ -227,9 +227,9 @@ window.DASHBOARD_DATA = {
       "collect_rate": 16.1,
       "works_count": 20,
       "category": "AI数字人",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
-      "growth": 0.0,
+      "growth": -0.4,
       "trend": "稳定",
       "blue_ocean_score": 125.55,
       "competition_score": 79.62,
@@ -238,19 +238,19 @@ window.DASHBOARD_DATA = {
     {
       "keyword": "AI数字人",
       "platform": "xiaohongshu",
-      "total": 880,
+      "total": 867,
       "max_like": 231,
-      "avg_like": 55,
-      "avg_collect": 49,
-      "collect_rate": 88.6,
+      "avg_like": 59,
+      "avg_collect": 54,
+      "collect_rate": 90.5,
       "works_count": 20,
       "category": "AI数字人",
-      "_cached": true,
-      "_collected_date": "2026-09-10",
+      "_cached": false,
+      "_collected_date": "2026-09-13",
       "growth": -99.6,
       "trend": "衰退",
-      "blue_ocean_score": 393.75,
-      "competition_score": 24.68,
+      "blue_ocean_score": 399.65,
+      "competition_score": 24.32,
       "efficiency_tag": "蓝海"
     },
     {
@@ -274,19 +274,19 @@ window.DASHBOARD_DATA = {
     {
       "keyword": "AI写作",
       "platform": "xiaohongshu",
-      "total": 185,
-      "max_like": 1923,
-      "avg_like": 178,
-      "avg_collect": 79,
-      "collect_rate": 44.3,
+      "total": 183,
+      "max_like": 1353,
+      "avg_like": 85,
+      "avg_collect": 38,
+      "collect_rate": 44.7,
       "works_count": 20,
       "category": "AI写作",
-      "_cached": true,
-      "_collected_date": "2026-09-10",
-      "growth": -37.7,
+      "_cached": false,
+      "_collected_date": "2026-09-13",
+      "growth": -38.4,
       "trend": "衰退",
-      "blue_ocean_score": 15591.89,
-      "competition_score": 0.64,
+      "blue_ocean_score": 11090.16,
+      "competition_score": 0.9,
       "efficiency_tag": "蓝海"
     },
     {
@@ -371,9 +371,9 @@ window.DASHBOARD_DATA = {
       "collect_rate": 24.8,
       "works_count": 20,
       "category": "AI自动化",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
-      "growth": -37.6,
+      "growth": -37.3,
       "trend": "衰退",
       "blue_ocean_score": 87202.51,
       "competition_score": 0.11,
@@ -391,7 +391,7 @@ window.DASHBOARD_DATA = {
       "category": "AI自动化",
       "_cached": true,
       "_collected_date": "2026-09-11",
-      "growth": -62.9,
+      "growth": -62.7,
       "trend": "衰退",
       "blue_ocean_score": 268.86,
       "competition_score": 36.47,
@@ -443,7 +443,7 @@ window.DASHBOARD_DATA = {
       "collect_rate": 29.1,
       "works_count": 20,
       "category": "AI PPT",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
       "growth": -0.1,
       "trend": "稳定",
@@ -490,19 +490,19 @@ window.DASHBOARD_DATA = {
     {
       "keyword": "AI音乐",
       "platform": "xiaohongshu",
-      "total": 156,
-      "max_like": 987,
-      "avg_like": 140,
-      "avg_collect": 41,
-      "collect_rate": 29.6,
+      "total": 146,
+      "max_like": 1047,
+      "avg_like": 131,
+      "avg_collect": 36,
+      "collect_rate": 27.8,
       "works_count": 20,
       "category": "AI音乐",
-      "_cached": true,
-      "_collected_date": "2026-09-10",
-      "growth": -70.0,
+      "_cached": false,
+      "_collected_date": "2026-09-13",
+      "growth": -71.9,
       "trend": "衰退",
-      "blue_ocean_score": 9490.38,
-      "competition_score": 1.05,
+      "blue_ocean_score": 10756.85,
+      "competition_score": 0.92,
       "efficiency_tag": "蓝海"
     },
     {
@@ -551,7 +551,7 @@ window.DASHBOARD_DATA = {
       "collect_rate": 54.7,
       "works_count": 20,
       "category": "AI Agent",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
       "growth": -0.2,
       "trend": "稳定",
@@ -587,7 +587,7 @@ window.DASHBOARD_DATA = {
       "collect_rate": 11.5,
       "works_count": 20,
       "category": "AI大类",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
       "growth": -37.5,
       "trend": "衰退",
@@ -607,7 +607,7 @@ window.DASHBOARD_DATA = {
       "category": "AI大类",
       "_cached": true,
       "_collected_date": "2026-09-11",
-      "growth": -62.4,
+      "growth": -62.5,
       "trend": "衰退",
       "blue_ocean_score": 1303.5,
       "competition_score": 7.65,
@@ -695,9 +695,9 @@ window.DASHBOARD_DATA = {
       "collect_rate": 101.8,
       "works_count": 20,
       "category": "WorkBuddy",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
-      "growth": -80.3,
+      "growth": -80.5,
       "trend": "衰退",
       "blue_ocean_score": 683805.29,
       "competition_score": 0.01,
@@ -715,7 +715,7 @@ window.DASHBOARD_DATA = {
       "category": "WorkBuddy",
       "_cached": true,
       "_collected_date": "2026-09-11",
-      "growth": -18.7,
+      "growth": -19.5,
       "trend": "衰退",
       "blue_ocean_score": 2244.77,
       "competition_score": 4.43,
@@ -839,9 +839,9 @@ window.DASHBOARD_DATA = {
       "collect_rate": 6.7,
       "works_count": 20,
       "category": "AI视频",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
-      "growth": -43.0,
+      "growth": -42.4,
       "trend": "衰退",
       "blue_ocean_score": 1175008.31,
       "competition_score": 0.01,
@@ -859,7 +859,7 @@ window.DASHBOARD_DATA = {
       "category": "AI视频",
       "_cached": true,
       "_collected_date": "2026-09-11",
-      "growth": -58.0,
+      "growth": -57.6,
       "trend": "衰退",
       "blue_ocean_score": 135202.7,
       "competition_score": 0.07,
@@ -868,18 +868,18 @@ window.DASHBOARD_DATA = {
     {
       "keyword": "豆包AI",
       "platform": "douyin",
-      "total": 14281,
+      "total": 14327,
       "max_like": 111800,
-      "avg_like": 7156,
-      "avg_collect": 1206,
+      "avg_like": 7170,
+      "avg_collect": 1214,
       "collect_rate": 16.9,
       "works_count": 20,
       "category": "AI大类",
-      "_cached": true,
-      "_collected_date": "2026-09-11",
-      "growth": -1.2,
+      "_cached": false,
+      "_collected_date": "2026-09-13",
+      "growth": -0.9,
       "trend": "稳定",
-      "blue_ocean_score": 11742.88,
+      "blue_ocean_score": 11705.17,
       "competition_score": 0.85,
       "efficiency_tag": "蓝海"
     },
@@ -5198,6 +5198,25 @@ window.DASHBOARD_DATA = {
       "_keyword": "AI绘画"
     },
     {
+      "workId": "6aa0c19c0000000028030705",
+      "title": "Images 2.5发布6小时，盘点AI绘画脑洞玩法",
+      "content": "#AI画图 #AI工具 #AIGC #howto玩坏AI #AI生图 #大模型 #黑科技 #黑科技 #人工智能 #AI绘画有点东西",
+      "accountName": "阿博粒",
+      "accountType": "数码科技",
+      "followerCount": 0,
+      "likeCount": 154,
+      "collectCount": 138,
+      "shareCount": 120,
+      "commentCount": 0,
+      "publishTime": "2026-09-09 10:17:00",
+      "workUrl": "https://www.xiaohongshu.com/explore/6aa0c19c0000000028030705",
+      "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g34o324sls0e21o8g5oot9pm8v943846pb2o?imageView2/2/w/1080/format/webp",
+      "workType": "video",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI绘画"
+    },
+    {
       "workId": "6a827541000000003302c1bd",
       "title": "为啥不能AI绘画",
       "content": "btd致歉！！！#稿子 #画渣栀屿 #稿件展示#阿蕾奇诺  #AI画图 #接稿 #稿件分享 #原神 #标题党致歉",
@@ -5217,76 +5236,19 @@ window.DASHBOARD_DATA = {
       "_keyword": "AI绘画"
     },
     {
-      "workId": "6a7b175b0000000005028616",
-      "title": "WC！崩铁实锤真珠就是AI绘画！",
-      "content": "真珠！我一眼就看出你不是人！\n#崩坏星穹铁道 #星穹铁道二相乐园 #崩坏星穹铁道创作者激励计划 #星穹铁道攻略 #星穹铁道日更挑战 #开拓时间到 #星穹铁道真珠  #崩坏星穹铁道情报君",
-      "accountName": "崩坏：星穹铁道情报君",
-      "accountType": "旅行度假",
-      "followerCount": 0,
-      "likeCount": 465,
-      "collectCount": 21,
-      "shareCount": 17,
-      "commentCount": 7,
-      "publishTime": "2026-08-11 20:36:43",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a7b175b0000000005028616",
-      "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g34o323nsp15d70104bl098sqaoct3cdub00?imageView2/2/w/1080/format/webp",
-      "workType": "video",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI绘画"
-    },
-    {
-      "workId": "6a79c747000000002701f641",
-      "title": "我很狼狈，虽然ai绘画并未针对我",
-      "content": "我不中了啊！\n比内容更绷不住的是剪了一整天的视频！\n再也不想剪视频了，杏师傅累虚了😭😭😭😭\n#oc #绘画 #约稿 #稿件展示 #仅展示不可使用 #weeklypick #好视频扶持计划\n\t\n二编一下：封面不是单主不是单主ദ്ദി ༎ຶ‿༎ຶ )像ai是杏师傅自己幻视的，封面是亲友也觉得所以认同杏师傅",
-      "accountName": "杏铁锌",
-      "accountType": "休闲爱好",
-      "followerCount": 0,
-      "likeCount": 23925,
-      "collectCount": 2510,
-      "shareCount": 208,
-      "commentCount": 245,
-      "publishTime": "2026-08-10 20:42:47",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a79c747000000002701f641",
-      "coverUrl": "https://sns-na-i27.xhscdn.com/1040g008323mjf8lngo4g5ns523fg8541ga054ho?imageView2/2/w/576/format/heif/q/58%7CimageMogr2/strip&redImage/frame/0/enhance/4&ap=1&sc=V_PRV&sign=6ce0c391444192e69fe3d182a4c35311&t=6a81e0e5&origin=0",
-      "workType": "video",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI绘画"
-    },
-    {
       "workId": "6a8708e200000000230211b9",
       "title": "属于“AI绘画”的时代，永远不会到来",
       "content": "#和三花老师一起 #原创漫画 #不确定的未来 #手绘 #坚持 ",
       "accountName": "画漫画的三花老师",
       "accountType": "影视娱乐",
       "followerCount": 0,
-      "likeCount": 3887,
+      "likeCount": 3902,
       "collectCount": 200,
       "shareCount": 70,
       "commentCount": 217,
       "publishTime": "2026-08-20 22:02:10",
       "workUrl": "https://www.xiaohongshu.com/explore/6a8708e200000000230211b9",
       "coverUrl": "http://sns-img-hw.xhscdn.net/1040g0083243hr7msnk005o62tlc09095lu4osmg?imageView2/2/w/1080/format/webp",
-      "workType": "video",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI绘画"
-    },
-    {
-      "workId": "6a7aab7b0000000035016b78",
-      "title": "4.6上半真珠，老米居然用的是AI绘画！",
-      "content": "#假如崩铁角色也有小红书 #星穹铁道日更挑战 #虚构史学家 #崩坏星穹铁道 #好视频扶持计划 #开拓时间到 #崩坏星穹铁道创作者激励计划 #星穹铁道剧情 #星穹铁道二创 #星穹铁道真珠",
-      "accountName": "晚晚（星穹铁道）",
-      "accountType": "旅行度假",
-      "followerCount": 0,
-      "likeCount": 607,
-      "collectCount": 60,
-      "shareCount": 40,
-      "commentCount": 13,
-      "publishTime": "2026-08-11 12:56:27",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a7aab7b0000000035016b78",
-      "coverUrl": "http://sns-img-hw.xhscdn.net/1040g2sg323nfl4o90ae05p0dj6cqavnp18li2no?imageView2/2/w/1080/format/webp",
       "workType": "video",
       "duration": 0,
       "platform": "xiaohongshu",
@@ -5306,6 +5268,25 @@ window.DASHBOARD_DATA = {
       "publishTime": "2026-08-23 08:53:06",
       "workUrl": "https://www.xiaohongshu.com/explore/6a8a447200000000330294fd",
       "coverUrl": "http://sns-img-hw.xhscdn.net/notes_pre_post/1040g3k03246mg0oegs205oga2e340nijbikd7s8?imageView2/2/w/1080/format/webp",
+      "workType": "normal",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI绘画"
+    },
+    {
+      "workId": "6aa0bb170000000028001e7b",
+      "title": "AI绘画 Q版超英人物插画一组",
+      "content": "#二次元 #动漫 #原画分享家 #卡通 #插画 #动画 #漫画 #游戏 #插画师 #人物设计",
+      "accountName": "原画分享家",
+      "accountType": "休闲爱好",
+      "followerCount": 0,
+      "likeCount": 30,
+      "collectCount": 13,
+      "shareCount": 0,
+      "commentCount": 0,
+      "publishTime": "2026-09-09 09:49:11",
+      "workUrl": "https://www.xiaohongshu.com/explore/6aa0bb170000000028001e7b",
+      "coverUrl": "http://sns-img-hw.xhscdn.net/notes_pre_post/1040g3k0324skenu4hk2g5oga2e340nijnu8g6e0?imageView2/2/w/1080/format/webp",
       "workType": "normal",
       "duration": 0,
       "platform": "xiaohongshu",
@@ -5363,25 +5344,6 @@ window.DASHBOARD_DATA = {
       "publishTime": "2026-08-14 12:01:12",
       "workUrl": "https://www.xiaohongshu.com/explore/6a7e930800000000280030d3",
       "coverUrl": "http://sns-img-hw.xhscdn.net/1040g2sg323r9lu8u7udg5nhmt5eg9d7igl1mvog?imageView2/2/w/1080/format/webp",
-      "workType": "normal",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI绘画"
-    },
-    {
-      "workId": "6a7bb2fc0000000028006338",
-      "title": "阿努",
-      "content": "#插画 #疾风烈酒 #人设 #插画分享 #人物设计 #动作参考 #绘画参考 #可爱 #美少女 #AI绘画 ",
-      "accountName": "疾风烈酒(AI绘画)",
-      "accountType": "休闲爱好",
-      "followerCount": 0,
-      "likeCount": 112,
-      "collectCount": 36,
-      "shareCount": 6,
-      "commentCount": 12,
-      "publishTime": "2026-08-12 07:40:44",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a7bb2fc0000000028006338",
-      "coverUrl": "http://sns-img-hw.xhscdn.net/1040g008323ofqlt5go6g5nhmt5eg9d7ieq15mr8?imageView2/2/w/1080/format/webp",
       "workType": "normal",
       "duration": 0,
       "platform": "xiaohongshu",
@@ -5496,6 +5458,44 @@ window.DASHBOARD_DATA = {
       "publishTime": "2026-09-03 07:12:33",
       "workUrl": "https://www.xiaohongshu.com/explore/6a98ad61000000002b001e95",
       "coverUrl": "http://sns-img-hw.xhscdn.net/notes_pre_post/1040g3k8324kpcmhenad05nhmt5eg9d7ivpn1qk0?imageView2/2/w/1080/format/webp",
+      "workType": "normal",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI绘画"
+    },
+    {
+      "workId": "6a921ef9000000002501c6c5",
+      "title": "Kneesocks",
+      "content": "#插画 #疾风烈酒 #人设 #插画分享 #人物设计 #动作参考 #绘画参考 #可爱 #美少女 #AI绘画 ",
+      "accountName": "疾风烈酒(AI绘画)",
+      "accountType": "休闲爱好",
+      "followerCount": 0,
+      "likeCount": 82,
+      "collectCount": 22,
+      "shareCount": 6,
+      "commentCount": 8,
+      "publishTime": "2026-08-29 07:51:21",
+      "workUrl": "https://www.xiaohongshu.com/explore/6a921ef9000000002501c6c5",
+      "coverUrl": "http://sns-img-hw.xhscdn.net/notes_pre_post/1040g3k8324ecgfk7go6g5nhmt5eg9d7if7551s0?imageView2/2/w/1080/format/webp",
+      "workType": "normal",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI绘画"
+    },
+    {
+      "workId": "6a8f9ed8000000001f004b70",
+      "title": "夜樱",
+      "content": "#插画 #疾风烈酒 #人设 #插画分享 #人物设计 #动作参考 #绘画参考 #可爱 #美少女 #AI绘画 ",
+      "accountName": "疾风烈酒(AI绘画)",
+      "accountType": "休闲爱好",
+      "followerCount": 0,
+      "likeCount": 70,
+      "collectCount": 30,
+      "shareCount": 7,
+      "commentCount": 7,
+      "publishTime": "2026-08-27 10:20:08",
+      "workUrl": "https://www.xiaohongshu.com/explore/6a8f9ed8000000001f004b70",
+      "coverUrl": "http://sns-img-hw.xhscdn.net/1040g008324bubsa6na5g5nhmt5eg9d7i5hhhaeg?imageView2/2/w/1080/format/webp",
       "workType": "normal",
       "duration": 0,
       "platform": "xiaohongshu",
@@ -7153,17 +7153,17 @@ window.DASHBOARD_DATA = {
     {
       "workId": "6a9556ac0000000021025d05",
       "title": "用AI数字人做账号❗️保姆级流程🔥",
-      "content": "怕露脸、怕被熟人刷到、又不想花时间布景拍摄？用数字人替身出镜，一张图就做出来！[派对R]\n#自媒体 #AI还可以这样玩   #女性成长 #干货分享  #ai工具 #不出镜不露脸 #AI数字人#可灵AI #可灵 #AI智能分镜",
+      "content": "用AI数字人做账号❗️保姆级流程🔥\n怕露脸、怕被熟人刷到、又不想花时间布景拍摄？用数字人替身出镜，一张图就做出来！[派对R]\n#自媒体 #AI还可以这样玩   #女性成长 #干货分享  #ai工具 #不出镜不露脸 #AI数字人#可灵AI #可灵 #AI智能分镜",
       "accountName": "机智的七七🥜",
       "accountType": "职业发展",
       "followerCount": 0,
       "likeCount": 211,
       "collectCount": 77,
       "shareCount": 2,
-      "commentCount": 34,
+      "commentCount": 35,
       "publishTime": "2026-08-31 18:25:48",
       "workUrl": "https://www.xiaohongshu.com/explore/6a9556ac0000000021025d05",
-      "coverUrl": "http://sns-img-hw.xhscdn.net/1040g008324jvuchh0o005pga0jcjclmd0843s90?imageView2/2/w/1080/format/webp",
+      "coverUrl": "http://sns-na-i14.xhscdn.com/1040g008324jvuchh0o005pga0jcjclmd0843s90?imageView2/2/w/1080/format/webp",
       "workType": "video",
       "duration": 0,
       "platform": "xiaohongshu",
@@ -7309,13 +7309,13 @@ window.DASHBOARD_DATA = {
       "accountName": "AI产品狙击手",
       "accountType": "数码科技",
       "followerCount": 0,
-      "likeCount": 6,
-      "collectCount": 2,
+      "likeCount": 7,
+      "collectCount": 4,
       "shareCount": 2,
       "commentCount": 0,
       "publishTime": "2026-09-09 09:47:52",
       "workUrl": "https://www.xiaohongshu.com/explore/6aa0bac8000000002901b87a",
-      "coverUrl": "https://sns-i11-ae.rednotecdn.com/spectrum/1040g0k0324sl0kiviq0049hrgdfpuqeac770tg0?imageView2/2/w/576/format/heif/q/58|imageMogr2/strip&redImage/frame/0/enhance/4&ap=1&sc=V_PRV&sign=d32cb57c37947e5a97526194bc4aced0&t=6aa1bcfb",
+      "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g0k0324sl0kiviq0049hrgdfpuqeac770tg0?imageView2/2/w/1080/format/webp",
       "workType": "video",
       "duration": 0,
       "platform": "xiaohongshu",
@@ -7328,10 +7328,10 @@ window.DASHBOARD_DATA = {
       "accountName": "金妮AI提效",
       "accountType": "职业发展",
       "followerCount": 0,
-      "likeCount": 22,
-      "collectCount": 37,
+      "likeCount": 109,
+      "collectCount": 135,
       "shareCount": 5,
-      "commentCount": 1,
+      "commentCount": 7,
       "publishTime": "2026-09-08 17:50:34",
       "workUrl": "https://www.xiaohongshu.com/explore/6a9fda6a0000000026017797",
       "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g34o324rf3u0uhs105pvamcdjjnsibfoo0e0?imageView2/2/w/1080/format/webp",
@@ -8197,25 +8197,6 @@ window.DASHBOARD_DATA = {
       "_keyword": "AI写作"
     },
     {
-      "workId": "6a7b47660000000002003c00",
-      "title": "💥不可证明的AI写作时代即将结束❗",
-      "content": "#AI反常识howto #AI搞事业howto #Globall #AI进化生活howto #AI搞学习howto #AI写作",
-      "accountName": "大力馬 | AI科技资讯速递",
-      "accountType": "学习教育",
-      "followerCount": 0,
-      "likeCount": 1923,
-      "collectCount": 838,
-      "shareCount": 1323,
-      "commentCount": 447,
-      "publishTime": "2026-08-12 00:01:42",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a7b47660000000002003c00",
-      "coverUrl": "http://sns-img-hw.xhscdn.net/oss-sg/notes/1040g3l0323o2ksc6ik005o0rkv9g89lmrp8ghtg?imageView2/2/w/1080/format/webp",
-      "workType": "normal",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI写作"
-    },
-    {
       "workId": "6a856aea0000000033031317",
       "title": "不会AI写作？秋叶大叔手把手教你！",
       "content": "📕：《秒懂AI写作：让你轻松成为写作高手》\n✏️：秋叶   刘进新   贾凝墨  万静\n-\n#AI写作 #写作赚钱  #写作方法  #文字变现  #副业 #来小红书买一本好书  #书荒焦虑求推荐  #跟人邮读一本好书",
@@ -8241,13 +8222,32 @@ window.DASHBOARD_DATA = {
       "accountName": "总台科晚",
       "accountType": "新闻资讯",
       "followerCount": 0,
-      "likeCount": 19,
-      "collectCount": 12,
+      "likeCount": 20,
+      "collectCount": 13,
       "shareCount": 4,
       "commentCount": 1,
       "publishTime": "2026-08-30 08:00:52",
       "workUrl": "https://www.xiaohongshu.com/explore/6a9305f20000000024004edc",
       "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g34o324f8edkdmu105nfsuku095visdvp01g?imageView2/2/w/1080/format/webp",
+      "workType": "video",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI写作"
+    },
+    {
+      "workId": "6aa339ce000000000e03b400",
+      "title": "你的AI写作是不是很塑料？🤖",
+      "content": "说真的\n你写的文案是不是一眼AI？😅\n\t\n\"赋能\" \"解锁\" \"在当今这个……的时代\"\n这些万能句一出现\n读者秒变已读不回\n\t\n我最近把AI写作里\n最容易暴露身份的车轱辘话\n整理成了一份「陈词滥调检测清单」\n+ 压箱底的「去AI味神器」\n\t\n就是那个能把AI文案\n改到完全看不出痕迹的方法\n用ChatGPT / Claude写东西的姐妹\n真的建议收藏\n\t\n想要的宝子\n评论区扣一个「AI味」\n我私信发你 🤌\n\t\n不客套 不卖课 纯干货分享\n\t\n#AI写作#chatgpt#Claude#AI工具#文案技巧#内容创作#OOTD#海外生活#穿搭灵感",
+      "accountName": "科技YY",
+      "accountType": "体育锻炼",
+      "followerCount": 0,
+      "likeCount": 13,
+      "collectCount": 15,
+      "shareCount": 0,
+      "commentCount": 1,
+      "publishTime": "2026-09-11 07:14:22",
+      "workUrl": "https://www.xiaohongshu.com/explore/6aa339ce000000000e03b400",
+      "coverUrl": "https://sns-i11-ae.rednotecdn.com/oss-ae/spectrum/1040g440324v31ebc36005qdlloi9g0ag7o67n8o?imageView2/2/w/576/format/webp/q/87%7CimageMogr2/strip&redImage/frame/0&ap=1&sc=V_PRV&sign=9bbf21d61e54e052305f952d26590c0d&t=6aa42d71",
       "workType": "video",
       "duration": 0,
       "platform": "xiaohongshu",
@@ -8260,10 +8260,10 @@ window.DASHBOARD_DATA = {
       "accountName": "是虎虎呀🐯",
       "accountType": "亲子育儿",
       "followerCount": 0,
-      "likeCount": 1242,
-      "collectCount": 406,
-      "shareCount": 4,
-      "commentCount": 94,
+      "likeCount": 1353,
+      "collectCount": 456,
+      "shareCount": 7,
+      "commentCount": 103,
       "publishTime": "2026-09-02 14:43:58",
       "workUrl": "https://www.xiaohongshu.com/explore/6a97c5ae00000000260169e5",
       "coverUrl": "http://sns-img-hw.xhscdn.net/1040g008324jsoc7v7k005pbclga734gq48p0i50?imageView2/2/w/1080/format/webp",
@@ -8298,7 +8298,7 @@ window.DASHBOARD_DATA = {
       "accountName": "浙江大学",
       "accountType": "学习教育",
       "followerCount": 0,
-      "likeCount": 113,
+      "likeCount": 114,
       "collectCount": 19,
       "shareCount": 5,
       "commentCount": 7,
@@ -8336,8 +8336,8 @@ window.DASHBOARD_DATA = {
       "accountName": "清醒学姐",
       "accountType": "学习教育",
       "followerCount": 0,
-      "likeCount": 119,
-      "collectCount": 209,
+      "likeCount": 120,
+      "collectCount": 214,
       "shareCount": 12,
       "commentCount": 6,
       "publishTime": "2026-08-18 23:16:20",
@@ -8368,25 +8368,6 @@ window.DASHBOARD_DATA = {
       "_keyword": "AI写作"
     },
     {
-      "workId": "6a9910aa000000002802a450",
-      "title": "12个海外AI写作副业，会写不等于会赚钱",
-      "content": "AI写作赚钱2026年变了天：纯生成的稿子一篇5刀都嫌贵，另一头一单900刀的挂单排着队。差别不在会不会用AI，在你把AI放在哪一环。\n\t\n✅ 三个还没挤满的口子\n1️⃣ 让企业内容被AI引用，不只是搜索排名——这词两年前还不存在，现在4300多个服务\n2️⃣ 给AI客服整理知识库，把乱糟糟的资料拆成一问一答，每条300字内、不依赖上下文\n3️⃣ 窄题材文书代写：代笔1万多个服务，AI简历只有520个\n\t\n✅ 上手快的一门手艺\n把AI稿改出活人味：三段排比拆开、删掉结尾的正确废话、塞离谱具体的细节。客户买的就是\"看不出是AI写的\"。\n\t\n赚钱的从来不是\"生成\"这一步。12个方向都在图里，先收藏对号入座。你是哪种背景？\n\t\n#AI写作赚钱  #写作赚钱  #AI写作  #兼职副业  #写作变现副业  #被动收入  #海外副业",
-      "accountName": "猎者出海",
-      "accountType": "职业发展",
-      "followerCount": 0,
-      "likeCount": 6,
-      "collectCount": 4,
-      "shareCount": 0,
-      "commentCount": 0,
-      "publishTime": "2026-09-04 09:17:01",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a9910aa000000002802a450",
-      "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g34o324l5dqknmu005pt9hmjh71ptepa5lag?imageView2/2/w/1080/format/webp",
-      "workType": "normal",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI写作"
-    },
-    {
       "workId": "6a954481000000000303e3ec",
       "title": "不用懂技术！老外做AI写作助手月入2万刀",
       "content": "AI写作工具出海，这个老外一个人起步，现在月收 2 万美金。\n\t\n2023 年他只买了个域名，拉上一个开发朋友，1 个月做出第一版。\n\t\n1️⃣ 前两个月完全免费\n不急着收费，先攒用户和反馈，顺手把 bug 修干净。这批人后来成了他的邮件列表。\n\t\n2️⃣ 流量全靠搜索\n不投广告，一篇篇写内容 + 往各类工具目录提交收录，自然点击一度冲到日均 1 万次。\n\t\n3️⃣ 免费版留人，订阅版收钱\n毛利常年 50-60%，团队 7 个人还有一半是兼职。\n\t\n⚠️ 他也翻过车：搜索算法一次大更新，排名掉没，日活跟着跌了 20%，首页内容删掉大半重写才爬回来。\n\t\n工具出海有个反直觉的点——内容和收录带来的免费流量，比投广告扛得久。\n流程有点长，先收藏慢慢看🔖 你会先做哪一步？\n\t\n#AI写作工具  #AI工具  #AI副业  #AI写作  #出海  #出海创业  #AI出海  #产品出海",
@@ -8400,6 +8381,25 @@ window.DASHBOARD_DATA = {
       "publishTime": "2026-09-01 09:02:00",
       "workUrl": "https://www.xiaohongshu.com/explore/6a954481000000000303e3ec",
       "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g0k0324hb5ol5mu005pt9hmjh71ptsu8g00o?imageView2/2/w/1080/format/webp",
+      "workType": "normal",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI写作"
+    },
+    {
+      "workId": "6a9910aa000000002802a450",
+      "title": "12个海外AI写作副业，会写不等于会赚钱",
+      "content": "AI写作赚钱2026年变了天：纯生成的稿子一篇5刀都嫌贵，另一头一单900刀的挂单排着队。差别不在会不会用AI，在你把AI放在哪一环。\n\t\n✅ 三个还没挤满的口子\n1️⃣ 让企业内容被AI引用，不只是搜索排名——这词两年前还不存在，现在4300多个服务\n2️⃣ 给AI客服整理知识库，把乱糟糟的资料拆成一问一答，每条300字内、不依赖上下文\n3️⃣ 窄题材文书代写：代笔1万多个服务，AI简历只有520个\n\t\n✅ 上手快的一门手艺\n把AI稿改出活人味：三段排比拆开、删掉结尾的正确废话、塞离谱具体的细节。客户买的就是\"看不出是AI写的\"。\n\t\n赚钱的从来不是\"生成\"这一步。12个方向都在图里，先收藏对号入座。你是哪种背景？\n\t\n#AI写作赚钱  #写作赚钱  #AI写作  #兼职副业  #写作变现副业  #被动收入  #海外副业",
+      "accountName": "猎者出海",
+      "accountType": "职业发展",
+      "followerCount": 0,
+      "likeCount": 6,
+      "collectCount": 4,
+      "shareCount": 0,
+      "commentCount": 0,
+      "publishTime": "2026-09-04 09:17:01",
+      "workUrl": "https://www.xiaohongshu.com/explore/6a9910aa000000002802a450",
+      "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g34o324l5dqknmu005pt9hmjh71ptepa5lag?imageView2/2/w/1080/format/webp",
       "workType": "normal",
       "duration": 0,
       "platform": "xiaohongshu",
@@ -8450,8 +8450,8 @@ window.DASHBOARD_DATA = {
       "accountName": "电波曲奇",
       "accountType": "职业发展",
       "followerCount": 0,
-      "likeCount": 7,
-      "collectCount": 3,
+      "likeCount": 8,
+      "collectCount": 4,
       "shareCount": 7,
       "commentCount": 0,
       "publishTime": "2026-09-02 12:16:02",
@@ -8476,6 +8476,25 @@ window.DASHBOARD_DATA = {
       "publishTime": "2026-08-18 10:24:42",
       "workUrl": "https://www.xiaohongshu.com/explore/6a83c26a000000002c00404c",
       "coverUrl": "http://sns-img-hw.xhscdn.net/notes_pre_post/1040g3k83240bbc4i72l05n3hal7k0vebk304ss0?imageView2/2/w/1080/format/webp",
+      "workType": "normal",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI写作"
+    },
+    {
+      "workId": "6aa2a0ad0000000029019942",
+      "title": "AI写作实操：社会热点实操篇",
+      "content": "#热点 #ai #ai提效 #文案写作 #AI人工智能 #写作技巧 #写作干货 #人工智能艺术 #写作 #文章写作 ",
+      "accountName": "Ai绘画&知识Mountain",
+      "accountType": "影视娱乐",
+      "followerCount": 0,
+      "likeCount": 1,
+      "collectCount": 0,
+      "shareCount": 0,
+      "commentCount": 0,
+      "publishTime": "2026-09-10 20:21:01",
+      "workUrl": "https://www.xiaohongshu.com/explore/6aa2a0ad0000000029019942",
+      "coverUrl": "http://sns-img-hw.xhscdn.net/notes_pre_post/1040g3k0324ug93743u1g5nsdarg08e8bnsu6r8o?imageView2/2/w/1080/format/webp",
       "workType": "normal",
       "duration": 0,
       "platform": "xiaohongshu",
@@ -8514,25 +8533,6 @@ window.DASHBOARD_DATA = {
       "publishTime": "2026-09-04 17:42:24",
       "workUrl": "https://www.xiaohongshu.com/explore/6a9a9280000000002502c8f3",
       "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g34o324mltecan41g5pc518gn14nk5u0sg20?imageView2/2/w/1080/format/webp",
-      "workType": "video",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI写作"
-    },
-    {
-      "workId": "6a9abc93000000002a026cb1",
-      "title": "孩子特别喜欢依赖豆包、AI写作业、写作文",
-      "content": "与其天天研究怎么堵住孩子偷懒的路，不如重新回到那个更根本的问题：\n怎么让学习重新变成他自己的事。\n#家卫老师  #家庭教育  #如何唤醒孩子的自驱力  #父母课堂  #家卫老师德育课  #写作业  #学习方法",
-      "accountName": "家卫老师",
-      "accountType": "亲子育儿",
-      "followerCount": 0,
-      "likeCount": 63,
-      "collectCount": 50,
-      "shareCount": 15,
-      "commentCount": 1,
-      "publishTime": "2026-09-06 20:42:01",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a9abc93000000002a026cb1",
-      "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g0k0324mpnk550m0g5ovmrr63qd7djuu9ii0?imageView2/2/w/1080/format/webp",
       "workType": "video",
       "duration": 0,
       "platform": "xiaohongshu",
@@ -14283,14 +14283,52 @@ window.DASHBOARD_DATA = {
       "_keyword": "AI音乐"
     },
     {
+      "workId": "6aa2ad840000000028034dbf",
+      "title": "也是正式和Ai音乐一起演出了次！",
+      "content": "#AI芒造梦计划 #音乐人 #单簧管 #音乐会 #ai #音乐 #ai音乐 #演奏 #黑管 #黄野",
+      "accountName": "黄野音乐",
+      "accountType": "休闲爱好",
+      "followerCount": 0,
+      "likeCount": 2,
+      "collectCount": 1,
+      "shareCount": 0,
+      "commentCount": 0,
+      "publishTime": "2026-09-10 21:15:49",
+      "workUrl": "https://www.xiaohongshu.com/explore/6aa2ad840000000028034dbf",
+      "coverUrl": "http://sns-img-hw.xhscdn.net/1040g008324uhsirmiu005nmij4jg86kae1a0kl8?imageView2/2/w/1080/format/webp",
+      "workType": "normal",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI音乐"
+    },
+    {
+      "workId": "6aa38ee70000000026016634",
+      "title": "2026 Suno AI音乐到底应该怎么玩儿？",
+      "content": "#AI新手村 #音乐制作 #编曲 #ai音乐 #音乐制作人 #流行音乐#suno #作曲 #与音乐的日常 # #AI工具",
+      "accountName": "落幕日后",
+      "accountType": "综合杂项",
+      "followerCount": 0,
+      "likeCount": 2,
+      "collectCount": 3,
+      "shareCount": 0,
+      "commentCount": 1,
+      "publishTime": "2026-09-12 10:18:02",
+      "workUrl": "https://www.xiaohongshu.com/explore/6aa38ee70000000026016634",
+      "coverUrl": "https://sns-na-i4.xhscdn.com/spectrum/1040g0k0324vdcpme32005pnic2jnc6ljrbeko4o?imageView2/2/w/608/format/heif/q/56|imageMogr2/strip&redImage/frame/0/enhance/4&ap=22&sc=LF_PRV&sign=04995ac21e801f2738113fbd3d47b060&t=6aa4c711",
+      "workType": "video",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI音乐"
+    },
+    {
       "workId": "6a964977000000002a005638",
       "title": "Google 开源的一个AI音乐项目",
       "content": "Google 开源的一个AI音乐项目\nGoogle Magenta 开源了一个挺有意思的 AI 音乐项目：Magenta RealTime 2。\n\t\n它做的事情很好理解：\n\t\n你弹，它接着弹。\n\t\n你可以给它一段文字风格、参考音频，或者直接接 MIDI 键盘。模型会根据你的输入实时生成音乐，控制延迟大约 200ms。\n\t\nmac几乎都可以本地使用，也有app版本应用",
       "accountName": "Levi聊AI落地",
       "accountType": "职业发展",
       "followerCount": 0,
-      "likeCount": 34,
-      "collectCount": 19,
+      "likeCount": 35,
+      "collectCount": 22,
       "shareCount": 5,
       "commentCount": 1,
       "publishTime": "2026-09-01 11:41:43",
@@ -14359,6 +14397,25 @@ window.DASHBOARD_DATA = {
       "_keyword": "AI音乐"
     },
     {
+      "workId": "6aa21c13000000002502f007",
+      "title": "零基础不用懂乐理！Suno完整实操制作ai音乐",
+      "content": "#音乐制作 #编曲 #ai音乐 #原创音乐 #音乐制作人 #AI工具 #AI新手村 #作曲 #AI搞学习howto #AI实用技巧howto",
+      "accountName": "落幕日后",
+      "accountType": "综合杂项",
+      "followerCount": 0,
+      "likeCount": 29,
+      "collectCount": 40,
+      "shareCount": 4,
+      "commentCount": 24,
+      "publishTime": "2026-09-10 10:55:15",
+      "workUrl": "https://www.xiaohongshu.com/explore/6aa21c13000000002502f007",
+      "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g0k0324u053mgj4005pnic2jnc6lj8e6i43g?imageView2/2/w/1080/format/webp",
+      "workType": "video",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI音乐"
+    },
+    {
       "workId": "6a98e9650000000028000e9f",
       "title": "不会写歌也能出单曲Suno AI音乐实操全过程",
       "content": "#音乐制作 #编曲 #ai音乐 #音乐制作人 #AI工具 #suno #作曲 #AI新手村 #与音乐的日常 #作词作曲",
@@ -14366,7 +14423,7 @@ window.DASHBOARD_DATA = {
       "accountType": "综合杂项",
       "followerCount": 0,
       "likeCount": 59,
-      "collectCount": 105,
+      "collectCount": 106,
       "shareCount": 12,
       "commentCount": 25,
       "publishTime": "2026-09-03 11:28:37",
@@ -14384,10 +14441,10 @@ window.DASHBOARD_DATA = {
       "accountName": "草履虫饲养员",
       "accountType": "职业发展",
       "followerCount": 0,
-      "likeCount": 823,
-      "collectCount": 126,
-      "shareCount": 23,
-      "commentCount": 45,
+      "likeCount": 829,
+      "collectCount": 132,
+      "shareCount": 24,
+      "commentCount": 48,
       "publishTime": "2026-08-18 23:26:26",
       "workUrl": "https://www.xiaohongshu.com/explore/6a842dee000000002800b2d1",
       "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g0k03240oia38700g5oqu0sf6527g0psv0vg?imageView2/2/w/1080/format/webp",
@@ -14441,10 +14498,10 @@ window.DASHBOARD_DATA = {
       "accountName": "不困金金",
       "accountType": "美味佳肴",
       "followerCount": 0,
-      "likeCount": 987,
-      "collectCount": 81,
-      "shareCount": 73,
-      "commentCount": 136,
+      "likeCount": 1047,
+      "collectCount": 88,
+      "shareCount": 83,
+      "commentCount": 142,
       "publishTime": "2026-09-06 12:47:46",
       "workUrl": "https://www.xiaohongshu.com/explore/6a9cf0720000000026021524",
       "coverUrl": "http://sns-img-hw.xhscdn.net/notes_pre_post/1040g3k0324ouitiq0s005pk68s93uosrsr5e300?imageView2/2/w/1080/format/webp",
@@ -14460,14 +14517,52 @@ window.DASHBOARD_DATA = {
       "accountName": "Levi聊AI落地",
       "accountType": "职业发展",
       "followerCount": 0,
-      "likeCount": 34,
-      "collectCount": 45,
+      "likeCount": 36,
+      "collectCount": 47,
       "shareCount": 19,
       "commentCount": 3,
       "publishTime": "2026-09-01 11:32:42",
       "workUrl": "https://www.xiaohongshu.com/explore/6a96475a000000002701643f",
       "coverUrl": "http://sns-img-hw.xhscdn.net/1040g2sg324iecmda7aeg5ngn5l1g91uqjri44og?imageView2/2/w/1080/format/webp",
       "workType": "normal",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI音乐"
+    },
+    {
+      "workId": "6aa38e420000000011035c8d",
+      "title": "不愧是字节挖过来AI音乐大佬，逻辑太牛了",
+      "content": "我们组空降了一位字节来的AI音乐总监。第一次创作会上，就让我们见识了什么叫降维打击。\n制作人提了个很常见但模糊的需求：“我们想用AI写一首能火的歌，风格新一点，用户爱听就行。”\n这位新来的大佬没接话。她沉默了几秒，问了三个问题：\n你说“能火”，是想要旋律上头、节奏洗脑，还是歌词有共鸣？是走短视频BGM路线，还是适合live现场？这三个方向的编曲成本和传播逻辑完全不一样。\n期望AI参与哪个环节？是动机生成、和弦编排、歌词创作，还是人声合成？是需要AI给80%的完整草稿你只微调，还是只需要20%的灵感碎片你自己搭结构？\n这首歌上线半年后，你理想中你的创作团队工作方式会变成什么样？是每个人出歌速度翻倍，还是能同时跑三个风格方向，还是你能把精力从重复编曲里解放出来，专心写旋律？\n制作人愣住了。\n会后她分享了在字节做AI音乐必用的四层漏斗框架：\n第一层：伪需求过滤（用第一性原理拷问）\n每当接到“做一首爆款”“要AI写歌”“风格新一点”这种词，必须追问：“当前创作里最大的卡点是什么？是没旋律灵感、和弦写太俗、还是编曲配器太慢？”只有这里的问题，才是AI能解的真问题。\n用AI生成一段独特的副歌动机 → 真需求\n用AI直接把情绪标签变成一首完整的歌 → 大概率是伪需求（失去控制权，修改成本极高）\n第二层：真问题定义与量化\n拒绝“旋律不够抓耳”，要“副歌音程跳跃太平，前8小节只有3个音高变化，预期提升到6个以上”。\n第三层：方案权衡与设计（在模型生成、模板编排、手动修改之间做选择）\n她分享了一个简单的决策矩阵：\n效果优先且风格固定（如EDM drop）→ 用Suno/Udio批量生成，再挑选拼接\n逻辑清晰且需多次迭代（如流行歌主歌-副歌-桥段结构）→ 画工作流：AI出动机 → 人改和弦 → AI补编曲 → 人定混音\n快速试错、成本极低（如demo灵感）→ 提示词链 + 手动兜底\n“AI音乐人90%的决策，都是在‘让AI多出几个版本你选’和‘你亲手改两个音符’之间权衡。没有完美方案，只有最适合当前创作节奏的方案。”\n最后她说：“在字节，最怕的不是歌写不完，而是需求‘肿’——又想炸场子，又要走心，还要能跟跳。体积大，全是水分。我们的工作，就是抽出那个最核心、最坚硬、AI最擅长解的音乐内核。”\n#音乐制作 #AI工具 #编曲 #音乐制作人 #AI人工智能 #ai音乐 #suno #suno作曲 #ai写歌 #ai编曲",
+      "accountName": "落幕日后",
+      "accountType": "综合杂项",
+      "followerCount": 0,
+      "likeCount": 1,
+      "collectCount": 5,
+      "shareCount": 0,
+      "commentCount": 0,
+      "publishTime": "2026-09-11 13:14:42",
+      "workUrl": "https://www.xiaohongshu.com/explore/6aa38e420000000011035c8d",
+      "coverUrl": "https://sns-na-i2.xhscdn.com/1040g008324v6snk73u105pnic2jnc6ljhoj54mg?imageView2/2/w/608/format/heif/q/56|imageMogr2/strip&redImage/frame/0/enhance/4&ap=22&sc=LF_PRV&sign=28a83689d089e7bed1fa5407ef78a473&t=6aa39a7b",
+      "workType": "normal",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI音乐"
+    },
+    {
+      "workId": "6a99518c000000002700a0b8",
+      "title": "手搓AI音乐《小镇狂欢曲》",
+      "content": "#小镇狂欢曲 #小提琴 #钢琴 #乐器演奏 #犀利同学 #好视频扶持计划",
+      "accountName": "犀利同学🎹🎻",
+      "accountType": "休闲爱好",
+      "followerCount": 0,
+      "likeCount": 206,
+      "collectCount": 43,
+      "shareCount": 6,
+      "commentCount": 25,
+      "publishTime": "2026-09-03 18:53:00",
+      "workUrl": "https://www.xiaohongshu.com/explore/6a99518c000000002700a0b8",
+      "coverUrl": "http://sns-img-hw.xhscdn.net/1040g2sg324ldb4gv6ukg5o9k6lm0jdp0jeskh2g?imageView2/2/w/1080/format/webp",
+      "workType": "video",
       "duration": 0,
       "platform": "xiaohongshu",
       "_keyword": "AI音乐"
@@ -14492,25 +14587,6 @@ window.DASHBOARD_DATA = {
       "_keyword": "AI音乐"
     },
     {
-      "workId": "6a7bc7080000000008010244",
-      "title": "米哈游AI音乐互动软件停运",
-      "content": "",
-      "accountName": "3DM",
-      "accountType": "数码科技",
-      "followerCount": 0,
-      "likeCount": 2,
-      "collectCount": 0,
-      "shareCount": 0,
-      "commentCount": 0,
-      "publishTime": "2026-08-12 09:06:17",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a7bc7080000000008010244",
-      "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g34o323oi8lum72405pbeo84ma31nrq22frg?imageView2/2/w/1080/format/webp",
-      "workType": "normal",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI音乐"
-    },
-    {
       "workId": "6a944521000000001803ce40",
       "title": "统一回复：视频里的是Ai音乐学园",
       "content": "，这个码c4np5可以兑换课程和谱子（下栽后点击头像输入激活码即可使用）#吉他指弹 #whywouldiever #吉他",
@@ -14524,6 +14600,25 @@ window.DASHBOARD_DATA = {
       "publishTime": "2026-08-30 22:58:41",
       "workUrl": "https://www.xiaohongshu.com/explore/6a944521000000001803ce40",
       "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g0k0324gf5v5b0m005o0mpl0gbuajs44fvh8?imageView2/2/w/1080/format/webp",
+      "workType": "video",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "AI音乐"
+    },
+    {
+      "workId": "6aa3e26a000000002700951d",
+      "title": "手搓AI音乐｜小提琴勇闯约德尔赛道",
+      "content": "#约德尔唱法 #约德尔 #雪山小夜曲 #小提琴 #钢琴 #好视频扶持计划 #乐器演奏 #计算器弹奏 #犀利同学",
+      "accountName": "犀利同学🎹🎻",
+      "accountType": "休闲爱好",
+      "followerCount": 0,
+      "likeCount": 94,
+      "collectCount": 9,
+      "shareCount": 3,
+      "commentCount": 16,
+      "publishTime": "2026-09-11 19:13:46",
+      "workUrl": "https://www.xiaohongshu.com/explore/6aa3e26a000000002700951d",
+      "coverUrl": "http://sns-img-hw.xhscdn.net/1040g008324vnhgbu346g5o9k6lm0jdp0rsdb9e0?imageView2/2/w/1080/format/webp",
       "workType": "video",
       "duration": 0,
       "platform": "xiaohongshu",
@@ -14563,101 +14658,6 @@ window.DASHBOARD_DATA = {
       "workUrl": "https://www.xiaohongshu.com/explore/6a990395000000000d025d63",
       "coverUrl": "http://sns-img-hw.xhscdn.net/1040g2sg324l3tpls0a005pnic2jnc6ljjkak9uo?imageView2/2/w/1080/format/webp",
       "workType": "normal",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI音乐"
-    },
-    {
-      "workId": "6a9e662a000000002802d1db",
-      "title": "AI音乐还是太夯了，建议社恐的女生都来试试",
-      "content": "#当视频不再有爆款配乐的时候 #生活美学#AI工具 #ai创作  #每天都有值得记录的瞬间 #音乐制作 #作词作曲 #编曲",
-      "accountName": "落幕日后",
-      "accountType": "综合杂项",
-      "followerCount": 0,
-      "likeCount": 2,
-      "collectCount": 2,
-      "shareCount": 0,
-      "commentCount": 22,
-      "publishTime": "2026-09-07 15:22:18",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a9e662a000000002802d1db",
-      "coverUrl": "http://sns-img-hw.xhscdn.net/1040g008324q1l83r7a405pnic2jnc6ljmli3qig?imageView2/2/w/1080/format/webp",
-      "workType": "normal",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI音乐"
-    },
-    {
-      "workId": "6a842fc60000000025006418",
-      "title": "AI音乐创作进入“无门槛”时代？",
-      "content": "这家匹国产AI音乐黑马杀疯了！#AI音乐 #音潮大模型 #国产AI  #人工智能 #音乐创作 #司马华鹏",
-      "accountName": "硅基大司马",
-      "accountType": "科学探索",
-      "followerCount": 0,
-      "likeCount": 67,
-      "collectCount": 15,
-      "shareCount": 20,
-      "commentCount": 2,
-      "publishTime": "2026-08-18 18:11:18",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a842fc60000000025006418",
-      "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g34o3240p251un4105n85qprk2821nnv4gj0?imageView2/2/w/1080/format/webp",
-      "workType": "video",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI音乐"
-    },
-    {
-      "workId": "6a841da70000000032021101",
-      "title": "突然发现Ai音乐才是乖乖女的唯一出路......",
-      "content": "#AI工具 #音乐制作 #与音乐的日常 #音乐制作人 #人工智能发展 #编曲 #AI搞学习howto",
-      "accountName": "幼儿园干饭第一名",
-      "accountType": null,
-      "followerCount": 0,
-      "likeCount": 3,
-      "collectCount": 0,
-      "shareCount": 0,
-      "commentCount": 4,
-      "publishTime": "2026-08-18 16:53:59",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a841da70000000032021101",
-      "coverUrl": "https://sns-webpic.xhscdn.com/a4ba4398-4fe9-c09c-b1ec-71f63f0c8401?imageView2/2/w/540/format/jpg",
-      "workType": "normal",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI音乐"
-    },
-    {
-      "workId": "6a8ade480000000029019d14",
-      "title": "平板上的是AI音乐学园，新用户打：ter6m找谱子，调音器节拍器直接用\n#阳光宅男 #周杰伦 #ai音乐学园",
-      "content": "平板上的是AI音乐学园，新用户打：ter6m找谱子，调音器节拍器直接用\n#阳光宅男 #周杰伦 #ai音乐学园",
-      "accountName": "芒果糯米饭🎸",
-      "accountType": "休闲爱好",
-      "followerCount": 0,
-      "likeCount": 178,
-      "collectCount": 13,
-      "shareCount": 1,
-      "commentCount": 15,
-      "publishTime": "2026-08-23 19:49:28",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a8ade480000000029019d14",
-      "coverUrl": "http://sns-img-hw.xhscdn.net/1040g00832479rofugs005p88ba94gvquvgvtvpg?imageView2/2/w/1080/format/webp",
-      "workType": "video",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI音乐"
-    },
-    {
-      "workId": "6a8522ca000000003302f662",
-      "title": "快乐虾米，一个能制作金曲的AI",
-      "content": "#快乐虾米#happyshrimp#AI音乐",
-      "accountName": "智元无界",
-      "accountType": "宠物天地",
-      "followerCount": 0,
-      "likeCount": 329,
-      "collectCount": 190,
-      "shareCount": 3,
-      "commentCount": 4,
-      "publishTime": "2026-08-19 11:28:10",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a8522ca000000003302f662",
-      "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g34o3241m3icv74005p64gj3jkrpahg8rgp0?imageView2/2/w/1080/format/webp",
-      "workType": "video",
       "duration": 0,
       "platform": "xiaohongshu",
       "_keyword": "AI音乐"
@@ -23461,177 +23461,6 @@ window.DASHBOARD_DATA = {
       "_keyword": "豆包AI"
     },
     {
-      "accountName": "老男人",
-      "accountType": "情感",
-      "audioUrl": "https://lf9-music-east.douyinstatic.com/obj/ies-music-hj/7669473064861666085.mp3",
-      "authorId": "65246569266",
-      "authorLink": "https://www.douyin.com/user/65246569266",
-      "authorUrl": "https://p3.douyinpic.com/aweme-avatar/tos-cn-i-0813c000-ce_o4gz9ZI5pEeAAAE2JEeiqDIiICBALVASqwfkFy~tplv-dy-shrink:188:188.jpeg?from=2956013662&s=PackSourceEnum_USER_PROFILE&se=true&sh=188_188&sc=avatar&l=20260811023346BC54819305CA8A281619&biz_tag=aweme_avatar",
-      "collectCount": 3328,
-      "commentCount": 2303,
-      "commentTopKeywords": [
-        "谢谢",
-        "亲爱",
-        "你好",
-        "我爱你",
-        "鲜花",
-        "早上好",
-        "喜欢",
-        "收下",
-        "漂亮",
-        "我们",
-        "这样",
-        "朋友",
-        "真的",
-        "不要",
-        "辛苦",
-        "玫瑰花",
-        "接受",
-        "一天",
-        "什么",
-        "弟弟"
-      ],
-      "content": "#豆包AI #豆包ai生成 #情感音乐#情感文案#豆包AI",
-      "coverUrl": "https://p3-pc-sign.douyinpic.com/tos-cn-p-0015c000-ce/oo4f2ieBAR498BzXIhcElQL5RqiAbq3ewACvEq~tplv-dy-cropcenter:323:430.jpeg?lk3s=138a59ce&x-expires=2101762800&x-signature=YPj8VPg%2B6wHKT5gID7sCyL6rkIQ%3D&from=327834062&s=PackSourceEnum_PUBLISH&se=true&sh=323_430&sc=cover&biz_tag=pcweb_cover&l=20260811071528D512541A99E1ACE3A9E7",
-      "crawlTime": "2026-08-11 07:15:29",
-      "duration": 10084,
-      "followerCount": 261654,
-      "isPromotion": null,
-      "likeCount": 8256,
-      "publishTime": "2026-08-03 08:32:00",
-      "repostCount": 0,
-      "shareCount": 70,
-      "title": "#豆包AI #豆包ai生成 #情感音乐#情感文案#豆包AI",
-      "workId": "7669473072043216625",
-      "workType": "视频",
-      "workUrl": "https://www.iesdouyin.com/share/video/7669473072043216625",
-      "platform": "douyin",
-      "_keyword": "豆包AI"
-    },
-    {
-      "accountName": "🍀美好回忆🌻(手机摄影)",
-      "accountType": "生活vlog",
-      "audioUrl": "https://lf26-music-east.douyinstatic.com/obj/ies-music-hj/7649756795875314469.mp3",
-      "authorId": "yzL213213",
-      "authorLink": "https://www.douyin.com/user/yzL213213",
-      "authorUrl": "https://p3-pc.douyinpic.com/aweme-avatar/tos-cn-i-0813_f275257ca2144bfb9e097e9ed61d7038~tplv-dy-shrink:96:96.jpeg?from=327834062",
-      "collectCount": 6,
-      "commentCount": 10,
-      "commentTopKeywords": [],
-      "content": "#豆包AI #豆包AI",
-      "coverUrl": "https://p3-pc-sign.douyinpic.com/tos-cn-i-0813c000-ce/o8AWaDgVfAITKeBIAD7UMzFSPEJOFBA8GjAQf9~tplv-dy-cropcenter:323:430.jpeg?lk3s=138a59ce&x-expires=2097259200&x-signature=ixjSW8LrZYxiJK0J6DaozT%2BC9K4%3D&from=327834062&s=PackSourceEnum_PUBLISH&se=true&sh=323_430&sc=cover&biz_tag=pcweb_cover&l=202606200441566FBC15AF7AAC13607E89",
-      "crawlTime": "2026-06-20 04:41:58",
-      "duration": 18042,
-      "followerCount": 2497899,
-      "isPromotion": null,
-      "likeCount": 89,
-      "publishTime": "2026-06-12 04:50:37",
-      "repostCount": 0,
-      "shareCount": 2,
-      "title": "#豆包AI #豆包AI",
-      "workId": "7650243137756082545",
-      "workType": "视频",
-      "workUrl": "https://www.iesdouyin.com/share/video/7650243137756082545",
-      "platform": "douyin",
-      "_keyword": "豆包AI"
-    },
-    {
-      "accountName": "家和万事兴",
-      "accountType": "生活vlog",
-      "audioUrl": "https://lf26-music-east.douyinstatic.com/obj/ies-music-hj/7679495741370485553.mp3",
-      "authorId": "111469046411",
-      "authorLink": "https://www.douyin.com/user/111469046411",
-      "authorUrl": "https://p11.douyinpic.com/aweme-avatar/tos-cn-i-0813c000-ce_o8CFyACsEQ9oAwAhUfeSzIzzqCAPZDHDMAEwAE~tplv-dy-shrink:188:188.jpeg?from=2956013662",
-      "collectCount": 11963,
-      "commentCount": 21824,
-      "commentTopKeywords": [
-        "辛苦",
-        "你们",
-        "加油",
-        "平安",
-        "英雄",
-        "致敬",
-        "好人",
-        "一生",
-        "消防员",
-        "伟大",
-        "人民",
-        "点赞",
-        "注意安全",
-        "中国",
-        "子弟兵",
-        "好样",
-        "祝你们",
-        "战士",
-        "一线",
-        "自己"
-      ],
-      "content": "#豆包AI #豆包AI",
-      "coverUrl": "https://p3-pc-sign.douyinpic.com/image-cut-tos-priv/8a14c762843e51a18345111fdeeebca3~tplv-dy-resize-origshort-autoq-75:330.jpeg?lk3s=138a59ce&x-expires=2103620400&x-signature=gQdhpq0xfGvQ8EssRFXAk2%2B9ON8%3D&from=327834062&s=PackSourceEnum_WEBPC_RELATED_AWEME&se=false&sc=cover&biz_tag=pcweb_cover&l=20260901191950EF1E2B18C49481FF2D60",
-      "crawlTime": "2026-09-01 19:19:51",
-      "duration": 10055,
-      "followerCount": 14583,
-      "isPromotion": null,
-      "likeCount": 111800,
-      "publishTime": "2026-08-30 00:45:40",
-      "repostCount": 0,
-      "shareCount": 438,
-      "title": "#豆包AI #豆包AI",
-      "workId": "7679495755196283513",
-      "workType": "视频",
-      "workUrl": "https://www.iesdouyin.com/share/video/7679495755196283513",
-      "platform": "douyin",
-      "_keyword": "豆包AI"
-    },
-    {
-      "accountName": "草梅爱手舞",
-      "accountType": "生活vlog",
-      "audioUrl": "https://lf26-music-east.douyinstatic.com/obj/ies-music-hj/7665472346169330469.mp3",
-      "authorId": "72881247945",
-      "authorLink": "https://www.douyin.com/user/72881247945",
-      "authorUrl": "https://p3-pc.douyinpic.com/aweme-avatar/tos-cn-i-0813c000-ce_osFn7AGCaFQepA5IpvffQvbIAcALIBTKJQgAlD~tplv-dy-shrink:96:96.jpeg?from=327834062",
-      "collectCount": 3878,
-      "commentCount": 2198,
-      "commentTopKeywords": [
-        "本人",
-        "确认",
-        "谢谢",
-        "这个",
-        "这号",
-        "自己",
-        "关心",
-        "就是",
-        "账号",
-        "主播",
-        "视频",
-        "手机",
-        "主持人",
-        "你们",
-        "支持",
-        "老师",
-        "早上好",
-        "朋友",
-        "真是",
-        "头像"
-      ],
-      "content": "#豆包AI #豆包ai生成视频 #抖音玩法#豆包AI",
-      "coverUrl": "https://p3-pc-sign.douyinpic.com/tos-cn-i-0813c000-ce/o0ADOJXSBIBoAhy1AOiAnReCcCfP1AEEiiw3AM~tplv-dy-cropcenter:323:430.jpeg?lk3s=138a59ce&x-expires=2101687200&x-signature=48pfA%2FOmy%2BjzJN5JYIFSDYE4CC8%3D&from=327834062&s=PackSourceEnum_PUBLISH&se=true&sh=323_430&sc=cover&biz_tag=pcweb_cover&l=20260810102849822CF6A8CA8EE5E6964A",
-      "crawlTime": "2026-08-10 10:28:51",
-      "duration": 10084,
-      "followerCount": 101623,
-      "isPromotion": null,
-      "likeCount": 10525,
-      "publishTime": "2026-07-23 05:47:51",
-      "repostCount": 0,
-      "shareCount": 275,
-      "title": "#豆包AI #豆包ai生成视频 #抖音玩法#豆包AI",
-      "workId": "7665472386317743013",
-      "workType": "视频",
-      "workUrl": "https://www.iesdouyin.com/share/video/7665472386317743013",
-      "platform": "douyin",
-      "_keyword": "豆包AI"
-    },
-    {
       "accountName": "利辛小哥（Ai教学）",
       "accountType": "舞蹈才艺",
       "audioUrl": "https://lf9-music-east.douyinstatic.com/obj/ies-music-hj/7680517423992212283.mp3",
@@ -23761,6 +23590,150 @@ window.DASHBOARD_DATA = {
       "_keyword": "豆包AI"
     },
     {
+      "accountName": "老男人",
+      "accountType": "情感",
+      "audioUrl": "https://lf9-music-east.douyinstatic.com/obj/ies-music-hj/7669473064861666085.mp3",
+      "authorId": "65246569266",
+      "authorLink": "https://www.douyin.com/user/65246569266",
+      "authorUrl": "https://p3.douyinpic.com/aweme-avatar/tos-cn-i-0813c000-ce_o4gz9ZI5pEeAAAE2JEeiqDIiICBALVASqwfkFy~tplv-dy-shrink:188:188.jpeg?from=2956013662&s=PackSourceEnum_USER_PROFILE&se=true&sh=188_188&sc=avatar&l=20260811023346BC54819305CA8A281619&biz_tag=aweme_avatar",
+      "collectCount": 3328,
+      "commentCount": 2303,
+      "commentTopKeywords": [
+        "谢谢",
+        "亲爱",
+        "你好",
+        "我爱你",
+        "鲜花",
+        "早上好",
+        "喜欢",
+        "收下",
+        "漂亮",
+        "我们",
+        "这样",
+        "朋友",
+        "真的",
+        "不要",
+        "辛苦",
+        "玫瑰花",
+        "接受",
+        "一天",
+        "什么",
+        "弟弟"
+      ],
+      "content": "#豆包AI #豆包ai生成 #情感音乐#情感文案#豆包AI",
+      "coverUrl": "https://p3-pc-sign.douyinpic.com/tos-cn-p-0015c000-ce/oo4f2ieBAR498BzXIhcElQL5RqiAbq3ewACvEq~tplv-dy-cropcenter:323:430.jpeg?lk3s=138a59ce&x-expires=2101762800&x-signature=YPj8VPg%2B6wHKT5gID7sCyL6rkIQ%3D&from=327834062&s=PackSourceEnum_PUBLISH&se=true&sh=323_430&sc=cover&biz_tag=pcweb_cover&l=20260811071528D512541A99E1ACE3A9E7",
+      "crawlTime": "2026-08-11 07:15:29",
+      "duration": 10084,
+      "followerCount": 261654,
+      "isPromotion": null,
+      "likeCount": 8256,
+      "publishTime": "2026-08-03 08:32:00",
+      "repostCount": 0,
+      "shareCount": 70,
+      "title": "#豆包AI #豆包ai生成 #情感音乐#情感文案#豆包AI",
+      "workId": "7669473072043216625",
+      "workType": "视频",
+      "workUrl": "https://www.iesdouyin.com/share/video/7669473072043216625",
+      "platform": "douyin",
+      "_keyword": "豆包AI"
+    },
+    {
+      "accountName": "家和万事兴",
+      "accountType": "生活vlog",
+      "audioUrl": "https://lf26-music-east.douyinstatic.com/obj/ies-music-hj/7679495741370485553.mp3",
+      "authorId": "111469046411",
+      "authorLink": "https://www.douyin.com/user/111469046411",
+      "authorUrl": "https://p11.douyinpic.com/aweme-avatar/tos-cn-i-0813c000-ce_o8CFyACsEQ9oAwAhUfeSzIzzqCAPZDHDMAEwAE~tplv-dy-shrink:188:188.jpeg?from=2956013662",
+      "collectCount": 11963,
+      "commentCount": 21824,
+      "commentTopKeywords": [
+        "辛苦",
+        "你们",
+        "加油",
+        "平安",
+        "英雄",
+        "致敬",
+        "好人",
+        "一生",
+        "消防员",
+        "伟大",
+        "人民",
+        "点赞",
+        "注意安全",
+        "中国",
+        "子弟兵",
+        "好样",
+        "祝你们",
+        "战士",
+        "一线",
+        "自己"
+      ],
+      "content": "#豆包AI #豆包AI",
+      "coverUrl": "https://p3-pc-sign.douyinpic.com/image-cut-tos-priv/8a14c762843e51a18345111fdeeebca3~tplv-dy-resize-origshort-autoq-75:330.jpeg?lk3s=138a59ce&x-expires=2103620400&x-signature=gQdhpq0xfGvQ8EssRFXAk2%2B9ON8%3D&from=327834062&s=PackSourceEnum_WEBPC_RELATED_AWEME&se=false&sc=cover&biz_tag=pcweb_cover&l=20260901191950EF1E2B18C49481FF2D60",
+      "crawlTime": "2026-09-01 19:19:51",
+      "duration": 10055,
+      "followerCount": 14583,
+      "isPromotion": null,
+      "likeCount": 111800,
+      "publishTime": "2026-08-30 00:45:40",
+      "repostCount": 0,
+      "shareCount": 438,
+      "title": "#豆包AI #豆包AI",
+      "workId": "7679495755196283513",
+      "workType": "视频",
+      "workUrl": "https://www.iesdouyin.com/share/video/7679495755196283513",
+      "platform": "douyin",
+      "_keyword": "豆包AI"
+    },
+    {
+      "accountName": "草梅爱手舞",
+      "accountType": "生活vlog",
+      "audioUrl": "https://lf26-music-east.douyinstatic.com/obj/ies-music-hj/7665472346169330469.mp3",
+      "authorId": "72881247945",
+      "authorLink": "https://www.douyin.com/user/72881247945",
+      "authorUrl": "https://p3-pc.douyinpic.com/aweme-avatar/tos-cn-i-0813c000-ce_osFn7AGCaFQepA5IpvffQvbIAcALIBTKJQgAlD~tplv-dy-shrink:96:96.jpeg?from=327834062",
+      "collectCount": 3878,
+      "commentCount": 2198,
+      "commentTopKeywords": [
+        "本人",
+        "确认",
+        "谢谢",
+        "这个",
+        "这号",
+        "自己",
+        "关心",
+        "就是",
+        "账号",
+        "主播",
+        "视频",
+        "手机",
+        "主持人",
+        "你们",
+        "支持",
+        "老师",
+        "早上好",
+        "朋友",
+        "真是",
+        "头像"
+      ],
+      "content": "#豆包AI #豆包ai生成视频 #抖音玩法#豆包AI",
+      "coverUrl": "https://p3-pc-sign.douyinpic.com/tos-cn-i-0813c000-ce/o0ADOJXSBIBoAhy1AOiAnReCcCfP1AEEiiw3AM~tplv-dy-cropcenter:323:430.jpeg?lk3s=138a59ce&x-expires=2101687200&x-signature=48pfA%2FOmy%2BjzJN5JYIFSDYE4CC8%3D&from=327834062&s=PackSourceEnum_PUBLISH&se=true&sh=323_430&sc=cover&biz_tag=pcweb_cover&l=20260810102849822CF6A8CA8EE5E6964A",
+      "crawlTime": "2026-08-10 10:28:51",
+      "duration": 10084,
+      "followerCount": 101623,
+      "isPromotion": null,
+      "likeCount": 10525,
+      "publishTime": "2026-07-23 05:47:51",
+      "repostCount": 0,
+      "shareCount": 275,
+      "title": "#豆包AI #豆包ai生成视频 #抖音玩法#豆包AI",
+      "workId": "7665472386317743013",
+      "workType": "视频",
+      "workUrl": "https://www.iesdouyin.com/share/video/7665472386317743013",
+      "platform": "douyin",
+      "_keyword": "豆包AI"
+    },
+    {
       "accountName": "草梅爱手舞",
       "accountType": "生活vlog",
       "audioUrl": "https://lf26-music-east.douyinstatic.com/obj/ies-music-hj/7665649101643696954.mp3",
@@ -23811,6 +23784,33 @@ window.DASHBOARD_DATA = {
       "workId": "7658992000880304339",
       "workType": "视频",
       "workUrl": "https://www.iesdouyin.com/share/video/7658992000880304339",
+      "platform": "douyin",
+      "_keyword": "豆包AI"
+    },
+    {
+      "accountName": "花儿姐爱手舞",
+      "accountType": "舞蹈才艺",
+      "audioUrl": "https://sf6-cdn-tos.douyinstatic.com/obj/ies-music/7660358397790915334.mp3",
+      "authorId": "49074414252",
+      "authorLink": "https://www.douyin.com/user/49074414252",
+      "authorUrl": "https://p3-pc.douyinpic.com/aweme/100x100/aweme-avatar/tos-cn-i-0813_oYjEAgQfFyeTFBAwIeya7PPDAE9BGAANBqcHQA.jpeg?from=327834062",
+      "collectCount": 175,
+      "commentCount": 81,
+      "commentTopKeywords": [],
+      "content": "#豆包#豆包AI #豆包ai生成",
+      "coverUrl": "https://p3-pc-sign.douyinpic.com/tos-cn-i-0813/oUAsLdEgDdAFiEwDB19CeTfZA9DyACAInA1qEP~tplv-dy-resize-origshort-autoq-75:330.jpeg?lk3s=138a59ce&x-expires=2102338800&x-signature=jnV7gP2Qyr2%2BHvyJXiacpAs1cxc%3D&from=327834062&s=PackSourceEnum_SERIES_AWEME&se=false&sc=cover&biz_tag=pcweb_cover&l=20260817233605C670284DA167EAF5F6A1",
+      "crawlTime": "2026-08-17 23:36:06",
+      "duration": 10084,
+      "followerCount": 223890,
+      "isPromotion": null,
+      "likeCount": 361,
+      "publishTime": "2026-07-09 11:02:56",
+      "repostCount": 0,
+      "shareCount": 12,
+      "title": "#豆包#豆包AI #豆包ai生成",
+      "workId": "7660358393756345254",
+      "workType": "视频",
+      "workUrl": "https://www.iesdouyin.com/share/video/7660358393756345254",
       "platform": "douyin",
       "_keyword": "豆包AI"
     },
@@ -24197,15 +24197,15 @@ window.DASHBOARD_DATA = {
   ],
   "topics": [
     {
-      "title": "GitHub2天327星星，这个routeVSCODE让AI编程效率翻倍，抖音还没人讲",
+      "title": "GitHub3天389星星，这个rune让AI Agent效率翻倍，抖音还没人讲",
       "hook": "99%的人还不知道这个工具，我花了一下午踩坑，3分钟教你上手",
       "signal_source": "github",
-      "signal_name": "yudaprasetya007/routeVSCODE",
-      "signal_url": "https://github.com/yudaprasetya007/routeVSCODE",
+      "signal_name": "unstablebuild/rune",
+      "signal_url": "https://github.com/unstablebuild/rune",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
+      "tech_heat": 98.4,
       "social_heat": 0,
-      "info_gap_score": 100,
+      "info_gap_score": 98.4,
       "category": "信息差选题",
       "target_persona": {
         "name": "泛AI关注者",
@@ -24234,7 +24234,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -24244,7 +24244,7 @@ window.DASHBOARD_DATA = {
         ]
       },
       "priority": "高",
-      "keyword": "routeVSCODE",
+      "keyword": "rune",
       "platform": "双平台",
       "audience": "技术极客",
       "is_forecast": true,
@@ -24254,7 +24254,7 @@ window.DASHBOARD_DATA = {
       "monetization_hint": "完整工作流放私域，视频展示结果和片段",
       "conversion_path": {
         "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-        "product_match": "AI工具工作流系列（AI编程）",
+        "product_match": "AI工具工作流系列（AI Agent）",
         "conversion_potential": "高",
         "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
       },
@@ -24270,15 +24270,15 @@ window.DASHBOARD_DATA = {
       "conversion_potential": "中"
     },
     {
-      "title": "刚冒出来的Qwen3.8-27B，AI绘画的玩法全变了，现在学就是吃第一波红利",
+      "title": "刚冒出来的short-video-generator-AI，AI视频的玩法全变了，现在学就是吃第一波红利",
       "hook": "技术圈已经在讨论了，抖音还没火，这就是你的机会",
-      "signal_source": "huggingface",
-      "signal_name": "Qwen/Qwen3.8-27B",
-      "signal_url": "https://hf-mirror.com/Qwen/Qwen3.8-27B",
+      "signal_source": "github",
+      "signal_name": "Colafornia/short-video-generator-AI",
+      "signal_url": "https://github.com/Colafornia/short-video-generator-AI",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
+      "tech_heat": 95.7,
       "social_heat": 0,
-      "info_gap_score": 100,
+      "info_gap_score": 95.7,
       "category": "信息差选题",
       "target_persona": {
         "name": "泛AI关注者",
@@ -24307,7 +24307,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -24317,7 +24317,7 @@ window.DASHBOARD_DATA = {
         ]
       },
       "priority": "高",
-      "keyword": "Qwen3.8-27B",
+      "keyword": "short-video-generator-AI",
       "platform": "双平台",
       "audience": "技术极客",
       "is_forecast": true,
@@ -24327,7 +24327,7 @@ window.DASHBOARD_DATA = {
       "monetization_hint": "完整工作流放私域，视频展示结果和片段",
       "conversion_path": {
         "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-        "product_match": "AI工具工作流系列（AI绘画）",
+        "product_match": "AI工具工作流系列（AI视频）",
         "conversion_potential": "高",
         "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
       },
@@ -24343,15 +24343,15 @@ window.DASHBOARD_DATA = {
       "conversion_potential": "中"
     },
     {
-      "title": "Qwen3.8-27B-GSQ-RCO-GGUF深度拆解：技术圈已经炸了，社媒还没人讲，信息差就是钱",
-      "hook": "别人还在写提示词，你已经在用Qwen3.8-27B-GSQ-RCO-GGUF搭工作流了",
-      "signal_source": "huggingface",
-      "signal_name": "ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-      "signal_url": "https://hf-mirror.com/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
+      "title": "routeVSCODE深度拆解：技术圈已经炸了，社媒还没人讲，信息差就是钱",
+      "hook": "别人还在写提示词，你已经在用routeVSCODE搭工作流了",
+      "signal_source": "github",
+      "signal_name": "yudaprasetya007/routeVSCODE",
+      "signal_url": "https://github.com/yudaprasetya007/routeVSCODE",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
+      "tech_heat": 88.9,
       "social_heat": 0,
-      "info_gap_score": 100,
+      "info_gap_score": 88.9,
       "category": "信息差选题",
       "target_persona": {
         "name": "泛AI关注者",
@@ -24380,7 +24380,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -24390,7 +24390,7 @@ window.DASHBOARD_DATA = {
         ]
       },
       "priority": "高",
-      "keyword": "Qwen3.8-27B-GSQ-RCO-GGUF",
+      "keyword": "routeVSCODE",
       "platform": "双平台",
       "audience": "技术极客",
       "is_forecast": true,
@@ -24400,7 +24400,7 @@ window.DASHBOARD_DATA = {
       "monetization_hint": "完整工作流放私域，视频展示结果和片段",
       "conversion_path": {
         "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-        "product_match": "AI工具工作流系列（AI绘画）",
+        "product_match": "AI工具工作流系列（AI编程）",
         "conversion_potential": "高",
         "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
       },
@@ -24416,15 +24416,15 @@ window.DASHBOARD_DATA = {
       "conversion_potential": "低"
     },
     {
-      "title": "别再手动重复操作了，LTX-2.5已经帮你自动化，省下来的时间都是钱",
-      "hook": "这个项目7天0星星，我测完发现最值钱的不是功能，是思路",
-      "signal_source": "huggingface",
-      "signal_name": "Lightricks/LTX-2.5",
-      "signal_url": "https://hf-mirror.com/Lightricks/LTX-2.5",
+      "title": "别再手动重复操作了，tokentab已经帮你自动化，省下来的时间都是钱",
+      "hook": "这个项目6天549星星，我测完发现最值钱的不是功能，是思路",
+      "signal_source": "github",
+      "signal_name": "crwdla/tokentab",
+      "signal_url": "https://github.com/crwdla/tokentab",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
+      "tech_heat": 80.2,
       "social_heat": 0,
-      "info_gap_score": 100,
+      "info_gap_score": 80.2,
       "category": "信息差选题",
       "target_persona": {
         "name": "泛AI关注者",
@@ -24453,7 +24453,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -24463,7 +24463,7 @@ window.DASHBOARD_DATA = {
         ]
       },
       "priority": "高",
-      "keyword": "LTX-2.5",
+      "keyword": "tokentab",
       "platform": "双平台",
       "audience": "技术极客",
       "is_forecast": true,
@@ -24473,7 +24473,7 @@ window.DASHBOARD_DATA = {
       "monetization_hint": "完整工作流放私域，视频展示结果和片段",
       "conversion_path": {
         "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-        "product_match": "AI工具工作流系列（AI视频）",
+        "product_match": "AI工具工作流系列（AI编程）",
         "conversion_potential": "高",
         "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
       },
@@ -24489,15 +24489,15 @@ window.DASHBOARD_DATA = {
       "conversion_potential": "高"
     },
     {
-      "title": "实测short-video-generator-AI：458星星的项目，最值钱的是这个工作流思路",
-      "hook": "免费但值钱：short-video-generator-AI的正确打开方式，完整工作流放评论区",
+      "title": "实测ai-data-extractor：163星星的项目，最值钱的是这个工作流思路",
+      "hook": "免费但值钱：ai-data-extractor的正确打开方式，完整工作流放评论区",
       "signal_source": "github",
-      "signal_name": "Colafornia/short-video-generator-AI",
-      "signal_url": "https://github.com/Colafornia/short-video-generator-AI",
+      "signal_name": "kruzovic7/ai-data-extractor",
+      "signal_url": "https://github.com/kruzovic7/ai-data-extractor",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 89.1,
+      "tech_heat": 74.3,
       "social_heat": 0,
-      "info_gap_score": 89.1,
+      "info_gap_score": 74.3,
       "category": "信息差选题",
       "target_persona": {
         "name": "泛AI关注者",
@@ -24526,7 +24526,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -24536,7 +24536,7 @@ window.DASHBOARD_DATA = {
         ]
       },
       "priority": "高",
-      "keyword": "short-video-generator-AI",
+      "keyword": "ai-data-extractor",
       "platform": "双平台",
       "audience": "技术极客",
       "is_forecast": true,
@@ -24546,12 +24546,12 @@ window.DASHBOARD_DATA = {
       "monetization_hint": "完整工作流放私域，视频展示结果和片段",
       "conversion_path": {
         "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-        "product_match": "AI工具工作流系列（AI视频）",
+        "product_match": "AI工具工作流系列（AI编程）",
         "conversion_potential": "高",
         "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
       },
-      "heat_phase": "飙升期",
-      "heat_phase_color": "#ef4444",
+      "heat_phase": "上升期",
+      "heat_phase_color": "#f59e0b",
       "differentiated_angles": [
         "反向操作：别人说XX好，你说XX的3个坑",
         "隐藏功能：90%的人不知道XX的这个用法",
@@ -24562,13 +24562,13 @@ window.DASHBOARD_DATA = {
       "conversion_potential": "高"
     },
     {
-      "title": "GitHub 2天327星星，这个routeVSCODE正在悄悄改变AI编程",
+      "title": "GitHub 3天389星星，这个rune正在悄悄改变AI Agent开发",
       "hook": "今天GitHub最值得关注的项目，3分钟教你装上并用起来",
       "signal_source": "github",
-      "signal_name": "yudaprasetya007/routeVSCODE",
-      "signal_url": "https://github.com/yudaprasetya007/routeVSCODE",
+      "signal_name": "unstablebuild/rune",
+      "signal_url": "https://github.com/unstablebuild/rune",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
+      "tech_heat": 98.4,
       "social_heat": 0,
       "category": "前瞻选题",
       "target_persona": {
@@ -24598,7 +24598,131 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
+        "related_keywords": [
+          "AI",
+          "AI",
+          "AI提示词",
+          "AI提示词",
+          "豆包AI"
+        ]
+      },
+      "priority": "高",
+      "keyword": "rune",
+      "platform": "双平台",
+      "audience": "技术极客",
+      "is_forecast": true,
+      "heat_phase": "飙升期",
+      "heat_phase_color": "#ef4444",
+      "differentiated_angles": [
+        "效率对比：XX vs 传统方法，差多少倍",
+        "进阶技巧：XX的高阶用法，效率再翻3倍",
+        "隐藏功能：90%的人不知道XX的这个用法"
+      ],
+      "monetization_score": 77,
+      "monetization_tag": "工具推荐",
+      "conversion_potential": "中"
+    },
+    {
+      "title": "刚发现的short-video-generator-AI，AI视频效率提升10倍，知道的人还不多",
+      "hook": "我测完发现最值钱的不是功能，是这个思路",
+      "signal_source": "github",
+      "signal_name": "Colafornia/short-video-generator-AI",
+      "signal_url": "https://github.com/Colafornia/short-video-generator-AI",
+      "opportunity": "🔵 蓝海机会",
+      "tech_heat": 95.7,
+      "social_heat": 0,
+      "category": "前瞻选题",
+      "target_persona": {
+        "name": "泛AI关注者",
+        "traits": [
+          "科技爱好者",
+          "吃瓜群众",
+          "投资者",
+          "学生"
+        ],
+        "age": "16-45岁",
+        "gender": "男性偏多(60%)",
+        "needs": [
+          "AI资讯",
+          "产品测评",
+          "行业趋势",
+          "入门科普"
+        ],
+        "content_pref": "资讯速递+产品测评+趋势解读",
+        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
+        "monetization": "广告(品牌合作)、私域(AI社群)",
+        "pain_points": [
+          "信息过载",
+          "真假难辨",
+          "跟不上更新",
+          "不知道学啥"
+        ],
+        "category": "AI大类",
+        "proportion": 49.3,
+        "heat_score": 1646761,
+        "related_keywords": [
+          "AI",
+          "AI",
+          "AI提示词",
+          "AI提示词",
+          "豆包AI"
+        ]
+      },
+      "priority": "高",
+      "keyword": "short-video-generator-AI",
+      "platform": "双平台",
+      "audience": "技术极客",
+      "is_forecast": true,
+      "heat_phase": "飙升期",
+      "heat_phase_color": "#ef4444",
+      "differentiated_angles": [
+        "新手视角：第一次用XX踩了哪些坑",
+        "实战案例：用XX做了一个完整项目",
+        "效率对比：XX vs 传统方法，差多少倍"
+      ],
+      "monetization_score": 81,
+      "monetization_tag": "私域引流",
+      "conversion_potential": "高"
+    },
+    {
+      "title": "routeVSCODE深度测评：327星星的背后，是这个被低估的能力",
+      "hook": "别人还在手动重复劳动，你已经在自动化了，这就是差距",
+      "signal_source": "github",
+      "signal_name": "yudaprasetya007/routeVSCODE",
+      "signal_url": "https://github.com/yudaprasetya007/routeVSCODE",
+      "opportunity": "🔵 蓝海机会",
+      "tech_heat": 88.9,
+      "social_heat": 0,
+      "category": "前瞻选题",
+      "target_persona": {
+        "name": "泛AI关注者",
+        "traits": [
+          "科技爱好者",
+          "吃瓜群众",
+          "投资者",
+          "学生"
+        ],
+        "age": "16-45岁",
+        "gender": "男性偏多(60%)",
+        "needs": [
+          "AI资讯",
+          "产品测评",
+          "行业趋势",
+          "入门科普"
+        ],
+        "content_pref": "资讯速递+产品测评+趋势解读",
+        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
+        "monetization": "广告(品牌合作)、私域(AI社群)",
+        "pain_points": [
+          "信息过载",
+          "真假难辨",
+          "跟不上更新",
+          "不知道学啥"
+        ],
+        "category": "AI大类",
+        "proportion": 49.3,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -24615,130 +24739,6 @@ window.DASHBOARD_DATA = {
       "heat_phase": "飙升期",
       "heat_phase_color": "#ef4444",
       "differentiated_angles": [
-        "效率对比：XX vs 传统方法，差多少倍",
-        "进阶技巧：XX的高阶用法，效率再翻3倍",
-        "隐藏功能：90%的人不知道XX的这个用法"
-      ],
-      "monetization_score": 77,
-      "monetization_tag": "工具推荐",
-      "conversion_potential": "中"
-    },
-    {
-      "title": "刚发现的Qwen3.8-27B，AI绘画效率提升10倍，知道的人还不多",
-      "hook": "我测完发现最值钱的不是功能，是这个思路",
-      "signal_source": "huggingface",
-      "signal_name": "Qwen/Qwen3.8-27B",
-      "signal_url": "https://hf-mirror.com/Qwen/Qwen3.8-27B",
-      "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
-      "social_heat": 0,
-      "category": "前瞻选题",
-      "target_persona": {
-        "name": "泛AI关注者",
-        "traits": [
-          "科技爱好者",
-          "吃瓜群众",
-          "投资者",
-          "学生"
-        ],
-        "age": "16-45岁",
-        "gender": "男性偏多(60%)",
-        "needs": [
-          "AI资讯",
-          "产品测评",
-          "行业趋势",
-          "入门科普"
-        ],
-        "content_pref": "资讯速递+产品测评+趋势解读",
-        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
-        "monetization": "广告(品牌合作)、私域(AI社群)",
-        "pain_points": [
-          "信息过载",
-          "真假难辨",
-          "跟不上更新",
-          "不知道学啥"
-        ],
-        "category": "AI大类",
-        "proportion": 49.3,
-        "heat_score": 1646695,
-        "related_keywords": [
-          "AI",
-          "AI",
-          "AI提示词",
-          "AI提示词",
-          "豆包AI"
-        ]
-      },
-      "priority": "高",
-      "keyword": "Qwen3.8-27B",
-      "platform": "双平台",
-      "audience": "技术极客",
-      "is_forecast": true,
-      "heat_phase": "飙升期",
-      "heat_phase_color": "#ef4444",
-      "differentiated_angles": [
-        "新手视角：第一次用XX踩了哪些坑",
-        "实战案例：用XX做了一个完整项目",
-        "效率对比：XX vs 传统方法，差多少倍"
-      ],
-      "monetization_score": 81,
-      "monetization_tag": "私域引流",
-      "conversion_potential": "高"
-    },
-    {
-      "title": "Qwen3.8-27B-GSQ-RCO-GGUF深度测评：0星星的背后，是这个被低估的能力",
-      "hook": "别人还在手动重复劳动，你已经在自动化了，这就是差距",
-      "signal_source": "huggingface",
-      "signal_name": "ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-      "signal_url": "https://hf-mirror.com/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-      "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
-      "social_heat": 0,
-      "category": "前瞻选题",
-      "target_persona": {
-        "name": "泛AI关注者",
-        "traits": [
-          "科技爱好者",
-          "吃瓜群众",
-          "投资者",
-          "学生"
-        ],
-        "age": "16-45岁",
-        "gender": "男性偏多(60%)",
-        "needs": [
-          "AI资讯",
-          "产品测评",
-          "行业趋势",
-          "入门科普"
-        ],
-        "content_pref": "资讯速递+产品测评+趋势解读",
-        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
-        "monetization": "广告(品牌合作)、私域(AI社群)",
-        "pain_points": [
-          "信息过载",
-          "真假难辨",
-          "跟不上更新",
-          "不知道学啥"
-        ],
-        "category": "AI大类",
-        "proportion": 49.3,
-        "heat_score": 1646695,
-        "related_keywords": [
-          "AI",
-          "AI",
-          "AI提示词",
-          "AI提示词",
-          "豆包AI"
-        ]
-      },
-      "priority": "高",
-      "keyword": "Qwen3.8-27B-GSQ-RCO-GGUF",
-      "platform": "双平台",
-      "audience": "技术极客",
-      "is_forecast": true,
-      "heat_phase": "飙升期",
-      "heat_phase_color": "#ef4444",
-      "differentiated_angles": [
         "新手视角：第一次用XX踩了哪些坑",
         "成本拆解：XX工具到底值不值得付费",
         "进阶技巧：XX的高阶用法，效率再翻3倍"
@@ -24748,13 +24748,13 @@ window.DASHBOARD_DATA = {
       "conversion_potential": "中"
     },
     {
-      "title": "别再用笨办法了，LTX-2.5把AI视频自动化了",
-      "hook": "免费但值钱：LTX-2.5的正确打开方式，看完你会回来感谢我",
-      "signal_source": "huggingface",
-      "signal_name": "Lightricks/LTX-2.5",
-      "signal_url": "https://hf-mirror.com/Lightricks/LTX-2.5",
+      "title": "别再用笨办法了，tokentab把AI编程自动化了",
+      "hook": "免费但值钱：tokentab的正确打开方式，看完你会回来感谢我",
+      "signal_source": "github",
+      "signal_name": "crwdla/tokentab",
+      "signal_url": "https://github.com/crwdla/tokentab",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
+      "tech_heat": 80.2,
       "social_heat": 0,
       "category": "前瞻选题",
       "target_persona": {
@@ -24784,7 +24784,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -24794,7 +24794,7 @@ window.DASHBOARD_DATA = {
         ]
       },
       "priority": "高",
-      "keyword": "LTX-2.5",
+      "keyword": "tokentab",
       "platform": "双平台",
       "audience": "技术极客",
       "is_forecast": true,
@@ -24810,14 +24810,14 @@ window.DASHBOARD_DATA = {
       "conversion_potential": "高"
     },
     {
-      "title": "技术圈都在讨论short-video-generator-AI，但90%的人用错了方式",
-      "hook": "这个项目458星星只用了4天，我整理了完整的上手教程",
+      "title": "技术圈都在讨论reverify，但90%的人用错了方式",
+      "hook": "这个项目1178星星只用了13天，我整理了完整的上手教程",
       "signal_source": "github",
-      "signal_name": "Colafornia/short-video-generator-AI",
-      "signal_url": "https://github.com/Colafornia/short-video-generator-AI",
+      "signal_name": "2akouwu/reverify",
+      "signal_url": "https://github.com/2akouwu/reverify",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 89.1,
-      "social_heat": 0,
+      "tech_heat": 77.8,
+      "social_heat": 8,
       "category": "前瞻选题",
       "target_persona": {
         "name": "泛AI关注者",
@@ -24846,7 +24846,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -24856,12 +24856,12 @@ window.DASHBOARD_DATA = {
         ]
       },
       "priority": "高",
-      "keyword": "short-video-generator-AI",
+      "keyword": "reverify",
       "platform": "双平台",
       "audience": "技术极客",
       "is_forecast": true,
-      "heat_phase": "飙升期",
-      "heat_phase_color": "#ef4444",
+      "heat_phase": "上升期",
+      "heat_phase_color": "#f59e0b",
       "differentiated_angles": [
         "隐藏功能：90%的人不知道XX的这个用法",
         "避坑指南：买XX前必须知道的5件事",
@@ -25109,7 +25109,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -25163,7 +25163,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -25217,7 +25217,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -25271,7 +25271,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -25325,7 +25325,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -25686,13 +25686,13 @@ window.DASHBOARD_DATA = {
   "duration_dist": [
     {
       "range": "0-15秒",
-      "count": 587,
-      "avg_likes": 1308
+      "count": 588,
+      "avg_likes": 1261
     },
     {
       "range": "15-30秒",
-      "count": 81,
-      "avg_likes": 7570
+      "count": 80,
+      "avg_likes": 7663
     },
     {
       "range": "30-60秒",
@@ -25958,25 +25958,6 @@ window.DASHBOARD_DATA = {
       "_keyword": "AI自动化"
     },
     {
-      "workId": "6a79c747000000002701f641",
-      "title": "我很狼狈，虽然ai绘画并未针对我",
-      "content": "我不中了啊！\n比内容更绷不住的是剪了一整天的视频！\n再也不想剪视频了，杏师傅累虚了😭😭😭😭\n#oc #绘画 #约稿 #稿件展示 #仅展示不可使用 #weeklypick #好视频扶持计划\n\t\n二编一下：封面不是单主不是单主ദ്ദി ༎ຶ‿༎ຶ )像ai是杏师傅自己幻视的，封面是亲友也觉得所以认同杏师傅",
-      "accountName": "杏铁锌",
-      "accountType": "休闲爱好",
-      "followerCount": 0,
-      "likeCount": 23925,
-      "collectCount": 2510,
-      "shareCount": 208,
-      "commentCount": 245,
-      "publishTime": "2026-08-10 20:42:47",
-      "workUrl": "https://www.xiaohongshu.com/explore/6a79c747000000002701f641",
-      "coverUrl": "https://sns-na-i27.xhscdn.com/1040g008323mjf8lngo4g5ns523fg8541ga054ho?imageView2/2/w/576/format/heif/q/58%7CimageMogr2/strip&redImage/frame/0/enhance/4&ap=1&sc=V_PRV&sign=6ce0c391444192e69fe3d182a4c35311&t=6a81e0e5&origin=0",
-      "workType": "video",
-      "duration": 0,
-      "platform": "xiaohongshu",
-      "_keyword": "AI绘画"
-    },
-    {
       "workId": "6a804a380000000028032cd7",
       "title": "模拟恐怖｜《龙症》｜恐怖2星｜马赛克版",
       "content": "#可灵AI创作者计划 #模拟恐怖 #cult #热AI训练营#可灵AI",
@@ -26028,6 +26009,25 @@ window.DASHBOARD_DATA = {
       "publishTime": "2026-08-21 19:30:08",
       "workUrl": "https://www.xiaohongshu.com/explore/6a8836c0000000001602a4e6",
       "coverUrl": "http://sns-img-hw.xhscdn.net/spectrum/1040g34o3244mon1o72105pgi4chhosfh52rkvlg?imageView2/2/w/1080/format/webp",
+      "workType": "video",
+      "duration": 0,
+      "platform": "xiaohongshu",
+      "_keyword": "可灵AI"
+    },
+    {
+      "workId": "6a8ed9bd00000000200383af",
+      "title": "我在公元前400年的古希腊吃瓜！",
+      "content": "#WeeklyPick #可灵AI  #可灵AI创作者计划 #ai #AI视频",
+      "accountName": "Mara的穿越日记",
+      "accountType": "休闲爱好",
+      "followerCount": 0,
+      "likeCount": 10124,
+      "collectCount": 1683,
+      "shareCount": 358,
+      "commentCount": 288,
+      "publishTime": "2026-08-26 20:19:09",
+      "workUrl": "https://www.xiaohongshu.com/explore/6a8ed9bd00000000200383af",
+      "coverUrl": "https://sns-i11-ae.rednotecdn.com/spectrum/1040g0k0324b5nurf0s005pgi4chhosfht8248mg?imageView2/2/w/576/format/heif/q/58%7CimageMogr2/strip&redImage/frame/0/enhance/4&ap=1&sc=V_PRV&sign=b2bb708d647cdf3e526004cec0ee0534&t=6a9848a4",
       "workType": "video",
       "duration": 0,
       "platform": "xiaohongshu",
@@ -27839,6 +27839,136 @@ window.DASHBOARD_DATA = {
           "max_like": 111800
         }
       ]
+    },
+    {
+      "date": "2026-09-12",
+      "hotwords": [
+        {
+          "keyword": "AI",
+          "total": 1655899,
+          "max_like": 13839
+        },
+        {
+          "keyword": "AI工具",
+          "total": 6953,
+          "max_like": 40505
+        },
+        {
+          "keyword": "AI做图",
+          "total": 21,
+          "max_like": 62546
+        },
+        {
+          "keyword": "AI修图",
+          "total": 387,
+          "max_like": 68324
+        },
+        {
+          "keyword": "AI绘画",
+          "total": 1904,
+          "max_like": 119352
+        },
+        {
+          "keyword": "AI视频",
+          "total": 10409,
+          "max_like": 77857
+        },
+        {
+          "keyword": "AI数字人",
+          "total": 199860,
+          "max_like": 16655
+        },
+        {
+          "keyword": "AI写作",
+          "total": 297,
+          "max_like": 8591
+        },
+        {
+          "keyword": "AI办公",
+          "total": 1440,
+          "max_like": 33964
+        },
+        {
+          "keyword": "AI工作流",
+          "total": 2323,
+          "max_like": 36888
+        },
+        {
+          "keyword": "AI自动化",
+          "total": 5017,
+          "max_like": 183009
+        },
+        {
+          "keyword": "AI编程",
+          "total": 669,
+          "max_like": 3505
+        },
+        {
+          "keyword": "AI PPT",
+          "total": 1579756,
+          "max_like": 50462
+        },
+        {
+          "keyword": "AI音乐",
+          "total": 520,
+          "max_like": 16113
+        },
+        {
+          "keyword": "AI搜索",
+          "total": 140,
+          "max_like": 1546
+        },
+        {
+          "keyword": "AI Agent",
+          "total": 1581005,
+          "max_like": 1329
+        },
+        {
+          "keyword": "AI提示词",
+          "total": 6326,
+          "max_like": 79455
+        },
+        {
+          "keyword": "扣子",
+          "total": 2391,
+          "max_like": 22609
+        },
+        {
+          "keyword": "Coze",
+          "total": 81,
+          "max_like": 32528
+        },
+        {
+          "keyword": "WorkBuddy",
+          "total": 1068,
+          "max_like": 94821
+        },
+        {
+          "keyword": "n8n",
+          "total": 7,
+          "max_like": 85
+        },
+        {
+          "keyword": "Dify",
+          "total": 18,
+          "max_like": 59
+        },
+        {
+          "keyword": "即梦AI",
+          "total": 21216,
+          "max_like": 5493
+        },
+        {
+          "keyword": "可灵AI",
+          "total": 523,
+          "max_like": 235785
+        },
+        {
+          "keyword": "豆包AI",
+          "total": 14460,
+          "max_like": 111800
+        }
+      ]
     }
   ],
   "saturation": [
@@ -27870,7 +28000,7 @@ window.DASHBOARD_DATA = {
       "saturation": 1.3,
       "stage": "上升期",
       "advice": "赶紧做，还有机会",
-      "growth": -43.0
+      "growth": -42.4
     },
     {
       "keyword": "n8n",
@@ -27890,7 +28020,7 @@ window.DASHBOARD_DATA = {
       "saturation": 2.2,
       "stage": "上升期",
       "advice": "赶紧做，还有机会",
-      "growth": -80.3
+      "growth": -80.5
     },
     {
       "keyword": "AI修图",
@@ -27900,7 +28030,7 @@ window.DASHBOARD_DATA = {
       "saturation": 2.3,
       "stage": "上升期",
       "advice": "赶紧做，还有机会",
-      "growth": -59.7
+      "growth": -59.9
     },
     {
       "keyword": "AI绘画",
@@ -27910,7 +28040,7 @@ window.DASHBOARD_DATA = {
       "saturation": 3.3,
       "stage": "上升期",
       "advice": "赶紧做，还有机会",
-      "growth": -79.2
+      "growth": -79.1
     },
     {
       "keyword": "Dify",
@@ -27940,7 +28070,7 @@ window.DASHBOARD_DATA = {
       "saturation": 11.1,
       "stage": "上升期",
       "advice": "赶紧做，还有机会",
-      "growth": -58.0
+      "growth": -57.6
     },
     {
       "keyword": "AI做图",
@@ -27990,7 +28120,7 @@ window.DASHBOARD_DATA = {
       "saturation": 17.2,
       "stage": "上升期",
       "advice": "赶紧做，还有机会",
-      "growth": -37.6
+      "growth": -37.3
     },
     {
       "keyword": "AI工作流",
@@ -28040,7 +28170,7 @@ window.DASHBOARD_DATA = {
       "saturation": 33.7,
       "stage": "上升期",
       "advice": "赶紧做，还有机会",
-      "growth": -39.7
+      "growth": -40.1
     },
     {
       "keyword": "扣子",
@@ -28113,16 +28243,6 @@ window.DASHBOARD_DATA = {
       "growth": -99.2
     },
     {
-      "keyword": "AI绘画",
-      "category": "AI做图",
-      "total": 1506,
-      "max_like": 23925,
-      "saturation": 62.9,
-      "stage": "衰退期",
-      "advice": "不建议做",
-      "growth": -21.3
-    },
-    {
       "keyword": "AI PPT",
       "category": "AI PPT",
       "total": 1002,
@@ -28143,34 +28263,44 @@ window.DASHBOARD_DATA = {
       "growth": -41.6
     },
     {
-      "keyword": "AI写作",
-      "category": "AI写作",
-      "total": 185,
-      "max_like": 1923,
-      "saturation": 96.2,
-      "stage": "衰退期",
-      "advice": "不建议做",
-      "growth": -37.7
-    },
-    {
       "keyword": "豆包AI",
       "category": "AI大类",
-      "total": 14281,
+      "total": 14327,
       "max_like": 111800,
-      "saturation": 127.7,
+      "saturation": 128.1,
       "stage": "稳定期",
       "advice": "可做，注意差异化",
-      "growth": -1.2
+      "growth": -0.9
+    },
+    {
+      "keyword": "AI写作",
+      "category": "AI写作",
+      "total": 183,
+      "max_like": 1353,
+      "saturation": 135.3,
+      "stage": "衰退期",
+      "advice": "不建议做",
+      "growth": -38.4
     },
     {
       "keyword": "AI音乐",
       "category": "AI音乐",
-      "total": 156,
-      "max_like": 987,
-      "saturation": 156.0,
+      "total": 146,
+      "max_like": 1047,
+      "saturation": 139.4,
       "stage": "衰退期",
       "advice": "不建议做",
-      "growth": -70.0
+      "growth": -71.9
+    },
+    {
+      "keyword": "AI绘画",
+      "category": "AI做图",
+      "total": 1454,
+      "max_like": 3902,
+      "saturation": 372.6,
+      "stage": "爆发期",
+      "advice": "红海，需差异化切入",
+      "growth": -23.6
     },
     {
       "keyword": "AI编程",
@@ -28190,7 +28320,7 @@ window.DASHBOARD_DATA = {
       "saturation": 668.2,
       "stage": "爆发期",
       "advice": "红海，需差异化切入",
-      "growth": -18.7
+      "growth": -19.5
     },
     {
       "keyword": "AI办公",
@@ -28205,9 +28335,9 @@ window.DASHBOARD_DATA = {
     {
       "keyword": "AI数字人",
       "category": "AI数字人",
-      "total": 880,
+      "total": 867,
       "max_like": 231,
-      "saturation": 880.0,
+      "saturation": 867.0,
       "stage": "爆发期",
       "advice": "红海，需差异化切入",
       "growth": -99.6
@@ -28230,7 +28360,7 @@ window.DASHBOARD_DATA = {
       "saturation": 1150.8,
       "stage": "爆发期",
       "advice": "红海，需差异化切入",
-      "growth": -62.4
+      "growth": -62.5
     },
     {
       "keyword": "扣子",
@@ -28260,7 +28390,7 @@ window.DASHBOARD_DATA = {
       "saturation": 1869.0,
       "stage": "爆发期",
       "advice": "红海，需差异化切入",
-      "growth": -62.9
+      "growth": -62.7
     },
     {
       "keyword": "AI Agent",
@@ -28290,7 +28420,7 @@ window.DASHBOARD_DATA = {
       "saturation": 4334.0,
       "stage": "爆发期",
       "advice": "红海，需差异化切入",
-      "growth": -58.3
+      "growth": -58.4
     },
     {
       "keyword": "AI数字人",
@@ -28300,7 +28430,7 @@ window.DASHBOARD_DATA = {
       "saturation": 11947.2,
       "stage": "爆发期",
       "advice": "红海，需差异化切入",
-      "growth": 0.0
+      "growth": -0.4
     },
     {
       "keyword": "AI",
@@ -28382,7 +28512,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI视频",
         "proportion": -0.3,
-        "heat_score": -9158,
+        "heat_score": -9068,
         "related_keywords": [
           "AI视频",
           "AI视频",
@@ -28474,7 +28604,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI做图",
         "proportion": -0.1,
-        "heat_score": -6909,
+        "heat_score": -7181,
         "related_keywords": [
           "AI做图",
           "AI做图",
@@ -28522,7 +28652,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -28615,7 +28745,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -28663,7 +28793,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI视频",
         "proportion": -0.3,
-        "heat_score": -9158,
+        "heat_score": -9068,
         "related_keywords": [
           "AI视频",
           "AI视频",
@@ -28710,7 +28840,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI视频",
         "proportion": -0.3,
-        "heat_score": -9158,
+        "heat_score": -9068,
         "related_keywords": [
           "AI视频",
           "AI视频",
@@ -28757,7 +28887,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -28805,7 +28935,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI做图",
         "proportion": -0.1,
-        "heat_score": -6909,
+        "heat_score": -7181,
         "related_keywords": [
           "AI做图",
           "AI做图",
@@ -28819,16 +28949,16 @@ window.DASHBOARD_DATA = {
   "content_formats_dist": [
     {
       "format": "其他",
-      "count": 726,
-      "proportion": 78.4,
-      "avg_likes": 2550,
+      "count": 724,
+      "proportion": 78.2,
+      "avg_likes": 2520,
       "virality": 0.3
     },
     {
       "format": "教程",
-      "count": 112,
-      "proportion": 12.1,
-      "avg_likes": 4688,
+      "count": 113,
+      "proportion": 12.2,
+      "avg_likes": 4647,
       "virality": 0.5
     },
     {
@@ -28840,9 +28970,9 @@ window.DASHBOARD_DATA = {
     },
     {
       "format": "资讯",
-      "count": 24,
-      "proportion": 2.6,
-      "avg_likes": 334,
+      "count": 25,
+      "proportion": 2.7,
+      "avg_likes": 326,
       "virality": 0.0
     },
     {
@@ -28856,7 +28986,7 @@ window.DASHBOARD_DATA = {
       "format": "盘点",
       "count": 8,
       "proportion": 0.9,
-      "avg_likes": 6445,
+      "avg_likes": 6456,
       "virality": 0.6
     },
     {
@@ -28974,15 +29104,15 @@ window.DASHBOARD_DATA = {
   },
   "content_formats": [
     {
-      "title": "GitHub2天327星星，这个routeVSCODE让AI编程效率翻倍，抖音还没人讲",
+      "title": "GitHub3天389星星，这个rune让AI Agent效率翻倍，抖音还没人讲",
       "hook": "99%的人还不知道这个工具，我花了一下午踩坑，3分钟教你上手",
       "signal_source": "github",
-      "signal_name": "yudaprasetya007/routeVSCODE",
-      "signal_url": "https://github.com/yudaprasetya007/routeVSCODE",
+      "signal_name": "unstablebuild/rune",
+      "signal_url": "https://github.com/unstablebuild/rune",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
+      "tech_heat": 98.4,
       "social_heat": 0,
-      "info_gap_score": 100,
+      "info_gap_score": 98.4,
       "category": "信息差选题",
       "target_persona": {
         "name": "泛AI关注者",
@@ -29011,7 +29141,143 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
+        "related_keywords": [
+          "AI",
+          "AI",
+          "AI提示词",
+          "AI提示词",
+          "豆包AI"
+        ]
+      },
+      "priority": "高",
+      "keyword": "rune",
+      "platform": "双平台",
+      "audience": "技术极客",
+      "is_forecast": true,
+      "is_info_gap": true,
+      "action_angle": "安装配置+第一个工作流搭建",
+      "content_format": "实操教程+工作流展示",
+      "monetization_hint": "完整工作流放私域，视频展示结果和片段",
+      "conversion_path": {
+        "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
+        "product_match": "AI工具工作流系列（AI Agent）",
+        "conversion_potential": "高",
+        "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
+      },
+      "format": "科普+盘点",
+      "suggested_duration": "45-60秒",
+      "suggested_publish": "19:00-21:00",
+      "ref_title": "",
+      "ref_url": ""
+    },
+    {
+      "title": "刚冒出来的short-video-generator-AI，AI视频的玩法全变了，现在学就是吃第一波红利",
+      "hook": "技术圈已经在讨论了，抖音还没火，这就是你的机会",
+      "signal_source": "github",
+      "signal_name": "Colafornia/short-video-generator-AI",
+      "signal_url": "https://github.com/Colafornia/short-video-generator-AI",
+      "opportunity": "🔵 蓝海机会",
+      "tech_heat": 95.7,
+      "social_heat": 0,
+      "info_gap_score": 95.7,
+      "category": "信息差选题",
+      "target_persona": {
+        "name": "泛AI关注者",
+        "traits": [
+          "科技爱好者",
+          "吃瓜群众",
+          "投资者",
+          "学生"
+        ],
+        "age": "16-45岁",
+        "gender": "男性偏多(60%)",
+        "needs": [
+          "AI资讯",
+          "产品测评",
+          "行业趋势",
+          "入门科普"
+        ],
+        "content_pref": "资讯速递+产品测评+趋势解读",
+        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
+        "monetization": "广告(品牌合作)、私域(AI社群)",
+        "pain_points": [
+          "信息过载",
+          "真假难辨",
+          "跟不上更新",
+          "不知道学啥"
+        ],
+        "category": "AI大类",
+        "proportion": 49.3,
+        "heat_score": 1646761,
+        "related_keywords": [
+          "AI",
+          "AI",
+          "AI提示词",
+          "AI提示词",
+          "豆包AI"
+        ]
+      },
+      "priority": "高",
+      "keyword": "short-video-generator-AI",
+      "platform": "双平台",
+      "audience": "技术极客",
+      "is_forecast": true,
+      "is_info_gap": true,
+      "action_angle": "接入现有AI工具链的完整方案",
+      "content_format": "实操教程+工作流展示",
+      "monetization_hint": "完整工作流放私域，视频展示结果和片段",
+      "conversion_path": {
+        "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
+        "product_match": "AI工具工作流系列（AI视频）",
+        "conversion_potential": "高",
+        "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
+      },
+      "format": "科普+盘点",
+      "suggested_duration": "45-60秒",
+      "suggested_publish": "19:00-21:00",
+      "ref_title": "",
+      "ref_url": ""
+    },
+    {
+      "title": "routeVSCODE深度拆解：技术圈已经炸了，社媒还没人讲，信息差就是钱",
+      "hook": "别人还在写提示词，你已经在用routeVSCODE搭工作流了",
+      "signal_source": "github",
+      "signal_name": "yudaprasetya007/routeVSCODE",
+      "signal_url": "https://github.com/yudaprasetya007/routeVSCODE",
+      "opportunity": "🔵 蓝海机会",
+      "tech_heat": 88.9,
+      "social_heat": 0,
+      "info_gap_score": 88.9,
+      "category": "信息差选题",
+      "target_persona": {
+        "name": "泛AI关注者",
+        "traits": [
+          "科技爱好者",
+          "吃瓜群众",
+          "投资者",
+          "学生"
+        ],
+        "age": "16-45岁",
+        "gender": "男性偏多(60%)",
+        "needs": [
+          "AI资讯",
+          "产品测评",
+          "行业趋势",
+          "入门科普"
+        ],
+        "content_pref": "资讯速递+产品测评+趋势解读",
+        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
+        "monetization": "广告(品牌合作)、私域(AI社群)",
+        "pain_points": [
+          "信息过载",
+          "真假难辨",
+          "跟不上更新",
+          "不知道学啥"
+        ],
+        "category": "AI大类",
+        "proportion": 49.3,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -29026,7 +29292,7 @@ window.DASHBOARD_DATA = {
       "audience": "技术极客",
       "is_forecast": true,
       "is_info_gap": true,
-      "action_angle": "安装配置+第一个工作流搭建",
+      "action_angle": "从零到一的实操教程（避坑版）",
       "content_format": "实操教程+工作流展示",
       "monetization_hint": "完整工作流放私域，视频展示结果和片段",
       "conversion_path": {
@@ -29042,15 +29308,15 @@ window.DASHBOARD_DATA = {
       "ref_url": ""
     },
     {
-      "title": "刚冒出来的Qwen3.8-27B，AI绘画的玩法全变了，现在学就是吃第一波红利",
-      "hook": "技术圈已经在讨论了，抖音还没火，这就是你的机会",
-      "signal_source": "huggingface",
-      "signal_name": "Qwen/Qwen3.8-27B",
-      "signal_url": "https://hf-mirror.com/Qwen/Qwen3.8-27B",
+      "title": "别再手动重复操作了，tokentab已经帮你自动化，省下来的时间都是钱",
+      "hook": "这个项目6天549星星，我测完发现最值钱的不是功能，是思路",
+      "signal_source": "github",
+      "signal_name": "crwdla/tokentab",
+      "signal_url": "https://github.com/crwdla/tokentab",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
+      "tech_heat": 80.2,
       "social_heat": 0,
-      "info_gap_score": 100,
+      "info_gap_score": 80.2,
       "category": "信息差选题",
       "target_persona": {
         "name": "泛AI关注者",
@@ -29079,7 +29345,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -29089,143 +29355,7 @@ window.DASHBOARD_DATA = {
         ]
       },
       "priority": "高",
-      "keyword": "Qwen3.8-27B",
-      "platform": "双平台",
-      "audience": "技术极客",
-      "is_forecast": true,
-      "is_info_gap": true,
-      "action_angle": "接入现有AI工具链的完整方案",
-      "content_format": "实操教程+工作流展示",
-      "monetization_hint": "完整工作流放私域，视频展示结果和片段",
-      "conversion_path": {
-        "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-        "product_match": "AI工具工作流系列（AI绘画）",
-        "conversion_potential": "高",
-        "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
-      },
-      "format": "科普+盘点",
-      "suggested_duration": "45-60秒",
-      "suggested_publish": "19:00-21:00",
-      "ref_title": "",
-      "ref_url": ""
-    },
-    {
-      "title": "Qwen3.8-27B-GSQ-RCO-GGUF深度拆解：技术圈已经炸了，社媒还没人讲，信息差就是钱",
-      "hook": "别人还在写提示词，你已经在用Qwen3.8-27B-GSQ-RCO-GGUF搭工作流了",
-      "signal_source": "huggingface",
-      "signal_name": "ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-      "signal_url": "https://hf-mirror.com/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-      "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
-      "social_heat": 0,
-      "info_gap_score": 100,
-      "category": "信息差选题",
-      "target_persona": {
-        "name": "泛AI关注者",
-        "traits": [
-          "科技爱好者",
-          "吃瓜群众",
-          "投资者",
-          "学生"
-        ],
-        "age": "16-45岁",
-        "gender": "男性偏多(60%)",
-        "needs": [
-          "AI资讯",
-          "产品测评",
-          "行业趋势",
-          "入门科普"
-        ],
-        "content_pref": "资讯速递+产品测评+趋势解读",
-        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
-        "monetization": "广告(品牌合作)、私域(AI社群)",
-        "pain_points": [
-          "信息过载",
-          "真假难辨",
-          "跟不上更新",
-          "不知道学啥"
-        ],
-        "category": "AI大类",
-        "proportion": 49.3,
-        "heat_score": 1646695,
-        "related_keywords": [
-          "AI",
-          "AI",
-          "AI提示词",
-          "AI提示词",
-          "豆包AI"
-        ]
-      },
-      "priority": "高",
-      "keyword": "Qwen3.8-27B-GSQ-RCO-GGUF",
-      "platform": "双平台",
-      "audience": "技术极客",
-      "is_forecast": true,
-      "is_info_gap": true,
-      "action_angle": "从零到一的实操教程（避坑版）",
-      "content_format": "实操教程+工作流展示",
-      "monetization_hint": "完整工作流放私域，视频展示结果和片段",
-      "conversion_path": {
-        "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-        "product_match": "AI工具工作流系列（AI绘画）",
-        "conversion_potential": "高",
-        "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
-      },
-      "format": "科普+盘点",
-      "suggested_duration": "45-60秒",
-      "suggested_publish": "19:00-21:00",
-      "ref_title": "",
-      "ref_url": ""
-    },
-    {
-      "title": "别再手动重复操作了，LTX-2.5已经帮你自动化，省下来的时间都是钱",
-      "hook": "这个项目7天0星星，我测完发现最值钱的不是功能，是思路",
-      "signal_source": "huggingface",
-      "signal_name": "Lightricks/LTX-2.5",
-      "signal_url": "https://hf-mirror.com/Lightricks/LTX-2.5",
-      "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
-      "social_heat": 0,
-      "info_gap_score": 100,
-      "category": "信息差选题",
-      "target_persona": {
-        "name": "泛AI关注者",
-        "traits": [
-          "科技爱好者",
-          "吃瓜群众",
-          "投资者",
-          "学生"
-        ],
-        "age": "16-45岁",
-        "gender": "男性偏多(60%)",
-        "needs": [
-          "AI资讯",
-          "产品测评",
-          "行业趋势",
-          "入门科普"
-        ],
-        "content_pref": "资讯速递+产品测评+趋势解读",
-        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
-        "monetization": "广告(品牌合作)、私域(AI社群)",
-        "pain_points": [
-          "信息过载",
-          "真假难辨",
-          "跟不上更新",
-          "不知道学啥"
-        ],
-        "category": "AI大类",
-        "proportion": 49.3,
-        "heat_score": 1646695,
-        "related_keywords": [
-          "AI",
-          "AI",
-          "AI提示词",
-          "AI提示词",
-          "豆包AI"
-        ]
-      },
-      "priority": "高",
-      "keyword": "LTX-2.5",
+      "keyword": "tokentab",
       "platform": "双平台",
       "audience": "技术极客",
       "is_forecast": true,
@@ -29235,7 +29365,7 @@ window.DASHBOARD_DATA = {
       "monetization_hint": "完整工作流放私域，视频展示结果和片段",
       "conversion_path": {
         "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-        "product_match": "AI工具工作流系列（AI视频）",
+        "product_match": "AI工具工作流系列（AI编程）",
         "conversion_potential": "高",
         "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
       },
@@ -29246,15 +29376,15 @@ window.DASHBOARD_DATA = {
       "ref_url": ""
     },
     {
-      "title": "实测short-video-generator-AI：458星星的项目，最值钱的是这个工作流思路",
-      "hook": "免费但值钱：short-video-generator-AI的正确打开方式，完整工作流放评论区",
+      "title": "实测ai-data-extractor：163星星的项目，最值钱的是这个工作流思路",
+      "hook": "免费但值钱：ai-data-extractor的正确打开方式，完整工作流放评论区",
       "signal_source": "github",
-      "signal_name": "Colafornia/short-video-generator-AI",
-      "signal_url": "https://github.com/Colafornia/short-video-generator-AI",
+      "signal_name": "kruzovic7/ai-data-extractor",
+      "signal_url": "https://github.com/kruzovic7/ai-data-extractor",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 89.1,
+      "tech_heat": 74.3,
       "social_heat": 0,
-      "info_gap_score": 89.1,
+      "info_gap_score": 74.3,
       "category": "信息差选题",
       "target_persona": {
         "name": "泛AI关注者",
@@ -29283,7 +29413,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -29293,7 +29423,7 @@ window.DASHBOARD_DATA = {
         ]
       },
       "priority": "高",
-      "keyword": "short-video-generator-AI",
+      "keyword": "ai-data-extractor",
       "platform": "双平台",
       "audience": "技术极客",
       "is_forecast": true,
@@ -29303,7 +29433,7 @@ window.DASHBOARD_DATA = {
       "monetization_hint": "完整工作流放私域，视频展示结果和片段",
       "conversion_path": {
         "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-        "product_match": "AI工具工作流系列（AI视频）",
+        "product_match": "AI工具工作流系列（AI编程）",
         "conversion_potential": "高",
         "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
       },
@@ -29314,13 +29444,13 @@ window.DASHBOARD_DATA = {
       "ref_url": ""
     },
     {
-      "title": "GitHub 2天327星星，这个routeVSCODE正在悄悄改变AI编程",
+      "title": "GitHub 3天389星星，这个rune正在悄悄改变AI Agent开发",
       "hook": "今天GitHub最值得关注的项目，3分钟教你装上并用起来",
       "signal_source": "github",
-      "signal_name": "yudaprasetya007/routeVSCODE",
-      "signal_url": "https://github.com/yudaprasetya007/routeVSCODE",
+      "signal_name": "unstablebuild/rune",
+      "signal_url": "https://github.com/unstablebuild/rune",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
+      "tech_heat": 98.4,
       "social_heat": 0,
       "category": "前瞻选题",
       "target_persona": {
@@ -29350,7 +29480,121 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
+        "related_keywords": [
+          "AI",
+          "AI",
+          "AI提示词",
+          "AI提示词",
+          "豆包AI"
+        ]
+      },
+      "priority": "高",
+      "keyword": "rune",
+      "platform": "双平台",
+      "audience": "技术极客",
+      "is_forecast": true,
+      "format": "科普+盘点",
+      "suggested_duration": "45-60秒",
+      "suggested_publish": "19:00-21:00",
+      "ref_title": "",
+      "ref_url": ""
+    },
+    {
+      "title": "刚发现的short-video-generator-AI，AI视频效率提升10倍，知道的人还不多",
+      "hook": "我测完发现最值钱的不是功能，是这个思路",
+      "signal_source": "github",
+      "signal_name": "Colafornia/short-video-generator-AI",
+      "signal_url": "https://github.com/Colafornia/short-video-generator-AI",
+      "opportunity": "🔵 蓝海机会",
+      "tech_heat": 95.7,
+      "social_heat": 0,
+      "category": "前瞻选题",
+      "target_persona": {
+        "name": "泛AI关注者",
+        "traits": [
+          "科技爱好者",
+          "吃瓜群众",
+          "投资者",
+          "学生"
+        ],
+        "age": "16-45岁",
+        "gender": "男性偏多(60%)",
+        "needs": [
+          "AI资讯",
+          "产品测评",
+          "行业趋势",
+          "入门科普"
+        ],
+        "content_pref": "资讯速递+产品测评+趋势解读",
+        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
+        "monetization": "广告(品牌合作)、私域(AI社群)",
+        "pain_points": [
+          "信息过载",
+          "真假难辨",
+          "跟不上更新",
+          "不知道学啥"
+        ],
+        "category": "AI大类",
+        "proportion": 49.3,
+        "heat_score": 1646761,
+        "related_keywords": [
+          "AI",
+          "AI",
+          "AI提示词",
+          "AI提示词",
+          "豆包AI"
+        ]
+      },
+      "priority": "高",
+      "keyword": "short-video-generator-AI",
+      "platform": "双平台",
+      "audience": "技术极客",
+      "is_forecast": true,
+      "format": "科普+盘点",
+      "suggested_duration": "45-60秒",
+      "suggested_publish": "19:00-21:00",
+      "ref_title": "",
+      "ref_url": ""
+    },
+    {
+      "title": "routeVSCODE深度测评：327星星的背后，是这个被低估的能力",
+      "hook": "别人还在手动重复劳动，你已经在自动化了，这就是差距",
+      "signal_source": "github",
+      "signal_name": "yudaprasetya007/routeVSCODE",
+      "signal_url": "https://github.com/yudaprasetya007/routeVSCODE",
+      "opportunity": "🔵 蓝海机会",
+      "tech_heat": 88.9,
+      "social_heat": 0,
+      "category": "前瞻选题",
+      "target_persona": {
+        "name": "泛AI关注者",
+        "traits": [
+          "科技爱好者",
+          "吃瓜群众",
+          "投资者",
+          "学生"
+        ],
+        "age": "16-45岁",
+        "gender": "男性偏多(60%)",
+        "needs": [
+          "AI资讯",
+          "产品测评",
+          "行业趋势",
+          "入门科普"
+        ],
+        "content_pref": "资讯速递+产品测评+趋势解读",
+        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
+        "monetization": "广告(品牌合作)、私域(AI社群)",
+        "pain_points": [
+          "信息过载",
+          "真假难辨",
+          "跟不上更新",
+          "不知道学啥"
+        ],
+        "category": "AI大类",
+        "proportion": 49.3,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -29371,184 +29615,13 @@ window.DASHBOARD_DATA = {
       "ref_url": ""
     },
     {
-      "title": "刚发现的Qwen3.8-27B，AI绘画效率提升10倍，知道的人还不多",
-      "hook": "我测完发现最值钱的不是功能，是这个思路",
-      "signal_source": "huggingface",
-      "signal_name": "Qwen/Qwen3.8-27B",
-      "signal_url": "https://hf-mirror.com/Qwen/Qwen3.8-27B",
-      "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
-      "social_heat": 0,
-      "category": "前瞻选题",
-      "target_persona": {
-        "name": "泛AI关注者",
-        "traits": [
-          "科技爱好者",
-          "吃瓜群众",
-          "投资者",
-          "学生"
-        ],
-        "age": "16-45岁",
-        "gender": "男性偏多(60%)",
-        "needs": [
-          "AI资讯",
-          "产品测评",
-          "行业趋势",
-          "入门科普"
-        ],
-        "content_pref": "资讯速递+产品测评+趋势解读",
-        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
-        "monetization": "广告(品牌合作)、私域(AI社群)",
-        "pain_points": [
-          "信息过载",
-          "真假难辨",
-          "跟不上更新",
-          "不知道学啥"
-        ],
-        "category": "AI大类",
-        "proportion": 49.3,
-        "heat_score": 1646695,
-        "related_keywords": [
-          "AI",
-          "AI",
-          "AI提示词",
-          "AI提示词",
-          "豆包AI"
-        ]
-      },
-      "priority": "高",
-      "keyword": "Qwen3.8-27B",
-      "platform": "双平台",
-      "audience": "技术极客",
-      "is_forecast": true,
-      "format": "科普+盘点",
-      "suggested_duration": "45-60秒",
-      "suggested_publish": "19:00-21:00",
-      "ref_title": "",
-      "ref_url": ""
-    },
-    {
-      "title": "Qwen3.8-27B-GSQ-RCO-GGUF深度测评：0星星的背后，是这个被低估的能力",
-      "hook": "别人还在手动重复劳动，你已经在自动化了，这就是差距",
-      "signal_source": "huggingface",
-      "signal_name": "ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-      "signal_url": "https://hf-mirror.com/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-      "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
-      "social_heat": 0,
-      "category": "前瞻选题",
-      "target_persona": {
-        "name": "泛AI关注者",
-        "traits": [
-          "科技爱好者",
-          "吃瓜群众",
-          "投资者",
-          "学生"
-        ],
-        "age": "16-45岁",
-        "gender": "男性偏多(60%)",
-        "needs": [
-          "AI资讯",
-          "产品测评",
-          "行业趋势",
-          "入门科普"
-        ],
-        "content_pref": "资讯速递+产品测评+趋势解读",
-        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
-        "monetization": "广告(品牌合作)、私域(AI社群)",
-        "pain_points": [
-          "信息过载",
-          "真假难辨",
-          "跟不上更新",
-          "不知道学啥"
-        ],
-        "category": "AI大类",
-        "proportion": 49.3,
-        "heat_score": 1646695,
-        "related_keywords": [
-          "AI",
-          "AI",
-          "AI提示词",
-          "AI提示词",
-          "豆包AI"
-        ]
-      },
-      "priority": "高",
-      "keyword": "Qwen3.8-27B-GSQ-RCO-GGUF",
-      "platform": "双平台",
-      "audience": "技术极客",
-      "is_forecast": true,
-      "format": "科普+盘点",
-      "suggested_duration": "45-60秒",
-      "suggested_publish": "19:00-21:00",
-      "ref_title": "",
-      "ref_url": ""
-    },
-    {
-      "title": "别再用笨办法了，LTX-2.5把AI视频自动化了",
-      "hook": "免费但值钱：LTX-2.5的正确打开方式，看完你会回来感谢我",
-      "signal_source": "huggingface",
-      "signal_name": "Lightricks/LTX-2.5",
-      "signal_url": "https://hf-mirror.com/Lightricks/LTX-2.5",
-      "opportunity": "🔵 蓝海机会",
-      "tech_heat": 100,
-      "social_heat": 0,
-      "category": "前瞻选题",
-      "target_persona": {
-        "name": "泛AI关注者",
-        "traits": [
-          "科技爱好者",
-          "吃瓜群众",
-          "投资者",
-          "学生"
-        ],
-        "age": "16-45岁",
-        "gender": "男性偏多(60%)",
-        "needs": [
-          "AI资讯",
-          "产品测评",
-          "行业趋势",
-          "入门科普"
-        ],
-        "content_pref": "资讯速递+产品测评+趋势解读",
-        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
-        "monetization": "广告(品牌合作)、私域(AI社群)",
-        "pain_points": [
-          "信息过载",
-          "真假难辨",
-          "跟不上更新",
-          "不知道学啥"
-        ],
-        "category": "AI大类",
-        "proportion": 49.3,
-        "heat_score": 1646695,
-        "related_keywords": [
-          "AI",
-          "AI",
-          "AI提示词",
-          "AI提示词",
-          "豆包AI"
-        ]
-      },
-      "priority": "高",
-      "keyword": "LTX-2.5",
-      "platform": "双平台",
-      "audience": "技术极客",
-      "is_forecast": true,
-      "format": "科普+盘点",
-      "suggested_duration": "45-60秒",
-      "suggested_publish": "19:00-21:00",
-      "ref_title": "",
-      "ref_url": ""
-    },
-    {
-      "title": "技术圈都在讨论short-video-generator-AI，但90%的人用错了方式",
-      "hook": "这个项目458星星只用了4天，我整理了完整的上手教程",
+      "title": "别再用笨办法了，tokentab把AI编程自动化了",
+      "hook": "免费但值钱：tokentab的正确打开方式，看完你会回来感谢我",
       "signal_source": "github",
-      "signal_name": "Colafornia/short-video-generator-AI",
-      "signal_url": "https://github.com/Colafornia/short-video-generator-AI",
+      "signal_name": "crwdla/tokentab",
+      "signal_url": "https://github.com/crwdla/tokentab",
       "opportunity": "🔵 蓝海机会",
-      "tech_heat": 89.1,
+      "tech_heat": 80.2,
       "social_heat": 0,
       "category": "前瞻选题",
       "target_persona": {
@@ -29578,7 +29651,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -29588,7 +29661,64 @@ window.DASHBOARD_DATA = {
         ]
       },
       "priority": "高",
-      "keyword": "short-video-generator-AI",
+      "keyword": "tokentab",
+      "platform": "双平台",
+      "audience": "技术极客",
+      "is_forecast": true,
+      "format": "科普+盘点",
+      "suggested_duration": "45-60秒",
+      "suggested_publish": "19:00-21:00",
+      "ref_title": "",
+      "ref_url": ""
+    },
+    {
+      "title": "技术圈都在讨论reverify，但90%的人用错了方式",
+      "hook": "这个项目1178星星只用了13天，我整理了完整的上手教程",
+      "signal_source": "github",
+      "signal_name": "2akouwu/reverify",
+      "signal_url": "https://github.com/2akouwu/reverify",
+      "opportunity": "🔵 蓝海机会",
+      "tech_heat": 77.8,
+      "social_heat": 8,
+      "category": "前瞻选题",
+      "target_persona": {
+        "name": "泛AI关注者",
+        "traits": [
+          "科技爱好者",
+          "吃瓜群众",
+          "投资者",
+          "学生"
+        ],
+        "age": "16-45岁",
+        "gender": "男性偏多(60%)",
+        "needs": [
+          "AI资讯",
+          "产品测评",
+          "行业趋势",
+          "入门科普"
+        ],
+        "content_pref": "资讯速递+产品测评+趋势解读",
+        "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
+        "monetization": "广告(品牌合作)、私域(AI社群)",
+        "pain_points": [
+          "信息过载",
+          "真假难辨",
+          "跟不上更新",
+          "不知道学啥"
+        ],
+        "category": "AI大类",
+        "proportion": 49.3,
+        "heat_score": 1646761,
+        "related_keywords": [
+          "AI",
+          "AI",
+          "AI提示词",
+          "AI提示词",
+          "豆包AI"
+        ]
+      },
+      "priority": "高",
+      "keyword": "reverify",
       "platform": "双平台",
       "audience": "技术极客",
       "is_forecast": true,
@@ -29816,7 +29946,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -29865,7 +29995,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -29914,7 +30044,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -29963,7 +30093,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -30012,7 +30142,7 @@ window.DASHBOARD_DATA = {
         ],
         "category": "AI大类",
         "proportion": 49.3,
-        "heat_score": 1646695,
+        "heat_score": 1646761,
         "related_keywords": [
           "AI",
           "AI",
@@ -30078,7 +30208,7 @@ window.DASHBOARD_DATA = {
     {
       "type": "拍摄",
       "priority": "高",
-      "content": "拍摄选题：GitHub2天327星星，这个routeVSCODE让AI编程效率翻倍，抖音还没人讲",
+      "content": "拍摄选题：GitHub3天389星星，这个rune让AI Agent效率翻倍，抖音还没人讲",
       "detail": "99%的人还不知道这个工具，我花了一下午踩坑，3分钟教你上手"
     },
     {
@@ -30103,7 +30233,7 @@ window.DASHBOARD_DATA = {
   "keyword_matrix": [
     {
       "category": "AI大类",
-      "total": 1676685,
+      "total": 1676731,
       "count": 6,
       "max_like": 111800,
       "level": "🔥 超热",
@@ -30140,7 +30270,7 @@ window.DASHBOARD_DATA = {
     },
     {
       "category": "AI数字人",
-      "total": 199860,
+      "total": 199847,
       "count": 2,
       "max_like": 16655,
       "level": "🔥 超热",
@@ -30151,7 +30281,7 @@ window.DASHBOARD_DATA = {
     },
     {
       "category": "AI做图",
-      "total": 23141,
+      "total": 23089,
       "count": 6,
       "max_like": 119352,
       "level": "⭐ 热门",
@@ -30258,7 +30388,7 @@ window.DASHBOARD_DATA = {
     },
     {
       "category": "AI音乐",
-      "total": 520,
+      "total": 510,
       "count": 2,
       "max_like": 16113,
       "level": "🌱 蓝海",
@@ -30280,7 +30410,7 @@ window.DASHBOARD_DATA = {
     },
     {
       "category": "AI写作",
-      "total": 297,
+      "total": 295,
       "count": 2,
       "max_like": 8591,
       "level": "🌱 蓝海",
@@ -30363,11 +30493,11 @@ window.DASHBOARD_DATA = {
         "keyword": "AI数字人",
         "category": "AI数字人",
         "douyin_total": 198980,
-        "xhs_total": 880,
+        "xhs_total": 867,
         "douyin_max_like": 16655,
         "xhs_max_like": 231,
         "douyin_collect_rate": 16.1,
-        "xhs_collect_rate": 88.6,
+        "xhs_collect_rate": 90.5,
         "hotter_platform": "douyin"
       },
       {
@@ -30384,7 +30514,7 @@ window.DASHBOARD_DATA = {
       {
         "keyword": "豆包AI",
         "category": "AI大类",
-        "douyin_total": 14281,
+        "douyin_total": 14327,
         "xhs_total": 179,
         "douyin_max_like": 111800,
         "xhs_max_like": 9387,
@@ -30473,22 +30603,22 @@ window.DASHBOARD_DATA = {
         "keyword": "AI绘画",
         "category": "AI做图",
         "douyin_total": 398,
-        "xhs_total": 1506,
+        "xhs_total": 1454,
         "douyin_max_like": 119352,
-        "xhs_max_like": 23925,
+        "xhs_max_like": 3902,
         "douyin_collect_rate": 10.8,
-        "xhs_collect_rate": 11.4,
+        "xhs_collect_rate": 17.4,
         "hotter_platform": "xiaohongshu"
       },
       {
         "keyword": "AI音乐",
         "category": "AI音乐",
         "douyin_total": 364,
-        "xhs_total": 156,
+        "xhs_total": 146,
         "douyin_max_like": 16113,
-        "xhs_max_like": 987,
+        "xhs_max_like": 1047,
         "douyin_collect_rate": 32.2,
-        "xhs_collect_rate": 29.6,
+        "xhs_collect_rate": 27.8,
         "hotter_platform": "douyin"
       }
     ],
@@ -30497,13 +30627,13 @@ window.DASHBOARD_DATA = {
     "platform_summary": {
       "douyin": {
         "total_keywords": 25,
-        "total_works": 4988376,
-        "avg_like": 5343
+        "total_works": 4988422,
+        "avg_like": 5344
       },
       "xiaohongshu": {
         "total_keywords": 25,
-        "total_works": 104314,
-        "avg_like": 354
+        "total_works": 104237,
+        "avg_like": 301
       }
     },
     "top_works": {
@@ -30709,25 +30839,6 @@ window.DASHBOARD_DATA = {
       ],
       "xiaohongshu": [
         {
-          "workId": "6a79c747000000002701f641",
-          "title": "我很狼狈，虽然ai绘画并未针对我",
-          "content": "我不中了啊！\n比内容更绷不住的是剪了一整天的视频！\n再也不想剪视频了，杏师傅累虚了😭😭😭😭\n#oc #绘画 #约稿 #稿件展示 #仅展示不可使用 #weeklypick #好视频扶持计划\n\t\n二编一下：封面不是单主不是单主ദ്ദി ༎ຶ‿༎ຶ )像ai是杏师傅自己幻视的，封面是亲友也觉得所以认同杏师傅",
-          "accountName": "杏铁锌",
-          "accountType": "休闲爱好",
-          "followerCount": 0,
-          "likeCount": 23925,
-          "collectCount": 2510,
-          "shareCount": 208,
-          "commentCount": 245,
-          "publishTime": "2026-08-10 20:42:47",
-          "workUrl": "https://www.xiaohongshu.com/explore/6a79c747000000002701f641",
-          "coverUrl": "https://sns-na-i27.xhscdn.com/1040g008323mjf8lngo4g5ns523fg8541ga054ho?imageView2/2/w/576/format/heif/q/58%7CimageMogr2/strip&redImage/frame/0/enhance/4&ap=1&sc=V_PRV&sign=6ce0c391444192e69fe3d182a4c35311&t=6a81e0e5&origin=0",
-          "workType": "video",
-          "duration": 0,
-          "platform": "xiaohongshu",
-          "_keyword": "AI绘画"
-        },
-        {
           "workId": "6a804a380000000028032cd7",
           "title": "模拟恐怖｜《龙症》｜恐怖2星｜马赛克版",
           "content": "#可灵AI创作者计划 #模拟恐怖 #cult #热AI训练营#可灵AI",
@@ -30802,6 +30913,25 @@ window.DASHBOARD_DATA = {
           "duration": 0,
           "platform": "xiaohongshu",
           "_keyword": "可灵AI"
+        },
+        {
+          "workId": "6a8ffba7000000000303f63c",
+          "title": "我保证球球是全世界最可爱的小狗",
+          "content": "#球球#豆包ai",
+          "accountName": "卷毛铭狗萌^.🎸",
+          "accountType": "科学探索",
+          "followerCount": 0,
+          "likeCount": 9387,
+          "collectCount": 1318,
+          "shareCount": 383,
+          "commentCount": 68,
+          "publishTime": "2026-08-27 16:56:07",
+          "workUrl": "https://www.xiaohongshu.com/explore/6a8ffba7000000000303f63c",
+          "coverUrl": "https://sns-i11-ae.rednotecdn.com/1040g008324c9lvl4na5g5q0iol6j9a12npmhhog?imageView2/2/w/576/format/heif/q/58%7CimageMogr2/strip&redImage/frame/0/enhance/4&ap=1&sc=V_PRV&sign=3f51648216f8af2d39e73b7b986bf298&t=6a999a32",
+          "workType": "video",
+          "duration": 0,
+          "platform": "xiaohongshu",
+          "_keyword": "豆包AI"
         }
       ]
     }
@@ -30817,7 +30947,7 @@ window.DASHBOARD_DATA = {
       "collect_rate": 11.3,
       "works_count": 20,
       "category": "AI大类",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
       "growth": -4.7,
       "trend": "稳定",
@@ -30925,9 +31055,9 @@ window.DASHBOARD_DATA = {
       "collect_rate": 15.0,
       "works_count": 20,
       "category": "AI修图",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
-      "growth": -59.7,
+      "growth": -59.9,
       "trend": "衰退",
       "blue_ocean_score": 661200.0,
       "competition_score": 0.02,
@@ -30945,7 +31075,7 @@ window.DASHBOARD_DATA = {
       "category": "AI修图",
       "_cached": true,
       "_collected_date": "2026-09-11",
-      "growth": -39.7,
+      "growth": -40.1,
       "trend": "衰退",
       "blue_ocean_score": 44508.62,
       "competition_score": 0.22,
@@ -30961,9 +31091,9 @@ window.DASHBOARD_DATA = {
       "collect_rate": 10.8,
       "works_count": 20,
       "category": "AI做图",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
-      "growth": -79.2,
+      "growth": -79.1,
       "trend": "衰退",
       "blue_ocean_score": 449819.1,
       "competition_score": 0.02,
@@ -30972,19 +31102,19 @@ window.DASHBOARD_DATA = {
     {
       "keyword": "AI绘画",
       "platform": "xiaohongshu",
-      "total": 1506,
-      "max_like": 23925,
-      "avg_like": 1556,
-      "avg_collect": 176,
-      "collect_rate": 11.4,
+      "total": 1454,
+      "max_like": 3902,
+      "avg_like": 318,
+      "avg_collect": 55,
+      "collect_rate": 17.4,
       "works_count": 20,
       "category": "AI做图",
-      "_cached": true,
-      "_collected_date": "2026-09-10",
-      "growth": -21.3,
+      "_cached": false,
+      "_collected_date": "2026-09-13",
+      "growth": -23.6,
       "trend": "衰退",
-      "blue_ocean_score": 23829.68,
-      "competition_score": 0.42,
+      "blue_ocean_score": 4025.45,
+      "competition_score": 2.48,
       "efficiency_tag": "蓝海"
     },
     {
@@ -30997,7 +31127,7 @@ window.DASHBOARD_DATA = {
       "collect_rate": 2.4,
       "works_count": 20,
       "category": "AI视频",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
       "growth": -41.6,
       "trend": "衰退",
@@ -31017,7 +31147,7 @@ window.DASHBOARD_DATA = {
       "category": "AI视频",
       "_cached": true,
       "_collected_date": "2026-09-11",
-      "growth": -58.3,
+      "growth": -58.4,
       "trend": "衰退",
       "blue_ocean_score": 135.33,
       "competition_score": 72.66,
@@ -31033,9 +31163,9 @@ window.DASHBOARD_DATA = {
       "collect_rate": 16.1,
       "works_count": 20,
       "category": "AI数字人",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
-      "growth": 0.0,
+      "growth": -0.4,
       "trend": "稳定",
       "blue_ocean_score": 125.55,
       "competition_score": 79.62,
@@ -31044,19 +31174,19 @@ window.DASHBOARD_DATA = {
     {
       "keyword": "AI数字人",
       "platform": "xiaohongshu",
-      "total": 880,
+      "total": 867,
       "max_like": 231,
-      "avg_like": 55,
-      "avg_collect": 49,
-      "collect_rate": 88.6,
+      "avg_like": 59,
+      "avg_collect": 54,
+      "collect_rate": 90.5,
       "works_count": 20,
       "category": "AI数字人",
-      "_cached": true,
-      "_collected_date": "2026-09-10",
+      "_cached": false,
+      "_collected_date": "2026-09-13",
       "growth": -99.6,
       "trend": "衰退",
-      "blue_ocean_score": 393.75,
-      "competition_score": 24.68,
+      "blue_ocean_score": 399.65,
+      "competition_score": 24.32,
       "efficiency_tag": "蓝海"
     },
     {
@@ -31080,19 +31210,19 @@ window.DASHBOARD_DATA = {
     {
       "keyword": "AI写作",
       "platform": "xiaohongshu",
-      "total": 185,
-      "max_like": 1923,
-      "avg_like": 178,
-      "avg_collect": 79,
-      "collect_rate": 44.3,
+      "total": 183,
+      "max_like": 1353,
+      "avg_like": 85,
+      "avg_collect": 38,
+      "collect_rate": 44.7,
       "works_count": 20,
       "category": "AI写作",
-      "_cached": true,
-      "_collected_date": "2026-09-10",
-      "growth": -37.7,
+      "_cached": false,
+      "_collected_date": "2026-09-13",
+      "growth": -38.4,
       "trend": "衰退",
-      "blue_ocean_score": 15591.89,
-      "competition_score": 0.64,
+      "blue_ocean_score": 11090.16,
+      "competition_score": 0.9,
       "efficiency_tag": "蓝海"
     },
     {
@@ -31177,9 +31307,9 @@ window.DASHBOARD_DATA = {
       "collect_rate": 24.8,
       "works_count": 20,
       "category": "AI自动化",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
-      "growth": -37.6,
+      "growth": -37.3,
       "trend": "衰退",
       "blue_ocean_score": 87202.51,
       "competition_score": 0.11,
@@ -31197,7 +31327,7 @@ window.DASHBOARD_DATA = {
       "category": "AI自动化",
       "_cached": true,
       "_collected_date": "2026-09-11",
-      "growth": -62.9,
+      "growth": -62.7,
       "trend": "衰退",
       "blue_ocean_score": 268.86,
       "competition_score": 36.47,
@@ -31249,7 +31379,7 @@ window.DASHBOARD_DATA = {
       "collect_rate": 29.1,
       "works_count": 20,
       "category": "AI PPT",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
       "growth": -0.1,
       "trend": "稳定",
@@ -31296,19 +31426,19 @@ window.DASHBOARD_DATA = {
     {
       "keyword": "AI音乐",
       "platform": "xiaohongshu",
-      "total": 156,
-      "max_like": 987,
-      "avg_like": 140,
-      "avg_collect": 41,
-      "collect_rate": 29.6,
+      "total": 146,
+      "max_like": 1047,
+      "avg_like": 131,
+      "avg_collect": 36,
+      "collect_rate": 27.8,
       "works_count": 20,
       "category": "AI音乐",
-      "_cached": true,
-      "_collected_date": "2026-09-10",
-      "growth": -70.0,
+      "_cached": false,
+      "_collected_date": "2026-09-13",
+      "growth": -71.9,
       "trend": "衰退",
-      "blue_ocean_score": 9490.38,
-      "competition_score": 1.05,
+      "blue_ocean_score": 10756.85,
+      "competition_score": 0.92,
       "efficiency_tag": "蓝海"
     },
     {
@@ -31357,7 +31487,7 @@ window.DASHBOARD_DATA = {
       "collect_rate": 54.7,
       "works_count": 20,
       "category": "AI Agent",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
       "growth": -0.2,
       "trend": "稳定",
@@ -31393,7 +31523,7 @@ window.DASHBOARD_DATA = {
       "collect_rate": 11.5,
       "works_count": 20,
       "category": "AI大类",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
       "growth": -37.5,
       "trend": "衰退",
@@ -31413,7 +31543,7 @@ window.DASHBOARD_DATA = {
       "category": "AI大类",
       "_cached": true,
       "_collected_date": "2026-09-11",
-      "growth": -62.4,
+      "growth": -62.5,
       "trend": "衰退",
       "blue_ocean_score": 1303.5,
       "competition_score": 7.65,
@@ -31501,9 +31631,9 @@ window.DASHBOARD_DATA = {
       "collect_rate": 101.8,
       "works_count": 20,
       "category": "WorkBuddy",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
-      "growth": -80.3,
+      "growth": -80.5,
       "trend": "衰退",
       "blue_ocean_score": 683805.29,
       "competition_score": 0.01,
@@ -31521,7 +31651,7 @@ window.DASHBOARD_DATA = {
       "category": "WorkBuddy",
       "_cached": true,
       "_collected_date": "2026-09-11",
-      "growth": -18.7,
+      "growth": -19.5,
       "trend": "衰退",
       "blue_ocean_score": 2244.77,
       "competition_score": 4.43,
@@ -31645,9 +31775,9 @@ window.DASHBOARD_DATA = {
       "collect_rate": 6.7,
       "works_count": 20,
       "category": "AI视频",
-      "_cached": false,
+      "_cached": true,
       "_collected_date": "2026-09-12",
-      "growth": -43.0,
+      "growth": -42.4,
       "trend": "衰退",
       "blue_ocean_score": 1175008.31,
       "competition_score": 0.01,
@@ -31665,7 +31795,7 @@ window.DASHBOARD_DATA = {
       "category": "AI视频",
       "_cached": true,
       "_collected_date": "2026-09-11",
-      "growth": -58.0,
+      "growth": -57.6,
       "trend": "衰退",
       "blue_ocean_score": 135202.7,
       "competition_score": 0.07,
@@ -31674,18 +31804,18 @@ window.DASHBOARD_DATA = {
     {
       "keyword": "豆包AI",
       "platform": "douyin",
-      "total": 14281,
+      "total": 14327,
       "max_like": 111800,
-      "avg_like": 7156,
-      "avg_collect": 1206,
+      "avg_like": 7170,
+      "avg_collect": 1214,
       "collect_rate": 16.9,
       "works_count": 20,
       "category": "AI大类",
-      "_cached": true,
-      "_collected_date": "2026-09-11",
-      "growth": -1.2,
+      "_cached": false,
+      "_collected_date": "2026-09-13",
+      "growth": -0.9,
       "trend": "稳定",
-      "blue_ocean_score": 11742.88,
+      "blue_ocean_score": 11705.17,
       "competition_score": 0.85,
       "efficiency_tag": "蓝海"
     },
@@ -31717,7 +31847,7 @@ window.DASHBOARD_DATA = {
       "共鸣身份": 2,
       "恐惧焦虑": 1
     },
-    "avg_title_length": 35.9,
+    "avg_title_length": 36.0,
     "top_title_keywords": [
       [
         " #",
@@ -31729,7 +31859,7 @@ window.DASHBOARD_DATA = {
       ],
       [
         "ai",
-        28
+        27
       ],
       [
         "#a",
@@ -31889,6 +32019,11 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 1655791,
           "max_like": 13839
+        },
+        {
+          "date": "2026-09-12",
+          "total": 1655899,
+          "max_like": 13839
         }
       ],
       "growth": 9.4,
@@ -31938,6 +32073,11 @@ window.DASHBOARD_DATA = {
         },
         {
           "date": "2026-09-11",
+          "total": 6953,
+          "max_like": 40505
+        },
+        {
+          "date": "2026-09-12",
           "total": 6953,
           "max_like": 40505
         }
@@ -31991,6 +32131,11 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 21,
           "max_like": 62546
+        },
+        {
+          "date": "2026-09-12",
+          "total": 21,
+          "max_like": 62546
         }
       ],
       "growth": 110.0,
@@ -32042,9 +32187,14 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 385,
           "max_like": 264354
+        },
+        {
+          "date": "2026-09-12",
+          "total": 387,
+          "max_like": 68324
         }
       ],
-      "growth": 169.2,
+      "growth": 170.6,
       "direction": "up"
     },
     "AI绘画": {
@@ -32093,9 +32243,14 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 1914,
           "max_like": 119352
+        },
+        {
+          "date": "2026-09-12",
+          "total": 1904,
+          "max_like": 119352
         }
       ],
-      "growth": 343.1,
+      "growth": 340.7,
       "direction": "up"
     },
     "AI视频": {
@@ -32143,6 +32298,11 @@ window.DASHBOARD_DATA = {
         {
           "date": "2026-09-11",
           "total": 10404,
+          "max_like": 77857
+        },
+        {
+          "date": "2026-09-12",
+          "total": 10409,
           "max_like": 77857
         }
       ],
@@ -32195,9 +32355,14 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 198901,
           "max_like": 6572
+        },
+        {
+          "date": "2026-09-12",
+          "total": 199860,
+          "max_like": 16655
         }
       ],
-      "growth": 8.1,
+      "growth": 8.6,
       "direction": "flat"
     },
     "AI写作": {
@@ -32244,6 +32409,11 @@ window.DASHBOARD_DATA = {
         },
         {
           "date": "2026-09-11",
+          "total": 297,
+          "max_like": 8591
+        },
+        {
+          "date": "2026-09-12",
           "total": 297,
           "max_like": 8591
         }
@@ -32297,6 +32467,11 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 1440,
           "max_like": 33964
+        },
+        {
+          "date": "2026-09-12",
+          "total": 1440,
+          "max_like": 33964
         }
       ],
       "growth": 228.0,
@@ -32346,6 +32521,11 @@ window.DASHBOARD_DATA = {
         },
         {
           "date": "2026-09-11",
+          "total": 2323,
+          "max_like": 36888
+        },
+        {
+          "date": "2026-09-12",
           "total": 2323,
           "max_like": 36888
         }
@@ -32399,9 +32579,14 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 5044,
           "max_like": 183009
+        },
+        {
+          "date": "2026-09-12",
+          "total": 5017,
+          "max_like": 183009
         }
       ],
-      "growth": 60.5,
+      "growth": 59.6,
       "direction": "up"
     },
     "AI编程": {
@@ -32448,6 +32633,11 @@ window.DASHBOARD_DATA = {
         },
         {
           "date": "2026-09-11",
+          "total": 669,
+          "max_like": 3505
+        },
+        {
+          "date": "2026-09-12",
           "total": 669,
           "max_like": 3505
         }
@@ -32501,6 +32691,11 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 1579607,
           "max_like": 50462
+        },
+        {
+          "date": "2026-09-12",
+          "total": 1579756,
+          "max_like": 50462
         }
       ],
       "growth": 4.3,
@@ -32550,6 +32745,11 @@ window.DASHBOARD_DATA = {
         },
         {
           "date": "2026-09-11",
+          "total": 520,
+          "max_like": 16113
+        },
+        {
+          "date": "2026-09-12",
           "total": 520,
           "max_like": 16113
         }
@@ -32603,6 +32803,11 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 140,
           "max_like": 1546
+        },
+        {
+          "date": "2026-09-12",
+          "total": 140,
+          "max_like": 1546
         }
       ],
       "growth": 174.5,
@@ -32653,6 +32858,11 @@ window.DASHBOARD_DATA = {
         {
           "date": "2026-09-11",
           "total": 1580907,
+          "max_like": 1329
+        },
+        {
+          "date": "2026-09-12",
+          "total": 1581005,
           "max_like": 1329
         }
       ],
@@ -32705,9 +32915,14 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 6320,
           "max_like": 88280
+        },
+        {
+          "date": "2026-09-12",
+          "total": 6326,
+          "max_like": 79455
         }
       ],
-      "growth": 63.3,
+      "growth": 63.5,
       "direction": "up"
     },
     "扣子": {
@@ -32754,6 +32969,11 @@ window.DASHBOARD_DATA = {
         },
         {
           "date": "2026-09-11",
+          "total": 2391,
+          "max_like": 22609
+        },
+        {
+          "date": "2026-09-12",
           "total": 2391,
           "max_like": 22609
         }
@@ -32807,6 +33027,11 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 81,
           "max_like": 32528
+        },
+        {
+          "date": "2026-09-12",
+          "total": 81,
+          "max_like": 32528
         }
       ],
       "growth": 65.3,
@@ -32858,9 +33083,14 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 1058,
           "max_like": 94821
+        },
+        {
+          "date": "2026-09-12",
+          "total": 1068,
+          "max_like": 94821
         }
       ],
-      "growth": 605.3,
+      "growth": 612.0,
       "direction": "up"
     },
     "n8n": {
@@ -32907,6 +33137,11 @@ window.DASHBOARD_DATA = {
         },
         {
           "date": "2026-09-11",
+          "total": 7,
+          "max_like": 85
+        },
+        {
+          "date": "2026-09-12",
           "total": 7,
           "max_like": 85
         }
@@ -32960,6 +33195,11 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 18,
           "max_like": 59
+        },
+        {
+          "date": "2026-09-12",
+          "total": 18,
+          "max_like": 59
         }
       ],
       "growth": 260.0,
@@ -33009,6 +33249,11 @@ window.DASHBOARD_DATA = {
         },
         {
           "date": "2026-09-11",
+          "total": 21216,
+          "max_like": 5493
+        },
+        {
+          "date": "2026-09-12",
           "total": 21216,
           "max_like": 5493
         }
@@ -33062,9 +33307,14 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 528,
           "max_like": 235785
+        },
+        {
+          "date": "2026-09-12",
+          "total": 523,
+          "max_like": 235785
         }
       ],
-      "growth": 80.8,
+      "growth": 79.1,
       "direction": "up"
     },
     "豆包AI": {
@@ -33113,6 +33363,11 @@ window.DASHBOARD_DATA = {
           "date": "2026-09-11",
           "total": 14460,
           "max_like": 111800
+        },
+        {
+          "date": "2026-09-12",
+          "total": 14460,
+          "max_like": 111800
         }
       ],
       "growth": 8.2,
@@ -33147,7 +33402,7 @@ window.DASHBOARD_DATA = {
       ],
       "category": "AI大类",
       "proportion": 49.3,
-      "heat_score": 1646695,
+      "heat_score": 1646761,
       "related_keywords": [
         "AI",
         "AI",
@@ -33216,7 +33471,7 @@ window.DASHBOARD_DATA = {
       ],
       "category": "AI数字人",
       "proportion": 5.7,
-      "heat_score": 189900,
+      "heat_score": 189847,
       "related_keywords": [
         "AI数字人",
         "AI数字人"
@@ -33249,7 +33504,7 @@ window.DASHBOARD_DATA = {
       ],
       "category": "AI做图",
       "proportion": -0.1,
-      "heat_score": -6909,
+      "heat_score": -7181,
       "related_keywords": [
         "AI做图",
         "AI做图",
@@ -33351,7 +33606,7 @@ window.DASHBOARD_DATA = {
       ],
       "category": "AI视频",
       "proportion": -0.3,
-      "heat_score": -9158,
+      "heat_score": -9068,
       "related_keywords": [
         "AI视频",
         "AI视频",
@@ -33418,7 +33673,7 @@ window.DASHBOARD_DATA = {
       ],
       "category": "AI音乐",
       "proportion": -0.3,
-      "heat_score": -9480,
+      "heat_score": -9680,
       "related_keywords": [
         "AI音乐",
         "AI音乐"
@@ -33451,7 +33706,7 @@ window.DASHBOARD_DATA = {
       ],
       "category": "AI写作",
       "proportion": -0.3,
-      "heat_score": -9703,
+      "heat_score": -9775,
       "related_keywords": [
         "AI写作",
         "AI写作"
@@ -33459,11 +33714,100 @@ window.DASHBOARD_DATA = {
     }
   ],
   "tech_signals": {
-    "collect_date": "2026-09-12",
-    "total_signals": 20,
+    "collect_date": "2026-09-13",
+    "total_signals": 12,
     "github_count": 12,
-    "huggingface_count": 8,
+    "huggingface_count": 0,
     "signals": [
+      {
+        "name": "unstablebuild/rune",
+        "url": "https://github.com/unstablebuild/rune",
+        "description": "the development environment for pros",
+        "stars": 389,
+        "forks": 20,
+        "language": "Go",
+        "topics": [
+          "agent-orchestration",
+          "ai",
+          "cli",
+          "coding-agents",
+          "developer-tool"
+        ],
+        "created_at": "2026-09-10",
+        "updated_at": "2026-09-12",
+        "days_old": 3,
+        "freshness": 100,
+        "is_new": true,
+        "star_growth_per_day": 129.7,
+        "heat_score": 120.8,
+        "source": "github",
+        "signal_type": "开源项目",
+        "analysis": {
+          "tech_heat": 98.4,
+          "social_heat": 0,
+          "matched_hotwords": [
+            "AI",
+            "AI"
+          ],
+          "matched_works_count": 0,
+          "matched_works_avg_likes": 0,
+          "opportunity": "🔵 蓝海机会",
+          "opportunity_level": "high",
+          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
+          "tech_terms": [
+            "agent-orchestration",
+            "coding-agents",
+            "developer-tool"
+          ]
+        },
+        "description_zh": "the development environment for pros",
+        "_gap_score": 98.4
+      },
+      {
+        "name": "Colafornia/short-video-generator-AI",
+        "url": "https://github.com/Colafornia/short-video-generator-AI",
+        "description": "Free open-source project designed for turning youtube-viedos into viral short videos. Highlight detection, subtitles, tr",
+        "stars": 634,
+        "forks": 111,
+        "language": "Python",
+        "topics": [
+          "ai",
+          "ai-generation",
+          "short-video",
+          "short-video-maker"
+        ],
+        "created_at": "2026-09-08",
+        "updated_at": "2026-09-12",
+        "days_old": 5,
+        "freshness": 80,
+        "is_new": true,
+        "star_growth_per_day": 126.8,
+        "heat_score": 112.8,
+        "source": "github",
+        "signal_type": "开源项目",
+        "analysis": {
+          "tech_heat": 95.7,
+          "social_heat": 0,
+          "matched_hotwords": [
+            "AI",
+            "AI"
+          ],
+          "matched_works_count": 0,
+          "matched_works_avg_likes": 0,
+          "opportunity": "🔵 蓝海机会",
+          "opportunity_level": "high",
+          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
+          "tech_terms": [
+            "short-video",
+            "open-source",
+            "youtube-viedos",
+            "ai-generation",
+            "short-video-generator-ai"
+          ]
+        },
+        "description_zh": "Free 开源 project designed for turning youtube-viedos into viral short videos. Highlight detection, subtitles, tr",
+        "_gap_score": 95.7
+      },
       {
         "name": "yudaprasetya007/routeVSCODE",
         "url": "https://github.com/yudaprasetya007/routeVSCODE",
@@ -33480,15 +33824,15 @@ window.DASHBOARD_DATA = {
         ],
         "created_at": "2026-09-10",
         "updated_at": "2026-09-11",
-        "days_old": 2,
+        "days_old": 3,
         "freshness": 100,
         "is_new": true,
-        "star_growth_per_day": 163.5,
-        "heat_score": 144.4,
+        "star_growth_per_day": 109.0,
+        "heat_score": 106.3,
         "source": "github",
         "signal_type": "开源项目",
         "analysis": {
-          "tech_heat": 100,
+          "tech_heat": 88.9,
           "social_heat": 0,
           "matched_hotwords": [
             "AI",
@@ -33503,255 +33847,15 @@ window.DASHBOARD_DATA = {
             "zero-reload"
           ]
         },
-        "description_zh": "⚡ 通过9Router零重载VSCode Copilot Chat的动态AI @ @ TERM34 @ @切换器和本地智能体",
-        "_gap_score": 100
-      },
-      {
-        "name": "Qwen/Qwen3.8-27B",
-        "url": "https://hf-mirror.com/Qwen/Qwen3.8-27B",
-        "description": "image-text-to-text",
-        "downloads": 7563763,
-        "likes": 14742,
-        "tags": [
-          "transformers",
-          "safetensors",
-          "qwen3_5",
-          "image-text-to-text",
-          "conversational"
-        ],
-        "pipeline": "image-text-to-text",
-        "last_modified": "",
-        "source": "huggingface",
-        "signal_type": "AI模型",
-        "analysis": {
-          "tech_heat": 100,
-          "social_heat": 0,
-          "matched_hotwords": [],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "🔵 蓝海机会",
-          "opportunity_level": "high",
-          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
-          "tech_terms": [
-            "image-text-to-text"
-          ]
-        },
-        "description_zh": "image-text-to-text",
-        "_gap_score": 100
-      },
-      {
-        "name": "ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-        "url": "https://hf-mirror.com/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-        "description": "image-text-to-text",
-        "downloads": 682187,
-        "likes": 827,
-        "tags": [
-          "gguf",
-          "gsq",
-          "rco",
-          "quantization",
-          "mixed-precision"
-        ],
-        "pipeline": "image-text-to-text",
-        "last_modified": "",
-        "source": "huggingface",
-        "signal_type": "AI模型",
-        "analysis": {
-          "tech_heat": 100,
-          "social_heat": 0,
-          "matched_hotwords": [],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "🔵 蓝海机会",
-          "opportunity_level": "high",
-          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
-          "tech_terms": [
-            "mixed-precision",
-            "ista-daslab",
-            "gsq-rco-gguf",
-            "image-text-to-text"
-          ]
-        },
-        "description_zh": "image-text-to-text",
-        "_gap_score": 100
-      },
-      {
-        "name": "Lightricks/LTX-2.5",
-        "url": "https://hf-mirror.com/Lightricks/LTX-2.5",
-        "description": "image-to-video",
-        "downloads": 1669564,
-        "likes": 3470,
-        "tags": [
-          "diffusion-single-file",
-          "image-to-video",
-          "text-to-video",
-          "video-to-video",
-          "image-text-to-video"
-        ],
-        "pipeline": "image-to-video",
-        "last_modified": "",
-        "source": "huggingface",
-        "signal_type": "AI模型",
-        "analysis": {
-          "tech_heat": 100,
-          "social_heat": 0,
-          "matched_hotwords": [],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "🔵 蓝海机会",
-          "opportunity_level": "high",
-          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
-          "tech_terms": [
-            "video-to-video",
-            "diffusion-single-file",
-            "image-to-video",
-            "text-to-video",
-            "image-text-to-video"
-          ]
-        },
-        "description_zh": "image-to-video",
-        "_gap_score": 100
-      },
-      {
-        "name": "Colafornia/short-video-generator-AI",
-        "url": "https://github.com/Colafornia/short-video-generator-AI",
-        "description": "Free open-source project designed for turning youtube-viedos into viral short videos. Highlight detection, subtitles, tr",
-        "stars": 458,
-        "forks": 110,
-        "language": "Python",
-        "topics": [
-          "ai",
-          "ai-generation",
-          "short-video",
-          "short-video-maker"
-        ],
-        "created_at": "2026-09-08",
-        "updated_at": "2026-09-11",
-        "days_old": 4,
-        "freshness": 80,
-        "is_new": true,
-        "star_growth_per_day": 114.5,
-        "heat_score": 104.1,
-        "source": "github",
-        "signal_type": "开源项目",
-        "analysis": {
-          "tech_heat": 89.1,
-          "social_heat": 0,
-          "matched_hotwords": [
-            "AI",
-            "AI"
-          ],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "🔵 蓝海机会",
-          "opportunity_level": "high",
-          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
-          "tech_terms": [
-            "open-source",
-            "short-video-generator-ai",
-            "short-video-maker",
-            "ai-generation",
-            "youtube-viedos"
-          ]
-        },
-        "description_zh": "免费@ @ TERM24 @ @项目，旨在将youtube-viedos转化为病毒式短视频。高光检测、字幕、tr",
-        "_gap_score": 89.1
-      },
-      {
-        "name": "2akouwu/reverify",
-        "url": "https://github.com/2akouwu/reverify",
-        "description": "Stop your AI from making things up — it proposes, deterministic tools decide, every claim checked against ground truth w",
-        "stars": 1135,
-        "forks": 230,
-        "language": "Python",
-        "topics": [
-          "ai",
-          "ai-agents",
-          "ai-coding",
-          "anti-hallucination",
-          "binary-analysis"
-        ],
-        "created_at": "2026-08-31",
-        "updated_at": "2026-09-11",
-        "days_old": 12,
-        "freshness": 50,
-        "is_new": false,
-        "star_growth_per_day": 94.6,
-        "heat_score": 81.2,
-        "source": "github",
-        "signal_type": "开源项目",
-        "analysis": {
-          "tech_heat": 79.3,
-          "social_heat": 8,
-          "matched_hotwords": [
-            "AI",
-            "AI"
-          ],
-          "matched_works_count": 1,
-          "matched_works_avg_likes": 13,
-          "opportunity": "🔵 蓝海机会",
-          "opportunity_level": "high",
-          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
-          "tech_terms": [
-            "ai-agents",
-            "binary-analysis",
-            "anti-hallucination",
-            "ai-coding"
-          ]
-        },
-        "description_zh": "阻止你的人工智能编造事情—它提出，确定性工具决定，每个主张都根据地面真相进行检查",
-        "_gap_score": 71.3
-      },
-      {
-        "name": "unstablebuild/rune",
-        "url": "https://github.com/unstablebuild/rune",
-        "description": "the development environment for pros",
-        "stars": 176,
-        "forks": 8,
-        "language": "Go",
-        "topics": [
-          "agent-orchestration",
-          "ai",
-          "cli",
-          "coding-agents",
-          "developer-tool"
-        ],
-        "created_at": "2026-09-10",
-        "updated_at": "2026-09-11",
-        "days_old": 2,
-        "freshness": 100,
-        "is_new": true,
-        "star_growth_per_day": 88.0,
-        "heat_score": 91.6,
-        "source": "github",
-        "signal_type": "开源项目",
-        "analysis": {
-          "tech_heat": 77.4,
-          "social_heat": 0,
-          "matched_hotwords": [
-            "AI",
-            "AI"
-          ],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "🔵 蓝海机会",
-          "opportunity_level": "high",
-          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
-          "tech_terms": [
-            "coding-agents",
-            "developer-tool",
-            "agent-orchestration"
-          ]
-        },
-        "description_zh": "专业人士的开发环境",
-        "_gap_score": 77.4
+        "description_zh": "⚡ Zero-reload dynamic AI 模型 switcher & local proxy for VSCode Copilot Chat via 9Router",
+        "_gap_score": 88.9
       },
       {
         "name": "crwdla/tokentab",
         "url": "https://github.com/crwdla/tokentab",
         "description": "A CLI that reads Claude Code, Codex, and Gemini CLI session logs and works out how much they cost, by model, project, an",
-        "stars": 419,
-        "forks": 159,
+        "stars": 549,
+        "forks": 208,
         "language": "Python",
         "topics": [
           "ai",
@@ -33761,16 +33865,16 @@ window.DASHBOARD_DATA = {
           "token-usage"
         ],
         "created_at": "2026-09-07",
-        "updated_at": "2026-09-11",
-        "days_old": 5,
+        "updated_at": "2026-09-12",
+        "days_old": 6,
         "freshness": 80,
         "is_new": true,
-        "star_growth_per_day": 83.8,
-        "heat_score": 82.7,
+        "star_growth_per_day": 91.5,
+        "heat_score": 88.0,
         "source": "github",
         "signal_type": "开源项目",
         "analysis": {
-          "tech_heat": 75.8,
+          "tech_heat": 80.2,
           "social_heat": 0,
           "matched_hotwords": [
             "AI",
@@ -33788,15 +33892,147 @@ window.DASHBOARD_DATA = {
             "token-usage"
           ]
         },
-        "description_zh": "@ @ TERM4 @ @读取Claude Code、Codex和Gemini @ @ TERM4 @ @会话日志，并通过@ @ TERM34 @ @、project、",
-        "_gap_score": 75.8
+        "description_zh": "A CLI（命令行工具） that reads Claude Code, Codex, and Gemini CLI（命令行工具） session logs and works out how much they cost, by 模型, project, an",
+        "_gap_score": 80.2
+      },
+      {
+        "name": "2akouwu/reverify",
+        "url": "https://github.com/2akouwu/reverify",
+        "description": "Stop your AI from making things up — it proposes, deterministic tools decide, every claim checked against ground truth w",
+        "stars": 1178,
+        "forks": 233,
+        "language": "Python",
+        "topics": [
+          "ai",
+          "ai-agents",
+          "ai-coding",
+          "anti-hallucination",
+          "binary-analysis"
+        ],
+        "created_at": "2026-08-31",
+        "updated_at": "2026-09-12",
+        "days_old": 13,
+        "freshness": 50,
+        "is_new": false,
+        "star_growth_per_day": 90.6,
+        "heat_score": 78.4,
+        "source": "github",
+        "signal_type": "开源项目",
+        "analysis": {
+          "tech_heat": 77.8,
+          "social_heat": 8,
+          "matched_hotwords": [
+            "AI",
+            "AI"
+          ],
+          "matched_works_count": 1,
+          "matched_works_avg_likes": 13,
+          "opportunity": "🔵 蓝海机会",
+          "opportunity_level": "high",
+          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
+          "tech_terms": [
+            "ai-agents",
+            "binary-analysis",
+            "ai-coding",
+            "anti-hallucination"
+          ]
+        },
+        "description_zh": "Stop your AI from making things up — it proposes, deterministic tools decide, every claim checked against ground truth w",
+        "_gap_score": 69.8
+      },
+      {
+        "name": "kruzovic7/ai-data-extractor",
+        "url": "https://github.com/kruzovic7/ai-data-extractor",
+        "description": "Free open-source extractor for AI coding assistant chat histories. Supports Claude Code, Cursor, Windsurf, Aider, Cline/",
+        "stars": 163,
+        "forks": 58,
+        "language": "Python",
+        "topics": [
+          "ai",
+          "ai-data-extraction",
+          "claude-code",
+          "cursor"
+        ],
+        "created_at": "2026-09-11",
+        "updated_at": "2026-09-12",
+        "days_old": 2,
+        "freshness": 100,
+        "is_new": true,
+        "star_growth_per_day": 81.5,
+        "heat_score": 87.0,
+        "source": "github",
+        "signal_type": "开源项目",
+        "analysis": {
+          "tech_heat": 74.3,
+          "social_heat": 0,
+          "matched_hotwords": [
+            "AI",
+            "AI"
+          ],
+          "matched_works_count": 0,
+          "matched_works_avg_likes": 0,
+          "opportunity": "🔵 蓝海机会",
+          "opportunity_level": "high",
+          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
+          "tech_terms": [
+            "claude-code",
+            "open-source",
+            "ai-data-extraction",
+            "ai-data-extractor"
+          ]
+        },
+        "description_zh": "Free 开源 extractor for AI coding assistant chat histories. Supports Claude Code, Cursor, Windsurf, Aider, Cline/",
+        "_gap_score": 74.3
+      },
+      {
+        "name": "Xu123-Bob/Baize",
+        "url": "https://github.com/Xu123-Bob/Baize",
+        "description": "白泽 —— 中国古代神话中通晓万物的瑞兽，如今化身为 Vibe Coding 助手。  一个开源的 AI Coding Agent CLI，支持多后端（DeepSeek / OpenAI 兼容 / Ollama 本地），具备工具调用、技能加",
+        "stars": 67,
+        "forks": 0,
+        "language": "JavaScript",
+        "topics": [
+          "ai",
+          "ai-agent",
+          "ai-agents",
+          "ai-coding"
+        ],
+        "created_at": "2026-09-12",
+        "updated_at": "2026-09-12",
+        "days_old": 1,
+        "freshness": 100,
+        "is_new": true,
+        "star_growth_per_day": 67.0,
+        "heat_score": 76.9,
+        "source": "github",
+        "signal_type": "开源项目",
+        "analysis": {
+          "tech_heat": 64.4,
+          "social_heat": 8,
+          "matched_hotwords": [
+            "AI",
+            "AI"
+          ],
+          "matched_works_count": 1,
+          "matched_works_avg_likes": 13,
+          "opportunity": "🔵 蓝海机会",
+          "opportunity_level": "high",
+          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
+          "tech_terms": [
+            "ai-agent",
+            "ai-agents",
+            "ai-coding"
+          ]
+        },
+        "description_zh": "白泽 —— 中国古代神话中通晓万物的瑞兽，如今化身为 Vibe Coding 助手。  一个开源的 AI Coding Agent CLI，支持多后端（DeepSeek / OpenAI 兼容 / Ollama 本地），具备工具调用、技能加",
+        "_gap_score": 56.400000000000006
       },
       {
         "name": "xiaYuTian11/maskit",
         "url": "https://github.com/xiaYuTian11/maskit",
         "description": "数据面具 Data Maskit — 专为大模型打造的本地隐私脱敏网关（请求自动打码，回复流式还原；支持 Cursor / Claude Code / Codex / Pi 等任意可配 Base URL 工具）",
-        "stars": 146,
-        "forks": 24,
+        "stars": 191,
+        "forks": 36,
         "language": "Python",
         "topics": [
           "anthropic",
@@ -33806,16 +34042,16 @@ window.DASHBOARD_DATA = {
           "llm"
         ],
         "created_at": "2026-09-09",
-        "updated_at": "2026-09-11",
-        "days_old": 3,
-        "freshness": 100,
+        "updated_at": "2026-09-12",
+        "days_old": 4,
+        "freshness": 80,
         "is_new": true,
-        "star_growth_per_day": 48.7,
-        "heat_score": 64.1,
+        "star_growth_per_day": 47.8,
+        "heat_score": 57.4,
         "source": "github",
         "signal_type": "开源项目",
         "analysis": {
-          "tech_heat": 60.1,
+          "tech_heat": 57.3,
           "social_heat": 0,
           "matched_hotwords": [],
           "matched_works_count": 0,
@@ -33829,14 +34065,14 @@ window.DASHBOARD_DATA = {
           ]
         },
         "description_zh": "数据面具 Data Maskit — 专为大模型打造的本地隐私脱敏网关（请求自动打码，回复流式还原；支持 Cursor / Claude Code / Codex / Pi 等任意可配 Base URL 工具）",
-        "_gap_score": 60.1
+        "_gap_score": 57.3
       },
       {
         "name": "FankChen/tracecrate",
         "url": "https://github.com/FankChen/tracecrate",
         "description": "Local-first AI agent trace workbench. Inspect Claude Code, Codex and OTLP logs, compare runs, and export privacy-conscio",
-        "stars": 99,
-        "forks": 2,
+        "stars": 111,
+        "forks": 3,
         "language": "TypeScript",
         "topics": [
           "ai",
@@ -33847,15 +34083,15 @@ window.DASHBOARD_DATA = {
         ],
         "created_at": "2026-09-10",
         "updated_at": "2026-09-12",
-        "days_old": 2,
+        "days_old": 3,
         "freshness": 100,
         "is_new": true,
-        "star_growth_per_day": 49.5,
-        "heat_score": 64.7,
+        "star_growth_per_day": 37.0,
+        "heat_score": 55.9,
         "source": "github",
         "signal_type": "开源项目",
         "analysis": {
-          "tech_heat": 58.8,
+          "tech_heat": 54.0,
           "social_heat": 62.0,
           "matched_hotwords": [
             "AI",
@@ -33868,65 +34104,61 @@ window.DASHBOARD_DATA = {
           "opportunity_level": "high",
           "reason": "技术和社媒同时升温，抓紧跟进",
           "tech_terms": [
-            "claude-code",
-            "ai-agents",
             "local-first",
+            "ai-agents",
+            "claude-code",
             "privacy-conscio",
             "developer-tools"
           ]
         },
-        "description_zh": "本地优先AI @ @ TERM0 @ @跟踪工作台。检查Claude Code、Codex和OTLP日志，比较运行并导出隐私意识"
+        "description_zh": "Local-first AI Agent（智能体） trace workbench. Inspect Claude Code, Codex and OTLP logs, compare runs, and export privacy-conscio"
       },
       {
-        "name": "Albertchamberlain/Awesome-OKF",
-        "url": "https://github.com/Albertchamberlain/Awesome-OKF",
-        "description": "OKF (Open Knowledge Format) — curated catalog of tools, plugins, skills, proposals, and docs for agent-friendly knowledg",
-        "stars": 102,
+        "name": "LuxUmbra697/DSH-Desktop",
+        "url": "https://github.com/LuxUmbra697/DSH-Desktop",
+        "description": "把 DeepSeek Harness 装进一个独立窗口：双击即用、免终端、免浏览器，支持插件改造，载荷可裁到 210 MB（便携包 74.8 MB），内置运行环境探测与 DSH 就地更新。",
+        "stars": 51,
         "forks": 2,
-        "language": "Python",
+        "language": "C#",
         "topics": [
-          "agent-memory",
-          "agent-skills",
-          "ai-agents",
-          "ai-memory",
-          "awesome"
+          "agent",
+          "cordis",
+          "deepseek",
+          "deepseek-harness",
+          "desktop-app"
         ],
-        "created_at": "2026-09-07",
-        "updated_at": "2026-09-11",
-        "days_old": 5,
-        "freshness": 80,
+        "created_at": "2026-09-11",
+        "updated_at": "2026-09-12",
+        "days_old": 2,
+        "freshness": 100,
         "is_new": true,
-        "star_growth_per_day": 20.4,
-        "heat_score": 38.3,
+        "star_growth_per_day": 25.5,
+        "heat_score": 47.8,
         "source": "github",
         "signal_type": "开源项目",
         "analysis": {
-          "tech_heat": 43.1,
-          "social_heat": 16,
-          "matched_hotwords": [
-            "AI",
-            "AI"
-          ],
-          "matched_works_count": 2,
-          "matched_works_avg_likes": 20,
+          "tech_heat": 45.8,
+          "social_heat": 0,
+          "matched_hotwords": [],
+          "matched_works_count": 0,
+          "matched_works_avg_likes": 0,
           "opportunity": "🔵 蓝海机会",
           "opportunity_level": "high",
           "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
           "tech_terms": [
-            "ai-agents",
-            "awesome-okf",
-            "ai-memory",
-            "agent-memory",
-            "agent-friendly"
+            "dsh-desktop",
+            "deepseek-harness",
+            "desktop-app"
           ]
         },
-        "description_zh": "OKF （开放知识格式） —为@ @ TERM0 @ @友好型知识提供精心策划的工具目录、@ @ TERM31 @ @、技能、提案和文档"
+        "description_zh": "把 DeepSeek Harness 装进一个独立窗口：双击即用、免终端、免浏览器，支持插件改造，载荷可裁到 210 MB（便携包 74.8 MB），内置运行环境探测与 DSH 就地更新。",
+        "_gap_score": 45.8
       },
       {
         "name": "Loopera-ai/loopera",
         "url": "https://github.com/Loopera-ai/loopera",
         "description": "面向基本面因子研究的智能体-A hypothesis-driven AI agent for fundamental factor research, with evidence-gated validation and research ",
-        "stars": 79,
+        "stars": 117,
         "forks": 9,
         "language": null,
         "topics": [
@@ -33935,16 +34167,16 @@ window.DASHBOARD_DATA = {
           "quant"
         ],
         "created_at": "2026-09-08",
-        "updated_at": "2026-09-11",
-        "days_old": 4,
+        "updated_at": "2026-09-12",
+        "days_old": 5,
         "freshness": 80,
         "is_new": true,
-        "star_growth_per_day": 19.8,
-        "heat_score": 37.8,
+        "star_growth_per_day": 23.4,
+        "heat_score": 40.4,
         "source": "github",
         "signal_type": "开源项目",
         "analysis": {
-          "tech_heat": 41.7,
+          "tech_heat": 44.9,
           "social_heat": 62.0,
           "matched_hotwords": [
             "AI",
@@ -33958,315 +34190,66 @@ window.DASHBOARD_DATA = {
           "reason": "技术和社媒同时升温，抓紧跟进",
           "tech_terms": [
             "ai-agent",
+            "evidence-gated",
             "loopera-ai",
-            "hypothesis-driven",
-            "evidence-gated"
+            "hypothesis-driven"
           ]
         },
         "description_zh": "面向基本面因子研究的智能体-A hypothesis-driven AI agent for fundamental factor research, with evidence-gated validation and research "
       },
       {
-        "name": "paveldevyatov/refund-anything-ai-prompt",
-        "url": "https://github.com/paveldevyatov/refund-anything-ai-prompt",
-        "description": "AI prompt that gets your money back — subscriptions, digital purchases, bookings. Polite letter first, legal escalation ",
-        "stars": 73,
-        "forks": 3,
-        "language": null,
-        "topics": [
-          "ai",
-          "chargeback",
-          "chatgpt",
-          "claude",
-          "consumer-rights"
-        ],
-        "created_at": "2026-09-08",
-        "updated_at": "2026-09-11",
-        "days_old": 4,
-        "freshness": 80,
-        "is_new": true,
-        "star_growth_per_day": 18.2,
-        "heat_score": 36.8,
-        "source": "github",
-        "signal_type": "开源项目",
-        "analysis": {
-          "tech_heat": 40.7,
-          "social_heat": 0,
-          "matched_hotwords": [
-            "AI",
-            "AI"
-          ],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "🔵 蓝海机会",
-          "opportunity_level": "high",
-          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
-          "tech_terms": [
-            "consumer-rights",
-            "refund-anything-ai-prompt"
-          ]
-        },
-        "description_zh": "AI @ @ TERM15 @ @让您获得退款--订阅、数字购买、预订。礼貌信件第一，法律升级"
-      },
-      {
-        "name": "kruzovic7/ai-data-extractor",
-        "url": "https://github.com/kruzovic7/ai-data-extractor",
-        "description": "Free open-source extractor for AI coding assistant chat histories. Supports Claude Code, Cursor, Windsurf, Aider, Cline/",
-        "stars": 17,
+        "name": "kresogalic8/unwatched",
+        "url": "https://github.com/kresogalic8/unwatched",
+        "description": "Unwatched: an island of AI citizens with free will, owned by people who write letters, running on real time while nobody",
+        "stars": 25,
         "forks": 4,
-        "language": "Python",
+        "language": "TypeScript",
         "topics": [
-          "ai",
-          "ai-data-extraction",
-          "claude-code",
-          "cursor"
+          "ai-agents",
+          "claude",
+          "generative-agents",
+          "llm",
+          "multi-agent"
         ],
         "created_at": "2026-09-11",
-        "updated_at": "2026-09-11",
-        "days_old": 1,
-        "freshness": 100,
-        "is_new": true,
-        "star_growth_per_day": 17.0,
-        "heat_score": 41.9,
-        "source": "github",
-        "signal_type": "开源项目",
-        "analysis": {
-          "tech_heat": 37.4,
-          "social_heat": 0,
-          "matched_hotwords": [
-            "AI",
-            "AI"
-          ],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "🔵 蓝海机会",
-          "opportunity_level": "high",
-          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
-          "tech_terms": [
-            "ai-data-extractor",
-            "claude-code",
-            "open-source",
-            "ai-data-extraction"
-          ]
-        },
-        "description_zh": "免费@ @ TERM24 @ @提取器，用于AI编码助理聊天历史记录。支持Claude Code、Cursor、Windsurf、Aider、Cline/"
-      },
-      {
-        "name": "handyutils/sctxx",
-        "url": "https://github.com/handyutils/sctxx",
-        "description": "sctxx — coding agent Session Context Extractor. standalone, agent-agnostic CLI (plus a thin Agent Skill wrapper) that re",
-        "stars": 18,
-        "forks": 13,
-        "language": "Rust",
-        "topics": [
-          "agent",
-          "cl",
-          "coding",
-          "compactio",
-          "context"
-        ],
-        "created_at": "2026-09-10",
-        "updated_at": "2026-09-11",
+        "updated_at": "2026-09-12",
         "days_old": 2,
         "freshness": 100,
         "is_new": true,
-        "star_growth_per_day": 9.0,
-        "heat_score": 36.3,
+        "star_growth_per_day": 12.5,
+        "heat_score": 38.8,
         "source": "github",
         "signal_type": "开源项目",
         "analysis": {
-          "tech_heat": 34.3,
-          "social_heat": 0,
-          "matched_hotwords": [],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "👀 观察中",
-          "opportunity_level": "medium",
-          "reason": "热度中等，可持续观察",
-          "tech_terms": [
-            "agent-agnostic"
-          ]
-        },
-        "description_zh": "sctxx —编码@ @ TERM0 @ @会话上下文提取器。独立的， @ @ TERM0 @ @ -agnostic @ @ TERM4 @ @ （加上一个薄的@ @ TERM0 @ @技能包装器）"
-      },
-      {
-        "name": "deepseek-ai/DeepSeek-V4.1-Flash",
-        "url": "https://hf-mirror.com/deepseek-ai/DeepSeek-V4.1-Flash",
-        "description": "image-text-to-text",
-        "downloads": 75774,
-        "likes": 1752,
-        "tags": [
-          "transformers",
-          "safetensors",
-          "deepseek_v41",
-          "text-generation",
-          "image-text-to-text"
-        ],
-        "pipeline": "image-text-to-text",
-        "last_modified": "",
-        "source": "huggingface",
-        "signal_type": "AI模型",
-        "analysis": {
-          "tech_heat": 32.7,
-          "social_heat": 0,
+          "tech_heat": 37.3,
+          "social_heat": 24,
           "matched_hotwords": [
             "AI",
             "AI"
           ],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "👀 观察中",
-          "opportunity_level": "medium",
-          "reason": "热度中等，可持续观察",
+          "matched_works_count": 3,
+          "matched_works_avg_likes": 9,
+          "opportunity": "🔵 蓝海机会",
+          "opportunity_level": "high",
+          "reason": "技术热度高但社媒内容少，提前布局可抢占流量",
           "tech_terms": [
-            "deepseek-ai",
-            "image-text-to-text",
-            "text-generation"
+            "ai-agents",
+            "generative-agents",
+            "multi-agent"
           ]
         },
-        "description_zh": "image-text-to-text"
-      },
-      {
-        "name": "openbmb/MiniCPM5-2B",
-        "url": "https://hf-mirror.com/openbmb/MiniCPM5-2B",
-        "description": "text-generation",
-        "downloads": 67550,
-        "likes": 1186,
-        "tags": [
-          "transformers",
-          "safetensors",
-          "llama",
-          "text-generation",
-          "minicpm"
-        ],
-        "pipeline": "text-generation",
-        "last_modified": "",
-        "source": "huggingface",
-        "signal_type": "AI模型",
-        "analysis": {
-          "tech_heat": 25.4,
-          "social_heat": 0,
-          "matched_hotwords": [],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "👀 观察中",
-          "opportunity_level": "medium",
-          "reason": "热度中等，可持续观察",
-          "tech_terms": [
-            "text-generation"
-          ]
-        },
-        "description_zh": "Text Generation"
-      },
-      {
-        "name": "XHToken/Spark-X2.5-4B",
-        "url": "https://hf-mirror.com/XHToken/Spark-X2.5-4B",
-        "description": "text-generation",
-        "downloads": 17712,
-        "likes": 1094,
-        "tags": [
-          "transformers",
-          "safetensors",
-          "spark2_5",
-          "text-generation",
-          "llm"
-        ],
-        "pipeline": "text-generation",
-        "last_modified": "",
-        "source": "huggingface",
-        "signal_type": "AI模型",
-        "analysis": {
-          "tech_heat": 14.5,
-          "social_heat": 0,
-          "matched_hotwords": [],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "👀 观察中",
-          "opportunity_level": "medium",
-          "reason": "热度中等，可持续观察",
-          "tech_terms": [
-            "text-generation"
-          ]
-        },
-        "description_zh": "Text Generation"
-      },
-      {
-        "name": "nex-agi/Nex-N2.5-Pro",
-        "url": "https://hf-mirror.com/nex-agi/Nex-N2.5-Pro",
-        "description": "text-generation",
-        "downloads": 12260,
-        "likes": 593,
-        "tags": [
-          "transformers",
-          "safetensors",
-          "qwen3_5_moe",
-          "image-text-to-text",
-          "text-generation"
-        ],
-        "pipeline": "text-generation",
-        "last_modified": "",
-        "source": "huggingface",
-        "signal_type": "AI模型",
-        "analysis": {
-          "tech_heat": 8.4,
-          "social_heat": 0,
-          "matched_hotwords": [],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "👀 观察中",
-          "opportunity_level": "medium",
-          "reason": "热度中等，可持续观察",
-          "tech_terms": [
-            "nex-agi",
-            "image-text-to-text",
-            "text-generation"
-          ]
-        },
-        "description_zh": "Text Generation"
-      },
-      {
-        "name": "nex-agi/Nex-N2.5-mini",
-        "url": "https://hf-mirror.com/nex-agi/Nex-N2.5-mini",
-        "description": "text-generation",
-        "downloads": 3121,
-        "likes": 685,
-        "tags": [
-          "transformers",
-          "safetensors",
-          "qwen3_5_moe",
-          "image-text-to-text",
-          "text-generation"
-        ],
-        "pipeline": "text-generation",
-        "last_modified": "",
-        "source": "huggingface",
-        "signal_type": "AI模型",
-        "analysis": {
-          "tech_heat": 7.5,
-          "social_heat": 0,
-          "matched_hotwords": [],
-          "matched_works_count": 0,
-          "matched_works_avg_likes": 0,
-          "opportunity": "👀 观察中",
-          "opportunity_level": "medium",
-          "reason": "热度中等，可持续观察",
-          "tech_terms": [
-            "nex-agi",
-            "image-text-to-text",
-            "text-generation"
-          ]
-        },
-        "description_zh": "Text Generation"
+        "description_zh": "Unwatched: an island of AI citizens with free will, owned by people who write letters, running on 实时 while nobody"
       }
     ],
     "forecast_topics": [
       {
-        "title": "GitHub 2天327星星，这个routeVSCODE正在悄悄改变AI编程",
+        "title": "GitHub 3天389星星，这个rune正在悄悄改变AI Agent开发",
         "hook": "今天GitHub最值得关注的项目，3分钟教你装上并用起来",
         "signal_source": "github",
-        "signal_name": "yudaprasetya007/routeVSCODE",
-        "signal_url": "https://github.com/yudaprasetya007/routeVSCODE",
+        "signal_name": "unstablebuild/rune",
+        "signal_url": "https://github.com/unstablebuild/rune",
         "opportunity": "🔵 蓝海机会",
-        "tech_heat": 100,
+        "tech_heat": 98.4,
         "social_heat": 0,
         "category": "前瞻选题",
         "target_persona": {
@@ -34296,7 +34279,111 @@ window.DASHBOARD_DATA = {
           ],
           "category": "AI大类",
           "proportion": 49.3,
-          "heat_score": 1646695,
+          "heat_score": 1646761,
+          "related_keywords": [
+            "AI",
+            "AI",
+            "AI提示词",
+            "AI提示词",
+            "豆包AI"
+          ]
+        },
+        "priority": "高",
+        "keyword": "rune",
+        "platform": "双平台",
+        "audience": "技术极客",
+        "is_forecast": true
+      },
+      {
+        "title": "刚发现的short-video-generator-AI，AI视频效率提升10倍，知道的人还不多",
+        "hook": "我测完发现最值钱的不是功能，是这个思路",
+        "signal_source": "github",
+        "signal_name": "Colafornia/short-video-generator-AI",
+        "signal_url": "https://github.com/Colafornia/short-video-generator-AI",
+        "opportunity": "🔵 蓝海机会",
+        "tech_heat": 95.7,
+        "social_heat": 0,
+        "category": "前瞻选题",
+        "target_persona": {
+          "name": "泛AI关注者",
+          "traits": [
+            "科技爱好者",
+            "吃瓜群众",
+            "投资者",
+            "学生"
+          ],
+          "age": "16-45岁",
+          "gender": "男性偏多(60%)",
+          "needs": [
+            "AI资讯",
+            "产品测评",
+            "行业趋势",
+            "入门科普"
+          ],
+          "content_pref": "资讯速递+产品测评+趋势解读",
+          "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
+          "monetization": "广告(品牌合作)、私域(AI社群)",
+          "pain_points": [
+            "信息过载",
+            "真假难辨",
+            "跟不上更新",
+            "不知道学啥"
+          ],
+          "category": "AI大类",
+          "proportion": 49.3,
+          "heat_score": 1646761,
+          "related_keywords": [
+            "AI",
+            "AI",
+            "AI提示词",
+            "AI提示词",
+            "豆包AI"
+          ]
+        },
+        "priority": "高",
+        "keyword": "short-video-generator-AI",
+        "platform": "双平台",
+        "audience": "技术极客",
+        "is_forecast": true
+      },
+      {
+        "title": "routeVSCODE深度测评：327星星的背后，是这个被低估的能力",
+        "hook": "别人还在手动重复劳动，你已经在自动化了，这就是差距",
+        "signal_source": "github",
+        "signal_name": "yudaprasetya007/routeVSCODE",
+        "signal_url": "https://github.com/yudaprasetya007/routeVSCODE",
+        "opportunity": "🔵 蓝海机会",
+        "tech_heat": 88.9,
+        "social_heat": 0,
+        "category": "前瞻选题",
+        "target_persona": {
+          "name": "泛AI关注者",
+          "traits": [
+            "科技爱好者",
+            "吃瓜群众",
+            "投资者",
+            "学生"
+          ],
+          "age": "16-45岁",
+          "gender": "男性偏多(60%)",
+          "needs": [
+            "AI资讯",
+            "产品测评",
+            "行业趋势",
+            "入门科普"
+          ],
+          "content_pref": "资讯速递+产品测评+趋势解读",
+          "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
+          "monetization": "广告(品牌合作)、私域(AI社群)",
+          "pain_points": [
+            "信息过载",
+            "真假难辨",
+            "跟不上更新",
+            "不知道学啥"
+          ],
+          "category": "AI大类",
+          "proportion": 49.3,
+          "heat_score": 1646761,
           "related_keywords": [
             "AI",
             "AI",
@@ -34312,169 +34399,13 @@ window.DASHBOARD_DATA = {
         "is_forecast": true
       },
       {
-        "title": "刚发现的Qwen3.8-27B，AI绘画效率提升10倍，知道的人还不多",
-        "hook": "我测完发现最值钱的不是功能，是这个思路",
-        "signal_source": "huggingface",
-        "signal_name": "Qwen/Qwen3.8-27B",
-        "signal_url": "https://hf-mirror.com/Qwen/Qwen3.8-27B",
-        "opportunity": "🔵 蓝海机会",
-        "tech_heat": 100,
-        "social_heat": 0,
-        "category": "前瞻选题",
-        "target_persona": {
-          "name": "泛AI关注者",
-          "traits": [
-            "科技爱好者",
-            "吃瓜群众",
-            "投资者",
-            "学生"
-          ],
-          "age": "16-45岁",
-          "gender": "男性偏多(60%)",
-          "needs": [
-            "AI资讯",
-            "产品测评",
-            "行业趋势",
-            "入门科普"
-          ],
-          "content_pref": "资讯速递+产品测评+趋势解读",
-          "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
-          "monetization": "广告(品牌合作)、私域(AI社群)",
-          "pain_points": [
-            "信息过载",
-            "真假难辨",
-            "跟不上更新",
-            "不知道学啥"
-          ],
-          "category": "AI大类",
-          "proportion": 49.3,
-          "heat_score": 1646695,
-          "related_keywords": [
-            "AI",
-            "AI",
-            "AI提示词",
-            "AI提示词",
-            "豆包AI"
-          ]
-        },
-        "priority": "高",
-        "keyword": "Qwen3.8-27B",
-        "platform": "双平台",
-        "audience": "技术极客",
-        "is_forecast": true
-      },
-      {
-        "title": "Qwen3.8-27B-GSQ-RCO-GGUF深度测评：0星星的背后，是这个被低估的能力",
-        "hook": "别人还在手动重复劳动，你已经在自动化了，这就是差距",
-        "signal_source": "huggingface",
-        "signal_name": "ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-        "signal_url": "https://hf-mirror.com/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-        "opportunity": "🔵 蓝海机会",
-        "tech_heat": 100,
-        "social_heat": 0,
-        "category": "前瞻选题",
-        "target_persona": {
-          "name": "泛AI关注者",
-          "traits": [
-            "科技爱好者",
-            "吃瓜群众",
-            "投资者",
-            "学生"
-          ],
-          "age": "16-45岁",
-          "gender": "男性偏多(60%)",
-          "needs": [
-            "AI资讯",
-            "产品测评",
-            "行业趋势",
-            "入门科普"
-          ],
-          "content_pref": "资讯速递+产品测评+趋势解读",
-          "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
-          "monetization": "广告(品牌合作)、私域(AI社群)",
-          "pain_points": [
-            "信息过载",
-            "真假难辨",
-            "跟不上更新",
-            "不知道学啥"
-          ],
-          "category": "AI大类",
-          "proportion": 49.3,
-          "heat_score": 1646695,
-          "related_keywords": [
-            "AI",
-            "AI",
-            "AI提示词",
-            "AI提示词",
-            "豆包AI"
-          ]
-        },
-        "priority": "高",
-        "keyword": "Qwen3.8-27B-GSQ-RCO-GGUF",
-        "platform": "双平台",
-        "audience": "技术极客",
-        "is_forecast": true
-      },
-      {
-        "title": "别再用笨办法了，LTX-2.5把AI视频自动化了",
-        "hook": "免费但值钱：LTX-2.5的正确打开方式，看完你会回来感谢我",
-        "signal_source": "huggingface",
-        "signal_name": "Lightricks/LTX-2.5",
-        "signal_url": "https://hf-mirror.com/Lightricks/LTX-2.5",
-        "opportunity": "🔵 蓝海机会",
-        "tech_heat": 100,
-        "social_heat": 0,
-        "category": "前瞻选题",
-        "target_persona": {
-          "name": "泛AI关注者",
-          "traits": [
-            "科技爱好者",
-            "吃瓜群众",
-            "投资者",
-            "学生"
-          ],
-          "age": "16-45岁",
-          "gender": "男性偏多(60%)",
-          "needs": [
-            "AI资讯",
-            "产品测评",
-            "行业趋势",
-            "入门科普"
-          ],
-          "content_pref": "资讯速递+产品测评+趋势解读",
-          "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
-          "monetization": "广告(品牌合作)、私域(AI社群)",
-          "pain_points": [
-            "信息过载",
-            "真假难辨",
-            "跟不上更新",
-            "不知道学啥"
-          ],
-          "category": "AI大类",
-          "proportion": 49.3,
-          "heat_score": 1646695,
-          "related_keywords": [
-            "AI",
-            "AI",
-            "AI提示词",
-            "AI提示词",
-            "豆包AI"
-          ]
-        },
-        "priority": "高",
-        "keyword": "LTX-2.5",
-        "platform": "双平台",
-        "audience": "技术极客",
-        "is_forecast": true
-      },
-      {
-        "title": "技术圈都在讨论short-video-generator-AI，但90%的人用错了方式",
-        "hook": "这个项目458星星只用了4天，我整理了完整的上手教程",
+        "title": "别再用笨办法了，tokentab把AI编程自动化了",
+        "hook": "免费但值钱：tokentab的正确打开方式，看完你会回来感谢我",
         "signal_source": "github",
-        "signal_name": "Colafornia/short-video-generator-AI",
-        "signal_url": "https://github.com/Colafornia/short-video-generator-AI",
+        "signal_name": "crwdla/tokentab",
+        "signal_url": "https://github.com/crwdla/tokentab",
         "opportunity": "🔵 蓝海机会",
-        "tech_heat": 89.1,
+        "tech_heat": 80.2,
         "social_heat": 0,
         "category": "前瞻选题",
         "target_persona": {
@@ -34504,7 +34435,7 @@ window.DASHBOARD_DATA = {
           ],
           "category": "AI大类",
           "proportion": 49.3,
-          "heat_score": 1646695,
+          "heat_score": 1646761,
           "related_keywords": [
             "AI",
             "AI",
@@ -34514,7 +34445,59 @@ window.DASHBOARD_DATA = {
           ]
         },
         "priority": "高",
-        "keyword": "short-video-generator-AI",
+        "keyword": "tokentab",
+        "platform": "双平台",
+        "audience": "技术极客",
+        "is_forecast": true
+      },
+      {
+        "title": "技术圈都在讨论reverify，但90%的人用错了方式",
+        "hook": "这个项目1178星星只用了13天，我整理了完整的上手教程",
+        "signal_source": "github",
+        "signal_name": "2akouwu/reverify",
+        "signal_url": "https://github.com/2akouwu/reverify",
+        "opportunity": "🔵 蓝海机会",
+        "tech_heat": 77.8,
+        "social_heat": 8,
+        "category": "前瞻选题",
+        "target_persona": {
+          "name": "泛AI关注者",
+          "traits": [
+            "科技爱好者",
+            "吃瓜群众",
+            "投资者",
+            "学生"
+          ],
+          "age": "16-45岁",
+          "gender": "男性偏多(60%)",
+          "needs": [
+            "AI资讯",
+            "产品测评",
+            "行业趋势",
+            "入门科普"
+          ],
+          "content_pref": "资讯速递+产品测评+趋势解读",
+          "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
+          "monetization": "广告(品牌合作)、私域(AI社群)",
+          "pain_points": [
+            "信息过载",
+            "真假难辨",
+            "跟不上更新",
+            "不知道学啥"
+          ],
+          "category": "AI大类",
+          "proportion": 49.3,
+          "heat_score": 1646761,
+          "related_keywords": [
+            "AI",
+            "AI",
+            "AI提示词",
+            "AI提示词",
+            "豆包AI"
+          ]
+        },
+        "priority": "高",
+        "keyword": "reverify",
         "platform": "双平台",
         "audience": "技术极客",
         "is_forecast": true
@@ -34522,15 +34505,15 @@ window.DASHBOARD_DATA = {
     ],
     "info_gap_topics": [
       {
-        "title": "GitHub2天327星星，这个routeVSCODE让AI编程效率翻倍，抖音还没人讲",
+        "title": "GitHub3天389星星，这个rune让AI Agent效率翻倍，抖音还没人讲",
         "hook": "99%的人还不知道这个工具，我花了一下午踩坑，3分钟教你上手",
         "signal_source": "github",
-        "signal_name": "yudaprasetya007/routeVSCODE",
-        "signal_url": "https://github.com/yudaprasetya007/routeVSCODE",
+        "signal_name": "unstablebuild/rune",
+        "signal_url": "https://github.com/unstablebuild/rune",
         "opportunity": "🔵 蓝海机会",
-        "tech_heat": 100,
+        "tech_heat": 98.4,
         "social_heat": 0,
-        "info_gap_score": 100,
+        "info_gap_score": 98.4,
         "category": "信息差选题",
         "target_persona": {
           "name": "泛AI关注者",
@@ -34559,7 +34542,133 @@ window.DASHBOARD_DATA = {
           ],
           "category": "AI大类",
           "proportion": 49.3,
-          "heat_score": 1646695,
+          "heat_score": 1646761,
+          "related_keywords": [
+            "AI",
+            "AI",
+            "AI提示词",
+            "AI提示词",
+            "豆包AI"
+          ]
+        },
+        "priority": "高",
+        "keyword": "rune",
+        "platform": "双平台",
+        "audience": "技术极客",
+        "is_forecast": true,
+        "is_info_gap": true,
+        "action_angle": "安装配置+第一个工作流搭建",
+        "content_format": "实操教程+工作流展示",
+        "monetization_hint": "完整工作流放私域，视频展示结果和片段",
+        "conversion_path": {
+          "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
+          "product_match": "AI工具工作流系列（AI Agent）",
+          "conversion_potential": "高",
+          "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
+        }
+      },
+      {
+        "title": "刚冒出来的short-video-generator-AI，AI视频的玩法全变了，现在学就是吃第一波红利",
+        "hook": "技术圈已经在讨论了，抖音还没火，这就是你的机会",
+        "signal_source": "github",
+        "signal_name": "Colafornia/short-video-generator-AI",
+        "signal_url": "https://github.com/Colafornia/short-video-generator-AI",
+        "opportunity": "🔵 蓝海机会",
+        "tech_heat": 95.7,
+        "social_heat": 0,
+        "info_gap_score": 95.7,
+        "category": "信息差选题",
+        "target_persona": {
+          "name": "泛AI关注者",
+          "traits": [
+            "科技爱好者",
+            "吃瓜群众",
+            "投资者",
+            "学生"
+          ],
+          "age": "16-45岁",
+          "gender": "男性偏多(60%)",
+          "needs": [
+            "AI资讯",
+            "产品测评",
+            "行业趋势",
+            "入门科普"
+          ],
+          "content_pref": "资讯速递+产品测评+趋势解读",
+          "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
+          "monetization": "广告(品牌合作)、私域(AI社群)",
+          "pain_points": [
+            "信息过载",
+            "真假难辨",
+            "跟不上更新",
+            "不知道学啥"
+          ],
+          "category": "AI大类",
+          "proportion": 49.3,
+          "heat_score": 1646761,
+          "related_keywords": [
+            "AI",
+            "AI",
+            "AI提示词",
+            "AI提示词",
+            "豆包AI"
+          ]
+        },
+        "priority": "高",
+        "keyword": "short-video-generator-AI",
+        "platform": "双平台",
+        "audience": "技术极客",
+        "is_forecast": true,
+        "is_info_gap": true,
+        "action_angle": "接入现有AI工具链的完整方案",
+        "content_format": "实操教程+工作流展示",
+        "monetization_hint": "完整工作流放私域，视频展示结果和片段",
+        "conversion_path": {
+          "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
+          "product_match": "AI工具工作流系列（AI视频）",
+          "conversion_potential": "高",
+          "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
+        }
+      },
+      {
+        "title": "routeVSCODE深度拆解：技术圈已经炸了，社媒还没人讲，信息差就是钱",
+        "hook": "别人还在写提示词，你已经在用routeVSCODE搭工作流了",
+        "signal_source": "github",
+        "signal_name": "yudaprasetya007/routeVSCODE",
+        "signal_url": "https://github.com/yudaprasetya007/routeVSCODE",
+        "opportunity": "🔵 蓝海机会",
+        "tech_heat": 88.9,
+        "social_heat": 0,
+        "info_gap_score": 88.9,
+        "category": "信息差选题",
+        "target_persona": {
+          "name": "泛AI关注者",
+          "traits": [
+            "科技爱好者",
+            "吃瓜群众",
+            "投资者",
+            "学生"
+          ],
+          "age": "16-45岁",
+          "gender": "男性偏多(60%)",
+          "needs": [
+            "AI资讯",
+            "产品测评",
+            "行业趋势",
+            "入门科普"
+          ],
+          "content_pref": "资讯速递+产品测评+趋势解读",
+          "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
+          "monetization": "广告(品牌合作)、私域(AI社群)",
+          "pain_points": [
+            "信息过载",
+            "真假难辨",
+            "跟不上更新",
+            "不知道学啥"
+          ],
+          "category": "AI大类",
+          "proportion": 49.3,
+          "heat_score": 1646761,
           "related_keywords": [
             "AI",
             "AI",
@@ -34574,7 +34683,7 @@ window.DASHBOARD_DATA = {
         "audience": "技术极客",
         "is_forecast": true,
         "is_info_gap": true,
-        "action_angle": "安装配置+第一个工作流搭建",
+        "action_angle": "从零到一的实操教程（避坑版）",
         "content_format": "实操教程+工作流展示",
         "monetization_hint": "完整工作流放私域，视频展示结果和片段",
         "conversion_path": {
@@ -34585,15 +34694,15 @@ window.DASHBOARD_DATA = {
         }
       },
       {
-        "title": "刚冒出来的Qwen3.8-27B，AI绘画的玩法全变了，现在学就是吃第一波红利",
-        "hook": "技术圈已经在讨论了，抖音还没火，这就是你的机会",
-        "signal_source": "huggingface",
-        "signal_name": "Qwen/Qwen3.8-27B",
-        "signal_url": "https://hf-mirror.com/Qwen/Qwen3.8-27B",
+        "title": "别再手动重复操作了，tokentab已经帮你自动化，省下来的时间都是钱",
+        "hook": "这个项目6天549星星，我测完发现最值钱的不是功能，是思路",
+        "signal_source": "github",
+        "signal_name": "crwdla/tokentab",
+        "signal_url": "https://github.com/crwdla/tokentab",
         "opportunity": "🔵 蓝海机会",
-        "tech_heat": 100,
+        "tech_heat": 80.2,
         "social_heat": 0,
-        "info_gap_score": 100,
+        "info_gap_score": 80.2,
         "category": "信息差选题",
         "target_persona": {
           "name": "泛AI关注者",
@@ -34622,7 +34731,7 @@ window.DASHBOARD_DATA = {
           ],
           "category": "AI大类",
           "proportion": 49.3,
-          "heat_score": 1646695,
+          "heat_score": 1646761,
           "related_keywords": [
             "AI",
             "AI",
@@ -34632,133 +34741,7 @@ window.DASHBOARD_DATA = {
           ]
         },
         "priority": "高",
-        "keyword": "Qwen3.8-27B",
-        "platform": "双平台",
-        "audience": "技术极客",
-        "is_forecast": true,
-        "is_info_gap": true,
-        "action_angle": "接入现有AI工具链的完整方案",
-        "content_format": "实操教程+工作流展示",
-        "monetization_hint": "完整工作流放私域，视频展示结果和片段",
-        "conversion_path": {
-          "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-          "product_match": "AI工具工作流系列（AI绘画）",
-          "conversion_potential": "高",
-          "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
-        }
-      },
-      {
-        "title": "Qwen3.8-27B-GSQ-RCO-GGUF深度拆解：技术圈已经炸了，社媒还没人讲，信息差就是钱",
-        "hook": "别人还在写提示词，你已经在用Qwen3.8-27B-GSQ-RCO-GGUF搭工作流了",
-        "signal_source": "huggingface",
-        "signal_name": "ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-        "signal_url": "https://hf-mirror.com/ISTA-DASLab/Qwen3.8-27B-GSQ-RCO-GGUF",
-        "opportunity": "🔵 蓝海机会",
-        "tech_heat": 100,
-        "social_heat": 0,
-        "info_gap_score": 100,
-        "category": "信息差选题",
-        "target_persona": {
-          "name": "泛AI关注者",
-          "traits": [
-            "科技爱好者",
-            "吃瓜群众",
-            "投资者",
-            "学生"
-          ],
-          "age": "16-45岁",
-          "gender": "男性偏多(60%)",
-          "needs": [
-            "AI资讯",
-            "产品测评",
-            "行业趋势",
-            "入门科普"
-          ],
-          "content_pref": "资讯速递+产品测评+趋势解读",
-          "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
-          "monetization": "广告(品牌合作)、私域(AI社群)",
-          "pain_points": [
-            "信息过载",
-            "真假难辨",
-            "跟不上更新",
-            "不知道学啥"
-          ],
-          "category": "AI大类",
-          "proportion": 49.3,
-          "heat_score": 1646695,
-          "related_keywords": [
-            "AI",
-            "AI",
-            "AI提示词",
-            "AI提示词",
-            "豆包AI"
-          ]
-        },
-        "priority": "高",
-        "keyword": "Qwen3.8-27B-GSQ-RCO-GGUF",
-        "platform": "双平台",
-        "audience": "技术极客",
-        "is_forecast": true,
-        "is_info_gap": true,
-        "action_angle": "从零到一的实操教程（避坑版）",
-        "content_format": "实操教程+工作流展示",
-        "monetization_hint": "完整工作流放私域，视频展示结果和片段",
-        "conversion_path": {
-          "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-          "product_match": "AI工具工作流系列（AI绘画）",
-          "conversion_potential": "高",
-          "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
-        }
-      },
-      {
-        "title": "别再手动重复操作了，LTX-2.5已经帮你自动化，省下来的时间都是钱",
-        "hook": "这个项目7天0星星，我测完发现最值钱的不是功能，是思路",
-        "signal_source": "huggingface",
-        "signal_name": "Lightricks/LTX-2.5",
-        "signal_url": "https://hf-mirror.com/Lightricks/LTX-2.5",
-        "opportunity": "🔵 蓝海机会",
-        "tech_heat": 100,
-        "social_heat": 0,
-        "info_gap_score": 100,
-        "category": "信息差选题",
-        "target_persona": {
-          "name": "泛AI关注者",
-          "traits": [
-            "科技爱好者",
-            "吃瓜群众",
-            "投资者",
-            "学生"
-          ],
-          "age": "16-45岁",
-          "gender": "男性偏多(60%)",
-          "needs": [
-            "AI资讯",
-            "产品测评",
-            "行业趋势",
-            "入门科普"
-          ],
-          "content_pref": "资讯速递+产品测评+趋势解读",
-          "active_time": "7:30-9:00 / 12:00-13:00 / 21:00-23:00",
-          "monetization": "广告(品牌合作)、私域(AI社群)",
-          "pain_points": [
-            "信息过载",
-            "真假难辨",
-            "跟不上更新",
-            "不知道学啥"
-          ],
-          "category": "AI大类",
-          "proportion": 49.3,
-          "heat_score": 1646695,
-          "related_keywords": [
-            "AI",
-            "AI",
-            "AI提示词",
-            "AI提示词",
-            "豆包AI"
-          ]
-        },
-        "priority": "高",
-        "keyword": "LTX-2.5",
+        "keyword": "tokentab",
         "platform": "双平台",
         "audience": "技术极客",
         "is_forecast": true,
@@ -34768,21 +34751,21 @@ window.DASHBOARD_DATA = {
         "monetization_hint": "完整工作流放私域，视频展示结果和片段",
         "conversion_path": {
           "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-          "product_match": "AI工具工作流系列（AI视频）",
+          "product_match": "AI工具工作流系列（AI编程）",
           "conversion_potential": "高",
           "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
         }
       },
       {
-        "title": "实测short-video-generator-AI：458星星的项目，最值钱的是这个工作流思路",
-        "hook": "免费但值钱：short-video-generator-AI的正确打开方式，完整工作流放评论区",
+        "title": "实测ai-data-extractor：163星星的项目，最值钱的是这个工作流思路",
+        "hook": "免费但值钱：ai-data-extractor的正确打开方式，完整工作流放评论区",
         "signal_source": "github",
-        "signal_name": "Colafornia/short-video-generator-AI",
-        "signal_url": "https://github.com/Colafornia/short-video-generator-AI",
+        "signal_name": "kruzovic7/ai-data-extractor",
+        "signal_url": "https://github.com/kruzovic7/ai-data-extractor",
         "opportunity": "🔵 蓝海机会",
-        "tech_heat": 89.1,
+        "tech_heat": 74.3,
         "social_heat": 0,
-        "info_gap_score": 89.1,
+        "info_gap_score": 74.3,
         "category": "信息差选题",
         "target_persona": {
           "name": "泛AI关注者",
@@ -34811,7 +34794,7 @@ window.DASHBOARD_DATA = {
           ],
           "category": "AI大类",
           "proportion": 49.3,
-          "heat_score": 1646695,
+          "heat_score": 1646761,
           "related_keywords": [
             "AI",
             "AI",
@@ -34821,7 +34804,7 @@ window.DASHBOARD_DATA = {
           ]
         },
         "priority": "高",
-        "keyword": "short-video-generator-AI",
+        "keyword": "ai-data-extractor",
         "platform": "双平台",
         "audience": "技术极客",
         "is_forecast": true,
@@ -34831,28 +34814,28 @@ window.DASHBOARD_DATA = {
         "monetization_hint": "完整工作流放私域，视频展示结果和片段",
         "conversion_path": {
           "private_hook": "评论区/主页引导：完整工作流+源码进群领取",
-          "product_match": "AI工具工作流系列（AI视频）",
+          "product_match": "AI工具工作流系列（AI编程）",
           "conversion_potential": "高",
           "funnel_step": "视频展示效果→评论区钩子→私域领小样→付费转化"
         }
       }
     ],
     "summary": {
-      "blue_ocean": 12,
+      "blue_ocean": 10,
       "exploding": 2,
       "rising": 0,
       "declining": 0,
-      "watching": 6
+      "watching": 0
     }
   },
   "collection_status": {
-    "last_run": "2026-09-12 08:01:25",
+    "last_run": "2026-09-13 08:01:17",
     "status": "success",
     "keywords_collected": 25,
     "keywords_total": 20,
     "new_works_today": 35,
     "total_works": 926,
-    "avg_like_today": 3958,
+    "avg_like_today": 3964,
     "errors": []
   },
   "points_balance": {
@@ -34892,7 +34875,7 @@ window.DASHBOARD_DATA = {
       "competition_score": 0.01,
       "avg_like": 24286,
       "works_count": 20,
-      "growth": -43.0,
+      "growth": -42.4,
       "opportunity": "高需求低竞争"
     },
     {
@@ -34902,7 +34885,7 @@ window.DASHBOARD_DATA = {
       "competition_score": 0.01,
       "avg_like": 5525,
       "works_count": 20,
-      "growth": -80.3,
+      "growth": -80.5,
       "opportunity": "高需求低竞争"
     },
     {
@@ -34912,7 +34895,7 @@ window.DASHBOARD_DATA = {
       "competition_score": 0.02,
       "avg_like": 7016,
       "works_count": 20,
-      "growth": -59.7,
+      "growth": -59.9,
       "opportunity": "高需求低竞争"
     },
     {
@@ -34922,7 +34905,7 @@ window.DASHBOARD_DATA = {
       "competition_score": 0.02,
       "avg_like": 7634,
       "works_count": 20,
-      "growth": -79.2,
+      "growth": -79.1,
       "opportunity": "高需求低竞争"
     },
     {
@@ -34932,7 +34915,7 @@ window.DASHBOARD_DATA = {
       "competition_score": 0.07,
       "avg_like": 2329,
       "works_count": 20,
-      "growth": -58.0,
+      "growth": -57.6,
       "opportunity": "高需求低竞争"
     },
     {
@@ -34962,7 +34945,7 @@ window.DASHBOARD_DATA = {
       "competition_score": 0.11,
       "avg_like": 12954,
       "works_count": 20,
-      "growth": -37.6,
+      "growth": -37.3,
       "opportunity": "高需求低竞争"
     },
     {
@@ -35064,7 +35047,7 @@ window.DASHBOARD_DATA = {
     },
     {
       "pattern": "反差惊讶",
-      "count": 4,
+      "count": 3,
       "avg_like": 8490,
       "examples": [
         "当我用Ai做图时： #内容过于真实 #真实生活分享计划 #一人分饰多角 #剧情演绎 #万万没想到",
@@ -35153,13 +35136,13 @@ window.DASHBOARD_DATA = {
         "count": 1
       }
     ],
-    "total_comments_analyzed": 18716
+    "total_comments_analyzed": 18454
   },
   "conversion_signals": [],
   "completion_rate_analysis": [
     {
       "duration_bucket": "0-15s",
-      "avg_completion": 58.8,
+      "avg_completion": 58.7,
       "sample_count": 502
     },
     {
@@ -35179,17 +35162,10 @@ window.DASHBOARD_DATA = {
     },
     {
       "format": "口播分享",
-      "count": 850,
-      "avg_like": 2710,
+      "count": 849,
+      "avg_like": 2682,
       "avg_comment": 145,
-      "engagement_score": 6736
-    },
-    {
-      "format": "资讯速递",
-      "count": 9,
-      "avg_like": 341,
-      "avg_comment": 18,
-      "engagement_score": 462
+      "engagement_score": 6701
     },
     {
       "format": "测评推荐",
@@ -35197,6 +35173,13 @@ window.DASHBOARD_DATA = {
       "avg_like": 341,
       "avg_comment": 15,
       "engagement_score": 673
+    },
+    {
+      "format": "资讯速递",
+      "count": 10,
+      "avg_like": 322,
+      "avg_comment": 17,
+      "engagement_score": 491
     }
   ],
   "competitor_strategy": [
