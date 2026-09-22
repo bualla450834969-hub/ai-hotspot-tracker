@@ -2906,7 +2906,7 @@ if (document.readyState === 'loading') {
 
   // renderTitleFormulas
   function renderTitleFormulas() {
-    var formulas = DATA.title_formulas || [];
+    var formulas = DATA.title_formulas_array || [];
     var examples = cfg('title_formula_examples', {
       '感叹句': '太绝了！这个工具让我效率提升10倍',
       '教程型': '手把手教你做XX，3分钟上手',
