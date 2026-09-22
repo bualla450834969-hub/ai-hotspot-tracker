@@ -3945,6 +3945,13 @@ if (document.readyState === 'loading') {
       label: '对标与发布',
       sections: ['compareSection', 'compareSummary', 'overlapTable', 'dyOnlyList', 'xhsOnlyList', 'authorList', 'competitorWorks', 'smallViral', 'formatBars', 'schedule', 'scheduleContent', 'commentScripts', 'commentScriptsContent', 'checklist', 'checklistContent', 'checklistProgress', 'favoritesGrid', 'formatROI', 'competitorStrategy', 'contentCalendar'],
       title: '对标与发布'
+    },
+    {
+      id: 'settings',
+      icon: '⚙️',
+      label: '设置',
+      sections: ['settingsPanel'],
+      title: '设置'
     }
   ];
 
