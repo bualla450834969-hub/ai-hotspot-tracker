@@ -4000,7 +4000,7 @@ if (document.readyState === 'loading') {
     footer.className = 'sidebar-footer';
     footer.innerHTML = `
       <div class="sb-update-time" id="sbUpdateTime">数据加载中...</div>
-      <div class="sb-version">v4.0 · Sidebar Layout</div>
+      <div class="sb-version">v6.0 · Config Driven</div>
     `;
     sidebar.appendChild(footer);
 
