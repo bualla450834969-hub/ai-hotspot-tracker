@@ -984,7 +984,14 @@ function startCollection(){
     },2000);
   }).catch(function(){s.innerHTML='<span style="color:#f87171;">无法连接本地助手，请先运行 python local_helper.py</span>';});
 }
-function switchIndustry(){var i=document.getElementById('switchIndustryInput').value.trim();if(i)window.location.href=window.location.pathname+'?ind='+encodeURIComponent(i);}
+function switchIndustry(){
+  var i=document.getElementById('switchIndustryInput').value.trim();
+  if(!i)return;
+  // 中文行业名映射
+  var slugMap={'书法':'shufa','書法':'shufa','AI':'ai','人工智能':'ai'};
+  if(slugMap[i]) i=slugMap[i];
+  window.location.href=window.location.pathname+'?ind='+encodeURIComponent(i);
+}
 </script>
 <script>
 // 采集数据趋势
