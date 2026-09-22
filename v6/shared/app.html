@@ -900,7 +900,7 @@ window.safeCall = function(fn, ctx) {
     <p>3. 当前行业：<span id="currentIndLabel" style="color:#a78bfa;"></span></p>
   </div>
 </div>
-<button onclick="openSettings()" style="position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;background:rgba(139,92,246,0.3);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);color:white;font-size:20px;cursor:pointer;z-index:9999;box-shadow:0 4px 20px rgba(139,92,246,0.3);">⚙️</button>
+<button id="settingsBtn" onclick="openSettings()" style="position:fixed;bottom:24px;right:24px;width:48px;height:48px;border-radius:50%;background:rgba(139,92,246,0.3);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.1);color:white;font-size:20px;cursor:pointer;z-index:9999;box-shadow:0 4px 20px rgba(139,92,246,0.3);">⚙️</button>
 <script>
 function openSettings(){document.getElementById('settingsPanel').style.right='0';document.getElementById('currentIndLabel').textContent=window.CURRENT_INDUSTRY||'ai';document.getElementById('apiKeyInput').value=localStorage.getItem('redfox_api_key')||'';}
 function closeSettings(){document.getElementById('settingsPanel').style.right='-420px';}
