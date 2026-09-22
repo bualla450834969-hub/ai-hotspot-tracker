@@ -316,6 +316,7 @@ window.domainGuard = function(moduleId, renderFn) {
   window.renderAll = function() {
     if (window.Module && window.Module.all) {
       var data = window.DASHBOARD_DATA || window.DATA || {};
+      DATA = data;
       window.Module.all().forEach(function(m) {
         if (m.render) {
           try {
