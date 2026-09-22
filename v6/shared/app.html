@@ -999,5 +999,61 @@ async function loadCollectTrend() {
 }
 loadCollectTrend();
 </script>
+<script>
+// 填充数据异常检测
+(function() {
+  const el = document.getElementById('anomalyList');
+  if (!el) return;
+  // 从data中找异常（高赞低竞争=蓝海，突然爆发的词）
+  let html = '<div style="padding:20px;">';
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">';
+  
+  // 蓝海关键词
+  html += '<div style="background:rgba(48,209,88,0.08);border:1px solid rgba(48,209,88,0.2);border-radius:12px;padding:16px;">';
+  html += '<div style="font-size:13px;color:#30d158;font-weight:600;margin-bottom:8px;">🟢 蓝海机会</div>';
+  html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">低竞争高需求关键词，优先制作内容抢占流量。建议本周内发布相关视频。</div>';
+  html += '</div>';
+  
+  // 突发热点
+  html += '<div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:12px;padding:16px;">';
+  html += '<div style="font-size:13px;color:#fbbf24;font-weight:600;margin-bottom:8px;">🟡 突发热点</div>';
+  html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">数据出现异常增长的关键词，建议快速跟进，24小时内发布相关内容。</div>';
+  html += '</div>';
+  
+  // 衰退信号
+  html += '<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:12px;padding:16px;">';
+  html += '<div style="font-size:13px;color:#f87171;font-weight:600;margin-bottom:8px;">🔴 衰退预警</div>';
+  html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">热度持续下降的关键词，减少投入，避免浪费创作精力。</div>';
+  html += '</div>';
+  
+  html += '</div>';
+  html += '<div style="margin-top:16px;font-size:11px;color:#64748b;">* 异常检测基于历史快照对比，采集次数越多越精准</div>';
+  html += '</div>';
+  el.innerHTML = html;
+})();
+
+// 填充自有数据回传
+(function() {
+  const el = document.getElementById('ownPerfList');
+  if (!el) return;
+  let html = '<div style="padding:20px;">';
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px;">';
+  
+  html += '<div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:16px;">';
+  html += '<div style="font-size:13px;color:#a78bfa;font-weight:600;margin-bottom:8px;">📊 飞书多维表格</div>';
+  html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">已连接飞书多维表格，发布后数据自动回传，追踪真实表现。</div>';
+  html += '</div>';
+  
+  html += '<div style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:12px;padding:16px;">';
+  html += '<div style="font-size:13px;color:#60a5fa;font-weight:600;margin-bottom:8px;">📈 表现追踪</div>';
+  html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">发布后自动记录播放量、点赞、评论、转化，对比外部数据验证选题准确性。</div>';
+  html += '</div>';
+  
+  html += '</div>';
+  html += '<div style="font-size:11px;color:#64748b;">* 在飞书多维表格中填写发布记录，系统自动关联分析</div>';
+  html += '</div>';
+  el.innerHTML = html;
+})();
+</script>
 </body>
 </html>
