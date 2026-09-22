@@ -800,7 +800,7 @@ window.safeCall = function(fn, ctx) {
   
   var ds = document.createElement('script');
   ds.src = base + 'data.js?t=' + Date.now();
-  ds.onload = function() { if (window.renderAll) window.renderAll(); };
+  ds.onload = function() { window.DATA = window.DASHBOARD_DATA; if (window.renderAll) window.renderAll(); };
   document.head.appendChild(ds);
 })();
 </script>
