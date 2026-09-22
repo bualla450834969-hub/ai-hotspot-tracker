@@ -891,6 +891,24 @@ window.safeCall = function(fn, ctx) {
       <p style="font-size:11px;color:#64748b;margin-top:6px;">输入行业名后点击采集，自动生成关键词并采集数据</p>
     </div>
 
+    <div style="margin-bottom:16px;">
+      <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:8px;">采集平台</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);">
+          <input type="checkbox" id="platform_dy" checked style="accent-color:#8b5cf6;"> 抖音
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);">
+          <input type="checkbox" id="platform_xhs" checked style="accent-color:#8b5cf6;"> 小红书
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);">
+          <input type="checkbox" id="platform_sph" disabled style="accent-color:#8b5cf6;"> 视频号 <span style="font-size:10px;color:#64748b;">(待接入)</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);">
+          <input type="checkbox" id="platform_gzh" disabled style="accent-color:#8b5cf6;"> 公众号 <span style="font-size:10px;color:#64748b;">(待接入)</span>
+        </label>
+      </div>
+    </div>
+
     <button onclick="startCollection()" style="width:100%;padding:12px;background:linear-gradient(135deg,#8b5cf6,#6366f1);border:none;border-radius:10px;color:white;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px;">🚀 开始采集</button>
 
     <div id="collectStatus" style="display:none;padding:12px;border-radius:8px;background:rgba(255,255,255,0.05);font-size:12px;line-height:1.6;"></div>
@@ -917,9 +935,13 @@ function startCollection(){
   var k=document.getElementById('apiKeyInput').value.trim(),i=document.getElementById('industryInput').value.trim(),s=document.getElementById('collectStatus');
   s.style.display='block';
   if(!k||!i){s.innerHTML='<span style="color:#f87171;">请填写API Key和行业名</span>';return;}
+  var platforms=[];
+  if(document.getElementById('platform_dy').checked) platforms.push('douyin');
+  if(document.getElementById('platform_xhs').checked) platforms.push('xiaohongshu');
+  if(platforms.length===0){s.innerHTML='<span style="color:#f87171;">请至少选择一个平台</span>';return;}
   localStorage.setItem('redfox_api_key',k);
-  s.innerHTML='<span style="color:#60a5fa;">正在启动采集...</span>';
-  fetch('http://localhost:8765/collect?industry='+encodeURIComponent(i)+'&api_key='+encodeURIComponent(k))
+  s.innerHTML='<span style="color:#60a5fa;">正在启动采集... ('+platforms.join('+')+')</span>';
+  fetch('http://localhost:8765/collect?industry='+encodeURIComponent(i)+'&api_key='+encodeURIComponent(k)+'&platforms='+encodeURIComponent(platforms.join(',')))
   .then(function(r){return r.json()}).then(function(d){
     if(d.error){s.innerHTML='<span style="color:#f87171;">错误: '+d.error+'</span>';return;}
     var p=setInterval(function(){
