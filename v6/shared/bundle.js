@@ -338,7 +338,7 @@ window.domainGuard = function(moduleId, renderFn) {
     var sel = document.getElementById('categoryFilter');
     if (sel) window.currentCategory = sel.value;
     window.renderAll();
-  try { renderCommentSemantic(); renderConversionSignals(); } catch(e) {}
+  window.renderCommentSemantic = renderCommentSemantic; window.renderConversionSignals = renderConversionSignals; try { renderCommentSemantic(); renderConversionSignals(); } catch(e) {}
   };
 
   // ===== setPlatform — 平台切换 =====
