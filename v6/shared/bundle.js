@@ -1040,170 +1040,6 @@ window.domainGuard = function(moduleId, renderFn) {
   // 必须用赋值而非const，避免遮蔽已存在的全局DATA
   try { window.DATA = window.DASHBOARD_DATA || {};
 
-// ===== 数据适配层：统一不同行业的数据字段 =====
-window.normalizeData = function() {
-  var d = window.DATA;
-  // works 字段映射
-  if (d.works && d.works.length > 0) {
-    d.works = d.works.map(function(w) {
-      return {
-        title: w.title || w.name || '',
-        author: w.author || w.accountName || '',
-        platform: w.platform || 'douyin',
-        likes: w.likes || w.likeCount || 0,
-        comments: w.comments || w.commentCount || 0,
-        collects: w.collects || w.collectCount || 0,
-        shares: w.shares || w.shareCount || 0,
-        duration: w.duration || 0,
-        publishTime: w.publishTime || w.published_at || '',
-        url: w.url || w.workUrl || '',
-        cover: w.cover || w.coverUrl || ''
-      };
-    });
-  }
-  // ===== 自动填充：从 works 数据计算所有缺失字段 =====
-  var works = d.works || [];
-  var cfg = window.DOMAIN_CONFIG || {};
-  var coreKw = cfg.core_keywords || [];
-  var kwPct = coreKw.length > 0 ? 72 : 60;
-
-  // 1. launch_ops 起号运营
-  if (!d.launch_ops || !d.launch_ops.phase) {
-    d.launch_ops = {
-      phase: '打标期', day: 3, total_days: 14, health_score: 85,
-      core_keywords_pct: kwPct,
-      content_ratio: {core: 70, related: 20, broad: 10},
-      tasks: ['连续发布7条核心关键词内容', '评论区互动建立标签', '每天固定时段发布'],
-      avoid: ['避免发与领域无关内容', '避免频繁切换内容方向']
-    };
-  }
-  if (typeof d.launch_ops.core_keywords_pct !== 'number') d.launch_ops.core_keywords_pct = kwPct;
-  if (!d.launch_ops.phase) d.launch_ops.phase = '打标期';
-
-  // 2. audience_personas 人群画像
-  if (!d.audience_personas || d.audience_personas.length === 0) {
-    d.audience_personas = [
-      {name: '书法初学者', category: '零基础入门', proportion: 40, age: '18-30', gender: '女', traits: ['想写好字','教程需求'], need: '入门教程'},
-      {name: '硬笔爱好者', category: '日常书写', proportion: 35, age: '25-40', gender: '不限', traits: ['实用为主','快速见效'], need: '实用技巧'},
-      {name: '书法老师', category: '专业教学', proportion: 25, age: '30-50', gender: '不限', traits: ['教学需求','专业进阶'], need: '教学方法'}
-    ];
-  }
-  // 确保每个人群有 pct 字段
-  d.audience_personas = d.audience_personas.map(function(p, i) {
-    var pct = p.pct || p.percent || p.proportion || Math.round(100/d.audience_personas.length);
-    return {
-      name: p.name || '人群' + (i+1),
-      category: p.category || p.desc || '书法爱好者',
-      proportion: pct,
-      age: p.age || '18-35',
-      gender: p.gender || '不限',
-      traits: p.traits || ['学习需求强'],
-      need: p.need || p.core_need || '提升技能',
-      pct: pct
-    };
-  });
-
-  // 3. pitfall_list 起号避坑
-  if (!d.pitfall_list || d.pitfall_list.length === 0) {
-    d.pitfall_list = [
-      {title: '不要一开始就发带货', desc: '先建立账号标签，前7天纯价值输出'},
-      {title: '不要追无关热点', desc: '标签混乱会导致流量不精准'},
-      {title: '不要断更', desc: '连续14天日更建立账号权重'},
-      {title: '不要忽略评论区', desc: '评论互动影响推荐权重'}
-    ];
-  }
-
-  // 4. blue_ocean_list 蓝海关键词
-  if (!d.blue_ocean_list || d.blue_ocean_list.length === 0) {
-    var kws = (cfg.collect_keywords || []).slice(0, 5);
-    d.blue_ocean_list = kws.map(function(k) {
-      return {keyword: k, demand: '中', competition: '低', score: 75 + Math.floor(Math.random()*20)};
-    });
-  }
-
-  // 5. cross_platform 跨平台迁移
-  if (!d.cross_platform || d.cross_platform.length === 0) {
-    d.cross_platform = [
-      {topic: '入门教程', source: '小红书', target: '抖音', reason: '小红书已验证，抖音流量更大'},
-      {topic: '技巧分享', source: '抖音', target: '小红书', reason: '抖音爆款，小红书收藏率高'}
-    ];
-  }
-
-  // 6. comment_semantic 评论语义
-  if (!d.comment_semantic || !d.comment_semantic.themes || d.comment_semantic.themes.length === 0) {
-    d.comment_semantic = {themes: [
-      {theme: '求教程', count: 35, sentiment: 'positive'},
-      {theme: '问工具', count: 22, sentiment: 'neutral'},
-      {theme: '分享经验', count: 18, sentiment: 'positive'}
-    ]};
-  }
-
-  // 7. conversion_signals 转化信号
-  if (!d.conversion_signals || d.conversion_signals.length === 0) {
-    d.conversion_signals = [
-      {signal: '求购买链接', count: 12, intent: '高'},
-      {signal: '问课程', count: 8, intent: '高'},
-      {signal: '求推荐', count: 15, intent: '中'}
-    ];
-  }
-
-  // 8. growth_ranking 上升速率
-  if (!d.growth_ranking || d.growth_ranking.length === 0) {
-    var kws2 = (cfg.collect_keywords || []).slice(0, 5);
-    d.growth_ranking = kws2.map(function(k, i) {
-      return {keyword: k, growth: 30 - i*5 + Math.floor(Math.random()*10), trend: 'up'};
-    });
-  }
-
-  // 9. format_roi 内容形式ROI
-  if (!d.format_roi || d.format_roi.length === 0) {
-    d.format_roi = [
-      {format: '教学示范', avgLikes: 3200, collectRate: 12, roi: 85},
-      {format: '作品展示', avgLikes: 2800, collectRate: 8, roi: 70},
-      {format: '技巧分享', avgLikes: 4100, collectRate: 15, roi: 92}
-    ];
-  }
-
-  // 10. competitor_list 对标账号
-  if (!d.competitor_list || d.competitor_list.length === 0) {
-    var authors = {};
-    works.forEach(function(w) { if(w.author) authors[w.author] = (authors[w.author]||0) + (w.likes||0); });
-    var topAuth = Object.keys(authors).sort(function(a,b){return authors[b]-authors[a];}).slice(0,5);
-    d.competitor_list = topAuth.map(function(a) {
-      return {name: a, works: 1, avgLikes: Math.round(authors[a]/Math.max(1, works.filter(function(w){return w.author===a;}).length)), strategy: '持续输出+评论区互动'};
-    });
-  }
-
-  // 11. content_format 内容形式分布
-  if (!d.content_format_dist) {
-    var fmtMap = {教学: 0, 展示: 0, 技巧: 0, 对比: 0};
-    works.forEach(function(w) {
-      var t = (w.title||'');
-      if (t.indexOf('教程')>=0 || t.indexOf('入门')>=0 || t.indexOf('怎么')>=0) fmtMap.教学++;
-      else if (t.indexOf('作品')>=0 || t.indexOf('展示')>=0) fmtMap.展示++;
-      else if (t.indexOf('技巧')>=0 || t.indexOf('方法')>=0) fmtMap.技巧++;
-      else fmtMap.展示++;
-    });
-    d.content_format_dist = Object.keys(fmtMap).map(function(k) {
-      return {format: k, count: fmtMap[k], pct: Math.round(fmtMap[k]/Math.max(1,works.length)*100)};
-    });
-  }
-
-  // 12. topics 选题建议 fallback
-  if (!d.topics || d.topics.length === 0) {
-    var kws3 = (cfg.collect_keywords || []).slice(0, 5);
-    d.topics = kws3.map(function(k, i) {
-      return {title: k + '入门指南', score: 90-i*5, hook: '新手必看', format: '教学'};
-    });
-  }
-
-  // 13. blue_ocean_list ensure fields
-  d.blue_ocean_list = (d.blue_ocean_list || []).map(function(b) {
-    return {keyword: b.keyword || b.name || '', demand: b.demand || '中', competition: b.competition || '低', score: b.score || 75};
-  });
-
-  window.DATA = d;
-};
 window.normalizeData(); } catch(e) {}
   // 同时尝试赋值给全局词法环境的DATA（如果是var声明的全局变量）
   if (typeof DATA !== 'undefined') {
@@ -4543,4 +4379,73 @@ if (document.readyState === 'loading') {
   } else {
     initSidebar();
   }
+})();
+
+
+/* ===== modules/blueOcean.js ===== */
+/**
+ * modules/blueOcean.js
+ * 蓝海关键词 + 关键词上升速率榜
+ */
+(function() {
+  'use strict';
+
+  function renderEmpty(containerId, msg) {
+    var el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-secondary);font-size:13px;">' + (msg || '暂无数据') + '</div>';
+  }
+
+  function renderBlueOcean(data) {
+    var el = document.getElementById('blueOceanList');
+    if (!el) return;
+    var list = data || [];
+    if (!list.length) { renderEmpty('blueOceanList', '暂无蓝海关键词数据'); return; }
+    var html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;padding:4px 0;">';
+    list.forEach(function(b) {
+      var score = b.score || 75;
+      var color = score >= 85 ? '#30d158' : score >= 70 ? '#fbbf24' : '#f87171';
+      html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;">';
+      html += '<div style="font-size:14px;font-weight:600;margin-bottom:6px;">' + (b.keyword||b.name||'') + '</div>';
+      html += '<div style="font-size:11px;color:#94a3b8;margin-bottom:8px;">需求 ' + (b.demand||'中') + ' · 竞争 ' + (b.competition||'低') + '</div>';
+      html += '<div style="display:flex;align-items:center;gap:8px;"><div style="flex:1;height:4px;background:rgba(255,255,255,0.08);border-radius:2px;"><div style="width:' + score + '%;height:100%;background:' + color + ';border-radius:2px;"></div></div><span style="font-size:12px;color:' + color + ';font-weight:600;">' + score + '</span></div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  function renderGrowthRanking(data) {
+    var el = document.getElementById('growthRankingList');
+    if (!el) return;
+    var list = data || [];
+    if (!list.length) { renderEmpty('growthRankingList', '暂无上升速率数据'); return; }
+    var html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:4px 0;">';
+    list.forEach(function(g, i) {
+      var growth = g.growth || 0;
+      var arrow = growth > 50 ? '🚀' : growth > 20 ? '📈' : '📊';
+      html += '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:14px;">';
+      html += '<div style="font-size:11px;color:#64748b;margin-bottom:4px;">#' + (i+1) + '</div>';
+      html += '<div style="font-size:14px;font-weight:600;margin-bottom:6px;">' + (g.keyword||'') + '</div>';
+      html += '<div style="font-size:13px;color:#30d158;font-weight:600;">' + arrow + ' +' + growth + '%</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  if (window.Module) {
+    Module.register({
+      id: 'blueOcean',
+      requiredFields: ['blue_ocean_list'],
+      render: function(data) { try { renderBlueOcean(data); } catch(e) { console.error('[blueOcean]', e); } }
+    });
+    Module.register({
+      id: 'growthRanking',
+      requiredFields: ['growth_ranking'],
+      render: function(data) { try { renderGrowthRanking(data); } catch(e) { console.error('[growthRanking]', e); } }
+    });
+  }
+  window.renderBlueOcean = renderBlueOcean;
+  window.renderGrowthRanking = renderGrowthRanking;
 })();
