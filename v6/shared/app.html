@@ -955,5 +955,49 @@ function startCollection(){
 }
 function switchIndustry(){var i=document.getElementById('switchIndustryInput').value.trim();if(i)window.location.href=window.location.pathname+'?ind='+encodeURIComponent(i);}
 </script>
+<script>
+// 采集数据趋势
+async function loadCollectTrend() {
+  try {
+    const ind = new URLSearchParams(location.search).get('ind') || 'ai';
+    const resp = await fetch(../industries//history/index.json);
+    if (!resp.ok) { document.getElementById('collectTrendInfo').textContent = '首次采集中，明日可见趋势'; return; }
+    const snapshots = await resp.json();
+    if (!snapshots || snapshots.length < 1) {
+      document.getElementById('collectTrendInfo').textContent = '等待更多快照数据';
+      return;
+    }
+    snapshots.sort((a,b) => a.date.localeCompare(b.date));
+    const dates = snapshots.map(s => s.date.slice(5));
+    const likes = snapshots.map(s => s.avg_likes);
+    const comments = snapshots.map(s => s.avg_comments);
+    const works = snapshots.map(s => s.works_count);
+
+    // 简单折线图
+    const el = document.getElementById('chartCollectTrend');
+    el.innerHTML = '';
+    if (typeof echarts !== 'undefined') {
+      echarts.init(el).setOption({
+        grid: {left:40,right:20,top:30,bottom:25},
+        tooltip: {trigger:'axis'},
+        legend: {data:['均赞','均评论','作品数'],textStyle:{color:'#94a3b8',fontSize:10},top:0},
+        xAxis: {type:'category',data:dates,axisLabel:{color:'#94a3b8',fontSize:10}},
+        yAxis: {type:'value',axisLabel:{color:'#94a3b8',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.05)'}}},
+        series: [
+          {name:'均赞',type:'line',data:likes,smooth:true,itemStyle:{color:'#8b5cf6'}},
+          {name:'均评论',type:'line',data:comments,smooth:true,itemStyle:{color:'#30D158'}},
+          {name:'作品数',type:'line',data:works,smooth:true,itemStyle:{color:'#fbbf24'}}
+        ]
+      });
+    }
+    const latest = snapshots[snapshots.length-1];
+    document.getElementById('collectTrendInfo').innerHTML =
+      最新:  · 条作品 · 均赞 · 最高赞;
+  } catch(e) {
+    document.getElementById('collectTrendInfo').textContent = '趋势数据加载中...';
+  }
+}
+loadCollectTrend();
+</script>
 </body>
 </html>
