@@ -1,0 +1,196 @@
+/* ===== 运营状态条 ===== */
+.ops-bar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 20px; border-radius: 12px; margin-bottom: 16px;
+  background: rgba(255,255,255,0.06); backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.ops-item { display: flex; align-items: center; gap: 10px; flex: 1; }
+.ops-icon { font-size: 18px; }
+.ops-info { display: flex; flex-direction: column; }
+.ops-label { font-size: 11px; color: rgba(255,255,255,0.4); }
+.ops-value { font-size: 15px; font-weight: 600; color: rgba(255,255,255,0.9); }
+.ops-sub { font-size: 11px; color: rgba(255,255,255,0.35); margin-left: auto; }
+.ops-divider { width: 1px; height: 32px; background: rgba(255,255,255,0.1); }
+.ops-points-bar { width: 60px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; margin-left: 8px; }
+.ops-points-bar > div { height: 100%; border-radius: 3px; transition: width 0.3s; }
+.ops-collect-btn {
+  padding: 8px 16px; border: 1px solid rgba(255,255,255,0.15); border-radius: 8px; cursor: pointer;
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.85);
+  font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 6px;
+  transition: all 0.2s; backdrop-filter: blur(10px);
+}
+.ops-collect-btn:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.25); }
+
+/* ===== 蓝海词 ===== */
+.bo-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 8px; border-radius: 10px; }
+.bo-rank { width: 24px; height: 24px; border-radius: 50%; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #6b7280; }
+.bo-main { flex: 1; }
+.bo-keyword { font-size: 14px; font-weight: 600; }
+.bo-platform { font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+.bo-platform.douyin { background: #fee2e2; color: #dc2626; }
+.bo-platform.xiaohongshu { background: #fce7f3; color: #db2777; }
+.bo-meta { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+.bo-score { text-align: center; }
+.bo-score-val { font-size: 20px; font-weight: 700; }
+.bo-score-label { font-size: 10px; color: #9ca3af; }
+.bo-tag { font-size: 10px; padding: 3px 8px; border-radius: 10px; background: #dcfce7; color: #16a34a; }
+
+/* ===== 跨平台迁移 ===== */
+.cp-item { padding: 14px 16px; margin-bottom: 8px; border-radius: 10px; }
+.cp-keyword { font-size: 15px; font-weight: 600; margin-bottom: 8px; }
+.cp-compare { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.cp-side { display: flex; flex-direction: column; padding: 6px 12px; border-radius: 8px; flex: 1; text-align: center; }
+.cp-side.xhs { background: #fce7f3; }
+.cp-side.dy { background: #fee2e2; }
+.cp-label { font-size: 11px; color: #6b7280; }
+.cp-val { font-size: 14px; font-weight: 600; }
+.cp-arrow { color: #9ca3af; font-size: 18px; }
+.cp-gap { font-size: 12px; color: #059669; font-weight: 500; }
+
+/* ===== 标题基因库 ===== */
+.tg-item { padding: 14px 16px; margin-bottom: 10px; border-radius: 10px; }
+.tg-header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.tg-pattern { font-size: 15px; font-weight: 700; }
+.tg-count { font-size: 11px; color: #6b7280; background: #f3f4f6; padding: 2px 8px; border-radius: 10px; }
+.tg-like { font-size: 11px; color: #f59e0b; }
+.tg-formula { font-size: 12px; color: #4b5563; margin-bottom: 6px; }
+.tg-examples { border-left: 2px solid #e5e7eb; padding-left: 10px; }
+.tg-example { font-size: 12px; color: #6b7280; margin: 2px 0; font-style: italic; }
+
+/* ===== 评论语义 ===== */
+.cs-section { margin-bottom: 16px; }
+.cs-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #374151; }
+.cs-count { font-size: 11px; color: #9ca3af; font-weight: 400; }
+.cs-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.cs-tag { font-size: 12px; padding: 4px 10px; border-radius: 12px; display: flex; align-items: center; gap: 4px; }
+.cs-tag.pain { background: #fef2f2; color: #dc2626; }
+.cs-tag.question { background: #eff6ff; color: #2563eb; }
+.cs-tag.purchase { background: #f0fdf4; color: #16a34a; }
+.cs-tag-count { font-size: 10px; opacity: 0.7; }
+
+/* ===== 转化信号 ===== */
+.cv-item { padding: 12px 16px; margin-bottom: 8px; border-radius: 10px; }
+.cv-title { font-size: 13px; font-weight: 500; margin-bottom: 6px; }
+.cv-meta { display: flex; gap: 12px; font-size: 11px; color: #6b7280; }
+.cv-signal { color: #16a34a; font-weight: 600; }
+
+/* ===== 完播率 ===== */
+.cr-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.cr-label { width: 70px; font-size: 12px; color: #6b7280; }
+.cr-bar-wrap { flex: 1; height: 24px; background: #f3f4f6; border-radius: 6px; overflow: hidden; }
+.cr-bar { height: 100%; background: linear-gradient(90deg, #3b82f6, #8b5cf6); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; color: white; font-size: 11px; font-weight: 600; min-width: 40px; transition: width 0.5s; }
+.cr-sample { width: 60px; font-size: 11px; color: #9ca3af; text-align: right; }
+
+/* ===== 增长速率排名 ===== */
+.gr-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+.gr-rank { width: 24px; height: 24px; border-radius: 50%; background: #f3f4f6; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #6b7280; }
+.gr-rank.top { background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; }
+.gr-keyword { flex: 1; font-size: 13px; font-weight: 500; }
+.gr-platform { width: 20px; height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white; }
+.gr-platform.douyin { background: #dc2626; }
+.gr-platform.xiaohongshu { background: #db2777; }
+.gr-growth { font-size: 13px; font-weight: 600; color: #16a34a; width: 60px; text-align: right; }
+.gr-trend { font-size: 11px; padding: 2px 8px; border-radius: 8px; background: #f3f4f6; color: #6b7280; }
+.gr-trend.up { background: #fef2f2; color: #dc2626; }
+
+/* ===== 内容形式ROI ===== */
+.roi-item { padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+.roi-header { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.roi-format { font-size: 14px; font-weight: 600; }
+.roi-count { font-size: 11px; color: #9ca3af; }
+.roi-bars { display: flex; flex-direction: column; gap: 4px; }
+.roi-bar-row { display: flex; align-items: center; gap: 8px; font-size: 11px; color: #6b7280; }
+.roi-bar-row > span:first-child { width: 40px; }
+.roi-bar-row > span:last-child { width: 50px; text-align: right; }
+.roi-bar { flex: 1; height: 8px; background: #f3f4f6; border-radius: 4px; overflow: hidden; }
+.roi-bar > div { height: 100%; background: #3b82f6; border-radius: 4px; }
+.roi-bar.engagement > div { background: #8b5cf6; }
+
+/* ===== 对标账号 ===== */
+.comp-item { display: flex; gap: 12px; padding: 14px 16px; margin-bottom: 10px; border-radius: 10px; }
+.comp-rank { font-size: 12px; font-weight: 700; color: #f59e0b; width: 40px; }
+.comp-main { flex: 1; }
+.comp-name { font-size: 14px; font-weight: 600; }
+.comp-meta { font-size: 11px; color: #9ca3af; margin: 2px 0; }
+.comp-strategy { font-size: 12px; color: #4b5563; margin: 4px 0; }
+.comp-mix { display: flex; gap: 6px; flex-wrap: wrap; }
+.comp-mix-tag { font-size: 10px; padding: 2px 8px; border-radius: 8px; background: #eff6ff; color: #2563eb; }
+.comp-freq { font-size: 11px; color: #6b7280; text-align: right; }
+
+/* ===== 最佳发布组合 ===== */
+.bpc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.bpc-item { padding: 10px; border-radius: 8px; text-align: center; background: #f9fafb; border: 1px solid #e5e7eb; }
+.bpc-item.best { background: linear-gradient(135deg, #fef3c7, #fde68a); border-color: #f59e0b; }
+.bpc-item.good { background: #ecfdf5; border-color: #10b981; }
+.bpc-day { font-size: 12px; color: #6b7280; }
+.bpc-hour { font-size: 16px; font-weight: 700; }
+.bpc-score { font-size: 11px; color: #f59e0b; font-weight: 600; }
+
+/* ===== 发布提醒 ===== */
+.pr-bar { padding: 10px 16px; border-radius: 8px; display: flex; align-items: center; gap: 8px; font-size: 13px; margin-bottom: 12px; backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.08); }
+.pr-hot { background: rgba(239,68,68,0.12); color: #f87171; border-color: rgba(239,68,68,0.2); animation: pulse 2s infinite; }
+.pr-upcoming { background: rgba(59,130,246,0.1); color: #60a5fa; border-color: rgba(59,130,246,0.18); }
+.pr-passed { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.4); }
+.pr-default { background: rgba(245,158,11,0.1); color: #fbbf24; border-color: rgba(245,158,11,0.18); }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+/* ===== 选题增强 ===== */
+.topic-heat-phase { display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 8px; margin-left: 6px; color: white; }
+.topic-monetization { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; }
+.topic-angles { margin-top: 8px; padding: 8px 12px; background: #f0fdf4; border-radius: 8px; }
+.topic-angle { font-size: 12px; color: #166534; margin: 3px 0; padding-left: 12px; position: relative; }
+.topic-angle::before { content: '💡'; position: absolute; left: 0; }
+.copy-btn { padding: 4px 10px; font-size: 11px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer; transition: all 0.2s; }
+.copy-btn:hover { background: #3b82f6; color: white; border-color: #3b82f6; }
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .ops-bar { flex-wrap: wrap; }
+  .ops-divider { display: none; }
+  .bpc-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+
+/* 一键复制按钮 */
+.copy-topic-btn {
+  padding: 6px 12px; font-size: 11px; border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7);
+  cursor: pointer; transition: all 0.2s; width: 100%;
+}
+.copy-topic-btn:hover { background: rgba(255,255,255,0.12); color: white; }
+
+/* 热度阶段标签 */
+.heat-phase-badge {
+  display: inline-block; font-size: 10px; padding: 2px 8px; border-radius: 8px;
+  margin-left: 6px; font-weight: 600;
+}
+.heat-phase-badge.上升期 { background: rgba(16,185,129,0.15); color: #34d399; }
+.heat-phase-badge.爆发期 { background: rgba(239,68,68,0.15); color: #f87171; }
+.heat-phase-badge.衰退期 { background: rgba(156,163,175,0.15); color: #9ca3af; }
+.heat-phase-badge.稳定期 { background: rgba(59,130,246,0.15); color: #60a5fa; }
+
+/* 差异化角度 */
+.differentiated-angles { margin-top: 8px; padding: 8px 10px; background: rgba(139,92,246,0.08); border-radius: 8px; border: 1px solid rgba(139,92,246,0.15); }
+.da-label { font-size: 10px; color: #a78bfa; font-weight: 600; margin-bottom: 4px; }
+.da-item { font-size: 11px; color: rgba(255,255,255,0.7); margin: 2px 0; padding-left: 16px; position: relative; }
+.da-num { position: absolute; left: 0; color: #a78bfa; font-weight: 700; }
+
+/* 异常检测 */
+.anomaly-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 8px; }
+.anomaly-rank { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; min-width: 40px; text-align: center; }
+.anomaly-rank.surging { background: rgba(239,68,68,0.15); color: #f87171; }
+.anomaly-rank.declining { background: rgba(59,130,246,0.15); color: #60a5fa; }
+.anomaly-main { flex: 1; }
+.anomaly-keyword { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); }
+.anomaly-meta { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.anomaly-suggestion { font-size: 11px; color: #fbbf24; text-align: right; max-width: 140px; }
+
+/* 自有数据回传 */
+.own-perf-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; margin-bottom: 8px; }
+.own-perf-rank { width: 28px; height: 28px; border-radius: 50%; background: rgba(139,92,246,0.2); color: #a78bfa; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; flex-shrink: 0; }
+.own-perf-main { flex: 1; min-width: 0; }
+.own-perf-title { font-size: 14px; font-weight: 600; color: rgba(255,255,255,0.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.own-perf-meta { font-size: 11px; color: rgba(255,255,255,0.4); margin-top: 2px; }
+.own-perf-stats { display: flex; gap: 16px; }
+.empty-state { text-align: center; padding: 40px 20px; }
