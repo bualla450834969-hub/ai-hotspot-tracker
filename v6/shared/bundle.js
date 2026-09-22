@@ -3,6 +3,51 @@
  * 所有业务文案、关键词、模块开关、配色都从这里读取
  */
 window.DATA = window.DASHBOARD_DATA || {};
+
+// ===== 数据适配层：统一不同行业的数据字段 =====
+(function normalizeData() {
+  var d = window.DATA;
+  // works 字段映射
+  if (d.works && d.works.length > 0) {
+    d.works = d.works.map(function(w) {
+      return {
+        title: w.title || w.name || '',
+        author: w.author || w.accountName || '',
+        platform: w.platform || 'douyin',
+        likes: w.likes || w.likeCount || 0,
+        comments: w.comments || w.commentCount || 0,
+        collects: w.collects || w.collectCount || 0,
+        shares: w.shares || w.shareCount || 0,
+        duration: w.duration || 0,
+        publishTime: w.publishTime || w.published_at || '',
+        url: w.url || w.workUrl || '',
+        cover: w.cover || w.coverUrl || ''
+      };
+    });
+  }
+  // 其他字段 fallback
+  d.hotwords = d.hotwords || [];
+  d.topics = d.topics || [];
+  d.title_formulas = d.title_formulas || [];
+  d.title_formulas_array = d.title_formulas_array || [];
+  d.saturation = d.saturation || {level: 'unknown', score: 50};
+  d.comment_demands = d.comment_demands || {questions: [], complaints: []};
+  d.audience_personas = d.audience_personas || [];
+  d.benchmark = d.benchmark || {top_accounts: []};
+  d.viral_genes = d.viral_genes || {hook_distribution: {}, top_genes: []};
+  d.small_account_viral = d.small_account_viral || [];
+  d.daily_actions = d.daily_actions || [];
+  d.hot_breakdowns = d.hot_breakdowns || [];
+  d.launch_ops = d.launch_ops || {best_time: '', tips: []};
+  d.comment_keywords = d.comment_keywords || [];
+  d.comment_scripts = d.comment_scripts || [];
+  d.title_genes = d.title_genes || [];
+  d.completion_rate = d.completion_rate || [];
+  d.best_posting_combo = d.best_posting_combo || {time: '', platform: '', score: 0};
+  d.comment_semantic = d.comment_semantic || {themes: []};
+  d.conversion_signals = d.conversion_signals || [];
+  window.DATA = d;
+})();
 window.DOMAIN_CONFIG = window.DOMAIN_CONFIG || {
   // ===== 基础信息 =====
   id: 'ai',
@@ -872,7 +917,52 @@ window.domainGuard = function(moduleId, renderFn) {
   window.initFramework = init;
   // 兼容原模板的全局DATA引用（所有模块IIFE内引用的DATA）
   // 必须用赋值而非const，避免遮蔽已存在的全局DATA
-  try { window.DATA = window.DASHBOARD_DATA || {}; } catch(e) {}
+  try { window.DATA = window.DASHBOARD_DATA || {};
+
+// ===== 数据适配层：统一不同行业的数据字段 =====
+(function normalizeData() {
+  var d = window.DATA;
+  // works 字段映射
+  if (d.works && d.works.length > 0) {
+    d.works = d.works.map(function(w) {
+      return {
+        title: w.title || w.name || '',
+        author: w.author || w.accountName || '',
+        platform: w.platform || 'douyin',
+        likes: w.likes || w.likeCount || 0,
+        comments: w.comments || w.commentCount || 0,
+        collects: w.collects || w.collectCount || 0,
+        shares: w.shares || w.shareCount || 0,
+        duration: w.duration || 0,
+        publishTime: w.publishTime || w.published_at || '',
+        url: w.url || w.workUrl || '',
+        cover: w.cover || w.coverUrl || ''
+      };
+    });
+  }
+  // 其他字段 fallback
+  d.hotwords = d.hotwords || [];
+  d.topics = d.topics || [];
+  d.title_formulas = d.title_formulas || [];
+  d.title_formulas_array = d.title_formulas_array || [];
+  d.saturation = d.saturation || {level: 'unknown', score: 50};
+  d.comment_demands = d.comment_demands || {questions: [], complaints: []};
+  d.audience_personas = d.audience_personas || [];
+  d.benchmark = d.benchmark || {top_accounts: []};
+  d.viral_genes = d.viral_genes || {hook_distribution: {}, top_genes: []};
+  d.small_account_viral = d.small_account_viral || [];
+  d.daily_actions = d.daily_actions || [];
+  d.hot_breakdowns = d.hot_breakdowns || [];
+  d.launch_ops = d.launch_ops || {best_time: '', tips: []};
+  d.comment_keywords = d.comment_keywords || [];
+  d.comment_scripts = d.comment_scripts || [];
+  d.title_genes = d.title_genes || [];
+  d.completion_rate = d.completion_rate || [];
+  d.best_posting_combo = d.best_posting_combo || {time: '', platform: '', score: 0};
+  d.comment_semantic = d.comment_semantic || {themes: []};
+  d.conversion_signals = d.conversion_signals || [];
+  window.DATA = d;
+})(); } catch(e) {}
   // 同时尝试赋值给全局词法环境的DATA（如果是var声明的全局变量）
   if (typeof DATA !== 'undefined') {
     try { DATA = window.DASHBOARD_DATA || {}; } catch(e) {}
