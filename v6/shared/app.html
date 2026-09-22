@@ -758,7 +758,7 @@ window.safeCall = function(fn, ctx) {
 
   // 1. 加载 config.json
   var xhr = new XMLHttpRequest();
-  xhr.open('GET', base + 'config.json', false);
+  xhr.open('GET', base + 'config.json?t=' + Date.now(), false);
   xhr.send();
   if (xhr.status === 200) {
     window.DOMAIN_CONFIG = JSON.parse(xhr.responseText);
