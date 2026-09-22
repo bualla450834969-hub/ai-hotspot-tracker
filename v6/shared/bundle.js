@@ -2,7 +2,7 @@
  * 领域配置 — 换领域时唯一需要修改的文件
  * 所有业务文案、关键词、模块开关、配色都从这里读取
  */
-window.DOMAIN_CONFIG = {
+window.DOMAIN_CONFIG = window.DOMAIN_CONFIG || {
   // ===== 基础信息 =====
   id: 'ai',
   name: 'AI',
