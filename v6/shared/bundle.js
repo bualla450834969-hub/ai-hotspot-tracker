@@ -4399,7 +4399,7 @@ if (document.readyState === 'loading') {
   function renderBlueOcean(data) {
     var el = document.getElementById('blueOceanList');
     if (!el) return;
-    var list = data || [];
+    var list = data || (window.DATA && window.DATA.blue_ocean_list) || [];
     if (!list.length) { renderEmpty('blueOceanList', '暂无蓝海关键词数据'); return; }
     var html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;padding:4px 0;">';
     list.forEach(function(b) {
@@ -4418,7 +4418,7 @@ if (document.readyState === 'loading') {
   function renderGrowthRanking(data) {
     var el = document.getElementById('growthRankingList');
     if (!el) return;
-    var list = data || [];
+    var list = data || (window.DATA && window.DATA.growth_ranking) || [];
     if (!list.length) { renderEmpty('growthRankingList', '暂无上升速率数据'); return; }
     var html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:4px 0;">';
     list.forEach(function(g, i) {
