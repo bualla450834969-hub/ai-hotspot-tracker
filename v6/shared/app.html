@@ -753,6 +753,9 @@ window.safeCall = function(fn, ctx) {
 (function() {
   var params = new URLSearchParams(window.location.search);
   var ind = params.get('ind') || 'ai';
+    // 中文行业名映射到英文slug
+    var slugMap = {'书法':'shufa', '書法':'shufa'};
+    if (slugMap[ind]) ind = slugMap[ind];
   window.CURRENT_INDUSTRY = ind;
   var base = '../industries/' + ind + '/';
 
