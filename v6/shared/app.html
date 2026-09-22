@@ -749,31 +749,6 @@ window.safeCall = function(fn, ctx) {
   <!-- ===== 脚本层（模块化，按依赖顺序）===== -->
   
   <script>
-    // 动态注入品牌信息和页面文案（从domain.js配置读取）
-    (function() {
-      var name = cfg('display_name', '热点追踪');
-      document.getElementById('pageTitle').textContent = name;
-      document.getElementById('navLogo').textContent = name;
-      document.getElementById('loginBrandName').textContent = cfg('brand.name_en', 'BRAND');
-      document.getElementById('loginBrandTag').textContent = cfg('brand.name_cn', '') + ' · ' + cfg('brand.slogan', '');
-      // hero标题
-      var ht = document.getElementById('heroTitle');
-      if (ht) ht.innerHTML = cfg('name', 'AI') + ' 热点<em>追踪</em><br>工作台';
-      // section标题
-      document.querySelectorAll('[data-section]').forEach(function(el) {
-        var key = el.getAttribute('data-section');
-        var title = cfg('copy.section_titles.' + key, '');
-        if (title) el.textContent = title;
-      });
-      // footer
-      var ft = document.getElementById('pageFooter');
-      if (ft) ft.textContent = name + ' · 数据来源 RedFox Hub · 每日 8:00 自动采集';
-    })();
-  </script>
-
-  
-  
-<script>
 // ===== v6 动态行业配置加载器 =====
 (function() {
   var params = new URLSearchParams(window.location.search);
@@ -817,12 +792,39 @@ window.safeCall = function(fn, ctx) {
   };
 
   // 3. 加载 data.js (同步)
-  var s = document.createElement('script');
-  s.src = base + 'data.js?t=' + Date.now();
-  s.async = false;
-  document.write(s.outerHTML);
+  // Load data.js synchronously
+  
+  
+  document.write('<script src="' + base + 'data.js?t=' + Date.now() + '"><\\/script>');
 })();
 </script>
+
+<script>
+    // 动态注入品牌信息和页面文案（从domain.js配置读取）
+    (function() {
+      var name = cfg('display_name', '热点追踪');
+      document.getElementById('pageTitle').textContent = name;
+      document.getElementById('navLogo').textContent = name;
+      document.getElementById('loginBrandName').textContent = cfg('brand.name_en', 'BRAND');
+      document.getElementById('loginBrandTag').textContent = cfg('brand.name_cn', '') + ' · ' + cfg('brand.slogan', '');
+      // hero标题
+      var ht = document.getElementById('heroTitle');
+      if (ht) ht.innerHTML = cfg('name', 'AI') + ' 热点<em>追踪</em><br>工作台';
+      // section标题
+      document.querySelectorAll('[data-section]').forEach(function(el) {
+        var key = el.getAttribute('data-section');
+        var title = cfg('copy.section_titles.' + key, '');
+        if (title) el.textContent = title;
+      });
+      // footer
+      var ft = document.getElementById('pageFooter');
+      if (ft) ft.textContent = name + ' · 数据来源 RedFox Hub · 每日 8:00 自动采集';
+    })();
+  </script>
+
+  
+  
+
 
   <script src="../shared/bundle.js?v=20260922b"></script>
 <!-- 所有模块加载完毕后启动框架 -->
