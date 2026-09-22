@@ -798,7 +798,10 @@ window.safeCall = function(fn, ctx) {
   // Load data.js synchronously
   
   
-  document.write('<script src="' + base + 'data.js?t=' + Date.now() + '"><\\/script>');
+  var ds = document.createElement('script');
+  ds.src = base + 'data.js?t=' + Date.now();
+  ds.onload = function() { if (window.renderAll) window.renderAll(); };
+  document.head.appendChild(ds);
 })();
 </script>
 
