@@ -338,6 +338,7 @@ window.domainGuard = function(moduleId, renderFn) {
     var sel = document.getElementById('categoryFilter');
     if (sel) window.currentCategory = sel.value;
     window.renderAll();
+  try { renderCommentSemantic(); renderConversionSignals(); } catch(e) {}
   };
 
   // ===== setPlatform — 平台切换 =====
@@ -2493,6 +2494,33 @@ if (document.readyState === 'loading') {
         <div class="f-example">${f.example}</div>
         <div class="f-stats">命中 ${f.count} 条 · 平均点赞 ${f.avg_likes.toLocaleString()}</div>
       </div>`).join('');
+  }
+
+  // renderCommentSemantic
+  function renderCommentSemantic() {
+    var el = document.getElementById('commentSemanticContent');
+    if (!el) return;
+    var data = DATA.comment_semantic || {};
+    var themes = data.themes || [];
+    var html = '<div class="cs-grid">';
+    themes.forEach(function(t) {
+      html += '<div class="cs-item"><span class="cs-name">' + t.name + '</span><span class="cs-count">' + t.count + '</span></div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  // renderConversionSignals
+  function renderConversionSignals() {
+    var el = document.getElementById('conversionSignalList');
+    if (!el) return;
+    var signals = DATA.conversion_signals || [];
+    var html = '<div class="cs-list">';
+    signals.forEach(function(s) {
+      html += '<div class="cs-item"><div class="cs-signal">' + s.signal + '</div><div class="cs-desc">' + s.desc + '</div><span class="cs-impact impact-' + (s.impact||'中') + '">' + (s.impact||'中') + '影响</span></div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
   }
 
   // renderCollect
