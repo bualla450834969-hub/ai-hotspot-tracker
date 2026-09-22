@@ -1,0 +1,343 @@
+{
+  "id": "书法",
+  "name": "书法",
+  "display_name": "书法热点追踪",
+  "tagline": "数据驱动内容运营",
+  "language": "zh-CN",
+  "brand": {
+    "name_en": "PYRALUMA",
+    "name_cn": "璃火矩创",
+    "slogan": "Intelligence",
+    "logo_type": "shapes"
+  },
+  "collect_keywords": [
+    "书法",
+    "书法教程",
+    "书法怎么做",
+    "书法入门",
+    "书法推荐",
+    "书法技巧",
+    "书法案例",
+    "书法工具",
+    "书法方法",
+    "书法变现",
+    "书法创业",
+    "书法赚钱"
+  ],
+  "core_keywords": [
+    "书法",
+    "书法教程",
+    "书法怎么做",
+    "书法入门",
+    "书法推荐"
+  ],
+  "exclude_keywords": [
+    "书法"
+  ],
+  "related_keywords": [
+    "书法教程",
+    "书法怎么做",
+    "书法入门",
+    "书法推荐",
+    "书法技巧"
+  ],
+  "content_categories": [
+    {
+      "name": "书法教程",
+      "keywords": [
+        "教程",
+        "教学",
+        "入门",
+        "怎么做",
+        "手把手"
+      ]
+    },
+    {
+      "name": "书法案例",
+      "keywords": [
+        "案例",
+        "作品",
+        "展示",
+        "效果",
+        "欣赏"
+      ]
+    },
+    {
+      "name": "书法技巧",
+      "keywords": [
+        "技巧",
+        "方法",
+        "攻略",
+        "秘籍",
+        "干货"
+      ]
+    },
+    {
+      "name": "书法资讯",
+      "keywords": [
+        "资讯",
+        "新闻",
+        "最新",
+        "趋势",
+        "动态"
+      ]
+    }
+  ],
+  "format_rules": [
+    {
+      "name": "教程实操",
+      "keywords": [
+        "教程",
+        "教学",
+        "步骤",
+        "怎么",
+        "实操",
+        "手把手"
+      ]
+    },
+    {
+      "name": "案例展示",
+      "keywords": [
+        "案例",
+        "作品",
+        "展示",
+        "效果",
+        "欣赏"
+      ]
+    },
+    {
+      "name": "技巧攻略",
+      "keywords": [
+        "技巧",
+        "攻略",
+        "方法",
+        "干货",
+        "秘籍"
+      ]
+    }
+  ],
+  "modules": {
+    "hero": true,
+    "works": true,
+    "techradar": false,
+    "hotwords": true,
+    "history": true,
+    "breakdown": true,
+    "viralGenes": false,
+    "insights": true,
+    "topics": true,
+    "titleGen": true,
+    "schedule": true,
+    "topicPerf": true,
+    "commentScripts": true,
+    "checklist": true,
+    "publishTime": true,
+    "titleFormulas": true,
+    "leadScripts": true,
+    "launchOps": true,
+    "audience": true,
+    "saturation": false
+  },
+  "nav_order": [
+    "hero",
+    "hotwords",
+    "breakdown",
+    "topics",
+    "topicPerf",
+    "publishTime",
+    "titleFormulas",
+    "leadScripts",
+    "launchOps",
+    "audience"
+  ],
+  "nav_labels": {
+    "hero": "总览",
+    "techradar": "技术雷达",
+    "hotwords": "热词",
+    "breakdown": "爆款拆解",
+    "topics": "选题",
+    "topicPerf": "选题表现",
+    "publishTime": "发布时间",
+    "titleFormulas": "标题公式",
+    "leadScripts": "钩子话术",
+    "launchOps": "起号运营",
+    "audience": "人群画像"
+  },
+  "theme": {
+    "bg": "#0a0a0f",
+    "bg_gradient": "linear-gradient(135deg, #0a0a0f 0%, #1a1025 50%, #0f1a2a 100%)",
+    "primary": "#8b5cf6",
+    "primary_light": "#a78bfa",
+    "accent": "#30D158",
+    "warning": "#fbbf24",
+    "danger": "#f87171",
+    "info": "#60a5fa",
+    "text": "#f1f5f9",
+    "text_secondary": "#94a3b8",
+    "text_tertiary": "#64748b",
+    "glass_bg": "rgba(255,255,255,0.06)",
+    "glass_border": "rgba(255,255,255,0.1)",
+    "glow_hue_start": 280,
+    "glow_hue_end": 200
+  },
+  "launch": {
+    "start_date": "2026-09-22",
+    "target_ratio": {
+      "core": 70,
+      "related": 20,
+      "general": 10
+    },
+    "tasks": [
+      "每日发布1-2条",
+      "每条标题包含1个核心关键词",
+      "发布时间18:00-21:00",
+      "评论区主动互动"
+    ],
+    "pitfalls": [
+      "不要发泛娱乐内容",
+      "不要买粉买赞",
+      "不要一开始就带货"
+    ]
+  },
+  "audience_categories": [
+    {
+      "name": "新手入门",
+      "proportion": 40,
+      "needs": [
+        "教程",
+        "入门",
+        "怎么用",
+        "避坑"
+      ]
+    },
+    {
+      "name": "进阶玩家",
+      "proportion": 35,
+      "needs": [
+        "技巧",
+        "案例",
+        "进阶",
+        "攻略"
+      ]
+    },
+    {
+      "name": "行业从业者",
+      "proportion": 25,
+      "needs": [
+        "资讯",
+        "趋势",
+        "工具",
+        "变现"
+      ]
+    }
+  ],
+  "title_formulas": [
+    {
+      "pattern": "{keyword}保姆级教程，小白也能上手",
+      "type": "教程型",
+      "ctr": "高"
+    },
+    {
+      "pattern": "我用{keyword}做了一个{result}，效果惊人",
+      "type": "效果型",
+      "ctr": "高"
+    },
+    {
+      "pattern": "2026年最值得学的{keyword}，收藏吃灰",
+      "type": "收藏型",
+      "ctr": "中"
+    }
+  ],
+  "lead_scripts": [
+    {
+      "hook": "90%的人不知道，{keyword}还能这么用",
+      "type": "反常识",
+      "duration": "0-3秒"
+    },
+    {
+      "hook": "学会这个{keyword}技巧，效率直接翻倍",
+      "type": "利益点",
+      "duration": "0-3秒"
+    }
+  ],
+  "copy": {
+    "hero_title": "热点追踪工作台",
+    "hero_subtitle": "双平台数据 · 智能选题",
+    "data_fresh_warning": "数据超过24小时未更新",
+    "collect_failed": "采集失败",
+    "section_titles": {
+      "hero": "总览",
+      "hotwords": "热词分析",
+      "breakdown": "爆款拆解",
+      "topics": "选题建议",
+      "topicPerf": "选题表现",
+      "publishTime": "发布时间分析",
+      "titleFormulas": "标题公式库",
+      "leadScripts": "钩子话术库",
+      "launchOps": "起号运营",
+      "audience": "人群画像"
+    }
+  },
+  "monetization_rules": [
+    {
+      "match": [
+        "教程",
+        "入门",
+        "怎么做"
+      ],
+      "type": "course",
+      "score": 80,
+      "desc": "知识付费：课程/社群"
+    },
+    {
+      "match": [
+        "工具",
+        "推荐"
+      ],
+      "type": "affiliate",
+      "score": 75,
+      "desc": "带货：工具佣金"
+    },
+    {
+      "match": [
+        "资讯",
+        "趋势"
+      ],
+      "type": "ad",
+      "score": 60,
+      "desc": "广告：品牌合作"
+    }
+  ],
+  "hashtags": {
+    "core": "{cat} #干货分享"
+  },
+  "content_format": "15-40秒口播+素材混剪",
+  "cta": {
+    "question": "你们最想用这个解决什么问题？评论区告诉我！"
+  },
+  "tasks": {
+    "collect_footage": "收集素材并完成剪辑",
+    "collect_footage_short": "收集素材"
+  },
+  "script_templates": {
+    "follow_cta": "关注我，每天分享一个实用技巧",
+    "comment_cta": "评论区扣1，发你完整教程",
+    "hashtag_prefix": "#",
+    "bg_desc": ""
+  },
+  "works": {
+    "theme_keywords": [
+      "书法",
+      "书法教程",
+      "书法怎么做",
+      "书法入门",
+      "书法推荐",
+      "书法技巧",
+      "书法案例",
+      "书法工具"
+    ]
+  },
+  "lead_scripts_detail": [],
+  "title_formula_examples": {},
+  "domain_specific_modules": []
+}
