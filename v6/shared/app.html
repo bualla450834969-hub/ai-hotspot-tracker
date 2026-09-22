@@ -800,7 +800,7 @@ window.safeCall = function(fn, ctx) {
   
   var ds = document.createElement('script');
   ds.src = base + 'data.js?t=' + Date.now();
-  ds.onload = function() { window.DATA = window.DASHBOARD_DATA; if (window.normalizeData) window.normalizeData(); if (window.renderAll) window.renderAll(); };
+  ds.onload = function() { window.DATA = window.DASHBOARD_DATA; if (window.normalizeData) window.normalizeData(); if (window.renderAll) window.renderAll(); if (window.__renderBlueOcean) window.__renderBlueOcean(); if (window.__renderGrowth) window.__renderGrowth(); };
   document.head.appendChild(ds);
 })();
 </script>
@@ -832,7 +832,7 @@ window.safeCall = function(fn, ctx) {
   
 
 
-  <script src="../shared/bundle.js?v=20260923h"></script>
+  <script src="../shared/bundle.js?v=20260923i"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
