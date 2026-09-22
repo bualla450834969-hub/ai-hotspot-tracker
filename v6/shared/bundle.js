@@ -2686,7 +2686,8 @@ if (document.readyState === 'loading') {
       id: "breakdown",
       requiredFields: ['works'],
       render: function(data) {
-        try { renderBreakdowns(); renderMatrix(); renderFormulas(); renderCollect(DATA.hotwords); renderScatter(data); renderSaturation(DATA.hotwords); renderCommentDemands(); renderCommentKw(); renderHook(data); renderDuration(data); renderPublishTime(data); } catch(e) { console.error("[breakdown]", e); }
+        var steps = [renderBreakdowns, renderMatrix, renderFormulas, function(){renderCollect(DATA.hotwords);}, function(){renderScatter(data);}, function(){renderSaturation(DATA.hotwords);}, renderCommentDemands, function(){renderCommentKw(data);}, function(){renderHook(data);}, function(){renderDuration(data);}, function(){renderPublishTime(data);}];
+        steps.forEach(function(fn){ try { fn(); } catch(e) { console.error("[bd]", e.message); } });
       }
     });
   }
