@@ -2,6 +2,7 @@
  * 领域配置 — 换领域时唯一需要修改的文件
  * 所有业务文案、关键词、模块开关、配色都从这里读取
  */
+var DATA = window.DASHBOARD_DATA || {};
 window.DOMAIN_CONFIG = window.DOMAIN_CONFIG || {
   // ===== 基础信息 =====
   id: 'ai',
