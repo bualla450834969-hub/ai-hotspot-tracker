@@ -5,7 +5,7 @@
 window.DATA = window.DASHBOARD_DATA || {};
 
 // ===== 数据适配层：统一不同行业的数据字段 =====
-(function normalizeData() {
+window.normalizeData = function() {
   var d = window.DATA;
   // works 字段映射
   if (d.works && d.works.length > 0) {
@@ -167,7 +167,8 @@ window.DATA = window.DASHBOARD_DATA || {};
   });
 
   window.DATA = d;
-})();
+};
+window.normalizeData();
 window.DOMAIN_CONFIG = window.DOMAIN_CONFIG || {
   // ===== 基础信息 =====
   id: 'ai',
@@ -1040,7 +1041,7 @@ window.domainGuard = function(moduleId, renderFn) {
   try { window.DATA = window.DASHBOARD_DATA || {};
 
 // ===== 数据适配层：统一不同行业的数据字段 =====
-(function normalizeData() {
+window.normalizeData = function() {
   var d = window.DATA;
   // works 字段映射
   if (d.works && d.works.length > 0) {
@@ -1202,7 +1203,8 @@ window.domainGuard = function(moduleId, renderFn) {
   });
 
   window.DATA = d;
-})(); } catch(e) {}
+};
+window.normalizeData(); } catch(e) {}
   // 同时尝试赋值给全局词法环境的DATA（如果是var声明的全局变量）
   if (typeof DATA !== 'undefined') {
     try { DATA = window.DASHBOARD_DATA || {}; } catch(e) {}
