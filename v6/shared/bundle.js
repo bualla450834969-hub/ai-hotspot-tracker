@@ -3992,7 +3992,7 @@ if (document.readyState === 'loading') {
     const nav = document.createElement('nav');
     nav.className = 'sidebar-nav';
 
-    NAV_GROUPS.forEach(function(group) {
+    NAV_GROUPS.filter(function(g) { var mods = (window.DOMAIN_CONFIG||{}).modules||{}; return mods[g.id] !== false; }).forEach(function(group) {
       const item = document.createElement('div');
       item.className = 'sidebar-nav-item' + (group.id === currentPage ? ' active' : '');
       item.dataset.page = group.id;
