@@ -47,14 +47,24 @@ window.DATA = window.DASHBOARD_DATA || {};
   // 2. audience_personas 人群画像
   if (!d.audience_personas || d.audience_personas.length === 0) {
     d.audience_personas = [
-      {name: '入门学习者', desc: '零基础想开始', need: '教程/入门', pct: 40},
-      {name: '进阶爱好者', desc: '有基础想提升', need: '技巧/示范', pct: 35},
-      {name: '专业从业者', desc: '以此为生', need: '进阶/行业', pct: 25}
+      {name: '书法初学者', category: '零基础入门', proportion: 40, age: '18-30', gender: '女', traits: ['想写好字','教程需求'], need: '入门教程'},
+      {name: '硬笔爱好者', category: '日常书写', proportion: 35, age: '25-40', gender: '不限', traits: ['实用为主','快速见效'], need: '实用技巧'},
+      {name: '书法老师', category: '专业教学', proportion: 25, age: '30-50', gender: '不限', traits: ['教学需求','专业进阶'], need: '教学方法'}
     ];
   }
   // 确保每个人群有 pct 字段
   d.audience_personas = d.audience_personas.map(function(p, i) {
-    return {name: p.name || '人群' + (i+1), desc: p.desc || '', need: p.need || '', pct: p.pct || p.percent || Math.round(100/d.audience_personas.length)};
+    var pct = p.pct || p.percent || p.proportion || Math.round(100/d.audience_personas.length);
+    return {
+      name: p.name || '人群' + (i+1),
+      category: p.category || p.desc || '书法爱好者',
+      proportion: pct,
+      age: p.age || '18-35',
+      gender: p.gender || '不限',
+      traits: p.traits || ['学习需求强'],
+      need: p.need || p.core_need || '提升技能',
+      pct: pct
+    };
   });
 
   // 3. pitfall_list 起号避坑
@@ -1072,14 +1082,24 @@ window.domainGuard = function(moduleId, renderFn) {
   // 2. audience_personas 人群画像
   if (!d.audience_personas || d.audience_personas.length === 0) {
     d.audience_personas = [
-      {name: '入门学习者', desc: '零基础想开始', need: '教程/入门', pct: 40},
-      {name: '进阶爱好者', desc: '有基础想提升', need: '技巧/示范', pct: 35},
-      {name: '专业从业者', desc: '以此为生', need: '进阶/行业', pct: 25}
+      {name: '书法初学者', category: '零基础入门', proportion: 40, age: '18-30', gender: '女', traits: ['想写好字','教程需求'], need: '入门教程'},
+      {name: '硬笔爱好者', category: '日常书写', proportion: 35, age: '25-40', gender: '不限', traits: ['实用为主','快速见效'], need: '实用技巧'},
+      {name: '书法老师', category: '专业教学', proportion: 25, age: '30-50', gender: '不限', traits: ['教学需求','专业进阶'], need: '教学方法'}
     ];
   }
   // 确保每个人群有 pct 字段
   d.audience_personas = d.audience_personas.map(function(p, i) {
-    return {name: p.name || '人群' + (i+1), desc: p.desc || '', need: p.need || '', pct: p.pct || p.percent || Math.round(100/d.audience_personas.length)};
+    var pct = p.pct || p.percent || p.proportion || Math.round(100/d.audience_personas.length);
+    return {
+      name: p.name || '人群' + (i+1),
+      category: p.category || p.desc || '书法爱好者',
+      proportion: pct,
+      age: p.age || '18-35',
+      gender: p.gender || '不限',
+      traits: p.traits || ['学习需求强'],
+      need: p.need || p.core_need || '提升技能',
+      pct: pct
+    };
   });
 
   // 3. pitfall_list 起号避坑
