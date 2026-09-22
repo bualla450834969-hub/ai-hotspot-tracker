@@ -29,7 +29,7 @@ window.safeCall = function(fn, ctx) {
 <link rel="stylesheet" href="../shared/styles/sidebar.css?v=1788842270">
   <link rel="stylesheet" href="../shared/styles/advanced.css?v=1788757957">
   <!-- ECharts -->
-  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
 
 <div class="login-screen" id="loginScreen">
@@ -800,7 +800,7 @@ window.safeCall = function(fn, ctx) {
   
   var ds = document.createElement('script');
   ds.src = base + 'data.js?t=' + Date.now();
-  ds.onload = function() { window.DATA = window.DASHBOARD_DATA; if (window.normalizeData) window.normalizeData(); if (window.renderAll) window.renderAll(); if (window.__renderBlueOcean) window.__renderBlueOcean(); if (window.__renderGrowth) window.__renderGrowth(); };
+  ds.onload = function() { window.DATA = window.DASHBOARD_DATA; if (window.normalizeData) window.normalizeData(); if (window.renderAll) window.renderAll(); };
   document.head.appendChild(ds);
 })();
 </script>
@@ -832,7 +832,7 @@ window.safeCall = function(fn, ctx) {
   
 
 
-  <script src="../shared/bundle.js?v=20260923i"></script>
+  <script src="../shared/bundle.js?v=20260924b"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
