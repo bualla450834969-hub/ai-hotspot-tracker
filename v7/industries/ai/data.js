@@ -28,9 +28,7 @@ window.DASHBOARD_DATA = {"last_update": "2026-09-22 16:28:49", "hotwords": [{"ke
     "抖音",
     "B站",
     "小红书"
-  ]
-}
-,
+  ]},
   "blue_ocean_keywords": [
     {"keyword":"AI编程工具","platform":"douyin","avg_like":892,"works_count":12,"competition_score":23,"blue_ocean_score":78,"opportunity":"工具类低竞争"},
     {"keyword":"AI Agent教程","platform":"douyin","avg_like":1205,"works_count":8,"competition_score":18,"blue_ocean_score":85,"opportunity":"教程蓝海"},
