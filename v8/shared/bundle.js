@@ -115,6 +115,26 @@ window.normalizeData = function() {
   if (Array.isArray(d.title_formulas) && !d.title_formulas_array) {
     d.title_formulas_array = d.title_formulas.map(function(f){ return [f.formula, f.count || 1]; });
   }
+  // ===== 统一 format_roi / competitor_list 字段契约（任何行业通用）=====
+  if (Array.isArray(d.format_roi)) {
+    d.format_roi = d.format_roi.map(function(r){
+      return {
+        format: r.format,
+        avgLikes: r.avgLikes != null ? r.avgLikes : (r.avg_likes || 0),
+        collectRate: r.collectRate != null ? r.collectRate : (r.collect_rate || 0),
+        roi: r.roi || 0
+      };
+    });
+  }
+  if (Array.isArray(d.competitor_list)) {
+    d.competitor_list = d.competitor_list.map(function(c){
+      return {
+        name: c.name, works: c.works || 1,
+        avgLikes: c.avgLikes || 0, maxLikes: c.maxLikes || 0, avgCollect: c.avgCollect || 0,
+        strategy: c.strategy || '持续输出+评论区互动'
+      };
+    });
+  }
 
   // ===== 自动填充：从 works 数据计算所有缺失字段 =====
   var works = d.works || [];
@@ -3439,13 +3459,17 @@ if (document.readyState === 'loading') {
 (function() {
   'use strict';
 
-  // renderLeadScripts
+  // renderLeadScripts（优先用数据 comment_scripts，无则中性空状态，不硬编码行业内容）
   function renderLeadScripts() {
-    var scripts = cfg('lead_scripts_detail', []);
-    var html = scripts.map(function(s) {
-      return '<div class="script-card"><div class="sc-target">' + s.target + '</div><div class="sc-text">' + s.text + '</div><span class="sc-copy" onclick="copyScript(this)">📋 复制话术</span></div>';
+    var sc = document.getElementById('scriptContainer'); if (!sc) return;
+    var scripts = (DATA.comment_scripts && DATA.comment_scripts.length) ? DATA.comment_scripts : cfg('lead_scripts_detail', []);
+    if (!scripts.length) {
+      sc.innerHTML = '<div style="padding:28px;text-align:center;color:var(--text-secondary);font-size:13px;line-height:1.8;">💬 采集到评论区需求后<br>将自动生成针对性的私域引流话术</div>';
+      return;
+    }
+    sc.innerHTML = scripts.map(function(s) {
+      return '<div class="script-card"><div class="sc-target">' + (s.type || s.target || '引流话术') + '</div><div class="sc-text">' + (s.text || '') + '</div><span class="sc-copy" onclick="copyScript(this)">📋 复制话术</span></div>';
     }).join('');
-    var sc = document.getElementById('scriptContainer'); if (sc) sc.innerHTML = html;
   }
 
   // 模块注册
@@ -3459,6 +3483,44 @@ if (document.readyState === 'loading') {
     });
   }
   window.renderLeadScripts = renderLeadScripts;
+})();
+
+
+/* ===== modules/benchmarkExtras.js（内容形式ROI + 对标账号，数据驱动正式渲染）===== */
+(function() {
+  'use strict';
+  function renderFormatROI() {
+    var el = document.getElementById('formatROIList'); if (!el) return;
+    var rois = DATA.format_roi || [];
+    if (!rois.length) { el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-secondary);font-size:13px;">暂无数据，采集后自动生成</div>'; return; }
+    el.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;">' + rois.map(function(r){
+      var pct = Math.max(0, Math.min(100, r.roi||0));
+      return '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span style="font-size:14px;font-weight:600;">'+r.format+'</span><span style="font-size:12px;color:#fbbf24;font-weight:700;">ROI '+pct+'</span></div>' +
+        '<div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:linear-gradient(90deg,#8b5cf6,#ec4899);border-radius:3px;"></div></div>' +
+        '<div style="display:flex;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--text-secondary);"><span>均赞 '+Number(r.avgLikes||0).toLocaleString()+'</span><span>收藏率 '+Number(r.collectRate||0)+'%</span></div>' +
+        '</div>';
+    }).join('') + '</div>';
+  }
+  function renderCompetitorList() {
+    var el = document.getElementById('competitorList'); if (!el) return;
+    var comps = DATA.competitor_list || [];
+    if (!comps.length) { el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-secondary);font-size:13px;">暂无数据，采集后自动生成</div>'; return; }
+    el.innerHTML = '<div style="display:grid;gap:10px;">' + comps.map(function(c){
+      return '<div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;">' +
+        '<div><div style="font-size:14px;font-weight:600;">'+c.name+'</div><div style="font-size:11px;color:var(--text-secondary);margin-top:3px;">'+(c.strategy||'')+'</div></div>' +
+        '<div style="text-align:right;font-size:11px;color:var(--text-secondary);"><div style="font-size:15px;color:#a78bfa;font-weight:700;">'+Number(c.avgLikes||0).toLocaleString()+'</div><div>'+Number(c.works||0)+' 作品</div></div>' +
+        '</div>';
+    }).join('') + '</div>';
+  }
+  if (window.Module) {
+    Module.register({ id:'benchmarkExtras', requiredFields:[], render:function(){
+      try{renderFormatROI();}catch(e){console.error('[formatROI]',e);}
+      try{renderCompetitorList();}catch(e){console.error('[competitorList]',e);}
+    }});
+  }
+  window.renderFormatROI = renderFormatROI;
+  window.renderCompetitorList = renderCompetitorList;
 })();
 
 
@@ -4582,7 +4644,8 @@ if (document.readyState === 'loading') {
 
 
 
-// Run after data loads
+// Run after data loads（兜底填充已由 Module 渲染系统接管，safeRender 为空操作）
+  var safeRender = function(){};
   function start() {
     safeRender();
     // Re-run after a delay to catch late-loading sections
@@ -4595,92 +4658,4 @@ if (document.readyState === 'loading') {
     start();
   }
   window.__fillEmptySections = safeRender;
-})();
-
-/* ===== second-pass filler for remaining sections ===== */
-(function() {
-  function fill() {
-    var d = window.DATA || {};
-    var works = d.works || [];
-    
-    // 选题看板 priority undefined
-    var kanban = document.querySelector('#kanbanBoard, .kanban, .board');
-    if (kanban && kanban.innerText.includes('undefined')) {
-      kanban.innerHTML = kanban.innerHTML.replace(/undefined优先/g, '高优先').replace(/undefined/g, '中');
-    }
-    
-    // 选题看板 cards - make sure they have content
-    var todoCol = document.querySelector('.todo-col, [data-col="todo"]');
-    if (todoCol && todoCol.children.length === 0) {
-      var kws = (window.DOMAIN_CONFIG && window.DOMAIN_CONFIG.collect_keywords || ['书法','行书','楷书']).slice(0,3);
-      todoCol.innerHTML = kws.map(function(k) {
-        return '<div class="kanban-card" style="background:rgba(255,255,255,0.05);border-radius:8px;padding:10px;margin-bottom:8px;">' +
-          '<div style="font-size:13px;font-weight:600;">' + k + '：蓝海选题</div>' +
-          '<div style="font-size:10px;color:var(--text-secondary);margin-top:4px;">高优先 · 抖音</div></div>';
-      }).join('');
-    }
-    
-    // 内容形式分布 chart
-    var cfd = document.getElementById('contentFormatDist');
-    if (cfd && (cfd.innerText.includes('暂无') || cfd.innerText.trim().length < 30)) {
-      var fmtMap = {教学:0, 展示:0, 技巧:0, 日常:0};
-      works.forEach(function(w) {
-        var t = (w.title||'');
-        if (t.indexOf('教程')>=0||t.indexOf('入门')>=0) fmtMap.教学++;
-        else if (t.indexOf('作品')>=0||t.indexOf('展示')>=0) fmtMap.展示++;
-        else if (t.indexOf('技巧')>=0||t.indexOf('方法')>=0) fmtMap.技巧++;
-        else fmtMap.日常++;
-      });
-      var entries = Object.keys(fmtMap);
-      var total = Math.max(1, entries.reduce(function(s,k){return s+fmtMap[k];},0));
-      cfd.innerHTML = '<div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">' +
-        entries.map(function(k) {
-          var pct = Math.round(fmtMap[k]/total*100);
-          return '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;text-align:center;">' +
-            '<div style="font-size:22px;font-weight:700;color:#a78bfa;">' + pct + '%</div>' +
-            '<div style="font-size:11px;color:var(--text-secondary);margin-top:4px;">' + k + '型</div></div>';
-        }).join('') + '</div>';
-    }
-    
-    // 一周内容排期
-    var ws = document.getElementById('weeklySchedule');
-    if (ws && ws.innerText.trim().length < 30) {
-      var days = ['周一','周二','周三','周四','周五','周六','周日'];
-      var kws = (window.DOMAIN_CONFIG && window.DOMAIN_CONFIG.collect_keywords || ['书法','行书','楷书']).slice(0,3);
-      ws.innerHTML = '<div style="padding:16px;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">' +
-        days.map(function(day, i) {
-          var kw = kws[i % kws.length];
-          return '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:8px;text-align:center;">' +
-            '<div style="font-size:10px;color:var(--text-secondary);">' + day + '</div>' +
-            '<div style="font-size:11px;font-weight:600;margin-top:4px;">' + kw + '</div></div>';
-        }).join('') + '</div>';
-    }
-    
-    // 选题命中率
-    var th = document.getElementById('topicHitRate');
-    if (th && th.innerText.includes('暂无')) {
-      th.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-secondary);"><div style="font-size:28px;margin-bottom:8px;">🎯</div>发布作品后自动追踪播放、点赞、评论数据，对比预测得分计算命中率</div>';
-    }
-    
-    // 发布前自检
-    var cl = document.getElementById('checklistContent');
-    if (cl && cl.innerText.includes('0/6')) {
-      var checks = ['选题与核心关键词一致','封面有文字钩子','开头3秒有吸引力','时长30-60秒','文案含2-3个话题标签','发布时间18:00-21:00'];
-      cl.innerHTML = checks.map(function(c) {
-        return '<label style="display:flex;align-items:center;gap:10px;padding:6px 0;"><input type="checkbox" style="width:16px;height:16px;"><span style="font-size:13px;">' + c + '</span></label>';
-      }).join('');
-    }
-    
-    // 私域引流话术
-    var sc = document.getElementById('scriptContainer');
-    if (sc && sc.innerText.trim().length < 30) {
-      sc.innerHTML = '<div style="padding:16px;display:grid;gap:8px;">' +
-        ['这个字帖哪里买的？ → 私信发你链接', '新手先练什么？ → 30天入门计划，扣1领取', '有教学视频吗？ → 主页有系统课程'].map(function(s) {
-          return '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:10px;font-size:12px;">💬 ' + s + '</div>';
-        }).join('') + '</div>';
-    }
-  }
-  
-  setTimeout(fill, 500);
-  setTimeout(fill, 1500);
 })();
