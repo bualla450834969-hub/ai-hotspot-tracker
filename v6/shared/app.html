@@ -867,7 +867,7 @@ window.safeCall = function(fn, ctx) {
         '<span>🎯 难度：中高</span>' +
         '<span class="tag boom">高优先</span></div></div>';
       var _first = document.querySelector('.section');
-      if (_first && _first.parentNode) _first.parentNode.insertBefore(_ac, _first);
+      _ac.style.display = 'block'; _ac.style.opacity = '1'; _ac.style.visibility = 'visible'; if (_first && _first.parentNode) _first.parentNode.insertBefore(_ac, _first);
     }
   } catch(e) { console.error('archify:', e); }  }, 800);
 };
@@ -902,7 +902,7 @@ window.safeCall = function(fn, ctx) {
   
 
 
-  <script src="../shared/bundle.js?v=20260923ok"></script>
+  <script src="../shared/bundle.js?v=20260923final"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
