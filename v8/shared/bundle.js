@@ -39,6 +39,43 @@ window.normalizeData = function() {
       };
     });
   }
+  // ===== 统一 hot_breakdowns / comment_semantic / conversion_signals 契约 =====
+  if (Array.isArray(d.hot_breakdowns)) {
+    d.hot_breakdowns = d.hot_breakdowns.map(function(b) {
+      var likes = (b.likes != null) ? b.likes : (b.likeCount || 0);
+      var tp = b.target_persona;
+      if (typeof tp === 'string') tp = {name: tp, age: '', needs: []};
+      tp = tp || {};
+      if (!tp.name) tp.name = '';
+      tp.needs = Array.isArray(tp.needs) ? tp.needs : [];
+      return {
+        title: b.title || '',
+        likes: likes,
+        hook: (b.hook || '').replace(/型$/, ''),
+        structure: b.structure || '',
+        cta: b.cta || '',
+        target_persona: tp,
+        author: b.author || b.accountName || '',
+        duration: b.duration || '',
+        interaction: b.interaction || '',
+        work_url: b.work_url || b.workUrl || '',
+        cover: b.cover || b.coverUrl || '',
+        keyword: b.keyword || ''
+      };
+    });
+  }
+  if (d.comment_semantic && Array.isArray(d.comment_semantic.themes)) {
+    d.comment_semantic.themes = d.comment_semantic.themes.map(function(t) {
+      return {name: t.name || t.theme || '', count: t.count || 0, sentiment: t.sentiment || 'neutral'};
+    });
+  }
+  if (Array.isArray(d.conversion_signals)) {
+    d.conversion_signals = d.conversion_signals.map(function(s) {
+      var desc = s.desc || (s.count != null ? (s.count + '条相关评论') : '');
+      return {signal: s.signal || '', desc: desc, impact: s.impact || s.intent || ''};
+    });
+  }
+
   // ===== 自动填充：从 works 数据计算所有缺失字段 =====
   var works = d.works || [];
   var cfg = window.DOMAIN_CONFIG || {};
@@ -66,17 +103,39 @@ window.normalizeData = function() {
       {name: '书法老师', category: '专业教学', proportion: 25, age: '30-50', gender: '不限', traits: ['教学需求','专业进阶'], need: '教学方法'}
     ];
   }
-  // 确保每个人群有 pct 字段
+  // 从 works 发布时间统计整体活跃高峰时段（数据驱动，任何行业通用）
+  var hourCount = {};
+  works.forEach(function(w) {
+    var hm = String(w.publishTime||'').match(/\d{4}-\d{2}-\d{2}\s+(\d{1,2}):/);
+    if (hm) { var hh = parseInt(hm[1],10); hourCount[hh] = (hourCount[hh]||0)+1; }
+  });
+  var peakHours = Object.keys(hourCount).map(Number).sort(function(a,b){return hourCount[b]-hourCount[a];}).slice(0,3).sort(function(a,b){return a-b;});
+  var activeTimeStr = peakHours.length
+    ? (peakHours[0] + ':00-' + (peakHours[peakHours.length-1]+1) + ':00 最活跃')
+    : '晚间 19:00-22:00';
+
+  // 人群字段补全：标准字段 + 渲染所需维度；缺失时用通用模板，不硬编码任何行业内容
   d.audience_personas = d.audience_personas.map(function(p, i) {
     var pct = p.pct || p.percent || p.proportion || Math.round(100/d.audience_personas.length);
+    var name = p.name || '人群' + (i+1);
+    var category = p.category || p.desc || '核心用户';
+    var traits = p.traits || ['学习需求强'];
+    var need = p.need || p.core_need || '提升技能';
+    var needs = (p.needs || (Array.isArray(p.need) ? p.need : [need]).concat(traits)).slice(0,4);
+    needs = needs.filter(function(v,idx){return needs.indexOf(v)===idx;});
     return {
-      name: p.name || '人群' + (i+1),
-      category: p.category || p.desc || '书法爱好者',
+      name: name,
+      category: category,
       proportion: pct,
       age: p.age || '18-35',
       gender: p.gender || '不限',
-      traits: p.traits || ['学习需求强'],
-      need: p.need || p.core_need || '提升技能',
+      traits: traits,
+      need: need,
+      needs: needs,
+      content_pref: p.content_pref || p.contentPref || ('偏好' + category + '方向的' + (traits[0]||'实操') + '内容、教程与真实案例'),
+      active_time: p.active_time || p.activeTime || activeTimeStr,
+      monetization: p.monetization || '系统课程 · 社群陪跑 · 资料/工具推荐',
+      pain_points: p.pain_points || p.painPoints || [need + '缺少系统方法', '自学见效慢、难以坚持'],
       pct: pct
     };
   });
@@ -152,20 +211,34 @@ window.normalizeData = function() {
     });
   }
 
-  // 11. content_format 内容形式分布
-  if (!d.content_format_dist) {
-    var fmtMap = {教学: 0, 展示: 0, 技巧: 0, 对比: 0};
+  // 11. content_formats_dist 内容形式分布（数据驱动，字段名/子字段与 renderFormatDist 契约一致）
+  if (!d.content_formats_dist || d.content_formats_dist.length === 0) {
+    var fmtGroups = {};
     works.forEach(function(w) {
       var t = (w.title||'');
-      if (t.indexOf('教程')>=0 || t.indexOf('入门')>=0 || t.indexOf('怎么')>=0) fmtMap.教学++;
-      else if (t.indexOf('作品')>=0 || t.indexOf('展示')>=0) fmtMap.展示++;
-      else if (t.indexOf('技巧')>=0 || t.indexOf('方法')>=0) fmtMap.技巧++;
-      else fmtMap.展示++;
+      var cat;
+      if (t.indexOf('教程')>=0||t.indexOf('入门')>=0||t.indexOf('怎么')>=0||t.indexOf('教学')>=0) cat='教学';
+      else if (t.indexOf('技巧')>=0||t.indexOf('方法')>=0) cat='技巧';
+      else if (t.indexOf('对比')>=0||/vs|VS|区别|哪个/.test(t)) cat='对比';
+      else cat='展示';
+      if (!fmtGroups[cat]) fmtGroups[cat] = {count:0, likes:0};
+      fmtGroups[cat].count++;
+      fmtGroups[cat].likes += (w.likes||0);
     });
-    d.content_format_dist = Object.keys(fmtMap).map(function(k) {
-      return {format: k, count: fmtMap[k], pct: Math.round(fmtMap[k]/Math.max(1,works.length)*100)};
+    var totalWorks = Math.max(1, works.length);
+    d.content_formats_dist = Object.keys(fmtGroups).map(function(k) {
+      var g = fmtGroups[k];
+      return {format:k, count:g.count, proportion:Math.round(g.count/totalWorks*100),
+              avg_likes:Math.round(g.likes/Math.max(1,g.count))};
+    });
+  } else {
+    d.content_formats_dist = d.content_formats_dist.map(function(f) {
+      var proportion = (f.proportion!=null)?f.proportion:(f.pct||0);
+      return {format:f.format, count:f.count||0, proportion:proportion,
+              avg_likes:(f.avg_likes!=null)?f.avg_likes:(f.avgLikes||0)};
     });
   }
+  d.content_format_dist = d.content_formats_dist;  // 兼容别名
 
   // 12. topics 选题建议 fallback
   if (!d.topics || d.topics.length === 0) {
@@ -2896,7 +2969,7 @@ if (document.readyState === 'loading') {
       id: "breakdown",
       requiredFields: ['works'],
       render: function(data) {
-        var steps = [renderBreakdowns, renderMatrix, renderFormulas, function(){renderCollect(DATA.hotwords);}, function(){renderScatter(data);}, function(){renderSaturation(DATA.hotwords);}, renderCommentDemands, function(){renderCommentKw(data);}, function(){renderHook(data);}, function(){renderDuration(data);}, function(){renderPublishTime(data);}];
+        var steps = [renderBreakdowns, renderMatrix, renderFormulas, renderCommentSemantic, renderConversionSignals, function(){renderCollect(DATA.hotwords);}, function(){renderScatter(data);}, function(){renderSaturation(DATA.hotwords);}, renderCommentDemands, function(){renderCommentKw(data);}, function(){renderHook(data);}, function(){renderDuration(data);}, function(){renderPublishTime(data);}];
         steps.forEach(function(fn){ try { fn(); } catch(e) { console.error("[bd]", e.message); } });
       }
     });
