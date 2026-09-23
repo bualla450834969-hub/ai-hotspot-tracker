@@ -7,20 +7,34 @@ window.DATA = window.DASHBOARD_DATA || {};
 // ===== 数据适配层：统一不同行业的数据字段 =====
 window.normalizeData = function() {
   var d = window.DATA;
-  // works 字段映射
+  // works 字段映射：统一标准字段（likes/comments/collects/shares），
+  // 同时保留 likeCount 等兼容别名，供历史渲染函数读取（适配层是唯一契约边界）
   if (d.works && d.works.length > 0) {
     d.works = d.works.map(function(w) {
+      var likes = w.likes || w.likeCount || 0;
+      var comments = w.comments || w.commentCount || 0;
+      var collects = w.collects || w.collectCount || 0;
+      var shares = w.shares || w.shareCount || 0;
+      var author = w.author || w.accountName || '';
+      var url = w.url || w.workUrl || '';
       return {
         title: w.title || w.name || '',
-        author: w.author || w.accountName || '',
+        author: author,
+        accountName: author,
         platform: w.platform || 'douyin',
-        likes: w.likes || w.likeCount || 0,
-        comments: w.comments || w.commentCount || 0,
-        collects: w.collects || w.collectCount || 0,
-        shares: w.shares || w.shareCount || 0,
+        likes: likes,
+        comments: comments,
+        collects: collects,
+        shares: shares,
+        likeCount: likes,
+        commentCount: comments,
+        collectCount: collects,
+        shareCount: shares,
+        followerCount: w.followerCount || w.followers || 0,
         duration: w.duration || 0,
         publishTime: w.publishTime || w.published_at || '',
-        url: w.url || w.workUrl || '',
+        url: url,
+        workUrl: url,
         cover: w.cover || w.coverUrl || ''
       };
     });
