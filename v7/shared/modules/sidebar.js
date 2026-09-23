@@ -16,39 +16,25 @@
       title: '数据概览'
     },
     {
+      id: 'techradar',
+      icon: '🛰️',
+      label: '技术雷达',
+      sections: ['techradar', 'techSummary', 'techGrid'],
+      title: '技术雷达'
+    },
+    {
       id: 'hotspots',
       icon: '🔥',
       label: '热点追踪',
-      sections: ['works', 'hotwords', 'history', 'hotwordTable', 'worksTable', 'chartRanking', 'chartCategory', 'chartPublishTime', 'chartDuration', 'chartHook', 'insightsGrid', 'growthRanking', 'blueOcean', 'anomalyDetection', 'ownPerformance'],
+      sections: ['works', 'hotwords', 'history', 'hotwordTable', 'worksTable', 'chartRanking', 'chartCategory', 'chartPublishTime', 'chartDuration', 'chartHook', 'insightsGrid', 'growthRanking', 'blueOcean', 'anomalyDetection'],
       title: '热点追踪'
     },
     {
       id: 'breakdown',
       icon: '💥',
       label: '爆款拆解',
-      sections: ['breakdown', 'breakdownGrid', 'saturationList', 'commentDemands', 'commentKw', 'chartScatter', 'chartCollect', 'matrixGrid', 'commentSemantic', 'conversionSignals', 'viralGenes', 'viralGenesContent'],
+      sections: ['breakdown', 'breakdownGrid', 'saturationList', 'commentDemands', 'commentKw', 'chartScatter', 'chartCollect', 'matrixGrid', 'commentSemantic', 'conversionSignals', 'viralGenes', 'viralGenesContent', 'completionRate', 'formatROI'],
       title: '爆款拆解'
-    },
-    {
-      id: 'content',
-      icon: '✍️',
-      label: '内容创作',
-      sections: ['titleGen', 'titleFormulas', 'formulaGrid', 'leadScripts', 'scriptContainer', 'publishTime', 'ptChart', 'ptBestCards', 'ptPlatform', 'ptTips', 'titleGenes', 'bestPostingCombo', 'postingReminder', 'completionRate'],
-      title: '内容创作'
-    },
-    {
-      id: 'topics',
-      icon: '📋',
-      label: '选题管理',
-      sections: ['topics', 'topicsGrid', 'topicTracker', 'kanbanBoard', 'topicPerf', 'topicPerfContent', 'crossPlatform'],
-      title: '选题管理'
-    },
-    {
-      id: 'launch',
-      icon: '🚀',
-      label: '起号运营',
-      sections: ['launchOps', 'launchBanner', 'healthScore', 'healthBar', 'coreKwCloud', 'ratioBar', 'ratioLegend', 'launchTasks', 'pitfallList'],
-      title: '起号运营'
     },
     {
       id: 'audience',
@@ -58,18 +44,32 @@
       title: '人群洞察'
     },
     {
-      id: 'techradar',
-      icon: '🛰️',
-      label: '技术雷达',
-      sections: ['techradar', 'techSummary', 'techGrid'],
-      title: '技术雷达'
+      id: 'topics',
+      icon: '📋',
+      label: '选题管理',
+      sections: ['topics', 'topicsGrid', 'topicTracker', 'kanbanBoard', 'topicPerf', 'topicPerfContent', 'crossPlatform', 'ownPerformance'],
+      title: '选题管理'
+    },
+    {
+      id: 'content',
+      icon: '✍️',
+      label: '内容创作',
+      sections: ['titleGen', 'titleFormulas', 'formulaGrid', 'leadScripts', 'scriptContainer', 'titleGenes'],
+      title: '内容创作'
+    },
+    {
+      id: 'launch',
+      icon: '🚀',
+      label: '发布执行',
+      sections: ['publishTime', 'ptChart', 'ptBestCards', 'ptPlatform', 'ptTips', 'bestPostingCombo', 'postingReminder', 'contentCalendar', 'schedule', 'scheduleContent', 'commentScripts', 'commentScriptsContent', 'checklist', 'checklistContent', 'checklistProgress', 'favoritesGrid', 'launchOps', 'launchBanner', 'healthScore', 'healthBar', 'coreKwCloud', 'ratioBar', 'ratioLegend', 'launchTasks', 'pitfallList'],
+      title: '发布执行'
     },
     {
       id: 'benchmark',
       icon: '📚',
-      label: '对标与发布',
-      sections: ['compareSection', 'compareSummary', 'overlapTable', 'dyOnlyList', 'xhsOnlyList', 'authorList', 'competitorWorks', 'smallViral', 'formatBars', 'schedule', 'scheduleContent', 'commentScripts', 'commentScriptsContent', 'checklist', 'checklistContent', 'checklistProgress', 'favoritesGrid', 'formatROI', 'competitorStrategy', 'contentCalendar'],
-      title: '对标与发布'
+      label: '对标分析',
+      sections: ['compareSection', 'compareSummary', 'overlapTable', 'dyOnlyList', 'xhsOnlyList', 'authorList', 'competitorWorks', 'smallViral', 'formatBars', 'competitorStrategy'],
+      title: '对标分析'
     }
   ];
 
