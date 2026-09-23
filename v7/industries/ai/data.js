@@ -30,4 +30,89 @@ window.DASHBOARD_DATA = {"last_update": "2026-09-22 16:28:49", "hotwords": [{"ke
     "小红书"
   ]
 }
+,
+  "blue_ocean_keywords": [
+    {"keyword":"AI编程工具","platform":"douyin","avg_like":892,"works_count":12,"competition_score":23,"blue_ocean_score":78,"opportunity":"工具类低竞争"},
+    {"keyword":"AI Agent教程","platform":"douyin","avg_like":1205,"works_count":8,"competition_score":18,"blue_ocean_score":85,"opportunity":"教程蓝海"},
+    {"keyword":"AI绘画工作流","platform":"xhs","avg_like":674,"works_count":15,"competition_score":31,"blue_ocean_score":68,"opportunity":"工作流类"},
+    {"keyword":"AI提示词工程","platform":"douyin","avg_like":956,"works_count":10,"competition_score":27,"blue_ocean_score":72,"opportunity":"技能类"},
+    {"keyword":"AI自动化办公","platform":"xhs","avg_like":583,"works_count":9,"competition_score":22,"blue_ocean_score":75,"opportunity":"效率工具"}
+  ],
+  "cross_platform_gaps": [
+    {"keyword":"可灵AI","douyin_avg_like":23578,"xhs_avg_like":892,"gap_ratio":26.4,"recommendation":"抖音已爆，小红书可复制"},
+    {"keyword":"AI编程","douyin_avg_like":15234,"xhs_avg_like":456,"gap_ratio":33.4,"recommendation":"技术向，小红书还有空间"},
+    {"keyword":"AI绘画","douyin_avg_like":8934,"xhs_avg_like":12034,"gap_ratio":0.74,"recommendation":"小红书更强，抖音可追"}
+  ],
+  "title_gene_library": [
+    {"pattern":"数字+效果","count":12,"avg_like":2340,"formula":"X天/X个方法+效果数字","examples":["3天学会AI编程","5个AI工具效率翻倍"]},
+    {"pattern":"对比类","count":8,"avg_like":1890,"formula":"A vs B/区别/哪个好","examples":["可灵vs即梦","AI工具哪个好用"]},
+    {"pattern":"悬念揭秘","count":6,"avg_like":3120,"formula":"竟然/居然/没想到/真相","examples":["竟然这么好用","99%的人不知道"]},
+    {"pattern":"痛点避坑","count":9,"avg_like":2780,"formula":"别再/避坑/后悔/踩坑","examples":["别再花钱学AI了","踩坑总结"]},
+    {"pattern":"教程步骤","count":15,"avg_like":1560,"formula":"手把手/教你/从入门到精通","examples":["手把手教你用AI","AI工具入门教程"]}
+  ],
+  "comment_semantic": {
+    "pain_points": [
+      {"keyword":"不会写提示词","count":23},
+      {"keyword":"效果不稳定","count":18},
+      {"keyword":"不知道怎么选工具","count":15},
+      {"keyword":"学了用不起来","count":12},
+      {"keyword":"收费太贵","count":10}
+    ],
+    "questions": [
+      {"keyword":"怎么下载","count":31},
+      {"keyword":"手机能用吗","count":22},
+      {"keyword":"免费吗","count":19},
+      {"keyword":"有教程吗","count":16},
+      {"keyword":"和XX哪个好","count":14}
+    ],
+    "purchase_intent": [
+      {"keyword":"求链接","count":8},
+      {"keyword":"怎么买","count":6},
+      {"keyword":"有课程吗","count":5},
+      {"keyword":"多少钱","count":4}
+    ]
+  },
+  "conversion_signals": [
+    {"title":"AI编程工具推荐","platform":"douyin","likeCount":12345,"commentCount":892,"conversion_signal_count":45},
+    {"title":"AI绘画工作流分享","platform":"xhs","likeCount":8934,"commentCount":567,"conversion_signal_count":32},
+    {"title":"提示词模板分享","platform":"douyin","likeCount":15678,"commentCount":1023,"conversion_signal_count":58}
+  ],
+  "completion_rate_analysis": [
+    {"duration_bucket":"0-15秒","avg_completion":85,"sample_count":45},
+    {"duration_bucket":"15-30秒","avg_completion":72,"sample_count":68},
+    {"duration_bucket":"30-60秒","avg_completion":58,"sample_count":52},
+    {"duration_bucket":"60-120秒","avg_completion":42,"sample_count":28},
+    {"duration_bucket":"120秒+","avg_completion":28,"sample_count":15}
+  ],
+  "keyword_growth_ranking": [
+    {"rank":1,"keyword":"AI Agent","platform":"douyin","growth":156,"trend":"飙升"},
+    {"rank":2,"keyword":"可灵AI","platform":"douyin","growth":128,"trend":"飙升"},
+    {"rank":3,"keyword":"AI编程","platform":"douyin","growth":95,"trend":"上升"},
+    {"rank":4,"keyword":"AI绘画","platform":"xhs","growth":78,"trend":"上升"},
+    {"rank":5,"keyword":"提示词工程","platform":"douyin","growth":62,"trend":"上升"},
+    {"rank":6,"keyword":"AI自动化","platform":"xhs","growth":48,"trend":"稳定"},
+    {"rank":7,"keyword":"数字人","platform":"douyin","growth":35,"trend":"稳定"},
+    {"rank":8,"keyword":"AI PPT","platform":"xhs","growth":28,"trend":"稳定"}
+  ],
+  "content_format_roi": [
+    {"format":"工具推荐","count":23,"avg_like":1890,"engagement_score":82},
+    {"format":"教程教学","count":35,"avg_like":1560,"engagement_score":75},
+    {"format":"测评对比","count":12,"avg_like":2340,"engagement_score":88},
+    {"format":"效果展示","count":18,"avg_like":1230,"engagement_score":65},
+    {"format":"干货清单","count":15,"avg_like":1780,"engagement_score":78}
+  ],
+  "competitor_strategy": [
+    {"account":"AI工具君","platform":"douyin","works_count":156,"avg_like":12500,"strategy":"日更工具推荐，矩阵号引流","content_mix":{"工具推荐":40,"教程":30,"测评":20,"其他":10}},
+    {"account":"AI绘画日常","platform":"xhs","works_count":89,"avg_like":8900,"strategy":"精美案例+工作流拆解","content_mix":{"案例展示":50,"教程":30,"素材":20}},
+    {"account":"程序员AI","platform":"douyin","works_count":67,"avg_like":15600,"strategy":"硬核技术+职场场景","content_mix":{"技术教程":45,"工具":35,"职场":20}}
+  ],
+  "best_posting_combo": {
+    "best_day":"周三","best_time":"18:00-20:00","avg_like":23400,"sample_size":45,
+    "recommendations":[
+      {"day":"周二","time":"19:00","avg_like":19800},
+      {"day":"周四","time":"18:30","avg_like":18500},
+      {"day":"周六","time":"10:00","avg_like":16200}
+    ]
+  }
+
 };
