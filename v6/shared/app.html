@@ -835,7 +835,41 @@ window.safeCall = function(fn, ctx) {
       var ml = works.length ? Math.max.apply(null, works.map(function(w){return w.likes||0;})) : 0;
       ig.innerHTML = '<div class="insight-item hot">单条最高赞 <b>'+(ml/10000).toFixed(1)+'万</b> · 共'+works.length+'条</div><div class="insight-item value">蓝海关键词 <b>'+(d.blue_ocean_list||[]).length+'</b>个</div><div class="insight-item warn">建议时段 <b>18:00-21:00</b></div>';
     }
-  }, 800);
+
+  // Archify 技术雷达卡片（仅AI行业）
+  try {
+    var _params = new URLSearchParams(location.search);
+    var _ind = _params.get('ind') || 'ai';
+    if (_ind === 'ai' || _ind === '') {
+      var _old = document.getElementById('archifyCard');
+      if (_old) _old.remove();
+      var _ac = document.createElement('div');
+      _ac.className = 'section anim anim-d2';
+      _ac.id = 'archifyCard';
+      _ac.innerHTML = '<div class="section-header"><span class="section-num">🔥</span><span class="section-title">技术雷达 · Archify 深度选题</span></div>' +
+        '<div class="card glass-card" style="padding:20px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div style="font-size:18px;font-weight:700;">🔥 Archify：代码仓库秒变架构图</div><div style="display:flex;gap:8px;align-items:center;"><span class="tag boom">65.9K ⭐</span><span class="tag rise">飙升</span></div></div>' +
+        '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">Archify 是一款开源 Agent Skill，能把代码仓库或自然语言描述变成可交互的架构图。支持系统架构、工作流、调用时序、数据流向、生命周期5种图，输出自包含HTML，支持导出PNG/SVG/WebM。兼容Claude Code、Cursor、Codex CLI、OpenCode。</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div><div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#a78bfa;">📈 为什么火</div><ul style="list-style:none;padding:0;margin:0;">' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• AI写代码越来越快，但读懂别人的代码反而更难</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• 传统Mermaid图需要手撸语法，Archify直接自然语言生成</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• 65K星说明开发者对代码可视化需求强烈</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• Agent Skill生态正在爆发，这是标杆案例</li></ul></div>' +
+        '<div><div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#30d158;">💡 选题建议</div><ul style="list-style:none;padding:0;margin:0;">' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• Archify实测：3分钟看懂一个陌生项目</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• AI架构图工具横评：Archify vs Mermaid vs Excalidraw</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• 如何用Archify给老项目补文档（附教程）</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• Archify原理拆解：为什么它能自动排版？</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• 5个Archify高级用法，让架构图直接能用</li></ul></div></div>' +
+        '<div style="display:flex;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:var(--text-secondary);flex-wrap:wrap;">' +
+        '<span>👥 受众：全栈工程师、技术负责人、AI编程爱好者</span>' +
+        '<span>💰 变现：技术教程付费、Archify定制咨询、团队培训</span>' +
+        '<span>🎯 难度：中高</span>' +
+        '<span class="tag boom">高优先</span></div></div>';
+      var _first = document.querySelector('.section');
+      if (_first && _first.parentNode) _first.parentNode.insertBefore(_ac, _first);
+    }
+  } catch(e) { console.error('archify:', e); }  }, 800);
 };
   document.head.appendChild(ds);
 })();
@@ -868,7 +902,7 @@ window.safeCall = function(fn, ctx) {
   
 
 
-  <script src="../shared/bundle.js?v=20260923final"></script>
+  <script src="../shared/bundle.js?v=20260923z"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
