@@ -306,26 +306,47 @@
         const topic = topics[i % Math.max(topics.length, 1)];
         const isWeekend = dayIdx >= 5;
         const intensity = Math.min(score, 5);
-        const bgColor = intensity >= 4 ? 'rgba(239,68,68,0.15)' :
-                        intensity >= 3 ? 'rgba(245,158,11,0.12)' :
-                        intensity >= 2 ? 'rgba(16,185,129,0.08)' :
-                        'rgba(255,255,255,0.02)';
-        const borderColor = intensity >= 4 ? 'rgba(239,68,68,0.4)' :
-                            intensity >= 3 ? 'rgba(245,158,11,0.35)' :
-                            intensity >= 2 ? 'rgba(16,185,129,0.25)' :
-                            'rgba(255,255,255,0.06)';
-        cells.push(`
-          <div style="min-height:60px;padding:6px;border-radius:6px;background:${bgColor};border:1px solid ${borderColor};font-size:11px;overflow:hidden;">
-            <div style="font-weight:600;color:${isWeekend?'#f59e0b':'#9ca3af'};margin-bottom:2px;">D${dayNum}</div>
-            ${intensity >= 3 ? `<div style="color:#d1d5db;line-height:1.3;">${topic ? topic.title.slice(0,8) : ''}</div>` : ''}
-            ${intensity >= 4 ? `<div style="color:#f59e0b;font-size:10px;margin-top:2px;">🔥${bestTime}</div>` : ''}
-          </div>
-        `);
+
+        let bg, border, glow;
+        if (intensity >= 4) {
+          bg = 'linear-gradient(135deg, rgba(239,68,68,0.18), rgba(245,158,11,0.12))';
+          border = '1px solid rgba(239,68,68,0.5)';
+          glow = 'box-shadow: 0 0 12px rgba(239,68,68,0.2);';
+        } else if (intensity >= 3) {
+          bg = 'linear-gradient(135deg, rgba(245,158,11,0.15), rgba(239,68,68,0.08))';
+          border = '1px solid rgba(245,158,11,0.4)';
+          glow = 'box-shadow: 0 0 8px rgba(245,158,11,0.15);';
+        } else if (intensity >= 2) {
+          bg = 'rgba(16,185,129,0.08)';
+          border = '1px solid rgba(16,185,129,0.3)';
+          glow = '';
+        } else {
+          bg = 'rgba(255,255,255,0.03)';
+          border = '1px solid rgba(255,255,255,0.08)';
+          glow = '';
+        }
+
+        const titleColor = intensity >= 4 ? '#fbbf24' : intensity >= 3 ? '#fcd34d' : '#9ca3af';
+        const timeBadge = intensity >= 4
+          ? '<div style="margin-top:6px;padding:2px 6px;background:rgba(239,68,68,0.3);border-radius:4px;font-size:10px;color:#fca5a5;display:inline-block;">🔥 ' + bestTime + '</div>'
+          : intensity >= 3
+          ? '<div style="margin-top:6px;padding:2px 6px;background:rgba(245,158,11,0.25);border-radius:4px;font-size:10px;color:#fde68a;display:inline-block;">⭐ ' + bestTime + '</div>'
+          : '';
+
+        cells.push(
+          '<div style="min-height:80px;padding:10px;border-radius:10px;background:' + bg + ';border:' + border + ';' + glow + 'font-size:11px;overflow:hidden;transition:all 0.3s;">' +
+            '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
+              '<span style="font-weight:700;color:' + (isWeekend?'#fbbf24':'#e5e7eb') + ';font-size:13px;">' + dayNum + '</span>' +
+              (intensity >= 4 ? '<span style="width:6px;height:6px;border-radius:50%;background:#ef4444;animation:pulse 2s infinite;"></span>' : '') +
+            '</div>' +
+            (intensity >= 2 && topic ? '<div style="color:' + titleColor + ';line-height:1.4;font-size:11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' + topic.title.slice(0,12) + '</div>' : '') +
+            timeBadge +
+          '</div>'
+        );
       }
       grid.innerHTML = cells.join('');
     } catch(e) { console.warn('[AA] calendar:', e); }
   }
 
   window.renderContentCalendar = renderContentCalendar;
-
 })();
