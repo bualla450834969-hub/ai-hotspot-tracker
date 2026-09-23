@@ -4451,6 +4451,43 @@ if (document.readyState === 'loading') {
 })();
 
 
+
+  // renderArchifyTopic - special topic card for trending tech
+  function renderArchifyTopic() {
+    var d = window.DATA || {};
+    var a = d.archify_topic;
+    if (!a) return;
+    var el = document.getElementById('archifyTopic');
+    if (!el) return;
+    el.style.display = '';
+    el.innerHTML = '<div style="padding:20px;">' +
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
+        '<div style="font-size:18px;font-weight:700;">🔥 ' + a.title + '</div>' +
+        '<div style="display:flex;gap:8px;align-items:center;">' +
+          '<span class="tag boom">' + a.stars + ' ⭐</span>' +
+          '<span class="tag rise">' + a.trend + '</span>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">' + a.summary + '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
+        '<div>' +
+          '<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#a78bfa;">📈 为什么火</div>' +
+          '<ul style="list-style:none;padding:0;margin:0;">' + a.why_hot.map(function(w){return '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• '+w+'</li>';}).join('') + '</ul>' +
+        '</div>' +
+        '<div>' +
+          '<div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#30d158;">💡 选题建议</div>' +
+          '<ul style="list-style:none;padding:0;margin:0;">' + a.topic_suggestions.map(function(t){return '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• '+t+'</li>';}).join('') + '</ul>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:flex;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:var(--text-secondary);">' +
+        '<span>👥 受众：' + a.audience + '</span>' +
+        '<span>💰 变现：' + a.monetization + '</span>' +
+        '<span>🎯 难度：' + a.difficulty + '</span>' +
+        '<span class="tag ' + (a.priority==='高'?'boom':'medium') + '">'+a.priority+'优先</span>' +
+      '</div>' +
+    '</div>';
+  }
+
 /* ===== universal empty-section filler ===== */
 /**
  * 扫描所有section，如果内容为空或undefined，自动填入合理fallback
