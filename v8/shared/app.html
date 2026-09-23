@@ -828,36 +828,6 @@ window.safeCall = function(fn, ctx) {
   if (window.renderAll) window.renderAll();
     setTimeout(function(){ if(typeof renderArchifyTopic==='function') renderArchifyTopic(); }, 600);
   setTimeout(function() {
-    var d = window.DATA || {}, works = d.works || [], cfg = window.DOMAIN_CONFIG || {};
-    var kws = (cfg.collect_keywords || ['书法','行书','楷书']).slice(0,3);
-    function fill(id, html) {
-      var el = document.getElementById(id); if (!el) return;
-      var t = el.innerText.trim();
-      if (t.length < 30 || t.indexOf('undefined') >= 0 || t.indexOf('NaN') >= 0 || t.indexOf('暂无') >= 0) el.innerHTML = html;
-    }
-    var themes = (d.comment_semantic && d.comment_semantic.themes) || [{theme:'求教程',count:35,sentiment:'positive'},{theme:'问工具',count:22,sentiment:'neutral'},{theme:'分享经验',count:18,sentiment:'positive'}];
-    fill('commentSemanticContent', '<div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">' + themes.map(function(t){var col=t.sentiment==='positive'?'#30d158':t.sentiment==='negative'?'#f87171':'#fbbf24';return '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-size:13px;font-weight:600;">'+t.theme+'</div><div style="font-size:20px;font-weight:700;color:'+col+';margin-top:6px;">'+t.count+'</div><div style="font-size:10px;color:var(--text-secondary);">条评论</div></div>';}).join('') + '</div>');
-    var signals = d.conversion_signals || [{signal:'求购买链接',count:12,intent:'高'},{signal:'问课程',count:8,intent:'高'},{signal:'求推荐',count:15,intent:'中'}];
-    fill('conversionSignalList', '<div style="padding:16px;display:grid;gap:8px;">' + signals.map(function(s){var col=s.intent==='高'?'#f87171':'#fbbf24';return '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;display:flex;justify-content:space-between;"><span style="font-size:13px;">'+s.signal+'</span><span style="font-size:12px;color:'+col+';">'+s.count+'条</span></div>';}).join('') + '</div>');
-    var rois = d.format_roi || [{format:'教学示范',avgLikes:3200,collectRate:12,roi:85},{format:'作品展示',avgLikes:2800,collectRate:8,roi:70},{format:'技巧分享',avgLikes:4100,collectRate:15,roi:92}];
-    fill('formatROIList', '<div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">' + rois.map(function(r){return '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-size:13px;font-weight:600;margin-bottom:6px;">'+r.format+'</div><div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;"><div style="width:'+(r.roi||0)+'%;height:100%;background:linear-gradient(90deg,#8b5cf6,#ec4899);border-radius:3px;"></div></div><div style="font-size:11px;color:#a78bfa;margin-top:4px;">ROI '+(r.roi||0)+'</div></div>';}).join('') + '</div>');
-    var comps = d.competitor_list || [];
-    if (!comps.length) { var au={}; works.forEach(function(w){if(w.author)au[w.author]=(au[w.author]||0)+(w.likes||0);}); comps = Object.keys(au).sort(function(a,b){return au[b]-au[a];}).slice(0,5).map(function(n){return {name:n,strategy:'持续输出',avgLikes:Math.round(au[n]/Math.max(1,works.filter(function(w){return w.author===n;}).length))};}); }
-    fill('competitorList', '<div style="padding:16px;display:grid;gap:8px;">' + comps.map(function(c){return '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;display:flex;justify-content:space-between;"><span style="font-size:13px;font-weight:600;">'+c.name+'</span><span style="font-size:11px;color:var(--text-secondary);">'+(c.strategy||'')+'</span></div>';}).join('') + '</div>');
-    fill('scriptContainer', '<div style="padding:16px;display:grid;gap:8px;">' + ['字帖哪里买？→ 私信发你学生价','新手先练什么？→ 30天计划扣1','有教学视频吗？→ 主页系统课程'].map(function(s){return '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:10px;font-size:12px;">💬 '+s+'</div>';}).join('') + '</div>');
-    var days = ['周一','周二','周三','周四','周五','周六','周日'];
-    fill('weeklySchedule', '<div style="padding:16px;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">' + days.map(function(day,i){return '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:10px;color:var(--text-secondary);">'+day+'</div><div style="font-size:11px;font-weight:600;margin-top:4px;">'+kws[i%kws.length]+'</div></div>';}).join('') + '</div>');
-    fill('topicHitRate', '<div style="padding:20px;text-align:center;color:var(--text-secondary);"><div style="font-size:28px;margin-bottom:8px;">🎯</div>发布作品后自动追踪数据，对比预测得分计算命中率</div>');
-    fill('checklistContent', ['选题与核心关键词一致','封面有文字钩子','开头3秒有吸引力','时长30-60秒','文案含2-3个话题标签','发布时间18:00-21:00'].map(function(c){return '<label style="display:flex;align-items:center;gap:10px;padding:6px 0;"><input type="checkbox" style="width:16px;height:16px;"><span style="font-size:13px;">'+c+'</span></label>';}).join(''));
-    var fm={教学:0,展示:0,技巧:0,日常:0}; works.forEach(function(w){var t=w.title||'';if(t.indexOf('教程')>=0||t.indexOf('入门')>=0)fm.教学++;else if(t.indexOf('作品')>=0||t.indexOf('展示')>=0)fm.展示++;else if(t.indexOf('技巧')>=0)fm.技巧++;else fm.日常++;});
-    var fe=Object.keys(fm),ft=Math.max(1,fe.reduce(function(s,k){return s+fm[k];},0));
-    fill('contentFormatDist', '<div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">' + fe.map(function(k){var p=Math.round(fm[k]/ft*100);return '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:22px;font-weight:700;color:#a78bfa;">'+p+'%</div><div style="font-size:11px;color:var(--text-secondary);margin-top:4px;">'+k+'型</div></div>';}).join('') + '</div>');
-    var ig = document.getElementById('insightsGrid');
-    if (ig && (ig.innerText.indexOf('NaN')>=0 || ig.innerText.indexOf('undefined')>=0)) {
-      var ml = works.length ? Math.max.apply(null, works.map(function(w){return w.likes||0;})) : 0;
-      ig.innerHTML = '<div class="insight-item hot">单条最高赞 <b>'+(ml/10000).toFixed(1)+'万</b> · 共'+works.length+'条</div><div class="insight-item value">蓝海关键词 <b>'+(d.blue_ocean_list||[]).length+'</b>个</div><div class="insight-item warn">建议时段 <b>18:00-21:00</b></div>';
-    }
-
   // Archify 技术雷达卡片（仅AI行业）
   try {
     var _params = new URLSearchParams(location.search);
@@ -924,7 +894,7 @@ window.safeCall = function(fn, ctx) {
   
 
 
-  <script src="../shared/bundle.js?v=1790171430"></script>
+  <script src="../shared/bundle.js?v=1790172288"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
