@@ -860,6 +860,8 @@ setTimeout(function() {
         loadScript('core/state.js', function() {
           loadScript('core/framework.js', function() {
             // 加载所有卡片模块（独立文件，单卡崩溃不影响其他）
+            loadScript('core/error.js', function() {
+              loadScript('core/data-loader.js', function() {
             var modules = [
               'modules/_helpers.js',
               'modules/hero.js',
@@ -904,6 +906,8 @@ setTimeout(function() {
             }
             loadNext();
           });
+              });
+            });
         });
       });
     }
