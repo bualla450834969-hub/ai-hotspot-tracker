@@ -1,0 +1,150 @@
+/* ===== glass.css — 液态玻璃效果 ===== */
+
+.glass-card {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+/* 玻璃卡片内的子元素层级 */
+.glass-card > * { position: relative; z-index: 1; }
+
+/* Bento网格卡片 */
+.bento-card {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  overflow: hidden;
+}
+.bento-card > * { position: relative; z-index: 1; }
+
+/* Hero统计卡片 */
+.hero-stat {
+  position: relative;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+  overflow: hidden;
+}
+.hero-stat > * { position: relative; z-index: 1; }
+.hero-stat .stat-value {
+  font-size: 32px; font-weight: 800;
+  background: linear-gradient(135deg, var(--primary-light), var(--info));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-stat .stat-label {
+  font-size: 11px; color: var(--text-tertiary); margin-top: 4px;
+}
+
+/* ===== UFO光晕效果 — 所有带[data-glow]的元素 ===== */
+[data-glow] {
+  position: relative;
+  overflow: hidden;
+}
+
+[data-glow]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    280px circle at var(--mx, 50%) var(--my, 50%),
+    hsla(var(--glow-hue, 280), 80%, 60%, 0.36),
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  z-index: 0;
+  animation: glowHue 14s linear infinite;
+}
+
+[data-glow]:hover::before {
+  opacity: 1;
+}
+
+/* 小卡片用更小的光晕半径 */
+[data-glow][data-glow-size="small"]::before {
+  background: radial-gradient(
+    120px circle at var(--mx, 50%) var(--my, 50%),
+    hsla(var(--glow-hue, 280), 80%, 60%, 0.45),
+    transparent 70%
+  );
+}
+
+@keyframes glowHue {
+  0% { --glow-hue: 280; }
+  50% { --glow-hue: 200; }
+  100% { --glow-hue: 280; }
+}
+
+/* 光晕轨道漂移 */
+@keyframes orbitalDrift {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(10px, -5px) scale(1.05); }
+  50% { transform: translate(-5px, 8px) scale(0.95); }
+  75% { transform: translate(-8px, -3px) scale(1.02); }
+  100% { transform: translate(0, 0) scale(1); }
+}
+
+/* 呼吸脉动 */
+@keyframes breathPulse {
+  0%, 100% { opacity: 0.36; }
+  50% { opacity: 0.5; }
+}
+
+/* ===== 顶部导航玻璃条 ===== */
+.top-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(10,10,15,0.7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--glass-border);
+  transition: transform 0.3s;
+}
+.top-nav .nav-inner {
+  max-width: 1400px; margin: 0 auto; padding: 12px 24px;
+  display: flex; align-items: center; gap: 24px;
+}
+.top-nav .brand {
+  font-weight: 800; font-size: 16px;
+  background: linear-gradient(135deg, var(--primary-light), var(--info));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.top-nav .nav-links {
+  display: flex; gap: 4px; flex: 1; overflow-x: auto;
+}
+.nav-link {
+  padding: 6px 12px; border-radius: 6px; font-size: 12px;
+  color: var(--text-secondary); cursor: pointer; white-space: nowrap;
+  transition: all 0.2s;
+}
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+
+/* ===== 背景Logo ===== */
+.bg-logo {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: 70vmin; height: 70vmin; pointer-events: none; z-index: 0;
+  opacity: 0.5;
+}
