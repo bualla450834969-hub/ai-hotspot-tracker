@@ -30,4 +30,4 @@ window.DASHBOARD_DATA = {"last_update": "2026-09-22 16:28:49", "hotwords": [{"ke
     "小红书"
   ]
 }
-};
+};;
