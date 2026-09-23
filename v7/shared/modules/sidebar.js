@@ -1,4 +1,4 @@
-﻿/**
+/**
  * modules/sidebar.js
  * 左侧导航栏模块 - 动态创建sidebar，按分组切换显示section
  * 不修改现有HTML结构，只控制显示/隐藏
@@ -33,7 +33,7 @@
       id: 'breakdown',
       icon: '💥',
       label: '爆款拆解',
-      sections: ['breakdown', 'breakdownContent', 'breakdownGrid', 'viralGenes', 'viralGenesContent'],
+      sections: ['breakdown', 'breakdownGrid', 'saturationList', 'commentDemands', 'commentKw', 'chartScatter', 'chartCollect', 'matrixGrid', 'commentSemantic', 'conversionSignals', 'viralGenes', 'viralGenesContent', 'completionRate', 'formatROI'],
       title: '爆款拆解'
     },
     {
@@ -42,6 +42,13 @@
       label: '人群洞察',
       sections: ['audience', 'audienceChart', 'personaGrid', 'avgCommentRate', 'avgCollectRate', 'highCommentList'],
       title: '人群洞察'
+    },
+    {
+      id: 'topics',
+      icon: '📋',
+      label: '选题管理',
+      sections: ['topics', 'topicsGrid', 'topicTracker', 'kanbanBoard', 'topicPerf', 'topicPerfContent', 'crossPlatform', 'ownPerformance'],
+      title: '选题管理'
     },
     {
       id: 'content',
