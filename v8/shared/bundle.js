@@ -76,6 +76,42 @@ window.normalizeData = function() {
     });
   }
 
+  // ===== 统一 topics 契约（数据驱动，任何行业通用）=====
+  if (Array.isArray(d.topics)) {
+    d.topics = d.topics.map(function(t) {
+      var keyword = t.keyword || t.hotword || '';
+      var personaStr = (t.target_persona && t.target_persona.name) ? t.target_persona.name
+        : (typeof t.persona === 'string' ? t.persona : '');
+      var tp = t.target_persona;
+      if (typeof tp === 'string' || !tp) {
+        tp = {name: personaStr || '核心用户', age: '', gender: '', needs: [], content_pref: ''};
+      }
+      var priority = t.priority;
+      if (!priority) {
+        var al = t.avgLikes || 0;
+        priority = al >= 8000 ? '高' : al >= 3000 ? '中' : '低';
+      }
+      return Object.assign({}, t, {
+        keyword: keyword,
+        hotword: t.hotword || keyword,
+        priority: priority,
+        target_persona: tp,
+        audience: t.audience || personaStr || '核心用户',
+        hook: t.hook || (t.contentType ? (t.contentType + '内容') : ''),
+        content_type: t.content_type || (t.contentType ? String(t.contentType).split('/')[0] : '')
+      });
+    });
+  }
+  // ===== 补 topic_performance（无数据时给基础概览，而非"暂无数据"）=====
+  if (!d.topic_performance) {
+    d.topic_performance = {
+      total_topics: (d.topics || []).length,
+      published: 0,
+      hit_rate: 0,
+      note: '发布作品并记录效果后，将在此自动统计命中率'
+    };
+  }
+
   // ===== 自动填充：从 works 数据计算所有缺失字段 =====
   var works = d.works || [];
   var cfg = window.DOMAIN_CONFIG || {};
@@ -2595,7 +2631,9 @@ if (document.readyState === 'loading') {
       id: "topics",
       requiredFields: ['topics'],
       render: function(data) {
-        try { renderTopics(data); generateSchedule(data); renderCommentScripts(data); renderChecklist(); } catch(e) { console.error("[topics]", e); }
+        [[renderTopics,data],[generateSchedule,data],[renderCommentScripts,data],[renderChecklist,null]].forEach(function(pair){
+          try { pair[0](pair[1]); } catch(e) { console.error('[topics:'+pair[0].name+']', e); }
+        });
       }
     });
   }
