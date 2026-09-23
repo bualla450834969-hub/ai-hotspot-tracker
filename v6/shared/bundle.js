@@ -4465,7 +4465,7 @@ if (document.readyState === 'loading') {
       el.className = 'section';
       el.id = 'archifyTopic';
       // Insert at top of content
-      var firstSection = document.querySelector('.section'); if(firstSection&&firstSection.parentNode)firstSection.parentNode.insertBefore(el,firstSection);else document.body.insertBefore(el,document.body.firstChild);
+      var hero = document.querySelector('.hero') || document.querySelector('.section.anim'); if(hero&&hero.nextElementSibling) hero.parentNode.insertBefore(el,hero.nextElementSibling); else { var fs=document.querySelector('.section'); if(fs)fs.parentNode.insertBefore(el,fs); }
       
     }
     
