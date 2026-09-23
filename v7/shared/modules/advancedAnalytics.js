@@ -281,4 +281,51 @@
     } catch(e) { console.warn('[AA] ownPerf:', e); }
   }
 
+  // 内容日历渲染
+  function renderContentCalendar() {
+    try {
+      const grid = document.getElementById('calendarGrid');
+      if (!grid) return;
+      const topics = DASHBOARD_DATA.topics || [];
+      const bestCombo = DASHBOARD_DATA.best_posting_combo || {};
+      const recs = bestCombo.recommendations || [];
+      const bestDay = bestCombo.best_day || '周三';
+      const bestTime = bestCombo.best_time || '18:00-20:00';
+
+      const dayMap = {'周一':0,'周二':1,'周三':2,'周四':3,'周五':4,'周六':5,'周日':6};
+      const dayScores = {};
+      dayScores[dayMap[bestDay]] = 5;
+      recs.forEach(r => { if (dayMap[r.day] !== undefined) dayScores[dayMap[r.day]] = (dayScores[dayMap[r.day]]||0) + 1; });
+
+      const cells = [];
+      for (let i = 0; i < 35; i++) {
+        const dayIdx = i % 7;
+        const weekNum = Math.floor(i / 7);
+        const dayNum = weekNum * 7 + dayIdx + 1;
+        const score = dayScores[dayIdx] || 0;
+        const topic = topics[i % Math.max(topics.length, 1)];
+        const isWeekend = dayIdx >= 5;
+        const intensity = Math.min(score, 5);
+        const bgColor = intensity >= 4 ? 'rgba(239,68,68,0.15)' :
+                        intensity >= 3 ? 'rgba(245,158,11,0.12)' :
+                        intensity >= 2 ? 'rgba(16,185,129,0.08)' :
+                        'rgba(255,255,255,0.02)';
+        const borderColor = intensity >= 4 ? 'rgba(239,68,68,0.4)' :
+                            intensity >= 3 ? 'rgba(245,158,11,0.35)' :
+                            intensity >= 2 ? 'rgba(16,185,129,0.25)' :
+                            'rgba(255,255,255,0.06)';
+        cells.push(`
+          <div style="min-height:60px;padding:6px;border-radius:6px;background:${bgColor};border:1px solid ${borderColor};font-size:11px;overflow:hidden;">
+            <div style="font-weight:600;color:${isWeekend?'#f59e0b':'#9ca3af'};margin-bottom:2px;">D${dayNum}</div>
+            ${intensity >= 3 ? `<div style="color:#d1d5db;line-height:1.3;">${topic ? topic.title.slice(0,8) : ''}</div>` : ''}
+            ${intensity >= 4 ? `<div style="color:#f59e0b;font-size:10px;margin-top:2px;">🔥${bestTime}</div>` : ''}
+          </div>
+        `);
+      }
+      grid.innerHTML = cells.join('');
+    } catch(e) { console.warn('[AA] calendar:', e); }
+  }
+
+  window.renderContentCalendar = renderContentCalendar;
+
 })();
