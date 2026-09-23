@@ -2,6 +2,15 @@
 <html lang="zh-CN">
 <head>
 <script>
+// 启动遮罩：避免旧布局闪现（FOUC）
+document.write('<style>body{opacity:0;visibility:hidden;transition:opacity 0.3s ease;}body.ready{opacity:1;visibility:visible;}</style>');
+document.write('<div id="bootMask" style="position:fixed;inset:0;z-index:99999;background:#0a0a0f;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;">' +
+  '<div style="width:48px;height:48px;border:2px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:bootspin 0.8s linear infinite;"></div>' +
+  '<div style="color:rgba(255,255,255,0.4);font-size:13px;letter-spacing:2px;">加载中...</div>' +
+  '<style>@keyframes bootspin{to{transform:rotate(360deg)}}</style>' +
+'</div>');
+</script>
+<script>
 // Superpowers verification-before-completion: 全局错误兜底
 // 任何模块报错只影响自身，不拖垮整页
 window.addEventListener('error', function(e) {
@@ -30,6 +39,23 @@ window.safeCall = function(fn, ctx) {
   <link rel="stylesheet" href="styles/advanced.css">
   <!-- ECharts -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+<script>
+// 所有模块加载完成后，隐藏启动遮罩并显示页面
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    var mask = document.getElementById('bootMask');
+    if (mask) mask.style.display = 'none';
+    document.body.classList.add('ready');
+  }, 300);
+});
+// 兜底：3秒后强制显示
+setTimeout(function() {
+  var mask = document.getElementById('bootMask');
+  if (mask) mask.style.display = 'none';
+  document.body.classList.add('ready');
+}, 3000);
+</script>
 </head>
 
 <div class="login-screen" id="loginScreen">
