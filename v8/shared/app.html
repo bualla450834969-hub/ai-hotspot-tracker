@@ -3,7 +3,12 @@
 <head>
 <script>
 // 启动遮罩：避免旧布局闪现（FOUC）
-document.write('<style>body{opacity:0;visibility:hidden;transition:opacity 0.3s ease;}body.ready{opacity:1;visibility:visible;}</style>');
+document.write('<style>
+body{opacity:0;visibility:hidden;transition:opacity 0.3s ease;}
+body.ready{opacity:1;visibility:visible;}
+/* 启动时隐藏所有 section，只显示启动页，避免闪现老布局 */
+body:not(.sidebar-ready) section, body:not(.sidebar-ready) .hero { display:none !important; }
+</style>');
 document.write('<div id="bootMask" style="position:fixed;inset:0;z-index:99999;background:#0a0a0f;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;">' +
   '<div style="width:48px;height:48px;border:2px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:bootspin 0.8s linear infinite;"></div>' +
   '<div style="color:rgba(255,255,255,0.4);font-size:13px;letter-spacing:2px;">加载中...</div>' +
@@ -62,6 +67,7 @@ function loadSidebarThenShow() {
         var mask = document.getElementById('bootMask');
         if (mask) mask.style.display = 'none';
         document.body.classList.add('ready');
+        document.body.classList.add('sidebar-ready');
       }, 100);
     }, 100);
   };
