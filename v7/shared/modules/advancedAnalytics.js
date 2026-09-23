@@ -180,14 +180,41 @@
   function renderBestPostingCombo() {
     const el = document.getElementById('bestPostingComboContent');
     if (!el) return;
-    const list = DASHBOARD_DATA.best_posting_combo || [];
+    const data = DASHBOARD_DATA.best_posting_combo;
+    if (!data) { el.innerHTML = '<div class="empty-state">暂无数据</div>'; return; }
+
+    let list = [];
+    if (Array.isArray(data)) {
+      list = data;
+    } else if (data.recommendations) {
+      list = data.recommendations.map(function(r) {
+        return {
+          day: r.day,
+          hour: r.time,
+          score: r.avg_like ? Math.round(r.avg_like / 300) : 70
+        };
+      });
+      if (data.best_day && data.best_time) {
+        list.unshift({
+          day: data.best_day,
+          hour: data.best_time,
+          score: data.avg_like ? Math.round(data.avg_like / 300) : 90
+        });
+      }
+    }
+
     if (!list.length) { el.innerHTML = '<div class="empty-state">暂无数据</div>'; return; }
-    el.innerHTML = `<div class="bpc-grid">${list.map(c => `
-      <div class="bpc-item ${c.score>=85?'best':c.score>=70?'good':''}">
-        <div class="bpc-day">${c.day}</div>
-        <div class="bpc-hour">${c.hour}</div>
-        <div class="bpc-score">${c.score}分</div>
-      </div>`).join('')}</div>`;
+    var html = '<div class="bpc-grid">';
+    list.forEach(function(c) {
+      var cls = c.score >= 85 ? 'best' : (c.score >= 70 ? 'good' : '');
+      html += '<div class="bpc-item ' + cls + '">' +
+        '<div class="bpc-day">' + c.day + '</div>' +
+        '<div class="bpc-hour">' + c.hour + '</div>' +
+        '<div class="bpc-score">' + c.score + '分</div>' +
+      '</div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
   }
 
   // 发布时间提醒
@@ -198,7 +225,18 @@
     const hour = now.getHours();
     const dayNames = ['周日','周一','周二','周三','周四','周五','周六'];
     const today = dayNames[now.getDay()];
-    const best = (DASHBOARD_DATA.best_posting_combo||[]).find(c => c.day === today);
+    const bpc = DASHBOARD_DATA.best_posting_combo;
+    let best = null;
+    if (bpc) {
+      if (Array.isArray(bpc)) {
+        best = bpc.find(c => c.day === today);
+      } else if (bpc.recommendations) {
+        best = bpc.recommendations.find(c => c.day === today);
+        if (!best && bpc.best_day === today) {
+          best = { day: bpc.best_day, hour: bpc.best_time };
+        }
+      }
+    }
     let msg, status;
     if (best) {
       const bestHour = parseInt(best.hour);
