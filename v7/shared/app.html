@@ -860,8 +860,6 @@ setTimeout(function() {
         loadScript('core/state.js', function() {
           loadScript('core/framework.js', function() {
             // 加载所有卡片模块（独立文件，单卡崩溃不影响其他）
-            loadScript('core/error.js', function() {
-              loadScript('core/data-loader.js', function() {
             var modules = [
               'modules/_helpers.js',
               'modules/hero.js',
@@ -906,46 +904,19 @@ setTimeout(function() {
             }
             loadNext();
           });
-              });
-            });
         });
       });
     }
 
-    // 6. 加载行业数据（拆分后的模块文件）
-    var dataModules = ['hero', 'hotwords', 'breakdown', 'topics', 'audience', 'techradar', 'publish'];
-    var moduleIndex = 0;
-    
-    function loadNextModule() {
-      if (moduleIndex >= dataModules.length) {
-        // 所有模块加载完成，合并数据并启动
-        window.DASHBOARD_DATA = {};
-        dataModules.forEach(function(mod) {
-          var modData = window['DASHBOARD_DATA_' + mod];
-          if (modData) {
-            Object.assign(window.DASHBOARD_DATA, modData);
-          }
-        });
-        startAfterData();
-        return;
-      }
-      
-      var modName = dataModules[moduleIndex];
-      var ds = document.createElement('script');
-      ds.src = base + 'data/' + modName + '.js?t=' + Date.now();
-      ds.onload = function() {
-        moduleIndex++;
-        loadNextModule();
-      };
-      ds.onerror = function() {
-        console.warn('模块加载失败：' + modName);
-        moduleIndex++;
-        loadNextModule();
-      };
-      document.head.appendChild(ds);
-    }
-    
-    loadNextModule();
+    // 6. 加载行业数据
+    var ds = document.createElement('script');
+    ds.src = base + 'data.js?t=' + Date.now();
+    ds.onload = startAfterData;
+    ds.onerror = function() {
+      document.body.innerHTML = '<div style="padding:60px;text-align:center;color:#888;font-family:sans-serif;">数据加载失败: ' + ind + '</div>';
+    };
+    document.head.appendChild(ds);
+  })();
   </script>
   <!-- ===== 特效层（固定，不依赖数据）===== -->
   <script src="effects/login.js"></script>
