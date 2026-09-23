@@ -42,19 +42,30 @@ window.safeCall = function(fn, ctx) {
 
 <script>
 // 所有模块加载完成后，隐藏启动遮罩并显示页面
-window.addEventListener('load', function() {
-  setTimeout(function() {
-    var mask = document.getElementById('bootMask');
-    if (mask) mask.style.display = 'none';
-    document.body.classList.add('ready');
-  }, 300);
-});
-// 兜底：3秒后强制显示
-setTimeout(function() {
+function hideBootMask() {
   var mask = document.getElementById('bootMask');
   if (mask) mask.style.display = 'none';
   document.body.classList.add('ready');
-}, 3000);
+  // bootMask 隐藏后，页面回到顶部，需要手动初始化侧边栏
+  // 因为 sidebar.js 加载时 scrollY=0 误判为登录页状态
+  setTimeout(function() {
+    if (typeof window.initSidebar === 'function') {
+      // 直接调用，跳过滚动检测
+      if (typeof window.switchPage === 'function') {
+        // 如果侧边栏已存在，直接切换页面
+        window.switchPage('overview');
+      } else {
+        // 否则强制初始化
+        window.initSidebar();
+      }
+    }
+  }, 100);
+}
+window.addEventListener('load', function() {
+  setTimeout(hideBootMask, 300);
+});
+// 兜底：3秒后强制显示
+setTimeout(hideBootMask, 3000);
 </script>
 </head>
 
