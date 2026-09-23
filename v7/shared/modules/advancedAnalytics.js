@@ -284,30 +284,31 @@
   // 内容日历渲染
   function renderContentCalendar() {
     try {
-      const grid = document.getElementById('calendarGrid');
-      if (!grid) return;
-      const topics = DASHBOARD_DATA.topics || [];
-      const bestCombo = DASHBOARD_DATA.best_posting_combo || {};
-      const recs = bestCombo.recommendations || [];
-      const bestDay = bestCombo.best_day || '周三';
-      const bestTime = bestCombo.best_time || '18:00-20:00';
+      var grid = document.getElementById('calendarGrid');
+      if (!grid) { console.warn('[Calendar] calendarGrid not found'); return; }
+      
+      var topics = (typeof DASHBOARD_DATA !== 'undefined' && DASHBOARD_DATA.topics) ? DASHBOARD_DATA.topics : [];
+      var bestCombo = (typeof DASHBOARD_DATA !== 'undefined' && DASHBOARD_DATA.best_posting_combo) ? DASHBOARD_DATA.best_posting_combo : {};
+      var recs = bestCombo.recommendations || [];
+      var bestDay = bestCombo.best_day || '周三';
+      var bestTime = bestCombo.best_time || '18:00-20:00';
 
-      const dayMap = {'周一':0,'周二':1,'周三':2,'周四':3,'周五':4,'周六':5,'周日':6};
-      const dayScores = {};
+      var dayMap = {'周一':0,'周二':1,'周三':2,'周四':3,'周五':4,'周六':5,'周日':6};
+      var dayScores = {};
       dayScores[dayMap[bestDay]] = 5;
-      recs.forEach(r => { if (dayMap[r.day] !== undefined) dayScores[dayMap[r.day]] = (dayScores[dayMap[r.day]]||0) + 1; });
+      recs.forEach(function(r) { if (dayMap[r.day] !== undefined) dayScores[dayMap[r.day]] = (dayScores[dayMap[r.day]]||0) + 1; });
 
-      const cells = [];
-      for (let i = 0; i < 35; i++) {
-        const dayIdx = i % 7;
-        const weekNum = Math.floor(i / 7);
-        const dayNum = weekNum * 7 + dayIdx + 1;
-        const score = dayScores[dayIdx] || 0;
-        const topic = topics[i % Math.max(topics.length, 1)];
-        const isWeekend = dayIdx >= 5;
-        const intensity = Math.min(score, 5);
+      var cells = [];
+      for (var i = 0; i < 35; i++) {
+        var dayIdx = i % 7;
+        var weekNum = Math.floor(i / 7);
+        var dayNum = weekNum * 7 + dayIdx + 1;
+        var score = dayScores[dayIdx] || 0;
+        var topic = topics[i % Math.max(topics.length, 1)];
+        var isWeekend = dayIdx >= 5;
+        var intensity = Math.min(score, 5);
 
-        let bg, border, glow;
+        var bg, border, glow;
         if (intensity >= 4) {
           bg = 'linear-gradient(135deg, rgba(239,68,68,0.18), rgba(245,158,11,0.12))';
           border = '1px solid rgba(239,68,68,0.5)';
@@ -326,27 +327,35 @@
           glow = '';
         }
 
-        const titleColor = intensity >= 4 ? '#fbbf24' : intensity >= 3 ? '#fcd34d' : '#9ca3af';
-        const timeBadge = intensity >= 4
-          ? '<div style="margin-top:6px;padding:2px 6px;background:rgba(239,68,68,0.3);border-radius:4px;font-size:10px;color:#fca5a5;display:inline-block;">🔥 ' + bestTime + '</div>'
-          : intensity >= 3
-          ? '<div style="margin-top:6px;padding:2px 6px;background:rgba(245,158,11,0.25);border-radius:4px;font-size:10px;color:#fde68a;display:inline-block;">⭐ ' + bestTime + '</div>'
-          : '';
+        var titleColor = intensity >= 4 ? '#fbbf24' : intensity >= 3 ? '#fcd34d' : '#9ca3af';
+        var timeBadge = '';
+        if (intensity >= 4) {
+          timeBadge = '<div style="margin-top:6px;padding:2px 6px;background:rgba(239,68,68,0.3);border-radius:4px;font-size:10px;color:#fca5a5;display:inline-block;">🔥 ' + bestTime + '</div>';
+        } else if (intensity >= 3) {
+          timeBadge = '<div style="margin-top:6px;padding:2px 6px;background:rgba(245,158,11,0.25);border-radius:4px;font-size:10px;color:#fde68a;display:inline-block;">⭐ ' + bestTime + '</div>';
+        }
+
+        var topicHtml = '';
+        if (intensity >= 2 && topic && topic.title) {
+          topicHtml = '<div style="color:' + titleColor + ';line-height:1.4;font-size:11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' + topic.title.slice(0,12) + '</div>';
+        }
 
         cells.push(
           '<div style="min-height:80px;padding:10px;border-radius:10px;background:' + bg + ';border:' + border + ';' + glow + 'font-size:11px;overflow:hidden;transition:all 0.3s;">' +
             '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
               '<span style="font-weight:700;color:' + (isWeekend?'#fbbf24':'#e5e7eb') + ';font-size:13px;">' + dayNum + '</span>' +
-              (intensity >= 4 ? '<span style="width:6px;height:6px;border-radius:50%;background:#ef4444;animation:pulse 2s infinite;"></span>' : '') +
+              (intensity >= 4 ? '<span style="width:6px;height:6px;border-radius:50%;background:#ef4444;"></span>' : '') +
             '</div>' +
-            (intensity >= 2 && topic ? '<div style="color:' + titleColor + ';line-height:1.4;font-size:11px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">' + topic.title.slice(0,12) + '</div>' : '') +
+            topicHtml +
             timeBadge +
           '</div>'
         );
       }
       grid.innerHTML = cells.join('');
-    } catch(e) { console.warn('[AA] calendar:', e); }
+      console.log('[Calendar] Rendered', cells.length, 'days');
+    } catch(e) { 
+      console.warn('[Calendar] Error:', e.message); 
+    }
   }
 
-  window.renderContentCalendar = renderContentCalendar;
-})();
+  window.renderContentCalendar = renderContentCalendar;})();
