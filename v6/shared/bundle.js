@@ -4461,8 +4461,8 @@ if (document.readyState === 'loading') {
     // Create section if not exists
     var el = document.getElementById('archifyTopic');
     if (!el) {
-      el = document.createElement('section');
-      el.className = 'section';
+      el = document.createElement('div');
+      el.className = 'section anim';
       el.id = 'archifyTopic';
       // Insert at top of content
       var hero = document.querySelector('.hero') || document.querySelector('.section.anim'); if(hero&&hero.nextElementSibling) hero.parentNode.insertBefore(el,hero.nextElementSibling); else { var fs=document.querySelector('.section'); if(fs)fs.parentNode.insertBefore(el,fs); }
