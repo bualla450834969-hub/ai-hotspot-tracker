@@ -4457,10 +4457,20 @@ if (document.readyState === 'loading') {
     var d = window.DATA || {};
     var a = d.archify_topic;
     if (!a) return;
+    
+    // Create section if not exists
     var el = document.getElementById('archifyTopic');
-    if (!el) return;
-    el.style.display = '';
-    el.innerHTML = '<div style="padding:20px;">' +
+    if (!el) {
+      el = document.createElement('section');
+      el.className = 'section';
+      el.id = 'archifyTopic';
+      // Insert at top of content
+      var content = document.querySelector('.content') || document.querySelector('main') || document.body;
+      content.insertBefore(el, content.firstChild);
+    }
+    
+    el.innerHTML = '<h2 class="section-title">🔥 技术雷达 <span class="section-sub">Archify 深度选题</span></h2>' +
+      '<div class="card glass-card" style="padding:20px;margin-top:12px;">' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">' +
         '<div style="font-size:18px;font-weight:700;">🔥 ' + a.title + '</div>' +
         '<div style="display:flex;gap:8px;align-items:center;">' +
@@ -4479,7 +4489,7 @@ if (document.readyState === 'loading') {
           '<ul style="list-style:none;padding:0;margin:0;">' + a.topic_suggestions.map(function(t){return '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• '+t+'</li>';}).join('') + '</ul>' +
         '</div>' +
       '</div>' +
-      '<div style="display:flex;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:var(--text-secondary);">' +
+      '<div style="display:flex;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:var(--text-secondary);flex-wrap:wrap;">' +
         '<span>👥 受众：' + a.audience + '</span>' +
         '<span>💰 变现：' + a.monetization + '</span>' +
         '<span>🎯 难度：' + a.difficulty + '</span>' +
@@ -4487,7 +4497,6 @@ if (document.readyState === 'loading') {
       '</div>' +
     '</div>';
   }
-
 /* ===== universal empty-section filler ===== */
 /**
  * 扫描所有section，如果内容为空或undefined，自动填入合理fallback
