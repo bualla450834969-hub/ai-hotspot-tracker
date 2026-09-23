@@ -1,4 +1,4 @@
-/**
+﻿/**
  * modules/sidebar.js
  * 左侧导航栏模块 - 动态创建sidebar，按分组切换显示section
  * 不修改现有HTML结构，只控制显示/隐藏
