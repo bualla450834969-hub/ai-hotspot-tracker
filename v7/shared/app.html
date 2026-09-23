@@ -843,7 +843,7 @@ window.safeCall = function(fn, ctx) {
                   var fns = ['renderOpsStatus','renderBlueOcean','renderCrossPlatform','renderTitleGenes',
                     'renderCommentSemantic','renderConversionSignals','renderCompletionRate','renderGrowthRanking',
                     'renderFormatROI','renderCompetitorStrategy','renderBestPostingCombo','renderPostingReminder',
-                    'renderAnomalyDetection','renderOwnPerformance','renderArchifyTopic'];
+                    'renderAnomalyDetection','renderOwnPerformance','renderArchifyTopic','renderContentCalendar'];
                   fns.forEach(function(fn) { if (typeof window[fn] === 'function') { try { window[fn](); } catch(e){} } });
                 }, 800);
               }
