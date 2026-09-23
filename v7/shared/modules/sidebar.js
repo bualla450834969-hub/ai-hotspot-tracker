@@ -26,7 +26,7 @@
       id: 'breakdown',
       icon: '💥',
       label: '爆款拆解',
-      sections: ['breakdown', 'breakdownGrid', 'saturationList', 'commentDemands', 'commentKw', 'chartScatter', 'chartCollect', 'matrixGrid', 'commentSemantic', 'conversionSignals'],
+      sections: ['breakdown', 'breakdownGrid', 'saturationList', 'commentDemands', 'commentKw', 'chartScatter', 'chartCollect', 'matrixGrid', 'commentSemantic', 'conversionSignals', 'viralGenes', 'viralGenesContent'],
       title: '爆款拆解'
     },
     {
@@ -61,7 +61,7 @@
       id: 'techradar',
       icon: '🛰️',
       label: '技术雷达',
-      sections: ['techradar', 'techSummary', 'techGrid', 'viralGenes', 'viralGenesContent'],
+      sections: ['techradar', 'techSummary', 'techGrid'],
       title: '技术雷达'
     },
     {
