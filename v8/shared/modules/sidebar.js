@@ -159,6 +159,12 @@
     // 给body加class
     document.body.classList.add('has-sidebar');
 
+    // 隐藏登录页（只首次显示，进入工作台后永久隐藏）
+    const loginScreen = document.getElementById('loginScreen');
+    if (loginScreen) {
+      loginScreen.style.display = 'none';
+    }
+
     // 立即重置滚动位置到顶部（登录页隐藏后内容从顶部开始）
     window.scrollTo(0, 0);
     document.documentElement.scrollTop = 0;
@@ -186,6 +192,12 @@
     if (!group) return;
 
     currentPage = pageId;
+
+    // 确保登录页已隐藏（进入工作台后不再显示）
+    const loginScreen = document.getElementById('loginScreen');
+    if (loginScreen && loginScreen.style.display !== 'none') {
+      loginScreen.style.display = 'none';
+    }
 
     // 更新导航激活状态
     document.querySelectorAll('.sidebar-nav-item').forEach(function(item) {
