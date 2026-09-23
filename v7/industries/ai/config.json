@@ -119,11 +119,11 @@
   "modules": {
     "hero": true,
     "works": true,
-    "techradar": false,
+    "techradar": true,
     "hotwords": true,
     "history": true,
     "breakdown": true,
-    "viralGenes": false,
+    "viralGenes": true,
     "insights": true,
     "topics": true,
     "titleGen": true,
