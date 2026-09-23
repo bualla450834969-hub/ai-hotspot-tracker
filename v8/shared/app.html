@@ -41,26 +41,27 @@ window.safeCall = function(fn, ctx) {
   <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 
 <script>
-// 先加载 sidebar.js，再隐藏 bootMask 显示页面
-// 这样用户看到的第一个工作台画面就是带侧边栏的新版本
+// 先加载 sidebar.js，初始化侧边栏，再隐藏 bootMask 显示页面
+// 这样用户看到的第一个工作台画面就是带侧边栏的新版本，不会闪现老布局
 function loadSidebarThenShow() {
   // 先加载 sidebar.js
   var s = document.createElement('script');
   s.src = 'modules/sidebar.js?t=' + Date.now();
   s.onload = function() {
-    // sidebar.js 加载完成，隐藏 bootMask，初始化侧边栏
+    // sidebar.js 加载完成，先初始化侧边栏，再隐藏 bootMask
     setTimeout(function() {
-      var mask = document.getElementById('bootMask');
-      if (mask) mask.style.display = 'none';
-      document.body.classList.add('ready');
-      // 初始化侧边栏并切换到概览页
+      // 先初始化侧边栏并切换到概览页
+      if (typeof window.initSidebar === 'function') {
+        window.initSidebar();
+      }
+      if (typeof window.switchPage === 'function') {
+        window.switchPage('overview');
+      }
+      // 侧边栏初始化完成后，再隐藏 bootMask
       setTimeout(function() {
-        if (typeof window.initSidebar === 'function') {
-          window.initSidebar();
-        }
-        if (typeof window.switchPage === 'function') {
-          window.switchPage('overview');
-        }
+        var mask = document.getElementById('bootMask');
+        if (mask) mask.style.display = 'none';
+        document.body.classList.add('ready');
       }, 100);
     }, 100);
   };
