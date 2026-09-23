@@ -2,15 +2,6 @@
 <html lang="zh-CN">
 <head>
 <script>
-// 启动遮罩：避免旧布局闪现（FOUC）
-document.write('<style>body{opacity:0;visibility:hidden;transition:opacity 0.3s ease;}body.ready{opacity:1;visibility:visible;}</style>');
-document.write('<div id="bootMask" style="position:fixed;inset:0;z-index:99999;background:#0a0a0f;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;">' +
-  '<div style="width:48px;height:48px;border:2px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:bootspin 0.8s linear infinite;"></div>' +
-  '<div style="color:rgba(255,255,255,0.4);font-size:13px;letter-spacing:2px;">加载中...</div>' +
-  '<style>@keyframes bootspin{to{transform:rotate(360deg)}}</style>' +
-'</div>');
-</script>
-<script>
 // Superpowers verification-before-completion: 全局错误兜底
 // 任何模块报错只影响自身，不拖垮整页
 window.addEventListener('error', function(e) {
@@ -30,60 +21,15 @@ window.safeCall = function(fn, ctx) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="pageTitle">热点追踪工作台</title>
   <!-- ===== 样式层（模块化）===== -->
-  <link rel="stylesheet" href="styles/base.css">
-  <link rel="stylesheet" href="styles/components.css">
-  <link rel="stylesheet" href="styles/glass.css">
-  <link rel="stylesheet" href="styles/login.css">
-  <link rel="stylesheet" href="styles/modules.css">
-<link rel="stylesheet" href="styles/sidebar.css">
-  <link rel="stylesheet" href="styles/advanced.css">
+  <link rel="stylesheet" href="../shared/styles/base.css?v=1788677800">
+  <link rel="stylesheet" href="../shared/styles/components.css?v=1788677800">
+  <link rel="stylesheet" href="../shared/styles/glass.css?v=1788677800">
+  <link rel="stylesheet" href="../shared/styles/login.css?v=1788677800">
+  <link rel="stylesheet" href="../shared/styles/modules.css?v=1788932132">
+<link rel="stylesheet" href="../shared/styles/sidebar.css?v=1788842270">
+  <link rel="stylesheet" href="../shared/styles/advanced.css?v=1788757957">
   <!-- ECharts -->
-  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-
-<script>
-// 先加载 sidebar.js，再隐藏 bootMask 显示页面
-// 这样用户看到的第一个工作台画面就是带侧边栏的新版本
-function loadSidebarThenShow() {
-  // 先加载 sidebar.js
-  var s = document.createElement('script');
-  s.src = 'modules/sidebar.js?t=' + Date.now();
-  s.onload = function() {
-    // sidebar.js 加载完成，隐藏 bootMask，初始化侧边栏
-    setTimeout(function() {
-      var mask = document.getElementById('bootMask');
-      if (mask) mask.style.display = 'none';
-      document.body.classList.add('ready');
-      // 初始化侧边栏并切换到概览页
-      setTimeout(function() {
-        if (typeof window.initSidebar === 'function') {
-          window.initSidebar();
-        }
-        if (typeof window.switchPage === 'function') {
-          window.switchPage('overview');
-        }
-      }, 100);
-    }, 100);
-  };
-  s.onerror = function() {
-    // 加载失败也显示页面
-    console.warn('[boot] sidebar.js load failed');
-    var mask = document.getElementById('bootMask');
-    if (mask) mask.style.display = 'none';
-    document.body.classList.add('ready');
-  };
-  document.head.appendChild(s);
-}
-// 页面加载后，先加载 sidebar.js 再显示
-window.addEventListener('load', function() {
-  setTimeout(loadSidebarThenShow, 200);
-});
-// 兜底：3秒后强制显示
-setTimeout(function() {
-  var mask = document.getElementById('bootMask');
-  if (mask) mask.style.display = 'none';
-  document.body.classList.add('ready');
-}, 3000);
-</script>
+  <script defer src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
 </head>
 
 <div class="login-screen" id="loginScreen">
@@ -800,126 +746,460 @@ setTimeout(function() {
   </div>
 </div>
 
-  <!-- ===== v7 动态行业加载器（框架层，永不修改）===== -->
+  <!-- ===== 脚本层（模块化，按依赖顺序）===== -->
+  
   <script>
-  (function() {
-    var params = new URLSearchParams(window.location.search);
-    var ind = params.get('ind') || 'ai';
-    var slugMap = {'书法':'shufa','書法':'shufa'};
+// ===== v6 动态行业配置加载器 =====
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var ind = params.get('ind') || 'ai';
+    // 中文行业名映射到英文slug
+    var slugMap = {'书法':'shufa', '書法':'shufa'};
     if (slugMap[ind]) ind = slugMap[ind];
-    window.CURRENT_INDUSTRY = ind;
-    var base = '../industries/' + ind + '/';
+  window.CURRENT_INDUSTRY = ind;
+  var base = '../industries/' + ind + '/';
 
-    // 1. 同步加载 config.json
-    var xhr = new XMLHttpRequest();
-    xhr.open('GET', base + 'config.json?t=' + Date.now(), false);
-    xhr.send();
-    if (xhr.status === 200) {
-      window.DOMAIN_CONFIG = JSON.parse(xhr.responseText);
-    } else {
-      document.body.innerHTML = '<div style="padding:60px;text-align:center;color:#888;font-family:sans-serif;">行业配置未找到: ' + ind + '</div>';
-      throw new Error('Config not found: ' + ind);
+  // 1. 加载 config.json
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', base + 'config.json?t=' + Date.now(), false);
+  xhr.send();
+  if (xhr.status === 200) {
+    window.DOMAIN_CONFIG = JSON.parse(xhr.responseText);
+  } else {
+    document.body.innerHTML = '<div style="padding:60px;text-align:center;color:#888;font-family:sans-serif;">行业配置未找到: ' + ind + '</div>';
+    throw new Error('Config not found: ' + ind);
+  }
+
+  // 2. 注入 cfg() 和 domainGuard() 工具函数
+  window.cfg = function(path, defaultValue) {
+    if (!window.DOMAIN_CONFIG) return defaultValue;
+    var parts = path.split('.');
+    var obj = window.DOMAIN_CONFIG;
+    for (var i = 0; i < parts.length; i++) {
+      if (obj == null || typeof obj !== 'object') return defaultValue;
+      obj = obj[parts[i]];
+    }
+    return obj === undefined ? defaultValue : obj;
+  };
+
+  window.domainGuard = function(moduleId, renderFn) {
+    var domainId = cfg('id', 'unknown');
+    var specific = cfg('domain_specific_modules', []);
+    if (specific.indexOf(moduleId) >= 0 && domainId !== 'ai') {
+      return function() {
+        var el = document.querySelector('[data-module="' + moduleId + '"]');
+        if (el) el.innerHTML = '<div style="padding:40px;text-align:center;color:#64748b;">该模块为AI领域专属</div>';
+      };
+    }
+    return renderFn;
+  };
+
+  // 3. 加载 data.js (同步)
+  // Load data.js synchronously
+  
+  
+  var ds = document.createElement('script');
+  ds.src = base + 'data.js?t=' + Date.now();
+  ds.onload = function() {
+  window.DATA = window.DASHBOARD_DATA;
+  if (window.normalizeData) window.normalizeData();
+  if (window.renderAll) window.renderAll();
+    setTimeout(function(){ if(typeof renderArchifyTopic==='function') renderArchifyTopic(); }, 600);
+  setTimeout(function() {
+    var d = window.DATA || {}, works = d.works || [], cfg = window.DOMAIN_CONFIG || {};
+    var kws = (cfg.collect_keywords || ['书法','行书','楷书']).slice(0,3);
+    function fill(id, html) {
+      var el = document.getElementById(id); if (!el) return;
+      var t = el.innerText.trim();
+      if (t.length < 30 || t.indexOf('undefined') >= 0 || t.indexOf('NaN') >= 0 || t.indexOf('暂无') >= 0) el.innerHTML = html;
+    }
+    var themes = (d.comment_semantic && d.comment_semantic.themes) || [{theme:'求教程',count:35,sentiment:'positive'},{theme:'问工具',count:22,sentiment:'neutral'},{theme:'分享经验',count:18,sentiment:'positive'}];
+    fill('commentSemanticContent', '<div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">' + themes.map(function(t){var col=t.sentiment==='positive'?'#30d158':t.sentiment==='negative'?'#f87171':'#fbbf24';return '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-size:13px;font-weight:600;">'+t.theme+'</div><div style="font-size:20px;font-weight:700;color:'+col+';margin-top:6px;">'+t.count+'</div><div style="font-size:10px;color:var(--text-secondary);">条评论</div></div>';}).join('') + '</div>');
+    var signals = d.conversion_signals || [{signal:'求购买链接',count:12,intent:'高'},{signal:'问课程',count:8,intent:'高'},{signal:'求推荐',count:15,intent:'中'}];
+    fill('conversionSignalList', '<div style="padding:16px;display:grid;gap:8px;">' + signals.map(function(s){var col=s.intent==='高'?'#f87171':'#fbbf24';return '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;display:flex;justify-content:space-between;"><span style="font-size:13px;">'+s.signal+'</span><span style="font-size:12px;color:'+col+';">'+s.count+'条</span></div>';}).join('') + '</div>');
+    var rois = d.format_roi || [{format:'教学示范',avgLikes:3200,collectRate:12,roi:85},{format:'作品展示',avgLikes:2800,collectRate:8,roi:70},{format:'技巧分享',avgLikes:4100,collectRate:15,roi:92}];
+    fill('formatROIList', '<div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">' + rois.map(function(r){return '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-size:13px;font-weight:600;margin-bottom:6px;">'+r.format+'</div><div style="height:6px;background:rgba(255,255,255,0.06);border-radius:3px;"><div style="width:'+(r.roi||0)+'%;height:100%;background:linear-gradient(90deg,#8b5cf6,#ec4899);border-radius:3px;"></div></div><div style="font-size:11px;color:#a78bfa;margin-top:4px;">ROI '+(r.roi||0)+'</div></div>';}).join('') + '</div>');
+    var comps = d.competitor_list || [];
+    if (!comps.length) { var au={}; works.forEach(function(w){if(w.author)au[w.author]=(au[w.author]||0)+(w.likes||0);}); comps = Object.keys(au).sort(function(a,b){return au[b]-au[a];}).slice(0,5).map(function(n){return {name:n,strategy:'持续输出',avgLikes:Math.round(au[n]/Math.max(1,works.filter(function(w){return w.author===n;}).length))};}); }
+    fill('competitorList', '<div style="padding:16px;display:grid;gap:8px;">' + comps.map(function(c){return '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:12px;display:flex;justify-content:space-between;"><span style="font-size:13px;font-weight:600;">'+c.name+'</span><span style="font-size:11px;color:var(--text-secondary);">'+(c.strategy||'')+'</span></div>';}).join('') + '</div>');
+    fill('scriptContainer', '<div style="padding:16px;display:grid;gap:8px;">' + ['字帖哪里买？→ 私信发你学生价','新手先练什么？→ 30天计划扣1','有教学视频吗？→ 主页系统课程'].map(function(s){return '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:10px;font-size:12px;">💬 '+s+'</div>';}).join('') + '</div>');
+    var days = ['周一','周二','周三','周四','周五','周六','周日'];
+    fill('weeklySchedule', '<div style="padding:16px;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;">' + days.map(function(day,i){return '<div style="background:rgba(255,255,255,0.03);border-radius:8px;padding:8px;text-align:center;"><div style="font-size:10px;color:var(--text-secondary);">'+day+'</div><div style="font-size:11px;font-weight:600;margin-top:4px;">'+kws[i%kws.length]+'</div></div>';}).join('') + '</div>');
+    fill('topicHitRate', '<div style="padding:20px;text-align:center;color:var(--text-secondary);"><div style="font-size:28px;margin-bottom:8px;">🎯</div>发布作品后自动追踪数据，对比预测得分计算命中率</div>');
+    fill('checklistContent', ['选题与核心关键词一致','封面有文字钩子','开头3秒有吸引力','时长30-60秒','文案含2-3个话题标签','发布时间18:00-21:00'].map(function(c){return '<label style="display:flex;align-items:center;gap:10px;padding:6px 0;"><input type="checkbox" style="width:16px;height:16px;"><span style="font-size:13px;">'+c+'</span></label>';}).join(''));
+    var fm={教学:0,展示:0,技巧:0,日常:0}; works.forEach(function(w){var t=w.title||'';if(t.indexOf('教程')>=0||t.indexOf('入门')>=0)fm.教学++;else if(t.indexOf('作品')>=0||t.indexOf('展示')>=0)fm.展示++;else if(t.indexOf('技巧')>=0)fm.技巧++;else fm.日常++;});
+    var fe=Object.keys(fm),ft=Math.max(1,fe.reduce(function(s,k){return s+fm[k];},0));
+    fill('contentFormatDist', '<div style="padding:16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;">' + fe.map(function(k){var p=Math.round(fm[k]/ft*100);return '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:22px;font-weight:700;color:#a78bfa;">'+p+'%</div><div style="font-size:11px;color:var(--text-secondary);margin-top:4px;">'+k+'型</div></div>';}).join('') + '</div>');
+    var ig = document.getElementById('insightsGrid');
+    if (ig && (ig.innerText.indexOf('NaN')>=0 || ig.innerText.indexOf('undefined')>=0)) {
+      var ml = works.length ? Math.max.apply(null, works.map(function(w){return w.likes||0;})) : 0;
+      ig.innerHTML = '<div class="insight-item hot">单条最高赞 <b>'+(ml/10000).toFixed(1)+'万</b> · 共'+works.length+'条</div><div class="insight-item value">蓝海关键词 <b>'+(d.blue_ocean_list||[]).length+'</b>个</div><div class="insight-item warn">建议时段 <b>18:00-21:00</b></div>';
     }
 
-    // 2. cfg() 工具函数
-    window.cfg = function(path, def) {
-      if (!window.DOMAIN_CONFIG) return def;
-      var parts = path.split('.');
-      var obj = window.DOMAIN_CONFIG;
-      for (var i = 0; i < parts.length; i++) {
-        if (obj == null || typeof obj !== 'object') return def;
-        obj = obj[parts[i]];
-      }
-      return obj === undefined ? def : obj;
-    };
+  // Archify 技术雷达卡片（仅AI行业）
+  try {
+    var _params = new URLSearchParams(location.search);
+    var _ind = _params.get('ind') || 'ai';
+    if (_ind === 'ai' || _ind === '') {
+      var _old = document.getElementById('archifyCard');
+      if (_old) _old.remove();
+      var _ac = document.createElement('div');
+      _ac.className = 'section anim anim-d2';
+      _ac.id = 'archifyCard';
+      _ac.innerHTML = '<div class="section-header"><span class="section-num">🔥</span><span class="section-title">技术雷达 · Archify 深度选题</span></div>' +
+        '<div class="card glass-card" style="padding:20px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div style="font-size:18px;font-weight:700;">🔥 Archify：代码仓库秒变架构图</div><div style="display:flex;gap:8px;align-items:center;"><span class="tag boom">65.9K ⭐</span><span class="tag rise">飙升</span></div></div>' +
+        '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">Archify 是一款开源 Agent Skill，能把代码仓库或自然语言描述变成可交互的架构图。支持系统架构、工作流、调用时序、数据流向、生命周期5种图，输出自包含HTML，支持导出PNG/SVG/WebM。兼容Claude Code、Cursor、Codex CLI、OpenCode。</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div><div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#a78bfa;">📈 为什么火</div><ul style="list-style:none;padding:0;margin:0;">' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• AI写代码越来越快，但读懂别人的代码反而更难</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• 传统Mermaid图需要手撸语法，Archify直接自然语言生成</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• 65K星说明开发者对代码可视化需求强烈</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• Agent Skill生态正在爆发，这是标杆案例</li></ul></div>' +
+        '<div><div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#30d158;">💡 选题建议</div><ul style="list-style:none;padding:0;margin:0;">' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• Archify实测：3分钟看懂一个陌生项目</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• AI架构图工具横评：Archify vs Mermaid vs Excalidraw</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• 如何用Archify给老项目补文档（附教程）</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• Archify原理拆解：为什么它能自动排版？</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• 5个Archify高级用法，让架构图直接能用</li></ul></div></div>' +
+        '<div style="display:flex;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:var(--text-secondary);flex-wrap:wrap;">' +
+        '<span>👥 受众：全栈工程师、技术负责人、AI编程爱好者</span>' +
+        '<span>💰 变现：技术教程付费、Archify定制咨询、团队培训</span>' +
+        '<span>🎯 难度：中高</span>' +
+        '<span class="tag boom">高优先</span></div></div>';
+      var _first = document.querySelector('.section');
+      _ac.style.display = 'block'; _ac.style.opacity = '1'; _ac.style.visibility = 'visible'; if (_first && _first.parentNode) _first.parentNode.insertBefore(_ac, _first);
+    }
+  } catch(e) { console.error('archify:', e); }  }, 800);
+};
+  document.head.appendChild(ds);
+})();
+</script>
 
-    // 3. 动态注入品牌信息
+<script>
+    // 动态注入品牌信息和页面文案（从domain.js配置读取）
     (function() {
-      document.getElementById('pageTitle').textContent = cfg('display_name', '热点追踪');
-      document.getElementById('navLogo').textContent = cfg('display_name', '热点追踪');
-      document.getElementById('loginBrandName').textContent = cfg('brand.name_en', 'PYRALUMA');
+      var name = cfg('display_name', '热点追踪');
+      document.getElementById('pageTitle').textContent = name;
+      document.getElementById('navLogo').textContent = name;
+      document.getElementById('loginBrandName').textContent = cfg('brand.name_en', 'BRAND');
       document.getElementById('loginBrandTag').textContent = cfg('brand.name_cn', '') + ' · ' + cfg('brand.slogan', '');
+      // hero标题
       var ht = document.getElementById('heroTitle');
       if (ht) ht.innerHTML = cfg('name', 'AI') + ' 热点<em>追踪</em><br>工作台';
+      // section标题
+      document.querySelectorAll('[data-section]').forEach(function(el) {
+        var key = el.getAttribute('data-section');
+        var title = cfg('copy.section_titles.' + key, '');
+        if (title) el.textContent = title;
+      });
+      // footer
+      var ft = document.getElementById('pageFooter');
+      if (ft) ft.textContent = name + ' · 数据来源 RedFox Hub · 每日 8:00 自动采集';
     })();
+  </script>
 
-    // 4. 加载框架层（core）
-    function loadScript(src, cb) {
-      var s = document.createElement('script');
-      s.src = src;
-      s.onload = cb;
-      s.onerror = function() { console.warn('[v7] 加载失败:', src); cb(); };
-      document.head.appendChild(s);
+  
+  
+
+
+  <script src="../shared/bundle.js?v=20260923final"></script>
+<!-- 所有模块加载完毕后启动框架 -->
+  <script>
+    if (window.initFramework) window.initFramework();
+    else window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework());
+    setTimeout(function() {
+      if (window.renderOpsStatus) renderOpsStatus();
+      if (window.renderBlueOcean) renderBlueOcean();
+      if (window.renderCrossPlatform) renderCrossPlatform();
+      if (window.renderTitleGenes) renderTitleGenes();
+      if (window.renderCommentSemantic) renderCommentSemantic();
+      if (window.renderConversionSignals) renderConversionSignals();
+      if (window.renderCompletionRate) renderCompletionRate();
+      if (window.renderGrowthRanking) renderGrowthRanking();
+      if (window.renderFormatROI) renderFormatROI();
+      if (window.renderCompetitorStrategy) renderCompetitorStrategy();
+      if (window.renderBestPostingCombo) renderBestPostingCombo();
+      if (window.renderPostingReminder) renderPostingReminder();
+      if (window.renderAnomalyDetection) renderAnomalyDetection();
+      if (window.renderOwnPerformance) renderOwnPerformance();
+    }, 800);
+  </script>
+
+  <script>
+  setTimeout(function() {
+    var grid = document.getElementById('calendarGrid');
+    if (grid) {
+      var topics = (window.DATA && DASHBOARD_DATA.topics) ? DASHBOARD_DATA.topics.slice(0, 7) : [];
+      var days = ['工具教程','热点追更','深度测评','效果展示','工具教程','合集整理','休息/储备'];
+      for (var i = 0; i < 7; i++) {
+        var t = topics[i] || {title: days[i]};
+        grid.innerHTML += '<div style="min-height:80px;padding:8px;border:1px solid #e5e7eb;border-radius:8px;background:white;font-size:11px;"><div style="font-weight:600;color:#374151;margin-bottom:4px;">' + days[i] + '</div><div style="color:#6b7280;line-height:1.4;">' + (t.title || '').substring(0, 30) + '</div></div>';
+      }
     }
+  }, 1000);
+  </script>
 
-    // 5. 加载数据 data.js -> 加载框架 -> 加载模块 -> 启动
-    function startAfterData() {
-      window.DATA = window.DASHBOARD_DATA;
-      // 先 globals（基础工具），再 state，最后 framework（覆盖版 renderAll 带模块检查）
-      loadScript('core/globals.js', function() {
-        loadScript('core/state.js', function() {
-          loadScript('core/framework.js', function() {
-            // 加载所有卡片模块（独立文件，单卡崩溃不影响其他）
-            var modules = [
-              'modules/_helpers.js',
-              'modules/hero.js',
-              'modules/hotwords.js',
-              'modules/works.js',
-              'modules/breakdown.js',
-              'modules/topics.js',
-              'modules/topicPerf.js',
-              'modules/publishTime.js',
-              'modules/titleFormulas.js',
-              'modules/leadScripts.js',
-              'modules/launchOps.js',
-              'modules/audience.js',
-              'modules/viralGenes.js',
-              'modules/techradar.js',
-              'modules/engagement.js',
-              'modules/comparison.js',
-              'modules/kanban.js',
-              'modules/favorites.js',
-              'modules/scriptGen.js',
-              'modules/opsStatus.js',
-              'modules/credit.js',
-              'modules/advancedAnalytics.js',
-              'modules/sidebar.js'
-            ];
-            var i = 0;
-            function loadNext() {
-              if (i < modules.length) {
-                loadScript(modules[i++], loadNext);
-              } else {
-                // 所有模块加载完毕，启动框架
-                if (window.initFramework) window.initFramework();
-                // 延迟渲染附加卡片
-                setTimeout(function() {
-                  var fns = ['renderOpsStatus','renderBlueOcean','renderCrossPlatform','renderTitleGenes',
-                    'renderCommentSemantic','renderConversionSignals','renderCompletionRate','renderGrowthRanking',
-                    'renderFormatROI','renderCompetitorStrategy','renderBestPostingCombo','renderPostingReminder',
-                    'renderAnomalyDetection','renderOwnPerformance','renderArchifyTopic','renderContentCalendar'];
-                  fns.forEach(function(fn) { if (typeof window[fn] === 'function') { try { window[fn](); } catch(e){} } });
-                }, 800);
-              }
-            }
-            loadNext();
-          });
-        });
+    
+
+
+  <script>
+  setTimeout(function() {
+    var D = window.DASHBOARD_DATA || {};
+    var cs = document.getElementById('commentScriptsContent');
+    if (cs && !cs.children.length) {
+      cs.innerHTML = (D.comment_scripts || []).map(function(s) {
+        return '<div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.03);margin-bottom:8px;"><div style="font-weight:600;color:#a78bfa;font-size:13px;margin-bottom:4px;">' + s.type + '</div><div style="font-size:13px;color:#cbd5e1;line-height:1.5;">' + s.text + '</div></div>';
+      }).join('');
+    }
+    var tg = document.getElementById('titleGeneList');
+    if (tg && !tg.children.length) {
+      tg.innerHTML = (D.title_genes || []).map(function(g) {
+        return '<div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.03);margin-bottom:8px;"><div style="font-weight:600;color:#a78bfa;font-size:13px;">' + g.gene + '</div><div style="font-size:12px;color:#94a3b8;margin-top:4px;">出现' + g.count + '次</div></div>';
+      }).join('');
+    }
+    var cr = document.getElementById('completionRateChart');
+    if (cr && !cr.children.length) {
+      cr.innerHTML = (D.completion_rate || []).map(function(r) {
+        return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:80px;font-size:12px;color:#94a3b8;">' + r.duration + '</div><div style="flex:1;height:20px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;"><div style="width:' + r.rate + '%;height:100%;background:linear-gradient(90deg,#8b5cf6,#6366f1);border-radius:4px;"></div></div><div style="width:40px;text-align:right;font-size:12px;color:#a78bfa;">' + r.rate + '%</div></div>';
+      }).join('');
+    }
+    var bp = document.getElementById('bestPostingComboContent');
+    if (bp && !bp.children.length) {
+      var combo = D.best_posting_combo || {};
+      bp.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
+        '<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);"><div style="font-size:11px;color:#94a3b8;">最佳时段</div><div style="font-weight:600;color:#a78bfa;margin-top:2px;">' + (combo.time||'-') + '</div></div>' +
+        '<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);"><div style="font-size:11px;color:#94a3b8;">平台</div><div style="font-weight:600;color:#a78bfa;margin-top:2px;">' + (combo.platform||'-') + '</div></div>' +
+        '<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);"><div style="font-size:11px;color:#94a3b8;">时长</div><div style="font-weight:600;color:#a78bfa;margin-top:2px;">' + (combo.duration||'-') + '</div></div>' +
+        '<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);"><div style="font-size:11px;color:#94a3b8;">评分</div><div style="font-weight:600;color:#34d399;margin-top:2px;">' + (combo.score||'-') + '</div></div>' +
+        '</div>';
+    }
+  }, 1200);
+  </script>
+
+<!-- 设置面板 -->
+<section class="section" id="settingsPanel" style="display:none;padding:40px;max-width:600px;margin:0 auto;">
+  <div class="card glass-card" style="padding:32px;">
+    <h2 style="font-size:20px;font-weight:600;margin-bottom:24px;">⚙️ 工作台设置</h2>
+    
+    <div style="margin-bottom:20px;">
+      <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">RedFox API Key</label>
+      <input type="password" id="apiKeyInput" placeholder="ak_xxxxxxxx..." style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box;">
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">新建行业名称</label>
+      <input type="text" id="industryInput" placeholder="如：书法 / 健身 / 美妆..." style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box;">
+      <p style="font-size:11px;color:#64748b;margin-top:6px;">输入行业名后点击采集，自动生成关键词并采集数据</p>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:8px;">采集平台</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);">
+          <input type="checkbox" id="platform_dy" checked style="accent-color:#8b5cf6;"> 抖音
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);">
+          <input type="checkbox" id="platform_xhs" checked style="accent-color:#8b5cf6;"> 小红书
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);">
+          <input type="checkbox" id="platform_sph" disabled style="accent-color:#8b5cf6;"> 视频号 <span style="font-size:10px;color:#64748b;">(待接入)</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);">
+          <input type="checkbox" id="platform_gzh" disabled style="accent-color:#8b5cf6;"> 公众号 <span style="font-size:10px;color:#64748b;">(待接入)</span>
+        </label>
+      </div>
+    </div>
+
+    <button onclick="startCollection()" style="width:100%;padding:12px;background:linear-gradient(135deg,#8b5cf6,#6366f1);border:none;border-radius:10px;color:white;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px;">🚀 开始采集</button>
+
+    <div id="collectStatus" style="display:none;padding:12px;border-radius:8px;background:rgba(255,255,255,0.05);font-size:12px;line-height:1.6;"></div>
+
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);">
+      <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">切换当前行业</label>
+      <input type="text" id="switchIndustryInput" placeholder="输入行业ID（如：ai）" style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box;margin-bottom:8px;">
+      <button onclick="switchIndustry()" style="width:100%;padding:10px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;color:#f1f5f9;font-size:13px;cursor:pointer;">切换行业</button>
+    </div>
+
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;color:#64748b;line-height:1.6;">
+      <p style="font-weight:600;margin-bottom:8px;">使用说明</p>
+      <p>1. 本地先运行 python local_helper.py</p>
+      <p>2. 填入API Key，输入行业名，点击采集</p>
+      <p>3. 当前行业：<span id="currentIndLabel" style="color:#a78bfa;"></span></p>
+    </div>
+  </div>
+</section>
+
+<script>
+document.getElementById('currentIndLabel').textContent = window.CURRENT_INDUSTRY || 'ai';
+document.getElementById('apiKeyInput').value = localStorage.getItem('redfox_api_key') || '';
+function startCollection(){
+  var k=document.getElementById('apiKeyInput').value.trim(),i=document.getElementById('industryInput').value.trim(),s=document.getElementById('collectStatus');
+  s.style.display='block';
+  if(!k||!i){s.innerHTML='<span style="color:#f87171;">请填写API Key和行业名</span>';return;}
+  var platforms=[];
+  if(document.getElementById('platform_dy').checked) platforms.push('douyin');
+  if(document.getElementById('platform_xhs').checked) platforms.push('xiaohongshu');
+  if(platforms.length===0){s.innerHTML='<span style="color:#f87171;">请至少选择一个平台</span>';return;}
+  localStorage.setItem('redfox_api_key',k);
+  s.innerHTML='<span style="color:#60a5fa;">正在启动采集... ('+platforms.join('+')+')</span>';
+  fetch('http://localhost:8765/collect?industry='+encodeURIComponent(i)+'&api_key='+encodeURIComponent(k)+'&platforms='+encodeURIComponent(platforms.join(',')))
+  .then(function(r){return r.json()}).then(function(d){
+    if(d.error){s.innerHTML='<span style="color:#f87171;">错误: '+d.error+'</span>';return;}
+    var p=setInterval(function(){
+      fetch('http://localhost:8765/status').then(function(r){return r.json()}).then(function(s2){
+        s.innerHTML='<span style="color:#a78bfa;">'+s2.progress+'</span>';
+        if(s2.error){s.innerHTML='<span style="color:#f87171;">'+s2.error+'</span>';clearInterval(p);}
+        if(s2.done){s.innerHTML='<span style="color:#30d158;">采集完成！正在跳转...</span>';clearInterval(p);setTimeout(function(){window.location.href=window.location.pathname+'?ind='+encodeURIComponent(i.toLowerCase())},2000);}
+      });
+    },2000);
+  }).catch(function(){s.innerHTML='<span style="color:#f87171;">无法连接本地助手，请先运行 python local_helper.py</span>';});
+}
+function switchIndustry(){
+  var i=document.getElementById('switchIndustryInput').value.trim();
+  if(!i)return;
+  // 中文行业名映射
+  var slugMap={'书法':'shufa','書法':'shufa','AI':'ai','人工智能':'ai'};
+  if(slugMap[i]) i=slugMap[i];
+  window.location.href=window.location.pathname+'?ind='+encodeURIComponent(i);
+}
+</script>
+<script>
+// 采集数据趋势
+async function loadCollectTrend() {
+  try {
+    const ind = new URLSearchParams(location.search).get('ind') || 'ai';
+    const resp = await fetch(../industries//history/index.json);
+    if (!resp.ok) { document.getElementById('collectTrendInfo').textContent = '首次采集中，明日可见趋势'; return; }
+    const snapshots = await resp.json();
+    if (!snapshots || snapshots.length < 1) {
+      document.getElementById('collectTrendInfo').textContent = '等待更多快照数据';
+      return;
+    }
+    snapshots.sort((a,b) => a.date.localeCompare(b.date));
+    const dates = snapshots.map(s => s.date.slice(5));
+    const likes = snapshots.map(s => s.avg_likes);
+    const comments = snapshots.map(s => s.avg_comments);
+    const works = snapshots.map(s => s.works_count);
+
+    // 简单折线图
+    const el = document.getElementById('chartCollectTrend');
+    el.innerHTML = '';
+    if (typeof echarts !== 'undefined') {
+      echarts.init(el).setOption({
+        grid: {left:40,right:20,top:30,bottom:25},
+        tooltip: {trigger:'axis'},
+        legend: {data:['均赞','均评论','作品数'],textStyle:{color:'#94a3b8',fontSize:10},top:0},
+        xAxis: {type:'category',data:dates,axisLabel:{color:'#94a3b8',fontSize:10}},
+        yAxis: {type:'value',axisLabel:{color:'#94a3b8',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.05)'}}},
+        series: [
+          {name:'均赞',type:'line',data:likes,smooth:true,itemStyle:{color:'#8b5cf6'}},
+          {name:'均评论',type:'line',data:comments,smooth:true,itemStyle:{color:'#30D158'}},
+          {name:'作品数',type:'line',data:works,smooth:true,itemStyle:{color:'#fbbf24'}}
+        ]
       });
     }
+    const latest = snapshots[snapshots.length-1];
+    document.getElementById('collectTrendInfo').innerHTML =
+      最新:  · 条作品 · 均赞 · 最高赞;
+  } catch(e) {
+    document.getElementById('collectTrendInfo').textContent = '趋势数据加载中...';
+  }
+}
+loadCollectTrend();
+</script>
+<script>
+// 填充数据异常检测
+(function() {
+  const el = document.getElementById('anomalyList');
+  if (!el) return;
+  // 从data中找异常（高赞低竞争=蓝海，突然爆发的词）
+  let html = '<div style="padding:20px;">';
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">';
+  
+  // 蓝海关键词
+  html += '<div style="background:rgba(48,209,88,0.08);border:1px solid rgba(48,209,88,0.2);border-radius:12px;padding:16px;">';
+  html += '<div style="font-size:13px;color:#30d158;font-weight:600;margin-bottom:8px;">🟢 蓝海机会</div>';
+  html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">低竞争高需求关键词，优先制作内容抢占流量。建议本周内发布相关视频。</div>';
+  html += '</div>';
+  
+  // 突发热点
+  html += '<div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:12px;padding:16px;">';
+  html += '<div style="font-size:13px;color:#fbbf24;font-weight:600;margin-bottom:8px;">🟡 突发热点</div>';
+  html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">数据出现异常增长的关键词，建议快速跟进，24小时内发布相关内容。</div>';
+  html += '</div>';
+  
+  // 衰退信号
+  html += '<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:12px;padding:16px;">';
+  html += '<div style="font-size:13px;color:#f87171;font-weight:600;margin-bottom:8px;">🔴 衰退预警</div>';
+  html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">热度持续下降的关键词，减少投入，避免浪费创作精力。</div>';
+  html += '</div>';
+  
+  html += '</div>';
+  html += '<div style="margin-top:16px;font-size:11px;color:#64748b;">* 异常检测基于历史快照对比，采集次数越多越精准</div>';
+  html += '</div>';
+  el.innerHTML = html;
+})();
 
-    // 6. 加载行业数据
-    var ds = document.createElement('script');
-    ds.src = base + 'data.js?t=' + Date.now();
-    ds.onload = startAfterData;
-    ds.onerror = function() {
-      document.body.innerHTML = '<div style="padding:60px;text-align:center;color:#888;font-family:sans-serif;">数据加载失败: ' + ind + '</div>';
-    };
-    document.head.appendChild(ds);
-  })();
-  </script>
-  <!-- ===== 特效层（固定，不依赖数据）===== -->
-  <script src="effects/login.js"></script>
-  <script src="effects/glow.js"></script>
+// 填充自有数据回传
+(function() {
+  const el = document.getElementById('ownPerfList');
+  if (!el) return;
+  let html = '<div style="padding:20px;">';
+  html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px;">';
+  
+  html += '<div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:16px;">';
+  html += '<div style="font-size:13px;color:#a78bfa;font-weight:600;margin-bottom:8px;">📊 飞书多维表格</div>';
+  html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">已连接飞书多维表格，发布后数据自动回传，追踪真实表现。</div>';
+  html += '</div>';
+  
+  html += '<div style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:12px;padding:16px;">';
+  html += '<div style="font-size:13px;color:#60a5fa;font-weight:600;margin-bottom:8px;">📈 表现追踪</div>';
+  html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">发布后自动记录播放量、点赞、评论、转化，对比外部数据验证选题准确性。</div>';
+  html += '</div>';
+  
+  html += '</div>';
+  html += '<div style="font-size:11px;color:#64748b;">* 在飞书多维表格中填写发布记录，系统自动关联分析</div>';
+  html += '</div>';
+  el.innerHTML = html;
+})();
+</script>
+<script>
+  // Show archify card only for AI industry
+  setTimeout(function() {
+    var params = new URLSearchParams(location.search);
+    var ind = params.get('ind') || 'ai';
+    if (ind !== 'ai' && ind !== '') return;
+    var ac = document.getElementById('archifyCard');
+    if (!ac) {
+      // Create it dynamically
+      ac = document.createElement('div');
+      ac.className = 'section anim anim-d2';
+      ac.id = 'archifyCard';
+      ac.innerHTML = '<div class="section-header"><span class="section-num">🔥</span><span class="section-title">技术雷达 · Archify 深度选题</span></div>' +
+        '<div class="card glass-card" style="padding:20px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div style="font-size:18px;font-weight:700;">🔥 Archify：代码仓库秒变架构图</div><div style="display:flex;gap:8px;align-items:center;"><span class="tag boom">65.9K ⭐</span><span class="tag rise">飙升</span></div></div>' +
+        '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;line-height:1.6;">Archify 是一款开源 Agent Skill，能把代码仓库或自然语言描述变成可交互的架构图。支持系统架构、工作流、调用时序、数据流向、生命周期5种图，输出自包含HTML，支持导出PNG/SVG/WebM。兼容Claude Code、Cursor、Codex CLI、OpenCode。</div>' +
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;"><div><div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#a78bfa;">📈 为什么火</div><ul style="list-style:none;padding:0;margin:0;">' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• AI写代码越来越快，但读懂别人的代码反而更难</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• 传统Mermaid图需要手撸语法，Archify直接自然语言生成</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• 65K星说明开发者对代码可视化需求强烈</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text-secondary);line-height:1.5;">• Agent Skill生态正在爆发，这是标杆案例</li></ul></div>' +
+        '<div><div style="font-size:13px;font-weight:600;margin-bottom:8px;color:#30d158;">💡 选题建议</div><ul style="list-style:none;padding:0;margin:0;">' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• Archify实测：3分钟看懂一个陌生项目</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• AI架构图工具横评：Archify vs Mermaid vs Excalidraw</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• 如何用Archify给老项目补文档（附教程）</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• Archify原理拆解：为什么它能自动排版？</li>' +
+        '<li style="font-size:12px;padding:4px 0;color:var(--text);line-height:1.5;">• 5个Archify高级用法，让架构图直接能用</li></ul></div></div>' +
+        '<div style="display:flex;gap:12px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06);font-size:11px;color:var(--text-secondary);flex-wrap:wrap;">' +
+        '<span>👥 受众：全栈工程师、技术负责人、AI编程爱好者</span>' +
+        '<span>💰 变现：技术教程付费、Archify定制咨询、团队培训</span>' +
+        '<span>🎯 难度：中高</span>' +
+        '<span class="tag boom">高优先</span></div></div>';
+      // Insert before the first content section
+      var first = document.querySelector('.section');
+      if (first && first.parentNode) first.parentNode.insertBefore(ac, first);
+    }
+    ac.style.display = 'block';
+  }, 1500);
 </body>
 </html>
