@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <script>
@@ -794,13 +794,35 @@ window.safeCall = function(fn, ctx) {
     return renderFn;
   };
 
-  // 3. 加载 data.js (同步)
-  // Load data.js synchronously
-  
-  
-  var ds = document.createElement('script');
-  ds.src = base + 'data.js?t=' + Date.now();
-  ds.onload = function() {
+  // 3. 加载拆分后的 7 个数据模块（顺序加载，全部完成后合并）
+  var dataModules = ['hero', 'hotwords', 'breakdown', 'topics', 'audience', 'techradar', 'publish'];
+  var moduleIndex = 0;
+
+  function loadNextModule() {
+    if (moduleIndex >= dataModules.length) {
+      // 所有模块加载完成，合并到 DASHBOARD_DATA
+      window.DASHBOARD_DATA = {};
+      dataModules.forEach(function(mod) {
+        var modData = window['DASHBOARD_DATA_' + mod];
+        if (modData) Object.assign(window.DASHBOARD_DATA, modData);
+      });
+      console.log('[Data] 7 个模块全部加载并合并完成');
+      initAfterData();
+      return;
+    }
+    var modName = dataModules[moduleIndex++];
+    var ds = document.createElement('script');
+    ds.src = base + 'data/' + modName + '.js?t=' + Date.now();
+    ds.onload = loadNextModule;
+    ds.onerror = function() {
+      console.warn('[Data] 模块加载失败，跳过:', modName);
+      loadNextModule();
+    };
+    document.head.appendChild(ds);
+  }
+
+  // 数据全部加载完成后的初始化（原 data.js onload 逻辑）
+  function initAfterData() {
   window.DATA = window.DASHBOARD_DATA;
   if (window.normalizeData) window.normalizeData();
   if (window.renderAll) window.renderAll();
@@ -870,8 +892,8 @@ window.safeCall = function(fn, ctx) {
       _ac.style.display = 'block'; _ac.style.opacity = '1'; _ac.style.visibility = 'visible'; if (_first && _first.parentNode) _first.parentNode.insertBefore(_ac, _first);
     }
   } catch(e) { console.error('archify:', e); }  }, 800);
-};
-  document.head.appendChild(ds);
+}
+  loadNextModule();
 })();
 </script>
 
