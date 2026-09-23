@@ -4448,7 +4448,6 @@ if (document.readyState === 'loading') {
   }
   window.renderBlueOcean = renderBlueOcean;
   window.renderGrowthRanking = renderGrowthRanking;
-})();
 
 
 
