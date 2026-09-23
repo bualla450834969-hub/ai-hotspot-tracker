@@ -229,18 +229,18 @@ window.normalizeData = function() {
   // 6. comment_semantic 评论语义
   if (!d.comment_semantic || !d.comment_semantic.themes || d.comment_semantic.themes.length === 0) {
     d.comment_semantic = {themes: [
-      {theme: '求教程', count: 35, sentiment: 'positive'},
-      {theme: '问工具', count: 22, sentiment: 'neutral'},
-      {theme: '分享经验', count: 18, sentiment: 'positive'}
+      {name: '求教程', count: 35, sentiment: 'positive'},
+      {name: '问工具', count: 22, sentiment: 'neutral'},
+      {name: '分享经验', count: 18, sentiment: 'positive'}
     ]};
   }
 
   // 7. conversion_signals 转化信号
   if (!d.conversion_signals || d.conversion_signals.length === 0) {
     d.conversion_signals = [
-      {signal: '求购买链接', count: 12, intent: '高'},
-      {signal: '问课程', count: 8, intent: '高'},
-      {signal: '求推荐', count: 15, intent: '中'}
+      {signal: '求购买链接', desc: '12条相关评论', impact: '高'},
+      {signal: '问课程', desc: '8条相关评论', impact: '高'},
+      {signal: '求推荐', desc: '15条相关评论', impact: '中'}
     ];
   }
 
@@ -1962,7 +1962,7 @@ if (document.readyState === 'loading') {
   function renderInsights(hw, works) {
     const ins = [];
     const topWork = [...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0))[0];
-    if (topWork) ins.push({type:'hot',text:`单条最高赞 <b>${(topWork.likeCount/10000).toFixed(1)}万</b> — 「${(topWork.title||'').slice(0,16)}…」· ${topWork._keyword}`});
+    if (topWork) ins.push({type:'hot',text:`单条最高赞 <b>${(topWork.likeCount/10000).toFixed(1)}万</b> — 「${(topWork.title||'').slice(0,16)}…」${topWork._keyword?' · '+topWork._keyword:''}`});
     const topCollect = [...hw].sort((a,b)=>(b.collect_rate||0)-(a.collect_rate||0))[0];
     if (topCollect && topCollect.collect_rate>0) ins.push({type:'value',text:`收藏率最高 <b>${topCollect.keyword}</b>（${topCollect.collect_rate}%），适合做教程型内容`});
     const blueOcean = hw.filter(h=>h.total<1000&&h.max_like>10000).sort((a,b)=>b.max_like-a.max_like)[0];
