@@ -4465,8 +4465,8 @@ if (document.readyState === 'loading') {
       el.className = 'section';
       el.id = 'archifyTopic';
       // Insert at top of content
-      var content = document.querySelector('.content') || document.querySelector('main') || document.body;
-      content.insertBefore(el, content.firstChild);
+      var firstSection = document.querySelector('.section'); if(firstSection&&firstSection.parentNode)firstSection.parentNode.insertBefore(el,firstSection);else document.body.insertBefore(el,document.body.firstChild);
+      
     }
     
     el.innerHTML = '<h2 class="section-title">🔥 技术雷达 <span class="section-sub">Archify 深度选题</span></h2>' +
