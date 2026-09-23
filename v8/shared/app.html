@@ -1,0 +1,925 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script>
+// 启动遮罩：避免旧布局闪现（FOUC）
+document.write('<style>body{opacity:0;visibility:hidden;transition:opacity 0.3s ease;}body.ready{opacity:1;visibility:visible;}</style>');
+document.write('<div id="bootMask" style="position:fixed;inset:0;z-index:99999;background:#0a0a0f;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;">' +
+  '<div style="width:48px;height:48px;border:2px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:bootspin 0.8s linear infinite;"></div>' +
+  '<div style="color:rgba(255,255,255,0.4);font-size:13px;letter-spacing:2px;">加载中...</div>' +
+  '<style>@keyframes bootspin{to{transform:rotate(360deg)}}</style>' +
+'</div>');
+</script>
+<script>
+// Superpowers verification-before-completion: 全局错误兜底
+// 任何模块报错只影响自身，不拖垮整页
+window.addEventListener('error', function(e) {
+  console.warn('[SafeGuard]', e.message, e.filename + ':' + e.lineno);
+  return true;
+});
+window.addEventListener('unhandledrejection', function(e) {
+  console.warn('[SafeGuard] Promise:', e.reason);
+  return true;
+});
+// 安全调用包装器
+window.safeCall = function(fn, ctx) {
+  try { return fn.call(ctx); } catch(err) { console.warn('[SafeCall]', err); return null; }
+};
+</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">热点追踪工作台</title>
+  <!-- ===== 样式层（模块化）===== -->
+  <link rel="stylesheet" href="styles/base.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/glass.css">
+  <link rel="stylesheet" href="styles/login.css">
+  <link rel="stylesheet" href="styles/modules.css">
+<link rel="stylesheet" href="styles/sidebar.css">
+  <link rel="stylesheet" href="styles/advanced.css">
+  <!-- ECharts -->
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+
+<script>
+// 先加载 sidebar.js，再隐藏 bootMask 显示页面
+// 这样用户看到的第一个工作台画面就是带侧边栏的新版本
+function loadSidebarThenShow() {
+  // 先加载 sidebar.js
+  var s = document.createElement('script');
+  s.src = 'modules/sidebar.js?t=' + Date.now();
+  s.onload = function() {
+    // sidebar.js 加载完成，隐藏 bootMask，初始化侧边栏
+    setTimeout(function() {
+      var mask = document.getElementById('bootMask');
+      if (mask) mask.style.display = 'none';
+      document.body.classList.add('ready');
+      // 初始化侧边栏并切换到概览页
+      setTimeout(function() {
+        if (typeof window.initSidebar === 'function') {
+          window.initSidebar();
+        }
+        if (typeof window.switchPage === 'function') {
+          window.switchPage('overview');
+        }
+      }, 100);
+    }, 100);
+  };
+  s.onerror = function() {
+    // 加载失败也显示页面
+    console.warn('[boot] sidebar.js load failed');
+    var mask = document.getElementById('bootMask');
+    if (mask) mask.style.display = 'none';
+    document.body.classList.add('ready');
+  };
+  document.head.appendChild(s);
+}
+// 页面加载后，先加载 sidebar.js 再显示
+window.addEventListener('load', function() {
+  setTimeout(loadSidebarThenShow, 200);
+});
+// 兜底：3秒后强制显示
+setTimeout(function() {
+  var mask = document.getElementById('bootMask');
+  if (mask) mask.style.display = 'none';
+  document.body.classList.add('ready');
+}, 3000);
+</script>
+</head>
+
+<div class="login-screen" id="loginScreen">
+  <div class="login-orb login-orb-1"></div>
+  <div class="login-orb login-orb-2"></div>
+  <div class="login-orb login-orb-3"></div>
+  <div class="login-logo-wrap">
+  <svg class="login-logo-svg" viewBox="212.9 89.4 403.6 287.9" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+  <radialGradient id="lgMain1" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgSub1" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgMain2" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgSub2" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgMain3" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgSub3" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgMain4" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="lgSub4" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+
+  <filter id="lgBlurM" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10"/></filter>
+  <filter id="lgBlurS" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="7"/></filter>
+  <radialGradient id="lgSparkGrad">
+  <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+  <stop offset="35%" stop-color="#b8e0ff" stop-opacity="0.7"/>
+  <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+  </radialGradient>
+  <filter id="lgSparkBlur" x="-300%" y="-300%" width="700%" height="700%"><feGaussianBlur stdDeviation="3.5"/></filter>
+  </defs>
+  <path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="login-glow lgm-1" fill="url(#lgMain1)" filter="url(#lgBlurM)"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="login-glow lgm-2" fill="url(#lgMain2)" filter="url(#lgBlurM)"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="login-glow lgm-3" fill="url(#lgMain3)" filter="url(#lgBlurM)"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="login-glow lgm-4" fill="url(#lgMain4)" filter="url(#lgBlurM)"/>
+
+  <path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="login-glow lgs-1" fill="url(#lgSub1)" filter="url(#lgBlurS)"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="login-glow lgs-2" fill="url(#lgSub2)" filter="url(#lgBlurS)"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="login-glow lgs-3" fill="url(#lgSub3)" filter="url(#lgBlurS)"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="login-glow lgs-4" fill="url(#lgSub4)" filter="url(#lgBlurS)"/>
+
+  <path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="login-glass"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="login-glass"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="login-glass"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="login-glass"/>
+
+  </svg>
+  </div>
+  <div class="login-brand">
+    <div class="login-brand-name" id="loginBrandName">PYRALUMA</div>
+    <div class="login-brand-tag" id="loginBrandTag">璃火矩创 · AI Intelligence</div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-arrow"></div>
+    <div class="scroll-text">上滑进入工作台</div>
+  </div>
+</div>
+
+<div class="top-nav" id="topNav">
+  <span class="nav-logo" id="navLogo">AI热点追踪</span>
+  <a class="nav-link" data-target="hero">工作台</a>
+  <a class="nav-link" data-target="techradar">技术雷达</a>
+  <a class="nav-link" data-target="hotwords">热点</a>
+  <a class="nav-link" data-target="breakdown">爆款</a>
+  <a class="nav-link" data-target="topics">生产</a>
+  <a class="nav-link" data-target="topicPerf">运营</a>
+  <a class="nav-link" data-target="publishTime">发布时间</a>
+      <a class="nav-link" data-target="titleFormulas">标题公式</a>
+      <a class="nav-link" data-target="leadScripts">引流话术</a>
+      <a class="nav-link" data-target="launchOps">起号运营</a>
+      <a class="nav-link" data-target="audience">受众</a>
+      <div class="global-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="globalSearch" placeholder="搜索选题/热词..." oninput="doGlobalSearch(this.value)">
+      </div>
+</div>
+<!-- 运营状态条 -->
+<div id="opsStatusBar" style="margin:16px 20px 0;max-width:1400px;margin-left:auto;margin-right:auto;"></div>
+<!-- 发布时间提醒 -->
+<div id="postingReminder" style="margin:8px 20px 0;max-width:1400px;margin-left:auto;margin-right:auto;"></div>
+<div class="scroll-progress" id="scrollProgress"></div>
+<div class="back-to-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</div>
+<div class="bg-logo">
+<svg class="bg-logo-svg" viewBox="212.9 89.4 403.6 287.9" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="bgMain1" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgSub1" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgMain2" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgSub2" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgMain3" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgSub3" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgMain4" cx="50%" cy="50%" r="75%">
+<stop offset="0%" stop-color="#409cff" stop-opacity="0.45"/>
+<stop offset="35%" stop-color="#af52de" stop-opacity="0.28"/>
+<stop offset="65%" stop-color="#af52de" stop-opacity="0.08"/>
+<stop offset="100%" stop-color="#af52de" stop-opacity="0"/>
+</radialGradient>
+<radialGradient id="bgSub4" cx="50%" cy="50%" r="50%">
+<stop offset="0%" stop-color="#ff64aa" stop-opacity="0.26"/>
+<stop offset="40%" stop-color="#64d2ff" stop-opacity="0.14"/>
+<stop offset="100%" stop-color="#64d2ff" stop-opacity="0"/>
+</radialGradient>
+<filter id="bgBlurM" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="10"/></filter>
+<filter id="bgBlurS" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="7"/></filter>
+</defs>
+<path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96     c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="bg-glow bg-glow-main bgm-1" fill="url(#bgMain1)" filter="url(#bgBlurM)"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56     c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="bg-glow bg-glow-main bgm-2" fill="url(#bgMain2)" filter="url(#bgBlurM)"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96      c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="bg-glow bg-glow-main bgm-3" fill="url(#bgMain3)" filter="url(#bgBlurM)"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56      c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="bg-glow bg-glow-main bgm-4" fill="url(#bgMain4)" filter="url(#bgBlurM)"/>
+
+<path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96     c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="bg-glow bg-glow-sub bgs-1" fill="url(#bgSub1)" filter="url(#bgBlurS)"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56     c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="bg-glow bg-glow-sub bgs-2" fill="url(#bgSub2)" filter="url(#bgBlurS)"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96      c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="bg-glow bg-glow-sub bgs-3" fill="url(#bgSub3)" filter="url(#bgBlurS)"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56      c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="bg-glow bg-glow-sub bgs-4" fill="url(#bgSub4)" filter="url(#bgBlurS)"/>
+
+<path d="M243.31,288.55h42.82c4.49,0,8.71-2.18,11.31-5.84l115.29-162.35c3.26-4.59-0.02-10.95-5.65-10.95h-45.96     c-6.74,0-13.06,3.26-16.96,8.76L234.83,272.12C229.94,279.01,234.86,288.55,243.31,288.55z" class="bg-glass"/>
+<path d="M398.58,357.28h-49.56c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92c-3.24-4.59,0.04-10.93,5.67-10.93h49.56     c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92C407.49,350.94,404.2,357.28,398.58,357.28z" class="bg-glass"/>
+<path d="M586.1,178.14h-42.82c-4.49,0-8.71,2.18-11.31,5.84L416.67,346.33c-3.26,4.59,0.02,10.95,5.65,10.95h45.96      c6.74,0,13.06-3.26,16.96-8.76l109.33-153.95C599.47,187.68,594.55,178.14,586.1,178.14z" class="bg-glass"/>
+<path d="M430.83,109.41h49.56c4.51,0,8.73,2.19,11.33,5.87l36.66,51.92c3.24,4.59-0.04,10.93-5.67,10.93h-49.56      c-4.51,0-8.73-2.19-11.33-5.87l-36.66-51.92C421.93,115.75,425.21,109.41,430.83,109.41z" class="bg-glass"/>
+
+</svg>
+</div>
+
+<div class="blob-3"></div>
+
+
+<div class="hero">
+  <div class="hero-top anim anim-d1">
+    <div>
+      <h1 class="hero-title" id="heroTitle">AI 热点<em>追踪</em><br>工作台</h1>
+      <div class="hero-sub">Daily Hotspot Intelligence · RedFox Hub</div>
+    </div>
+    <div class="hero-meta">
+      <div class="time" id="updateTime">加载中...</div>
+      <div>每日 8:00 自动采集 · 8:05 推送简报</div>
+      <div class="hero-filter">
+        <div class="platform-switch" id="platformSwitch">
+          <button class="platform-btn active" data-platform="all" onclick="setPlatform('all')">全部</button>
+          <button class="platform-btn" data-platform="douyin" onclick="setPlatform('douyin')">抖音</button>
+          <button class="platform-btn" data-platform="xiaohongshu" onclick="setPlatform('xiaohongshu')">小红书</button>
+          <button class="platform-btn" data-platform="compare" onclick="setPlatform('compare')">对比</button>
+        </div>
+        <select id="categoryFilter" onchange="applyFilter()">
+          <option value="all">全部赛道</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="hero-stats anim anim-d2" id="heroStats"></div>
+</div>
+
+<div class="section anim anim-d2">
+  <div id="hero" class="section-header">
+    <span class="section-num">01</span>
+    <span class="section-title">今日行动</span>
+    <span class="section-desc">每日待办 · 核心指标</span>
+  </div>
+  <div class="action-panel">
+    <div class="action-title">Action List</div>
+    <div class="action-list" id="actionList"></div>
+  </div>
+</div>
+
+<div class="section compare-section" id="compareSection">
+  <div class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">双平台对比</span>
+    <span class="section-desc">抖音 vs 小红书数据对比</span>
+  </div>
+  <div class="compare-grid" id="compareSummary"></div>
+  <div class="bento-card" style="margin-bottom:16px;">
+    <h4 style="margin:0 0 12px 0;font-size:15px;">热词重叠对比（两平台均在榜）</h4>
+    <div style="overflow-x:auto;">
+      <table class="overlap-table" id="overlapTable">
+        <thead><tr><th>关键词</th><th>分类</th><th>抖音作品数</th><th>小红书作品数</th><th>抖音最高赞</th><th>小红书最高赞</th><th>更热平台</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="compare-grid">
+    <div class="compare-card douyin">
+      <h4><span class="compare-tag dy">抖音</span>独有热词 TOP10</h4>
+      <div id="dyOnlyList"></div>
+    </div>
+    <div class="compare-card xiaohongshu">
+      <h4><span class="compare-tag xhs">小红书</span>独有热词 TOP10</h4>
+      <div id="xhsOnlyList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d3">
+  <div id="works" class="section-header">
+    <span class="section-num">02</span>
+    <span class="section-title">热度分析</span>
+    <span class="section-desc">什么在火 · 什么时候发 · 多长最好</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card span-2">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">热词热度排行 TOP15</span></div>
+      <div class="chart-lg" id="chartRanking"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">赛道分布</span></div>
+      <div class="chart" id="chartCategory"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">发布时间</span><span class="ch-tip">几点发最容易爆</span></div>
+      <div class="chart-sm" id="chartPublishTime"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">视频时长</span><span class="ch-tip">多长效果最好</span></div>
+      <div class="chart-sm" id="chartDuration"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">钩子爆款率</span></div>
+      <div class="chart-sm" id="chartHook"></div>
+      </div>
+      <div class="bento-card" style="position:relative;overflow:hidden;">
+        <div class="card-head"><span class="ch-bar"></span><span class="ch-title">互动质量</span><span class="ch-tip">评论率/收藏率越高越有价值</span></div>
+        <div class="engage-card">
+          <div class="engage-stats">
+            <div class="engage-stat"><div class="es-num" id="avgCommentRate">--</div><div class="es-label">平均评论率</div></div>
+            <div class="engage-stat"><div class="es-num" id="avgCollectRate">--</div><div class="es-label">平均收藏率</div></div>
+          </div>
+          <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;">🔥 高评论率作品</div>
+          <div class="engage-list" id="highCommentList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d2">
+  <div id="techradar" class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title" data-section="techradar">AI技术雷达</span>
+    <span class="section-desc">每日AI新技术/新模型/新项目 × 社媒热度关联分析，提前发现蓝海机会</span>
+  </div>
+  <div class="tech-summary" id="techSummary"></div>
+  <div class="tech-grid" id="techGrid"></div>
+</div>
+
+<div class="section anim anim-d3">
+  <div id="hotwords" class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">智能洞察</span>
+    <span class="section-desc">从数据中提取的关键信号</span>
+  </div>
+  <div class="insights-grid" id="insightsGrid"></div>
+</div>
+
+<div class="section anim anim-d5">
+  <div id="history" class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">趋势与数据</span>
+    <span class="section-desc">历史走势 · 完整明细</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">热词热度趋势（近14天）</span><span class="ch-tip">跑满2天后显示曲线</span></div>
+      <div class="chart" id="chartHistory"></div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">热词详情</span><span class="ch-tip">点击表头排序</span><button class="export-btn" onclick="exportHotwordsCSV()">导出CSV</button></div>
+      <div class="table-container">
+        <table id="hotwordTable">
+          <thead><tr><th onclick="sortTable(0)">#</th><th onclick="sortTable(1)">关键词</th><th onclick="sortTable(2)">分类</th><th onclick="sortTable(3)">作品数</th><th onclick="sortTable(4)">最高赞</th><th onclick="sortTable(5)">收藏率</th><th onclick="sortTable(6)">趋势</th><th>生命周期</th><th>效率</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">爆款作品 TOP20</span><span class="ch-tip">点击标题跳转原视频</span></div>
+      <div class="table-container">
+        <table id="worksTable">
+          <thead><tr><th>#</th><th>标题</th><th>作者</th><th>粉丝</th><th>点赞</th><th>收藏</th><th>分享</th><th>热词</th><th>钩子</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d6">
+  <div id="breakdown" class="section-header">
+    <span class="section-num">03</span>
+    <span class="section-title">爆款结构拆解</span>
+    <span class="section-desc">钩子 → 结构 → CTA → 目标人群</span>
+  </div>
+  <div class="topic-board" id="topicsGrid" style="margin-bottom:16px;"></div>
+  <div class="tracker-bar" id="topicTracker">
+    <div class="tracker-stat"><span class="ts-num" style="color:var(--accent-4);" id="publishedCount">0</span><span class="ts-label">已发布</span></div>
+    <div class="tracker-stat"><span class="ts-num" style="color:var(--accent-3);" id="shootingCount">0</span><span class="ts-label">拍摄中</span></div>
+    <div class="tracker-stat"><span class="ts-num" style="color:var(--text-tertiary);" id="pendingCount">0</span><span class="ts-label">待拍摄</span></div>
+    <div class="tracker-progress">
+      <div id="barPublished" style="background:var(--accent-4);width:0%;"></div>
+      <div id="barShooting" style="background:var(--accent-3);width:0%;"></div>
+    </div>
+    <button onclick="resetKanbanStatus()">重置状态</button>
+  </div>
+</div>
+
+<div class="footer" id="pageFooter">AI 热点追踪工作台 · 数据来源 RedFox Hub · 每日 8:00 自动采集</div>
+
+<div class="section anim anim-d6">
+<div id="viralGenes" class="section-header">
+<span class="section-num"></span>
+<span class="section-title">爆款基因库</span>
+<span class="section-desc">钩子类型 · 标题公式 · 高频词</span>
+</div>
+<div id="viralGenesContent"></div>
+</div>
+
+
+<div class="section anim anim-d4">
+  <div class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">内容形式分布</span>
+    <span class="section-desc">什么形式最容易火 · 占比 × 平均点赞</span>
+  </div>
+  <div class="format-bars" id="formatBars"></div>
+</div>
+<div class="section anim anim-d4">
+  <div id="insights" class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">对标与评论</span>
+    <span class="section-desc">评论关键词 · 收藏率 · 需求挖掘 · 饱和度</span>
+  </div>
+  <div class="bento">
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">小账号爆款</span><span class="ch-tip">粉丝&lt;5万 赞&gt;3千</span></div>
+      <div class="small-list" id="smallViral"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">标题公式</span><span class="ch-tip">可直接套用</span></div>
+      <div class="formula-list" id="formulaList"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">对标作者 TOP10</span></div>
+      <div class="author-list" id="authorList"></div><div id="competitorWorks"></div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">爆款结构化拆解 TOP10</span><span class="ch-tip">钩子 → 结构 → CTA</span></div>
+      <div class="breakdown-grid" id="breakdownGrid"></div>
+    </div>
+    <div class="bento-card span-3">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">赛道覆盖矩阵</span><span class="ch-tip">找空白机会点</span></div>
+      <div class="matrix-grid" id="matrixGrid"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d4">
+  <div id="topics" class="section-header">
+    <span class="section-num">04</span>
+    <span class="section-title">选题建议</span>
+    <span class="section-desc">带人群画像 · 综合评分 · 变现路径</span>
+    <button class="export-btn" onclick="exportTopicsCSV()" style="margin-left:auto;">导出选题CSV</button>
+  </div>
+  <div class="bento">
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">评论高频词</span><span class="ch-tip">观众在问什么</span></div>
+      <div class="kw-cloud" id="commentKw"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">点赞 × 收藏</span></div>
+      <div class="chart-sm" id="chartScatter"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">收藏率排行</span><span class="ch-tip">价值型内容</span></div>
+      <div class="chart-sm" id="chartCollect"></div>
+    </div>
+    <div class="bento-card span-2">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">评论区需求挖掘</span><span class="ch-tip">从评论找选题</span></div>
+      <div id="commentDemands"></div>
+    </div>
+    <div class="bento-card">
+      <div class="card-head"><span class="ch-bar"></span><span class="ch-title">饱和度 & 生命周期</span><span class="ch-tip">值越低越蓝海</span></div>
+      <div class="sat-list" id="saturationList"></div>
+    </div>
+  </div>
+</div>
+
+<div class="section anim anim-d7">
+<div id="titleGen" class="section-header">
+<span class="section-num"></span>
+<span class="section-title">爆款标题生成器</span>
+<span class="section-desc">输入关键词 → 5条标题+钩子</span>
+</div>
+<div style="display:flex;gap:12px;align-items:flex-end">
+<div style="flex:1">
+<input type="text" id="titleGenInput" class="gen-input" placeholder="输入关键词，如：可灵AI、AI PPT、WorkBuddy..." />
+</div>
+<button class="gen-btn" onclick="generateTitles()">生成标题</button>
+</div>
+<div id="titleGenResult" class="gen-result"></div>
+</div>
+
+<div class="section anim-d8">
+<div class="section-header">
+<span class="section-num"></span>
+<span class="section-title">选题看板</span>
+<span class="section-desc">三列状态管理 · 点击切换状态 · 一键生成脚本</span>
+</div>
+<div class="kanban-board" id="kanbanBoard"></div>
+</div>
+
+<div class="section anim-d8">
+<div id="schedule" class="section-header">
+<span class="section-num"></span>
+<span class="section-title">一周内容排期</span>
+<span class="section-desc">抖音日更 · 小红书隔日更</span>
+</div>
+<div id="scheduleContent"></div>
+</div>
+
+<div class="section anim anim-d7">
+<div id="topicPerf" class="section-header">
+<span class="section-num">05</span>
+<span class="section-title">选题命中率</span>
+<span class="section-desc">发布后自动追踪效果</span>
+</div>
+<div id="topicPerfContent"></div>
+</div>
+
+<div class="section anim-d8">
+<div id="commentScripts" class="section-header">
+<span class="section-num"></span>
+<span class="section-title">评论区话术库</span>
+<span class="section-desc">高赞回复 · 置顶引导 · 需求收集</span>
+</div>
+<div id="commentScriptsContent"></div>
+</div>
+
+<div class="section anim-d9">
+<div id="checklist" class="section-header">
+<span class="section-num"></span>
+<span class="section-title">发布前自检</span>
+<span class="section-desc">6项检查 · 避免低级错误</span>
+</div>
+<div class="checklist-progress" id="checklistProgress">已完成 <b>0</b>/6 项</div>
+<div id="checklistContent"></div>
+</div>
+
+
+<div class="section anim anim-d4">
+  <div class="section-header">
+    <span class="section-num"></span>
+    <span class="section-title">我的对标库</span>
+    <span class="section-desc">收藏的爆款拆解 · 拍之前翻一翻</span>
+  </div>
+  <div class="breakdown-grid" id="favoritesGrid"></div>
+</div>
+<div id="publishTime" class="section">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">⏰ 发布时间分析</h2>
+        <div class="hs-sub">几点发最容易爆 · 基于爆款作品数据</div>
+      </div>
+      <button class="section-collapse-btn" onclick="toggleSection('publishTime')">收起</button>
+    </div>
+    <div class="publish-time-section glass-card">
+      <div style="font-size:12px;color:var(--text-tertiary);margin-bottom:8px;">24小时发布热度分布（柱高=作品数，金色=爆款率最高时段，柱顶数字=爆款率）</div>
+      <div class="pt-chart" id="ptChart"></div>
+      <div class="pt-best-cards" id="ptBestCards"></div>
+      <div class="pt-platform" id="ptPlatform"></div>
+      <div class="pt-tips" id="ptTips"></div>
+    </div>
+  </div>
+
+<div id="titleFormulas" class="section">
+    <div class="section-header">
+      <div><h2 class="section-title">📝 爆款标题公式库</h2><div class="hs-sub">从爆款作品中自动提取的标题模式</div></div>
+      <button class="section-collapse-btn" onclick="toggleSection('titleFormulas')">收起</button>
+    </div>
+    <div class="glass-card" style="padding:20px;">
+      <div class="formula-grid" id="formulaGrid"></div>
+    </div>
+  </div>
+
+  <div id="leadScripts" class="section">
+    <div class="section-header">
+      <div><h2 class="section-title">💬 私域引流话术库</h2><div class="hs-sub">针对不同人群的评论区引流话术</div></div>
+      <button class="section-collapse-btn" onclick="toggleSection('leadScripts')">收起</button>
+    </div>
+    <div class="glass-card" style="padding:20px;" id="scriptContainer"></div>
+  </div>
+
+<div id="launchOps" class="section">
+    <div class="section-header">
+      <div><h2 class="section-title">🚀 起号运营</h2><div class="hs-sub">零推流贴标签起号法 · 阶段追踪与任务清单</div></div>
+      <button class="section-collapse-btn" onclick="toggleSection('launchOps')">收起</button>
+    </div>
+    <!-- 阶段横幅 -->
+    <div class="launch-phase-banner" id="launchBanner"></div>
+    <div class="grid-2">
+      <!-- 标签健康度 -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="card-head" style="margin-bottom:12px;"><span class="ch-bar"></span><span class="ch-title">账号标签健康度</span></div>
+        <div class="health-gauge">
+          <div class="health-score" id="healthScore">--</div>
+          <div class="health-bar-wrap">
+            <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;">核心内容占比 <span id="coreCoverage">--</span></div>
+            <div class="health-bar"><div class="health-bar-fill" id="healthBar" style="width:0%"></div></div>
+            <div style="font-size:10px;color:var(--text-tertiary);margin-top:6px;" id="healthTip"></div>
+          </div>
+        </div>
+        <div style="margin-top:12px;">
+          <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:6px;">已覆盖核心关键词</div>
+          <div id="coreKwCloud"></div>
+        </div>
+      </div>
+      <!-- 内容配比 -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="card-head" style="margin-bottom:12px;"><span class="ch-bar"></span><span class="ch-title">内容配比（目标70/20/10）</span></div>
+        <div class="ratio-bar" id="ratioBar"></div>
+        <div class="ratio-legend" id="ratioLegend"></div>
+        <div style="margin-top:12px;font-size:11px;color:var(--text-tertiary);line-height:1.8;" id="ratioTip"></div>
+      </div>
+    </div>
+    <div class="grid-2" style="margin-top:16px;">
+      <!-- 阶段任务清单 -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="card-head" style="margin-bottom:12px;"><span class="ch-bar"></span><span class="ch-title">本阶段任务清单</span></div>
+        <div id="launchTasks"></div>
+      </div>
+      <!-- 避坑提醒 -->
+      <div class="glass-card" style="padding:20px;">
+        <div class="card-head" style="margin-bottom:12px;"><span class="ch-bar"></span><span class="ch-title">⚠️ 起号避坑提醒</span></div>
+        <div id="pitfallList"></div>
+      </div>
+    </div>
+  </div>
+
+<div id="audience" class="section anim-d9">
+<div class="section-header">
+<span class="section-num">06</span>
+<span class="section-title">人群画像</span>
+<span class="section-desc">10类核心受众 · 特征 · 需求 · 变现</span>
+</div>
+<div class="audience-chart" id="audienceChart"></div>
+<div class="persona-grid" id="personaGrid"></div>
+</div>
+
+<!-- 热词趋势弹窗 -->
+<div class="trend-modal" id="trendModal" onclick="if(event.target===this)this.classList.remove('active')">
+<div class="trend-modal-content">
+<span class="close-btn" onclick="document.getElementById('trendModal').classList.remove('active')">&times;</span>
+<h3 id="trendModalTitle">热词趋势</h3>
+<div id="trendModalBody"><p style="color:var(--text-secondary)">加载中...</p></div>
+</div>
+</div>
+
+
+
+<div class="script-modal-overlay" id="scriptModal">
+  <div class="script-modal" style="position:relative;">
+    <button class="script-close" onclick="closeScriptModal()">&times;</button>
+    <h3 id="scriptModalTitle">生成脚本</h3>
+    <div id="scriptModalContent"></div>
+    <button class="script-copy-btn" onclick="copyScript()">复制脚本</button>
+  </div>
+</div>
+
+
+
+  <!-- 蓝海关键词 -->
+  <div id="blueOcean" class="section">
+    <h2 class="section-title">🌊 蓝海关键词 <span class="section-sub">高需求低竞争，优先做</span></h2>
+    <div id="blueOceanList"></div>
+  </div>
+
+  <!-- 跨平台选题迁移 -->
+  <div id="crossPlatform" class="section">
+    <h2 class="section-title">🔄 跨平台选题迁移 <span class="section-sub">小红书已验证，抖音还没爆</span></h2>
+    <div id="crossPlatformList"></div>
+  </div>
+
+  <!-- 标题基因库 -->
+  <div id="titleGenes" class="section">
+    <h2 class="section-title">🧬 爆款标题基因库 <span class="section-sub">拆解Top标题模式，直接套用</span></h2>
+    <div id="titleGeneList"></div>
+  </div>
+
+  <!-- 评论语义挖掘 -->
+  <div id="commentSemantic" class="section">
+    <h2 class="section-title">💬 评论语义挖掘 <span class="section-sub">用户痛点/提问/购买意向</span></h2>
+    <div id="commentSemanticContent"></div>
+  </div>
+
+  <!-- 转化信号 -->
+  <div id="conversionSignals" class="section">
+    <h2 class="section-title">💰 转化信号识别 <span class="section-sub">评论中含购买意向的作品</span></h2>
+    <div id="conversionSignalList"></div>
+  </div>
+
+  <!-- 完播率分析 -->
+  <div id="completionRate" class="section">
+    <h2 class="section-title">⏱️ 完播率推断 <span class="section-sub">不同时长的预估完播率</span></h2>
+    <div id="completionRateChart"></div>
+  </div>
+
+  <!-- 关键词上升速率 -->
+  <div id="growthRanking" class="section">
+    <h2 class="section-title">📈 关键词上升速率榜 <span class="section-sub">按增长速度排序，捕捉早期热点</span></h2>
+    <div id="growthRankingList"></div>
+  </div>
+
+  <!-- 内容形式ROI -->
+  <div id="formatROI" class="section">
+    <h2 class="section-title">📊 内容形式ROI <span class="section-sub">哪种形式互动效率最高</span></h2>
+    <div id="formatROIList"></div>
+  </div>
+
+  <!-- 对标账号策略 -->
+  <div id="competitorStrategy" class="section">
+    <h2 class="section-title">🎯 对标账号策略拆解 <span class="section-sub">Top5账号的内容配比与更新节奏</span></h2>
+    <div id="competitorList"></div>
+  </div>
+
+  <!-- 最佳发布组合 -->
+  <div id="bestPostingCombo" class="section">
+    <h2 class="section-title">📅 最佳发布组合 <span class="section-sub">星期×时段最优解</span></h2>
+    <div id="bestPostingComboContent"></div>
+  </div>
+
+  <!-- 内容日历 -->
+  <div id="contentCalendar" class="section">
+    <h2 class="section-title">🗓️ 内容日历 <span class="section-sub">选题排期与发布计划</span></h2>
+    <div style="padding:20px;">
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:12px;">
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#6b7280;">周一</div>
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#6b7280;">周二</div>
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#6b7280;">周三</div>
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#6b7280;">周四</div>
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#6b7280;">周五</div>
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#f59e0b;">周六</div>
+        <div style="text-align:center;font-weight:600;font-size:12px;color:#f59e0b;">周日</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;" id="calendarGrid"></div>
+      <div style="margin-top:16px;padding:12px;background:#f0fdf4;border-radius:8px;font-size:13px;color:#166534;">
+        💡 建议：每周发布4-5条，周二/四/六晚20:00为最佳发布时段。工具教程类安排在工作日，热点追更类安排在周末。
+      </div>
+    </div>
+  </div>
+
+<div class="shoot-modal" id="shootModal" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="shoot-modal-content">
+    <h3>🎬 拍摄清单</h3>
+    <div id="shootModalBody"></div>
+    <div style="margin-top:16px;text-align:right;">
+      <button onclick="document.getElementById('shootModal').classList.remove('active')" style="padding:8px 16px;background:rgba(139,92,246,0.2);border:1px solid rgba(139,92,246,0.3);border-radius:8px;color:#c4b5fd;cursor:pointer;">关闭</button>
+    </div>
+  </div>
+</div>
+
+  <!-- ===== v7 动态行业加载器（框架层，永不修改）===== -->
+  <script>
+  (function() {
+    var params = new URLSearchParams(window.location.search);
+    var ind = params.get('ind') || 'ai';
+    var slugMap = {'书法':'shufa','書法':'shufa'};
+    if (slugMap[ind]) ind = slugMap[ind];
+    window.CURRENT_INDUSTRY = ind;
+    var base = '../industries/' + ind + '/';
+
+    // 1. 同步加载 config.json
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', base + 'config.json?t=' + Date.now(), false);
+    xhr.send();
+    if (xhr.status === 200) {
+      window.DOMAIN_CONFIG = JSON.parse(xhr.responseText);
+    } else {
+      document.body.innerHTML = '<div style="padding:60px;text-align:center;color:#888;font-family:sans-serif;">行业配置未找到: ' + ind + '</div>';
+      throw new Error('Config not found: ' + ind);
+    }
+
+    // 2. cfg() 工具函数
+    window.cfg = function(path, def) {
+      if (!window.DOMAIN_CONFIG) return def;
+      var parts = path.split('.');
+      var obj = window.DOMAIN_CONFIG;
+      for (var i = 0; i < parts.length; i++) {
+        if (obj == null || typeof obj !== 'object') return def;
+        obj = obj[parts[i]];
+      }
+      return obj === undefined ? def : obj;
+    };
+
+    // 3. 动态注入品牌信息
+    (function() {
+      document.getElementById('pageTitle').textContent = cfg('display_name', '热点追踪');
+      document.getElementById('navLogo').textContent = cfg('display_name', '热点追踪');
+      document.getElementById('loginBrandName').textContent = cfg('brand.name_en', 'PYRALUMA');
+      document.getElementById('loginBrandTag').textContent = cfg('brand.name_cn', '') + ' · ' + cfg('brand.slogan', '');
+      var ht = document.getElementById('heroTitle');
+      if (ht) ht.innerHTML = cfg('name', 'AI') + ' 热点<em>追踪</em><br>工作台';
+    })();
+
+    // 4. 加载框架层（core）
+    function loadScript(src, cb) {
+      var s = document.createElement('script');
+      s.src = src;
+      s.onload = cb;
+      s.onerror = function() { console.warn('[v7] 加载失败:', src); cb(); };
+      document.head.appendChild(s);
+    }
+
+    // 5. 加载数据 data.js -> 加载框架 -> 加载模块 -> 启动
+    function startAfterData() {
+      window.DATA = window.DASHBOARD_DATA;
+      // 先 globals（基础工具），再 state，最后 framework（覆盖版 renderAll 带模块检查）
+      loadScript('core/globals.js', function() {
+        loadScript('core/state.js', function() {
+          loadScript('core/framework.js', function() {
+            // 加载所有卡片模块（独立文件，单卡崩溃不影响其他）
+            var modules = [
+              'modules/_helpers.js',
+              'modules/hero.js',
+              'modules/hotwords.js',
+              'modules/works.js',
+              'modules/breakdown.js',
+              'modules/topics.js',
+              'modules/topicPerf.js',
+              'modules/publishTime.js',
+              'modules/titleFormulas.js',
+              'modules/leadScripts.js',
+              'modules/launchOps.js',
+              'modules/audience.js',
+              'modules/viralGenes.js',
+              'modules/techradar.js',
+              'modules/engagement.js',
+              'modules/comparison.js',
+              'modules/kanban.js',
+              'modules/favorites.js',
+              'modules/scriptGen.js',
+              'modules/opsStatus.js',
+              'modules/credit.js',
+              'modules/advancedAnalytics.js',
+              'modules/sidebar.js'
+            ];
+            var i = 0;
+            function loadNext() {
+              if (i < modules.length) {
+                loadScript(modules[i++], loadNext);
+              } else {
+                // 所有模块加载完毕，启动框架
+                if (window.initFramework) window.initFramework();
+                // 延迟渲染附加卡片
+                setTimeout(function() {
+                  var fns = ['renderOpsStatus','renderBlueOcean','renderCrossPlatform','renderTitleGenes',
+                    'renderCommentSemantic','renderConversionSignals','renderCompletionRate','renderGrowthRanking',
+                    'renderFormatROI','renderCompetitorStrategy','renderBestPostingCombo','renderPostingReminder',
+                    'renderAnomalyDetection','renderOwnPerformance','renderArchifyTopic','renderContentCalendar'];
+                  fns.forEach(function(fn) { if (typeof window[fn] === 'function') { try { window[fn](); } catch(e){} } });
+                }, 800);
+              }
+            }
+            loadNext();
+          });
+        });
+      });
+    }
+
+    // 6. 加载行业数据
+    var ds = document.createElement('script');
+    ds.src = base + 'data.js?t=' + Date.now();
+    ds.onload = startAfterData;
+    ds.onerror = function() {
+      document.body.innerHTML = '<div style="padding:60px;text-align:center;color:#888;font-family:sans-serif;">数据加载失败: ' + ind + '</div>';
+    };
+    document.head.appendChild(ds);
+  })();
+  </script>
+  <!-- ===== 特效层（固定，不依赖数据）===== -->
+  <script src="effects/login.js"></script>
+  <script src="effects/glow.js"></script>
+</body>
+</html>
