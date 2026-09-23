@@ -44,13 +44,6 @@
       title: '人群洞察'
     },
     {
-      id: 'topics',
-      icon: '📋',
-      label: '选题管理',
-      sections: ['topics', 'topicsGrid', 'topicTracker', 'kanbanBoard', 'topicPerf', 'topicPerfContent'],
-      title: '选题管理'
-    },
-    {
       id: 'content',
       icon: '✍️',
       label: '内容创作',
