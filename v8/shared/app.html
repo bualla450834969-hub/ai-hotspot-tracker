@@ -757,6 +757,32 @@ window.safeCall = function(fn, ctx) {
     var slugMap = {'书法':'shufa', '書法':'shufa'};
     if (slugMap[ind]) ind = slugMap[ind];
   window.CURRENT_INDUSTRY = ind;
+
+  // ---- 本地采集的自定义行业（数据存浏览器 localStorage）----
+  if (ind.indexOf('local:') === 0) {
+    var cname = decodeURIComponent(ind.slice(6));
+    window.CURRENT_INDUSTRY = 'local';
+    try {
+      window.DOMAIN_CONFIG = JSON.parse(localStorage.getItem('custom_cfg_' + cname) || '{}');
+      window.DASHBOARD_DATA = JSON.parse(localStorage.getItem('custom_data_' + cname) || '{}');
+    } catch (e) {
+      document.body.innerHTML = '<div style="padding:60px;text-align:center;color:#888;font-family:sans-serif;">本地行业数据读取失败: ' + cname + '</div>';
+      return;
+    }
+    window.cfg = function(path, defaultValue) {
+      if (!window.DOMAIN_CONFIG) return defaultValue;
+      var parts = path.split('.');
+      var obj = window.DOMAIN_CONFIG;
+      for (var i = 0; i < parts.length; i++) { if (obj == null || typeof obj !== 'object') return defaultValue; obj = obj[parts[i]]; }
+      return obj === undefined ? defaultValue : obj;
+    };
+    window.domainGuard = function(moduleId, renderFn) { return renderFn; };
+    window.DATA = window.DASHBOARD_DATA;
+    if (window.normalizeData) window.normalizeData();
+    if (window.renderAll) window.renderAll();
+    return;
+  }
+
   var base = '../industries/' + ind + '/';
 
   // 1. 加载 config.json
@@ -979,6 +1005,12 @@ window.safeCall = function(fn, ctx) {
     </div>
 
     <div style="margin-bottom:20px;">
+      <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">采集中转地址（部署后填 Worker 网址）</label>
+      <input type="text" id="proxyUrlInput" placeholder="https://redfox-proxy.xxx.workers.dev" style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box;">
+      <p style="font-size:11px;color:#64748b;margin-top:6px;">首次使用需按说明部署一次免费中转，把网址填这里</p>
+    </div>
+
+    <div style="margin-bottom:20px;">
       <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">新建行业名称</label>
       <input type="text" id="industryInput" placeholder="如：书法 / 健身 / 美妆..." style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box;">
       <p style="font-size:11px;color:#64748b;margin-top:6px;">输入行业名后点击采集，自动生成关键词并采集数据</p>
@@ -1024,9 +1056,10 @@ window.safeCall = function(fn, ctx) {
 
     <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;color:#64748b;line-height:1.6;">
       <p style="font-weight:600;margin-bottom:8px;">使用说明</p>
-      <p>1. 本地先运行 python local_helper.py</p>
-      <p>2. 填入API Key，输入行业名，点击采集</p>
-      <p>3. 当前行业：<span id="currentIndLabel" style="color:#a78bfa;"></span></p>
+      <p>1. 部署一次免费中转（Worker），把网址填到上方「采集中转地址」</p>
+      <p>2. 填入你自己的 RedFox API Key，输入行业名，点采集</p>
+      <p>3. 采集完自动存入浏览器，并出现在下方行业下拉里，随时切换</p>
+      <p>当前行业：<span id="currentIndLabel" style="color:#a78bfa;"></span></p>
     </div>
   </div>
 </section>
@@ -1034,43 +1067,192 @@ window.safeCall = function(fn, ctx) {
 <script>
 document.getElementById('currentIndLabel').textContent = window.CURRENT_INDUSTRY || 'ai';
 document.getElementById('apiKeyInput').value = localStorage.getItem('redfox_api_key') || '';
-function startCollection(){
-  var k=document.getElementById('apiKeyInput').value.trim(),i=document.getElementById('industryInput').value.trim(),s=document.getElementById('collectStatus');
+document.getElementById('proxyUrlInput').value = localStorage.getItem('redfox_proxy_url') || '';
+
+// 钩子分类
+function classifyHook(title){
+  title = title || '';
+  if (/翻车|踩坑|避坑|别再|不要/.test(title)) return '避坑预警';
+  if (/对比|vs|VS|区别|哪个好/.test(title)) return '对比选择';
+  if (/揭秘|竟然|居然|没想到|真相/.test(title)) return '反常识揭秘';
+  if (/3个|5个|10个|3招|5招|分钟|秒/.test(title)) return '数字清单';
+  if (/太美了|绝了|惊艳|震撼|效果/.test(title)) return '效果展示';
+  if (/哭了|感动|暖心|治愈|陪伴/.test(title)) return '情感共鸣';
+  return '普通';
+}
+
+// 统一作品字段
+function normalizeWork(w, platform){
+  if (platform === 'xiaohongshu') {
+    return {
+      workId: w.workId || '',
+      title: w.workTitle || w.workDesc || '',
+      accountName: w.accountNickname || '',
+      likeCount: w.workLikedCount || 0,
+      collectCount: w.workCollectedCount || 0,
+      shareCount: w.workSharedCount || 0,
+      commentCount: w.workCommentsCount || 0,
+      publishTime: w.workPublishTime || '',
+      workUrl: w.workUrl || '',
+      coverUrl: w.coverUrl || '',
+      duration: 0,
+      platform: 'xiaohongshu'
+    };
+  }
+  return {
+    workId: w.workId || w.awemeId || '',
+    title: w.title || w.desc || '',
+    accountName: w.accountName || w.nickname || '',
+    likeCount: w.likeCount || w.diggCount || 0,
+    collectCount: w.collectCount || w.collectCount || 0,
+    shareCount: w.shareCount || w.shareCount || 0,
+    commentCount: w.commentCount || w.commentCount || 0,
+    publishTime: w.publishTime || w.createTime || '',
+    workUrl: w.workUrl || '',
+    coverUrl: w.coverUrl || w.coverUrl || '',
+    duration: w.duration || 0,
+    platform: 'douyin'
+  };
+}
+
+// 调中转搜一个关键词
+async function searchOnce(proxyUrl, apiKey, platform, keyword){
+  const resp = await fetch(proxyUrl, {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({platform:platform, keyword:keyword, apiKey:apiKey, offset:0})
+  });
+  const j = await resp.json();
+  if (j.code === 2000) return j.data || {};
+  throw new Error(j.msg || ('code='+j.code));
+}
+
+// 聚合成工作台数据
+function buildDashboardData(works, hotwords, industryName){
+  works.sort((a,b)=>(b.likeCount||0)-(a.likeCount||0));
+  var totalLike = works.reduce((s,w)=>s+(w.likeCount||0),0);
+  var maxLike = works.length? works[0].likeCount||0 : 0;
+  var avgLike = works.length? Math.round(totalLike/works.length) : 0;
+
+  // 发布时间分布（按月）
+  var pm = {};
+  works.forEach(w=>{
+    var t = (w.publishTime||'').toString();
+    var m = t.slice(0,7);
+    if(m) pm[m] = (pm[m]||0)+1;
+  });
+  var publishDist = Object.keys(pm).sort().map(k=>({period:k, count:pm[k]}));
+
+  // 钩子分布
+  var hookMap = {};
+  works.forEach(w=>{ var h=classifyHook(w.title); hookMap[h]=(hookMap[h]||0)+1; });
+  var titleFormulas = Object.keys(hookMap).map(k=>({
+    hook:k, count:hookMap[k], pct: Math.round(hookMap[k]/works.length*100)
+  })).sort((a,b)=>b.count-a.count);
+
+  // 爆款 top10
+  var viral = works.slice(0,10).map(w=>({
+    title:w.title, accountName:w.accountName, likeCount:w.likeCount,
+    commentCount:w.commentCount, collectCount:w.collectCount,
+    platform:w.platform, workUrl:w.workUrl, hook:classifyHook(w.title)
+  }));
+
+  return {
+    last_update: new Date().toLocaleString('zh-CN'),
+    summary: {
+      industry: industryName,
+      total_works: works.length,
+      total_likes: totalLike,
+      max_like: maxLike,
+      avg_like: avgLike,
+      platforms: Array.from(new Set(works.map(w=>w.platform)))
+    },
+    works: works,
+    hotwords: hotwords,
+    publish_time_dist: publishDist,
+    title_formulas: titleFormulas,
+    viral_genes: { top: viral },
+    topics: hotwords.map(h=>h.keyword)
+  };
+}
+
+async function startCollection(){
+  var k = document.getElementById('apiKeyInput').value.trim();
+  var i = document.getElementById('industryInput').value.trim();
+  var p = document.getElementById('proxyUrlInput').value.trim().replace(/\/+$/,'');
+  var s = document.getElementById('collectStatus');
   s.style.display='block';
-  if(!k||!i){s.innerHTML='<span style="color:#f87171;">请填写API Key和行业名</span>';return;}
+  if(!k){ s.innerHTML='<span style="color:#f87171;">请填写 API Key</span>'; return; }
+  if(!i){ s.innerHTML='<span style="color:#f87171;">请填写行业名</span>'; return; }
+  if(!p){ s.innerHTML='<span style="color:#f87171;">请填写采集中转地址（Worker 网址）</span>'; return; }
   var platforms=[];
   if(document.getElementById('platform_dy').checked) platforms.push('douyin');
   if(document.getElementById('platform_xhs').checked) platforms.push('xiaohongshu');
-  if(platforms.length===0){s.innerHTML='<span style="color:#f87171;">请至少选择一个平台</span>';return;}
-  localStorage.setItem('redfox_api_key',k);
-  s.innerHTML='<span style="color:#60a5fa;">正在启动采集... ('+platforms.join('+')+')</span>';
-  fetch('http://localhost:8765/collect?industry='+encodeURIComponent(i)+'&api_key='+encodeURIComponent(k)+'&platforms='+encodeURIComponent(platforms.join(',')))
-  .then(function(r){return r.json()}).then(function(d){
-    if(d.error){s.innerHTML='<span style="color:#f87171;">错误: '+d.error+'</span>';return;}
-    var p=setInterval(function(){
-      fetch('http://localhost:8765/status').then(function(r){return r.json()}).then(function(s2){
-        s.innerHTML='<span style="color:#a78bfa;">'+s2.progress+'</span>';
-        if(s2.error){s.innerHTML='<span style="color:#f87171;">'+s2.error+'</span>';clearInterval(p);}
-        if(s2.done){s.innerHTML='<span style="color:#30d158;">采集完成！正在跳转...</span>';clearInterval(p);setTimeout(function(){window.location.href=window.location.pathname+'?ind='+encodeURIComponent(i.toLowerCase())},2000);}
-      });
-    },2000);
-  }).catch(function(){s.innerHTML='<span style="color:#f87171;">无法连接本地助手，请先运行 python local_helper.py</span>';});
+  if(platforms.length===0){ s.innerHTML='<span style="color:#f87171;">请至少选一个平台</span>'; return; }
+
+  localStorage.setItem('redfox_api_key', k);
+  localStorage.setItem('redfox_proxy_url', p);
+
+  var keywords = [i, i+'教程', i+'推荐', i+'怎么选', i+'避坑', i+'排行榜'];
+  var allWorks = [], hotwords = [], done = 0, total = platforms.length*keywords.length;
+
+  for (const platform of platforms){
+    for (const kw of keywords){
+      try {
+        var data = await searchOnce(p, k, platform, kw);
+        var list = data.list || [];
+        list.forEach(w=>allWorks.push(normalizeWork(w, platform)));
+        hotwords.push({keyword:kw, platform:platform, total:data.total||list.length, works:list.length, avg_like: list.length?Math.round(list.reduce((a,w)=>a+(w.likeCount||w.workLikedCount||0),0)/list.length):0});
+      } catch(e){
+        hotwords.push({keyword:kw, platform:platform, total:0, works:0, error:String(e.message||e)});
+      }
+      done++;
+      s.innerHTML='<span style="color:#a78bfa;">采集中 '+done+'/'+total+'：'+platform+' · '+kw+'</span>';
+    }
+  }
+
+  if (allWorks.length === 0){
+    s.innerHTML='<span style="color:#f87171;">没有采到作品，请检查 Key / 中转地址 / 行业名是否正确</span>';
+    return;
+  }
+
+  var dashboard = buildDashboardData(allWorks, hotwords, i);
+  localStorage.setItem('custom_cfg_'+i, JSON.stringify({
+    id:'local', display_name:i, name:i, language:'zh',
+    nav_labels:{hotspot:'热点追踪',breakdown:'爆款拆解',content:'内容创作',publish:'对标与发布'},
+    nav_order:['hotspot','breakdown','content','publish'],
+    theme:{primary:'#8b5cf6'}
+  }));
+  localStorage.setItem('custom_data_'+i, JSON.stringify(dashboard));
+  var list = JSON.parse(localStorage.getItem('custom_industries')||'[]');
+  if(list.indexOf(i)<0) list.push(i);
+  localStorage.setItem('custom_industries', JSON.stringify(list));
+  refreshIndustryDropdown();
+
+  s.innerHTML='<span style="color:#30d158;">采集完成！共 '+allWorks.length+' 条作品，正在跳转...</span>';
+  setTimeout(function(){ window.location.href = window.location.pathname + '?ind=local:' + encodeURIComponent(i); }, 1200);
 }
+
 function switchIndustry(){
-  var i=document.getElementById('switchIndustryInput').value.trim();
-  if(!i)return;
-  // 中文行业名映射
-  var slugMap={'书法':'shufa','書法':'shufa','AI':'ai','人工智能':'ai'};
-  if(slugMap[i]) i=slugMap[i];
-  window.location.href=window.location.pathname+'?ind='+encodeURIComponent(i);
+  var i = document.getElementById('switchIndustryInput').value.trim();
+  if(!i) return;
+  window.location.href = window.location.pathname + '?ind=' + encodeURIComponent(i);
 }
-// 初始化行业下拉为当前行业
-(function(){
-  var m=location.search.match(/ind=([^&]+)/);
-  var cur=m?decodeURIComponent(m[1]):'ai';
-  var sel=document.getElementById('switchIndustryInput');
-  if(sel){ for(var k=0;k<sel.options.length;k++){ if(sel.options[k].value===cur){sel.selectedIndex=k;break;} } }
-})();
+
+function refreshIndustryDropdown(){
+  var sel = document.getElementById('switchIndustryInput');
+  if(!sel) return;
+  var cur = (location.search.match(/ind=([^&]+)/)||[])[1] || 'ai';
+  // 保留内置项
+  var html = '<option value="ai">AI 热点追踪</option><option value="shufa">书法 · 墨上花开</option>';
+  var list = JSON.parse(localStorage.getItem('custom_industries')||'[]');
+  list.forEach(function(n){
+    html += '<option value="local:'+encodeURIComponent(n)+'">'+n+'（本地）</option>';
+  });
+  sel.innerHTML = html;
+  for(var k=0;k<sel.options.length;k++){ if(sel.options[k].value===cur){ sel.selectedIndex=k; break; } }
+}
+refreshIndustryDropdown();
 </script>
 <script>
 // 采集数据趋势
