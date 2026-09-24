@@ -1860,5 +1860,115 @@ loadCollectTrend();
 })();
 </script>
 
+
+<script>
+/* ===== 卡片稳定层（防止换行业/数据缺失时卡片崩溃） ===== */
+(function(){
+  'use strict';
+
+  // 1. 数据契约：所有字段默认值，渲染前补齐，杜绝 undefined
+  var FIELD_DEFAULTS = {
+    works: [], hotwords: [], topics: [], viral_genes: {},
+    title_formulas: [], title_formulas_array: [], publish_time_dist: [],
+    saturation: [], daily_actions: [], blue_ocean_list: [], growth_ranking: [],
+    tech_signals: [], audience_personas: [], comment_scripts: [], format_roi: [],
+    competitor_list: [], comment_semantic: [], conversion_signals: [],
+    cross_platform: [], launch_ops: [], pitfall_list: [], topic_performance: {},
+    content_formats_dist: [], content_format_dist: [], summary: {}
+  };
+
+  window.normalizeDataContract = function(){
+    var D = window.DASHBOARD_DATA;
+    if (!D) return;
+    Object.keys(FIELD_DEFAULTS).forEach(function(k){
+      if (D[k] === undefined || D[k] === null) {
+        var def = FIELD_DEFAULTS[k];
+        D[k] = Array.isArray(def) ? [] : (typeof def === 'object' ? {} : def);
+      }
+    });
+    // hotwords 每项补安全字段
+    (D.hotwords||[]).forEach(function(h){
+      if (h.max_like === undefined) h.max_like = 0;
+      if (h.collect_rate === undefined) h.collect_rate = 0;
+      if (!h.trend) h.trend = '稳定';
+      if (!h.category) h.category = '其他';
+    });
+    // viral_genes 对象补字段
+    if (D.viral_genes) {
+      if (!D.viral_genes.hook_distribution) D.viral_genes.hook_distribution = [];
+      if (!D.viral_genes.top_title_keywords) D.viral_genes.top_title_keywords = [];
+      if (!D.viral_genes.structure_examples) D.viral_genes.structure_examples = [];
+      if (D.viral_genes.sample_size === undefined) D.viral_genes.sample_size = (D.works||[]).length;
+      if (D.viral_genes.avg_title_length === undefined) D.viral_genes.avg_title_length = 20;
+    }
+  };
+
+  // 2. echarts 安全初始化：容器 0 尺寸时等待，不画在 0 尺寸上
+  if (window.echarts) {
+    var origInit = echarts.init.bind(echarts);
+    echarts.init = function(dom, theme, opts){
+      function ready(){
+        return dom && dom.offsetWidth > 10 && dom.offsetHeight > 10;
+      }
+      if (ready()) return origInit(dom, theme, opts);
+      // 容器还没尺寸，轮询等待
+      var tries = 0;
+      var timer = setInterval(function(){
+        tries++;
+        if (ready()) {
+          clearInterval(timer);
+          if (!echarts.getInstanceByDom(dom)) {
+            var inst = origInit(dom, theme, opts);
+            // 标记是延迟创建的
+            dom._delayedInit = true;
+          }
+        } else if (tries > 50) {
+          clearInterval(timer); // 10秒还没尺寸放弃
+        }
+      }, 200);
+      // 先返回一个占位，避免调用方报错
+      return origInit(dom, theme, opts);
+    };
+  }
+
+  // 3. 渲染守卫：包装 renderAll，渲染前 normalize + 失败显示空状态而非白屏
+  var origRenderAll = window.renderAll;
+  window.renderAll = function(){
+    try { window.normalizeDataContract(); } catch(e){ console.warn('normalize err', e); }
+    if (typeof origRenderAll === 'function') {
+      try { origRenderAll(); } catch(e){ console.error('renderAll err', e); }
+    }
+    // 渲染后体检：找显示中的空 section，补空状态提示
+    setTimeout(function(){
+      document.querySelectorAll('.section').forEach(function(sec){
+        if (getComputedStyle(sec).display === 'none') return;
+        if (sec.id === 'settingsPanel' || sec.id === 'compareSection') return;
+        var text = sec.textContent.replace(/\s+/g,'').trim();
+        // 有标题但正文几乎为空
+        var title = sec.querySelector('.section-title, h2, h3');
+        var titleLen = title ? title.textContent.replace(/\s+/g,'').length : 0;
+        if (text.length - titleLen < 8) {
+          var holder = sec.querySelector('[id$="List"],[id$="Content"],[id$="Chart"],.bento,.glass-card');
+          if (holder && !holder.dataset.stableFilled) {
+            holder.dataset.stableFilled = '1';
+            holder.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-secondary,#9ca3af);font-size:13px;line-height:1.8;">📊 该卡片数据采集中或暂无数据<br><span style="font-size:11px;opacity:0.7;">重新采集本行业后自动填充</span></div>';
+          }
+        }
+      });
+      // echarts 延迟实例 resize
+      document.querySelectorAll('[id^="chart"]').forEach(function(el){
+        var inst = window.echarts && echarts.getInstanceByDom ? echarts.getInstanceByDom(el) : null;
+        if (inst) { try { inst.resize(); } catch(e){} }
+      });
+    }, 600);
+  };
+
+  // 4. 全局错误兜底：单个脚本错误不白屏
+  window.addEventListener('error', function(e){
+    console.warn('[stable] caught:', e.message);
+  });
+})();
+</script>
+
 </body>
 </html>
