@@ -826,7 +826,6 @@ window.safeCall = function(fn, ctx) {
   window.DATA = window.DASHBOARD_DATA;
   if (window.normalizeData) window.normalizeData();
   if (window.renderAll) window.renderAll();
-  setTimeout(function(){ if(window.scheduleAutoAudit) window.scheduleAutoAudit(); }, 500);
     setTimeout(function(){ if(typeof renderArchifyTopic==='function') renderArchifyTopic(); }, 600);
   setTimeout(function() {
   // Archify 技术雷达卡片（仅AI行业）
@@ -895,7 +894,7 @@ window.safeCall = function(fn, ctx) {
   
 
 
-  <script src="../shared/bundle.js?v=1790239803"></script>
+  <script src="../shared/bundle.js?v=1790240131"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
