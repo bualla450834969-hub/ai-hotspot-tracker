@@ -781,13 +781,17 @@ window.safeCall = function(fn, ctx) {
     if (window.normalizeData) window.normalizeData();
     if (window.renderAll) window.renderAll();
     // local 行业：取消"单 section 切换"模式，所有 section 垂直铺开
-    setTimeout(function(){
+    // renderAll 内部会 hideSection 隐藏无数据模块，这里用定时器持续覆盖 3 秒
+    var showTimer = setInterval(function(){
       document.querySelectorAll('.section').forEach(function(s){
         if (s.id === 'settingsPanel' || s.id === 'compareSection') return;
         s.style.display = ''; s.style.opacity = '1'; s.style.visibility = 'visible';
       });
-      setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 400);
-    }, 300);
+    }, 200);
+    setTimeout(function(){
+      clearInterval(showTimer);
+      window.dispatchEvent(new Event('resize'));
+    }, 3000);
     return;
   }
 
