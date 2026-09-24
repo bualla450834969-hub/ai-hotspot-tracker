@@ -4280,6 +4280,14 @@ if (document.readyState === 'loading') {
       sections: ['hero', 'actionList', 'heroStats'],
       title: '数据概览'
     },
+
+    {
+      id: 'techradar',
+      icon: '🛰️',
+      label: '技术雷达',
+      sections: ['techradar', 'techSummary', 'techGrid'],
+      title: '技术雷达'
+    },
     {
       id: 'hotspots',
       icon: '🔥',
@@ -4291,7 +4299,7 @@ if (document.readyState === 'loading') {
       id: 'breakdown',
       icon: '💥',
       label: '爆款拆解',
-      sections: ['breakdown', 'breakdownGrid', 'saturationList', 'commentDemands', 'commentKw', 'chartScatter', 'chartCollect', 'matrixGrid', 'commentSemantic', 'conversionSignals'],
+      sections: ['breakdown', 'breakdownGrid', 'viralGenes', 'saturationList', 'commentDemands', 'commentKw', 'chartScatter', 'chartCollect', 'matrixGrid', 'commentSemantic', 'conversionSignals'],
       title: '爆款拆解'
     },
     {
@@ -4321,13 +4329,6 @@ if (document.readyState === 'loading') {
       label: '人群洞察',
       sections: ['audience', 'audienceChart', 'personaGrid', 'avgCommentRate', 'avgCollectRate', 'highCommentList'],
       title: '人群洞察'
-    },
-    {
-      id: 'techradar',
-      icon: '🛰️',
-      label: '技术雷达',
-      sections: ['techradar', 'techSummary', 'techGrid'],
-      title: '技术雷达'
     },
     {
       id: 'benchmark',
