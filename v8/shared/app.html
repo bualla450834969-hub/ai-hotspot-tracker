@@ -1008,7 +1008,10 @@ window.safeCall = function(fn, ctx) {
 
     <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);">
       <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">切换当前行业</label>
-      <input type="text" id="switchIndustryInput" placeholder="输入行业ID（如：ai）" style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box;margin-bottom:8px;">
+      <select id="switchIndustryInput" style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(30,30,45,0.95);color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box;margin-bottom:8px;cursor:pointer;">
+        <option value="ai">AI 热点追踪</option>
+        <option value="shufa">书法 · 墨上花开</option>
+      </select>
       <button onclick="switchIndustry()" style="width:100%;padding:10px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;color:#f1f5f9;font-size:13px;cursor:pointer;">切换行业</button>
     </div>
 
@@ -1061,6 +1064,13 @@ function switchIndustry(){
   if(slugMap[i]) i=slugMap[i];
   window.location.href=window.location.pathname+'?ind='+encodeURIComponent(i);
 }
+// 初始化行业下拉为当前行业
+(function(){
+  var m=location.search.match(/ind=([^&]+)/);
+  var cur=m?decodeURIComponent(m[1]):'ai';
+  var sel=document.getElementById('switchIndustryInput');
+  if(sel){ for(var k=0;k<sel.options.length;k++){ if(sel.options[k].value===cur){sel.selectedIndex=k;break;} } }
+})();
 </script>
 <script>
 // 采集数据趋势
