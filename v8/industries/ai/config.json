@@ -119,7 +119,6 @@
   "modules": {
     "hero": true,
     "works": true,
-    "techradar": false,
     "hotwords": true,
     "history": true,
     "breakdown": true,
