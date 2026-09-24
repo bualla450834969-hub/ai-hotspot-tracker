@@ -786,17 +786,14 @@ window.safeCall = function(fn, ctx) {
       document.querySelectorAll('.section').forEach(function(s){
         if (s.id === 'settingsPanel' || s.id === 'compareSection') return;
         s.style.display = ''; s.style.opacity = '1'; s.style.visibility = 'visible';
+        s.style.transition = 'none';
       });
     }, 200);
-    // 3 秒后停止强制展开，再渲染两次确保 echarts 在有尺寸容器上 init
     setTimeout(function(){ clearInterval(showTimer); }, 2000);
     setTimeout(function(){
       try { if (typeof window.renderAll === 'function') window.renderAll(); } catch(e){}
-    }, 2500);
-    setTimeout(function(){
-      try { if (typeof window.renderAll === 'function') window.renderAll(); } catch(e){}
-      window.dispatchEvent(new Event('resize'));
-    }, 4000);
+      setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 200);
+    }, 3000);
     return;
   }
 
