@@ -790,8 +790,10 @@ window.safeCall = function(fn, ctx) {
     }, 200);
     setTimeout(function(){
       clearInterval(showTimer);
-      window.dispatchEvent(new Event('resize'));
-    }, 3000);
+      // section 展开后重新渲染一次，让 echarts 在有尺寸的容器上 init
+      try { if (typeof window.renderAll === 'function') window.renderAll(); } catch(e){}
+      setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 300);
+    }, 1500);
     return;
   }
 
