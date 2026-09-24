@@ -4379,7 +4379,16 @@ if (document.readyState === 'loading') {
     const nav = document.createElement('nav');
     nav.className = 'sidebar-nav';
 
-    NAV_GROUPS.filter(function(g) { var mods = (window.DOMAIN_CONFIG||{}).modules||{}; return mods[g.id] !== false; }).forEach(function(group) {
+    NAV_GROUPS.filter(function(g) {
+      var mods = (window.DOMAIN_CONFIG||{}).modules||{};
+      if (g.id === 'techradar') {
+        // 技术雷达由数据自动驱动：config未关闭且该行业确有技术信号才显示
+        var ts = (window.DASHBOARD_DATA||{}).tech_signals;
+        var hasTR = !!(ts && ts.signals && ts.signals.length);
+        return mods['techradar'] !== false && hasTR;
+      }
+      return mods[g.id] !== false;
+    }).forEach(function(group) {
       const item = document.createElement('div');
       item.className = 'sidebar-nav-item' + (group.id === currentPage ? ' active' : '');
       item.dataset.page = group.id;
