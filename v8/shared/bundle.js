@@ -4829,7 +4829,7 @@ if (document.readyState === 'loading') {
       tries++;
       var sidebar=document.getElementById('appSidebar');
       var pastLogin = window.scrollY > window.innerHeight*0.4;
-      if (sidebar && pastLogin && typeof window.switchPage==='function'){
+      if (sidebar && typeof window.switchPage==='function'){
         clearInterval(iv);
         setTimeout(function(){ runFullAudit({auto:true}); }, 1200);
       } else if (tries>90){ clearInterval(iv); }
