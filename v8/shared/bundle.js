@@ -4776,7 +4776,7 @@ if (document.readyState === 'loading') {
       // 自动修复轮：重渲染后复检
       var pass=0;
       function repairRound(cur){
-        if (cur.length===0 || pass>=maxPasses) return cur;
+        if (cur.length===0 || pass>=maxPasses) return Promise.resolve(cur);
         pass++;
         console.warn('[Audit] 第'+pass+'轮发现 '+cur.length+' 个问题，重渲染修复…', cur);
         try { if (typeof window.renderAll==='function') window.renderAll(); } catch(e){ console.error('[Audit] renderAll',e); }
