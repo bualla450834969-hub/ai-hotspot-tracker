@@ -780,6 +780,14 @@ window.safeCall = function(fn, ctx) {
     window.DATA = window.DASHBOARD_DATA;
     if (window.normalizeData) window.normalizeData();
     if (window.renderAll) window.renderAll();
+    // local 行业：取消"单 section 切换"模式，所有 section 垂直铺开
+    setTimeout(function(){
+      document.querySelectorAll('.section').forEach(function(s){
+        if (s.id === 'settingsPanel' || s.id === 'compareSection') return;
+        s.style.display = ''; s.style.opacity = '1'; s.style.visibility = 'visible';
+      });
+      setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 400);
+    }, 300);
     return;
   }
 
