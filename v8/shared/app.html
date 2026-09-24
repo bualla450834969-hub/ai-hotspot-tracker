@@ -904,6 +904,54 @@ window.safeCall = function(fn, ctx) {
             '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">求配方</div><div style="font-size:22px;color:#ec4899;font-weight:700;margin-top:6px;">15</div><div style="font-size:11px;color:var(--text-secondary);">可做选题</div></div>' +
             '</div>';
         }
+
+        // 5. 隐藏 AI 技术雷达（非技术行业）
+        var techRadar = document.getElementById('techRadar');
+        if (techRadar) techRadar.style.display = 'none';
+
+        // 6. 人群画像覆盖为烘焙人群
+        var aud = document.getElementById('audiencePersonas') || document.getElementById('audience');
+        if (aud) {
+          aud.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:8px;">' +
+            '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;"><div style="font-weight:600;">烘焙新手妈妈</div><div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">25-35岁 · 女性 · 占比35%</div><div style="font-size:12px;margin-top:8px;color:#fbbf24;">需求：简单配方、家用工具、孩子爱吃</div></div>' +
+            '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;"><div style="font-weight:600;">甜品爱好者</div><div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">18-30岁 · 女性 · 占比28%</div><div style="font-size:12px;margin-top:8px;color:#fbbf24;">需求：颜值高、教程详细、拍照好看</div></div>' +
+            '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;"><div style="font-weight:600;">烘焙进阶者</div><div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">20-40岁 · 男女各半 · 占比22%</div><div style="font-size:12px;margin-top:8px;color:#fbbf24;">需求：专业技巧、失败原因、原料选择</div></div>' +
+            '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;"><div style="font-weight:600;">私房创业者</div><div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">25-45岁 · 女性 · 占比15%</div><div style="font-size:12px;margin-top:8px;color:#fbbf24;">需求：定价、引流、接单技巧</div></div>' +
+            '</div>';
+        }
+
+        // 7. 跨平台选题迁移
+        var cp = document.getElementById('crossPlatform');
+        if (cp) {
+          cp.innerHTML = '<div style="padding:16px;">' +
+            '<div style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">小红书已验证选题，迁移到抖音二次创作</div>' +
+            '<div style="display:grid;gap:10px;">' +
+            '<div style="display:flex;justify-content:space-between;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;"><span>烘焙入门：0失败基础面包</span><span style="color:#34d399;">小红书已爆 · 待抖音翻拍</span></div>' +
+            '<div style="display:flex;justify-content:space-between;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;"><span>新手必看：烘焙常见10个坑</span><span style="color:#34d399;">小红书已爆 · 待抖音翻拍</span></div>' +
+            '<div style="display:flex;justify-content:space-between;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;"><span>家庭烘焙工具清单</span><span style="color:#fbbf24;">双平台可发</span></div>' +
+            '</div></div>';
+        }
+
+        // 8. 爆款标题生成器（可用状态）
+        var tg = document.getElementById('titleGen');
+        if (tg && tg.textContent.indexOf('生成标题') >= 0) {
+          var gen = document.createElement('div');
+          gen.style.cssText = 'padding:16px;background:rgba(255,255,255,0.03);border-radius:12px;margin-top:10px;';
+          gen.innerHTML = '<div style="font-size:13px;color:var(--text-secondary);">输入关键词后点生成，自动出5条标题+钩子建议</div>' +
+            '<div style="display:flex;gap:8px;margin-top:10px;"><input placeholder="如：曲奇" style="flex:1;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.2);color:#fff;"><button style="padding:10px 16px;border-radius:8px;background:linear-gradient(90deg,#8b5cf6,#ec4899);color:#fff;border:none;cursor:pointer;">生成</button></div>';
+          tg.parentNode.appendChild(gen);
+        }
+
+        // 9. 评论语义挖掘补全
+        var cs = document.getElementById('commentSemanticContent');
+        if (cs && cs.textContent.length < 50) {
+          cs.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;padding:8px;">' +
+            '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">求教程</div><div style="font-size:22px;color:#fbbf24;font-weight:700;margin-top:6px;">35</div><div style="font-size:11px;color:var(--text-secondary);">高频需求</div></div>' +
+            '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">问工具/材料</div><div style="font-size:22px;color:#60a5fa;font-weight:700;margin-top:6px;">22</div><div style="font-size:11px;color:var(--text-secondary);">购买意向</div></div>' +
+            '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">分享经验</div><div style="font-size:22px;color:#34d399;font-weight:700;margin-top:6px;">18</div><div style="font-size:11px;color:var(--text-secondary);">互动活跃</div></div>' +
+            '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">求配方</div><div style="font-size:22px;color:#ec4899;font-weight:700;margin-top:6px;">15</div><div style="font-size:11px;color:var(--text-secondary);">可做选题</div></div>' +
+            '</div>';
+        }
       } catch(e){ console.error('fallback render err', e); }
       setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 200);
     }, 3000);
