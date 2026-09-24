@@ -4456,6 +4456,14 @@ if (document.readyState === 'loading') {
     if (updateTime && sbUpdateTime) {
       sbUpdateTime.textContent = updateTime.textContent;
     }
+
+    // 进入工作台后自动体检（createSidebar 仅执行一次）
+    setTimeout(function(){
+      if (typeof window.runFullAudit === 'function' && !window.__auditAutoDone) {
+        window.__auditAutoDone = true;
+        window.runFullAudit({auto:true});
+      }
+    }, 1300);
   }
 
   // 切换页面
@@ -4821,23 +4829,7 @@ if (document.readyState === 'loading') {
     });
   }
 
-  // ---------- 换行业后自动体检（等待侧边栏 + 滚过启动页）----------
-  function scheduleAutoAudit(){
-    if (window.__auditScheduled) return; window.__auditScheduled=true;
-    var tries=0;
-    var iv=setInterval(function(){
-      tries++;
-      var sidebar=document.getElementById('appSidebar');
-      var pastLogin = window.scrollY > window.innerHeight*0.4;
-      if (sidebar && typeof window.switchPage==='function'){
-        clearInterval(iv);
-        setTimeout(function(){ runFullAudit({auto:true}); }, 1200);
-      } else if (tries>90){ clearInterval(iv); }
-    }, 1000);
-  }
-
   window.runCardAudit=runCardAudit;
   window.runFullAudit=runFullAudit;
-  window.scheduleAutoAudit=scheduleAutoAudit;
-  console.log('[Audit] 卡片体检助手已固化（runFullAudit / scheduleAutoAudit）');
+  console.log('[Audit] 卡片体检助手已固化（runFullAudit）');
 })();
