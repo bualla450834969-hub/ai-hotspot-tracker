@@ -4326,7 +4326,7 @@ if (document.readyState === 'loading') {
       id: 'techradar',
       icon: '🛰️',
       label: '技术雷达',
-      sections: ['techradar', 'techSummary', 'techGrid', 'viralGenes', 'viralGenesContent'],
+      sections: ['techradar', 'techSummary', 'techGrid'],
       title: '技术雷达'
     },
     {
