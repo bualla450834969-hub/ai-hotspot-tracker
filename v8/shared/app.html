@@ -826,6 +826,7 @@ window.safeCall = function(fn, ctx) {
   window.DATA = window.DASHBOARD_DATA;
   if (window.normalizeData) window.normalizeData();
   if (window.renderAll) window.renderAll();
+  setTimeout(function(){ if(window.scheduleAutoAudit) window.scheduleAutoAudit(); }, 500);
     setTimeout(function(){ if(typeof renderArchifyTopic==='function') renderArchifyTopic(); }, 600);
   setTimeout(function() {
   // Archify 技术雷达卡片（仅AI行业）
@@ -894,7 +895,7 @@ window.safeCall = function(fn, ctx) {
   
 
 
-  <script src="../shared/bundle.js?v=1790172749"></script>
+  <script src="../shared/bundle.js?v=1790237271"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
@@ -1012,6 +1013,13 @@ window.safeCall = function(fn, ctx) {
       <button onclick="switchIndustry()" style="width:100%;padding:10px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;color:#f1f5f9;font-size:13px;cursor:pointer;">切换行业</button>
     </div>
 
+    <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);">
+      <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:8px;">工作台体检</label>
+      <button onclick="runFullAudit({maxPasses:2})" style="width:100%;padding:10px;background:linear-gradient(135deg,#0ea5e9,#6366f1);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;">🔍 一键体检（遍历全部板块）</button>
+      <div id="manualAuditResult" style="margin-top:10px;font-size:12px;line-height:1.6;"></div>
+      <p style="font-size:11px;color:#64748b;margin-top:8px;line-height:1.6;">每次换行业进入工作台后，会自动体检并修复渲染问题</p>
+    </div>
+
     <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;color:#64748b;line-height:1.6;">
       <p style="font-weight:600;margin-bottom:8px;">使用说明</p>
       <p>1. 本地先运行 python local_helper.py</p>
@@ -1060,7 +1068,7 @@ function switchIndustry(){
 async function loadCollectTrend() {
   try {
     const ind = new URLSearchParams(location.search).get('ind') || 'ai';
-    const resp = await fetch(../industries//history/index.json);
+    const resp = await fetch('../industries/'+ind+'/history/index.json');
     if (!resp.ok) { document.getElementById('collectTrendInfo').textContent = '首次采集中，明日可见趋势'; return; }
     const snapshots = await resp.json();
     if (!snapshots || snapshots.length < 1) {
@@ -1092,7 +1100,7 @@ async function loadCollectTrend() {
     }
     const latest = snapshots[snapshots.length-1];
     document.getElementById('collectTrendInfo').innerHTML =
-      最新:  · 条作品 · 均赞 · 最高赞;
+      '最新 '+latest.date.slice(5)+' · '+latest.works_count+' 条作品 · 均赞 '+latest.avg_likes+' · 最高赞 '+latest.max_likes;
   } catch(e) {
     document.getElementById('collectTrendInfo').textContent = '趋势数据加载中...';
   }
