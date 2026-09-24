@@ -50,9 +50,7 @@
     "duration_target": "30秒-3分钟",
     "style": "教学/示范/作品展示"
   },
-  "modules": {
-    "techradar": false
-  },
+  "modules": {},
   "nav_order": [
     "overview",
     "hotspots",
