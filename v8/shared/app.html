@@ -1130,49 +1130,122 @@ async function searchOnce(proxyUrl, apiKey, platform, keyword){
 // 聚合成工作台数据
 function buildDashboardData(works, hotwords, industryName){
   works.sort((a,b)=>(b.likeCount||0)-(a.likeCount||0));
+  var n = works.length;
   var totalLike = works.reduce((s,w)=>s+(w.likeCount||0),0);
-  var maxLike = works.length? works[0].likeCount||0 : 0;
-  var avgLike = works.length? Math.round(totalLike/works.length) : 0;
+  var totalCollect = works.reduce((s,w)=>s+(w.collectCount||0),0);
+  var maxLike = n? works[0].likeCount||0 : 0;
+  var avgLike = n? Math.round(totalLike/n) : 0;
 
-  // 发布时间分布（按月）
-  var pm = {};
-  works.forEach(w=>{
-    var t = (w.publishTime||'').toString();
-    var m = t.slice(0,7);
-    if(m) pm[m] = (pm[m]||0)+1;
+  // hotwords 增强：补上 bundle.js 期望的 max_like / collect_rate / trend / efficiency_tag
+  hotwords.forEach(function(h){
+    var ws = works.filter(function(w){return w._keyword===h.keyword;});
+    h.max_like = ws.reduce(function(m,w){return Math.max(m,w.likeCount||0);},0);
+    var lk = ws.reduce(function(s,w){return s+(w.likeCount||0);},0);
+    var cl = ws.reduce(function(s,w){return s+(w.collectCount||0);},0);
+    h.collect_rate = lk? Math.round(cl/lk*100):0;
+    h.category = industryName;
+    h.trend = h.max_like>50000?'飙升':(h.max_like>10000?'上升':'稳定');
+    h.efficiency_tag = (h.total<200 && h.max_like>10000)?'蓝海':(h.total>2000?'红海':'适中');
   });
-  var publishDist = Object.keys(pm).sort().map(k=>({period:k, count:pm[k]}));
+
+  // 发布时间分布（按小时）
+  var hourMap = {};
+  works.forEach(function(w){
+    var t=(w.publishTime||'').toString();
+    var m=t.match(/(\d{1,2}):/);
+    var hh=m?parseInt(m[1]):12;
+    hourMap[hh]=(hourMap[hh]||0)+1;
+  });
+  var publishTimeDist = Object.keys(hourMap).sort(function(a,b){return a-b;}).map(function(k){
+    return {hour:parseInt(k), count:hourMap[k], pct:Math.round(hourMap[k]/n*100)};
+  });
 
   // 钩子分布
   var hookMap = {};
-  works.forEach(w=>{ var h=classifyHook(w.title); hookMap[h]=(hookMap[h]||0)+1; });
-  var titleFormulas = Object.keys(hookMap).map(k=>({
-    hook:k, count:hookMap[k], pct: Math.round(hookMap[k]/works.length*100)
-  })).sort((a,b)=>b.count-a.count);
+  works.forEach(function(w){var h=classifyHook(w.title); hookMap[h]=(hookMap[h]||0)+1;});
+  var hookNames = Object.keys(hookMap);
+  var titleFormulasArray = hookNames.map(function(k){return [k, hookMap[k]];}).sort(function(a,b){return b[1]-a[1];});
+  var formulaExamples = {
+    '避坑预警':'别再踩'+industryName+'的坑了！这3个错误90%的人都在犯',
+    '对比选择':industryName+'教程 vs 自学，哪个更值得？',
+    '反常识揭秘':'做了3年'+industryName+'才知道的真相',
+    '数字清单':'5个'+industryName+'技巧，第3个最实用',
+    '效果展示':'学了1个月'+industryName+'，成果展示',
+    '情感共鸣':'学'+industryName+'这条路，真的很累但值得',
+    '普通':industryName+'入门指南：从零开始'
+  };
+  var titleFormulas = hookNames.map(function(k){return {formula:k, example:formulaExamples[k]||''};}).sort(function(a,b){return hookMap[b.formula]-hookMap[a.formula];});
 
-  // 爆款 top10
-  var viral = works.slice(0,10).map(w=>({
-    title:w.title, accountName:w.accountName, likeCount:w.likeCount,
-    commentCount:w.commentCount, collectCount:w.collectCount,
-    platform:w.platform, workUrl:w.workUrl, hook:classifyHook(w.title)
-  }));
+  // viral_genes：bundle.js 期望 hook_distribution / avg_title_length / sample_size / top_title_keywords / structure_examples
+  var totalTitleLen = works.reduce(function(s,w){return s+(w.title||'').length;},0);
+  var avgTitleLen = n? Math.round(totalTitleLen/n):0;
+  var kwFreq = {};
+  works.forEach(function(w){
+    var t=w.title||'';
+    [industryName,'教程','推荐','避坑','排行榜','怎么选','入门','实战','测评'].forEach(function(kw){
+      if(t.indexOf(kw)>=0) kwFreq[kw]=(kwFreq[kw]||0)+1;
+    });
+  });
+  var topKw = Object.keys(kwFreq).map(function(k){return [k,kwFreq[k]];}).sort(function(a,b){return b[1]-a[1];}).slice(0,10);
+  var structureExamples = works.slice(0,5).map(function(w){
+    return {structure:classifyHook(w.title), title:w.title, likes:w.likeCount||0};
+  });
+  var viralGenes = {
+    hook_distribution: hookMap,
+    avg_title_length: avgTitleLen,
+    sample_size: n,
+    top_title_keywords: topKw,
+    structure_examples: structureExamples
+  };
+
+  // topics：bundle.js 期望 [{keyword,title}]
+  var topics = hotwords.map(function(h){
+    return {
+      keyword: h.keyword,
+      title: h.keyword+'：'+(h.max_like>50000?'正在爆发，优先做':(h.max_like>10000?'有热度，可跟进':'常规选题'))
+    };
+  });
+
+  // saturation 饱和度
+  var saturation = hotwords.map(function(h){
+    return {
+      keyword: h.keyword,
+      saturation: Math.min(100, Math.round(h.total/50)),
+      stage: h.efficiency_tag==='蓝海'?'萌芽期':(h.trend==='飙升'?'爆发期':(h.trend==='上升'?'上升期':'稳定期'))
+    };
+  }).sort(function(a,b){return a.saturation-b.saturation;});
+
+  // daily_actions 智能洞察
+  var dailyActions = [];
+  if(maxLike>0) dailyActions.push({priority:'高',type:'跟进爆款',content:'复刻最高赞「'+(works[0].title||'').slice(0,20)+'」的结构',detail:'点赞'+maxLike.toLocaleString()});
+  var blue = hotwords.find(function(h){return h.efficiency_tag==='蓝海';});
+  if(blue) dailyActions.push({priority:'高',type:'抢占蓝海',content:'蓝海词「'+blue.keyword+'」竞争小，抢先布局',detail:'仅'+blue.total+'条内容'});
+  if(publishTimeDist.length){
+    var best = publishTimeDist.slice().sort(function(a,b){return b.count-a.count;})[0];
+    dailyActions.push({priority:'中',type:'定时发布',content:'最佳发布时段 '+best.hour+':00，占比'+best.pct+'%',detail:'按此时间固定更新'});
+  }
 
   return {
     last_update: new Date().toLocaleString('zh-CN'),
     summary: {
-      industry: industryName,
-      total_works: works.length,
-      total_likes: totalLike,
-      max_like: maxLike,
-      avg_like: avgLike,
-      platforms: Array.from(new Set(works.map(w=>w.platform)))
+      industry: industryName, total_works:n, total_likes:totalLike,
+      max_like:maxLike, avg_like:avgLike,
+      blue_ocean: hotwords.filter(function(h){return h.efficiency_tag==='蓝海';}).length,
+      platforms: Array.from(new Set(works.map(function(w){return w.platform;})))
     },
     works: works,
     hotwords: hotwords,
-    publish_time_dist: publishDist,
+    topics: topics,
+    publish_time_dist: publishTimeDist,
     title_formulas: titleFormulas,
-    viral_genes: { top: viral },
-    topics: hotwords.map(h=>h.keyword)
+    title_formulas_array: titleFormulasArray,
+    viral_genes: viralGenes,
+    saturation: saturation,
+    daily_actions: dailyActions,
+    blue_ocean_list: hotwords.filter(function(h){return h.efficiency_tag==='蓝海';}).map(function(h){return {keyword:h.keyword,total:h.total,max_like:h.max_like};}),
+    growth_ranking: hotwords.filter(function(h){return h.trend==='飙升';}).map(function(h){return {keyword:h.keyword, growth:'+'+Math.round(h.max_like/1000)+'K'};}),
+    tech_signals: [],
+    audience_personas: []
   };
 }
 
@@ -1201,7 +1274,7 @@ async function startCollection(){
       try {
         var data = await searchOnce(p, k, platform, kw);
         var list = data.list || [];
-        list.forEach(w=>allWorks.push(normalizeWork(w, platform)));
+        list.forEach(function(w){ var nw=normalizeWork(w, platform); nw._keyword=kw; allWorks.push(nw); });
         hotwords.push({keyword:kw, platform:platform, total:data.total||list.length, works:list.length, avg_like: list.length?Math.round(list.reduce((a,w)=>a+(w.likeCount||w.workLikedCount||0),0)/list.length):0});
       } catch(e){
         hotwords.push({keyword:kw, platform:platform, total:0, works:0, error:String(e.message||e)});
