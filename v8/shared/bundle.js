@@ -33,6 +33,7 @@ window.normalizeData = function() {
         followerCount: w.followerCount || w.followers || 0,
         duration: w.duration || 0,
         publishTime: w.publishTime || w.published_at || '',
+        _keyword: w._keyword || '',
         url: url,
         workUrl: url,
         cover: w.cover || w.coverUrl || ''
@@ -219,7 +220,7 @@ window.normalizeData = function() {
   }
 
   // 5. cross_platform 跨平台迁移
-  if (!d.cross_platform || d.cross_platform.length === 0) {
+  if ((!d.cross_platform || d.cross_platform.length === 0) && !d._cross_checked) {
     d.cross_platform = [
       {topic: '入门教程', source: '小红书', target: '抖音', reason: '小红书已验证，抖音流量更大'},
       {topic: '技巧分享', source: '抖音', target: '小红书', reason: '抖音爆款，小红书收藏率高'}
