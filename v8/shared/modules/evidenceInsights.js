@@ -54,9 +54,10 @@
   }
 
   function render(data) {
+    var analysis = ensureAnalysis(data);
+    if (document.body.classList.contains('v82-research')) return;
     var root = ensureRoot();
     if (!root || !window.V82Evidence) return;
-    var analysis = ensureAnalysis(data);
     var cards = analysis.insights.slice(0, 3).map(function(insight) {
       return '<article class="v82-insight" data-insight-id="' + escapeHTML(insight.id) + '">' +
         '<div class="v82-insight-head"><span class="v82-source">真实数据推导</span>' +

@@ -34,6 +34,7 @@ const FILES = [
   'modules/hero.js',
   'modules/evidenceInsights.js', // V8.2可信洞察管线（复用一次性证据索引）
   'modules/evidenceDrawer.js',   // V8.2最小证据抽屉
+  'modules/homepageV82.js',      // V8.2研究工作台首页编排
   'modules/hotwords.js',
   'modules/works.js',
   'modules/topics.js',

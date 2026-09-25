@@ -348,6 +348,7 @@
    * 跨行业当前为整页加载：跳转前作废本页异步批次并清理全部定时器，
    * 新页面由本核心重新初始化，确保旧行业 timer/异步不延续。 */
   function switchIndustryContext(industryId) {
+    try { if (typeof window.closeEvidenceDrawer === 'function') window.closeEvidenceDrawer(); } catch (e) {}
     AppStore.nextRequest();      // 作废在途异步
     try { TimerManager.clearAll(); } catch (e) {}
     AppStore.status.loading = true;

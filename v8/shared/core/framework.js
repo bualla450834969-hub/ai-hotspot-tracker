@@ -76,6 +76,10 @@
       const mod = modules[id];
       if (!mod) return;
 
+      // V8.2研究首页只执行可信数据管线和首页编排。
+      if (document.body && document.body.classList.contains('v82-research') &&
+          id !== 'evidenceInsights' && id !== 'homepageV82') return;
+
       // 模块开关检查
       if (mods[id] === false) {
         hideSection(id);

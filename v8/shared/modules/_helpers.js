@@ -98,6 +98,7 @@
   function initSectionCollapse() {
     var sections = document.querySelectorAll('.hero, section');
     sections.forEach(function(sec, idx) {
+      if (sec.closest && sec.closest('#v82ResearchHome')) return;
       var header = sec.querySelector('.section-title, h2, .hero-title');
       if (!header) return;
       if (header.querySelector('.section-collapse-btn')) return;

@@ -194,10 +194,12 @@
     if (history.length < 2) limitations.push('缺少历史数据，无法判断增长趋势');
     if (platforms.size < 2) limitations.push('仅有单一平台样本，无法进行跨平台判断');
     return {
-      worksCount: works.length,
+      worksCount: Array.isArray(data.works) ? data.works.filter(function(item) { return item && typeof item === 'object'; }).length : 0,
+      uniqueWorksCount: works.length,
       commentsCount: comments.length,
       keywordsCount: keywords.length,
       platformsCount: platforms.size,
+      platforms: Array.from(platforms).sort(),
       collectionTime: data.last_update || null,
       historyDays: history.length,
       missingFields: missingFields,
@@ -282,14 +284,92 @@
     }).filter(Boolean);
   }
 
+  function engagementValue(work) {
+    var metrics = work.metrics || {};
+    return ['likes', 'comments', 'favorites', 'shares'].reduce(function(total, key) {
+      return total + (metrics[key] === null ? 0 : metrics[key]);
+    }, 0);
+  }
+
+  function buildEngagementPatternInsights(data, store) {
+    var works = store.getEvidenceByType('work');
+    var patterns = [
+      { key:'避坑', label:'避坑提醒', test:/避坑|踩坑|别再|不要|千万别/ },
+      { key:'教程', label:'教程讲解', test:/教程|教学|入门|怎么|方法|步骤/ },
+      { key:'清单', label:'数字清单', test:/\d+个|\d+种|清单|合集|盘点/ },
+      { key:'测评', label:'测评对比', test:/测评|对比|横评|哪个好|值不值/ }
+    ];
+    return patterns.map(function(pattern) {
+      var matched = works.filter(function(work) { return pattern.test.test(work.title || ''); });
+      if (matched.length < 3) return null;
+      var total = matched.reduce(function(sum, work) { return sum + engagementValue(work); }, 0);
+      var average = Math.round(total / matched.length);
+      return createInsight({
+        type: 'content_pattern',
+        title: pattern.label + '内容模式',
+        description: matched.length + ' 条标题包含相关表达，样本平均互动 ' + average.toLocaleString() + '。',
+        sourceType: 'DERIVED',
+        metrics: { pattern: pattern.key, worksCount: matched.length, averageEngagement: average },
+        evidenceIds: matched.map(function(work) { return work.id; }),
+        provenance: {
+          sourceType: 'DERIVED',
+          sourceFields: ['works.title', 'works.likeCount', 'works.commentCount', 'works.collectCount', 'works.shareCount'],
+          formula: 'match title expressions; average likes + comments + favorites + shares',
+          sampleSize: matched.length,
+          generatedBy: 'v8.2-engagement-pattern',
+          limitations: ['互动值为已有互动字段之和，不代表播放量或转化率', '标题模式使用明确词组匹配，不是语义分类模型']
+        }
+      }, store);
+    }).filter(Boolean).sort(function(a, b) { return b.metrics.averageEngagement - a.metrics.averageEngagement; });
+  }
+
+  function buildUserVoiceInsights(data, store) {
+    var comments = store.getEvidenceByType('comment');
+    var groups = new Map();
+    comments.forEach(function(comment) {
+      if (!comment.keyword) return;
+      if (!groups.has(comment.keyword)) groups.set(comment.keyword, []);
+      groups.get(comment.keyword).push(comment.id);
+    });
+    return Array.from(groups.entries()).filter(function(entry) { return entry[1].length >= 3; }).sort(function(a, b) {
+      return b[1].length - a[1].length;
+    }).slice(0, 5).map(function(entry) {
+      return createInsight({
+        type: 'need',
+        title: '评论集中提到“' + entry[0] + '”',
+        description: entry[1].length + ' 条真实评论带有该采集关键词，可查看原文确认具体表达。',
+        sourceType: 'DERIVED',
+        metrics: { keyword: entry[0], commentsCount: entry[1].length },
+        evidenceIds: entry[1],
+        provenance: {
+          sourceType: 'DERIVED', sourceFields: ['comments.text', 'comments.keyword'],
+          formula: 'group comments by explicit collection keyword', sampleSize: entry[1].length,
+          generatedBy: 'v8.2-user-voice', limitations: ['关键词分组不等同于情绪、痛点或购买意图判断']
+        }
+      }, store);
+    }).filter(Boolean);
+  }
+
   function buildAnalysis(data) {
     var store = adaptV81Evidence(data);
     var dataQuality = deriveDataQuality(data, store);
-    var insights = dataQuality.availableSignals.contentPatterns ? buildContentPatternInsights(data, store) : [];
+    var hotInsights = dataQuality.availableSignals.contentPatterns ? buildContentPatternInsights(data, store) : [];
+    var contentPatternInsights = dataQuality.availableSignals.contentPatterns ? buildEngagementPatternInsights(data, store) : [];
+    var userVoiceInsights = dataQuality.availableSignals.userVoice ? buildUserVoiceInsights(data, store) : [];
+    var insights = hotInsights.concat(contentPatternInsights, userVoiceInsights);
     var unsupportedInsights = [];
     if (!dataQuality.availableSignals.userVoice) unsupportedInsights.push({ type: 'user_voice', status: 'DATA_INSUFFICIENT', reason: '评论样本不足' });
+    else if (!userVoiceInsights.length) unsupportedInsights.push({ type: 'user_voice', status: 'DATA_INSUFFICIENT', reason: '评论缺少可验证的重复主题' });
     if (!dataQuality.availableSignals.trend) unsupportedInsights.push({ type: 'trend', status: 'DATA_INSUFFICIENT', reason: '历史数据不足' });
-    return { evidenceStore: store, insights: insights, unsupportedInsights: unsupportedInsights, dataQuality: dataQuality };
+    return {
+      evidenceStore: store,
+      insights: insights,
+      hotInsights: hotInsights,
+      contentPatternInsights: contentPatternInsights,
+      userVoiceInsights: userVoiceInsights,
+      unsupportedInsights: unsupportedInsights,
+      dataQuality: dataQuality
+    };
   }
 
   var api = {
@@ -303,6 +383,8 @@
     deriveDataQuality: deriveDataQuality,
     deriveEvidenceStrength: deriveEvidenceStrength,
     buildContentPatternInsights: buildContentPatternInsights,
+    buildEngagementPatternInsights: buildEngagementPatternInsights,
+    buildUserVoiceInsights: buildUserVoiceInsights,
     buildAnalysis: buildAnalysis
   };
   window.V82Evidence = api;
