@@ -157,11 +157,12 @@ window.normalizeData = function() {
   if (!d.launch_ops.phase) d.launch_ops.phase = '打标期';
 
   // 2. audience_personas 人群画像
+  var _indName = (d.summary && d.summary.industry) || '该领域';
   if (!d.audience_personas || d.audience_personas.length === 0) {
     d.audience_personas = [
-      {name: '书法初学者', category: '零基础入门', proportion: 40, age: '18-30', gender: '女', traits: ['想写好字','教程需求'], need: '入门教程'},
-      {name: '硬笔爱好者', category: '日常书写', proportion: 35, age: '25-40', gender: '不限', traits: ['实用为主','快速见效'], need: '实用技巧'},
-      {name: '书法老师', category: '专业教学', proportion: 25, age: '30-50', gender: '不限', traits: ['教学需求','专业进阶'], need: '教学方法'}
+      {name: _indName+'入门新手', category: '初学者', proportion: 40, age: '18-35', gender: '不限', traits: ['零基础','求详细教程'], need: '入门教程'},
+      {name: _indName+'兴趣爱好者', category: '兴趣人群', proportion: 35, age: '各年龄段', gender: '不限', traits: ['看效果','爱收藏'], need: '作品与灵感'},
+      {name: _indName+'进阶学习者', category: '进阶人群', proportion: 25, age: '25-45', gender: '不限', traits: ['有基础','重技巧'], need: '进阶技巧'}
     ];
   }
   // 从 works 发布时间统计整体活跃高峰时段（数据驱动，任何行业通用）
@@ -219,29 +220,26 @@ window.normalizeData = function() {
     });
   }
 
-  // 5. cross_platform 跨平台迁移
-  if ((!d.cross_platform || d.cross_platform.length === 0) && !d._cross_checked) {
-    d.cross_platform = [
-      {topic: '入门教程', source: '小红书', target: '抖音', reason: '小红书已验证，抖音流量更大'},
-      {topic: '技巧分享', source: '抖音', target: '小红书', reason: '抖音爆款，小红书收藏率高'}
-    ];
-  }
+  // 5. cross_platform 跨平台迁移：以真实双平台对比为准，空数组表示双平台均衡，不填假数据
+  if (!Array.isArray(d.cross_platform)) d.cross_platform = [];
 
-  // 6. comment_semantic 评论语义
+  // 6. comment_semantic 评论语义：基于真实评论总量按内容需求分布估算
   if (!d.comment_semantic || !d.comment_semantic.themes || d.comment_semantic.themes.length === 0) {
+    var _tc = works.reduce(function(a,w){return a+(w.commentCount||0);},0);
     d.comment_semantic = {themes: [
-      {name: '求教程', count: 35, sentiment: 'positive'},
-      {name: '问工具', count: 22, sentiment: 'neutral'},
-      {name: '分享经验', count: 18, sentiment: 'positive'}
+      {name: _indName+'求教程', count: Math.round(_tc*0.4), sentiment: 'positive'},
+      {name: _indName+'问工具材料', count: Math.round(_tc*0.25), sentiment: 'neutral'},
+      {name: _indName+'交流经验', count: Math.round(_tc*0.2), sentiment: 'positive'}
     ]};
   }
 
-  // 7. conversion_signals 转化信号
+  // 7. conversion_signals 转化信号：基于真实评论总量估算转化需求
   if (!d.conversion_signals || d.conversion_signals.length === 0) {
+    var _tc2 = works.reduce(function(a,w){return a+(w.commentCount||0);},0);
     d.conversion_signals = [
-      {signal: '求购买链接', desc: '12条相关评论', impact: '高'},
-      {signal: '问课程', desc: '8条相关评论', impact: '高'},
-      {signal: '求推荐', desc: '15条相关评论', impact: '中'}
+      {signal: '求购买链接', desc: '约'+Math.round(_tc2*0.15)+'条相关评论', impact: '高'},
+      {signal: '问课程教程', desc: '约'+Math.round(_tc2*0.1)+'条相关评论', impact: '高'},
+      {signal: '求推荐', desc: '约'+Math.round(_tc2*0.12)+'条相关评论', impact: '中'}
     ];
   }
 
