@@ -793,6 +793,7 @@ window.safeCall = function(fn, ctx) {
           try { localStorage.setItem('custom_data_' + cname, JSON.stringify(_fresh)); } catch(e){}
           if (window.normalizeData) window.normalizeData();
           if (window.renderAll) window.renderAll();
+          if (window.fillExtraCards) window.fillExtraCards();
           console.log('[REAGG] done works='+_fresh.works.length+' cr='+(_fresh.completion_rate?'yes':'no')+' crossLen='+_fresh.cross_platform.length);
         } catch(e) { console.warn('[REAGG] FAIL:', e); }
       }
@@ -998,28 +999,28 @@ window.safeCall = function(fn, ctx) {
 
 
   <script>
-  setTimeout(function() {
+  function fillExtraCards() {
     var D = window.DASHBOARD_DATA || {};
     var cs = document.getElementById('commentScriptsContent');
-    if (cs && !cs.children.length) {
+    if (cs) {
       cs.innerHTML = (D.comment_scripts || []).map(function(s) {
         return '<div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.03);margin-bottom:8px;"><div style="font-weight:600;color:#a78bfa;font-size:13px;margin-bottom:4px;">' + s.type + '</div><div style="font-size:13px;color:#cbd5e1;line-height:1.5;">' + s.text + '</div></div>';
       }).join('');
     }
     var tg = document.getElementById('titleGeneList');
-    if (tg && !tg.children.length) {
+    if (tg) {
       tg.innerHTML = (D.title_genes || []).map(function(g) {
         return '<div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.03);margin-bottom:8px;"><div style="font-weight:600;color:#a78bfa;font-size:13px;">' + g.gene + '</div><div style="font-size:12px;color:#94a3b8;margin-top:4px;">出现' + g.count + '次</div></div>';
       }).join('');
     }
     var cr = document.getElementById('completionRateChart');
-    if (cr && !cr.children.length) {
+    if (cr) {
       cr.innerHTML = (D.completion_rate || []).map(function(r) {
-        return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:80px;font-size:12px;color:#94a3b8;">' + r.duration + '</div><div style="flex:1;height:20px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;"><div style="width:' + r.rate + '%;height:100%;background:linear-gradient(90deg,#8b5cf6,#6366f1);border-radius:4px;"></div></div><div style="width:40px;text-align:right;font-size:12px;color:#a78bfa;">' + r.rate + '%</div></div>';
-      }).join('');
+        return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:70px;font-size:12px;color:#94a3b8;">' + r.duration + '</div><div style="flex:1;height:20px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;"><div style="width:' + r.rate + '%;height:100%;background:linear-gradient(90deg,#8b5cf6,#6366f1);border-radius:4px;"></div></div><div style="width:36px;text-align:right;font-size:12px;color:#a78bfa;">' + r.rate + '%</div><div style="width:52px;font-size:11px;color:#67e8f9;">' + (r.count!=null?r.count+'条':'') + '</div></div>';
+      }).join('') + '<div style="font-size:11px;color:var(--text-secondary);margin-top:4px;">基于' + (D.completion_rate||[]).reduce(function(s,r){return s+(r.count||0);},0) + '条抖音作品真实时长分布，完播率为平台经验衰减估算</div>';
     }
     var bp = document.getElementById('bestPostingComboContent');
-    if (bp && !bp.children.length) {
+    if (bp) {
       var combo = D.best_posting_combo || {};
       bp.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
         '<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);"><div style="font-size:11px;color:#94a3b8;">最佳时段</div><div style="font-weight:600;color:#a78bfa;margin-top:2px;">' + (combo.time||'-') + '</div></div>' +
@@ -1028,7 +1029,9 @@ window.safeCall = function(fn, ctx) {
         '<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);"><div style="font-size:11px;color:#94a3b8;">评分</div><div style="font-weight:600;color:#34d399;margin-top:2px;">' + (combo.score||'-') + '</div></div>' +
         '</div>';
     }
-  }, 1200);
+  }
+  window.fillExtraCards = fillExtraCards;
+  setTimeout(fillExtraCards, 1200);
   </script>
 
 <!-- 设置面板 -->
@@ -1318,6 +1321,23 @@ function buildDashboardData(works, hotwords, industryName){
     {signal:'问效果/推荐',desc:'约'+Math.round(totalComments*pcnt[1]/n)+'条效果咨询',impact:(pcnt[1]/n>0.2)?'高':'中'}
   ];
 
+  // 私域引流话术（行业名动态，全行业通用）
+  var commentScripts=[
+    {type:'新手提问',text:'刚入门'+industryName+'，有没有避坑清单可以发我？'},
+    {type:'求推荐',text:'求推荐靠谱的'+industryName+'入门工具/课程，谢谢！'},
+    {type:'购买意向',text:'这个'+industryName+'作品用的什么材料/设备？求链接'},
+    {type:'互动引流',text:'我整理了一份'+industryName+'新手资料包，需要的扣1'}
+  ];
+  // 最佳发布组合（基于真实发布时间分布与作品时长）
+  var _bestPt=publishTimeDist.slice().sort(function(a,b){return (b.count||0)-(a.count||0);})[0]||{};
+  var _hasLong=dyWorks.some(function(w){return w.duration>60;});
+  var bestPostingCombo={
+    time:(_bestPt.hour!=null?_bestPt.hour+':00':'18:00'),
+    platform:works.some(function(w){return w.platform==='douyin';})?'抖音':'小红书',
+    duration:_hasLong?'1-3分钟':'30-60秒',
+    score:'A'
+  };
+
   return {
     last_update: new Date().toLocaleString('zh-CN'),
     summary: {
@@ -1341,6 +1361,8 @@ function buildDashboardData(works, hotwords, industryName){
     audience_personas: audiencePersonas,
     comment_semantic: commentSemantic,
     conversion_signals: conversionSignals,
+    comment_scripts: commentScripts,
+    best_posting_combo: bestPostingCombo,
     cross_platform: crossPlatform,
     completion_rate: completionRate
   };
