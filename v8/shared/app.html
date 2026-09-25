@@ -779,17 +779,22 @@ window.safeCall = function(fn, ctx) {
     window.domainGuard = function(moduleId, renderFn) { return renderFn; };
     window.DATA = window.DASHBOARD_DATA;
     // 用最新聚合逻辑对已存作品重算，补全新增真实字段（兼容旧采集数据，无需重新采集）
-    if (typeof buildDashboardData === 'function' && window.DASHBOARD_DATA && window.DASHBOARD_DATA.works && window.DASHBOARD_DATA.works.length) {
+    setTimeout(function(){
+      if (typeof buildDashboardData !== 'function' || !window.DASHBOARD_DATA || !window.DASHBOARD_DATA.works || !window.DASHBOARD_DATA.works.length){ console.log('[REAGG] skipped'); return; }
       try {
         var _indName = (window.DASHBOARD_DATA.summary && window.DASHBOARD_DATA.summary.industry) || cname;
         var _fresh = buildDashboardData(window.DASHBOARD_DATA.works.slice(),
                                         (window.DASHBOARD_DATA.hotwords || []).slice(), _indName);
+        _fresh._cross_checked = true;
         Object.keys(window.DASHBOARD_DATA).forEach(function(k){ if (_fresh[k] === undefined) _fresh[k] = window.DASHBOARD_DATA[k]; });
         window.DASHBOARD_DATA = _fresh;
         window.DATA = _fresh;
         try { localStorage.setItem('custom_data_' + cname, JSON.stringify(_fresh)); } catch(e){}
-      } catch(e) { console.warn('重新聚合升级失败:', e); }
-    }
+        if (window.normalizeData) window.normalizeData();
+        if (window.renderAll) window.renderAll();
+        console.log('[REAGG] done cr='+(_fresh.completion_rate?'yes':'no')+' crossLen='+_fresh.cross_platform.length);
+      } catch(e) { console.warn('[REAGG] FAIL:', e); }
+    }, 1800);
     if (window.normalizeData) window.normalizeData();
     if (window.renderAll) window.renderAll();
     // local 行业：取消"单 section 切换"模式，所有 section 垂直铺开
@@ -1107,7 +1112,7 @@ window.safeCall = function(fn, ctx) {
   
 
 
-  <script src="../shared/bundle.js?v=1790244260"></script>
+  <script src="../shared/bundle.js?v=1790319133"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
