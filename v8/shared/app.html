@@ -900,16 +900,7 @@ window.safeCall = function(fn, ctx) {
         }
 
         // 7. 跨平台选题迁移
-        var cp = document.getElementById('crossPlatform');
-        if (cp) {
-          cp.innerHTML = '<div style="padding:16px;">' +
-            '<div style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">小红书已验证选题，迁移到抖音二次创作</div>' +
-            '<div style="display:grid;gap:10px;">' +
-            '<div style="display:flex;justify-content:space-between;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;"><span>烘焙入门：0失败基础面包</span><span style="color:#34d399;">小红书已爆 · 待抖音翻拍</span></div>' +
-            '<div style="display:flex;justify-content:space-between;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;"><span>新手必看：烘焙常见10个坑</span><span style="color:#34d399;">小红书已爆 · 待抖音翻拍</span></div>' +
-            '<div style="display:flex;justify-content:space-between;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;"><span>家庭烘焙工具清单</span><span style="color:#fbbf24;">双平台可发</span></div>' +
-            '</div></div>';
-        }
+        // 跨平台迁移交由真实数据填充层（基于 D.cross_platform）渲染，不写死
 
         // 8. 爆款标题生成器（可用状态）
         var tg = document.getElementById('titleGen');
@@ -948,16 +939,7 @@ window.safeCall = function(fn, ctx) {
         }
 
         // 7. 跨平台选题迁移
-        var cp = document.getElementById('crossPlatform');
-        if (cp) {
-          cp.innerHTML = '<div style="padding:16px;">' +
-            '<div style="color:var(--text-secondary);font-size:13px;margin-bottom:12px;">小红书已验证选题，迁移到抖音二次创作</div>' +
-            '<div style="display:grid;gap:10px;">' +
-            '<div style="display:flex;justify-content:space-between;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;"><span>烘焙入门：0失败基础面包</span><span style="color:#34d399;">小红书已爆 · 待抖音翻拍</span></div>' +
-            '<div style="display:flex;justify-content:space-between;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;"><span>新手必看：烘焙常见10个坑</span><span style="color:#34d399;">小红书已爆 · 待抖音翻拍</span></div>' +
-            '<div style="display:flex;justify-content:space-between;padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;"><span>家庭烘焙工具清单</span><span style="color:#fbbf24;">双平台可发</span></div>' +
-            '</div></div>';
-        }
+        // 跨平台迁移交由真实数据填充层（基于 D.cross_platform）渲染，不写死
 
         // 8. 爆款标题生成器（可用状态）
         var tg = document.getElementById('titleGen');
