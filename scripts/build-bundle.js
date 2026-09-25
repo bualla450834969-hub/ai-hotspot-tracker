@@ -25,6 +25,7 @@ const FILES = [
   'core/domainConfig.js',    // 领域默认配置 DOMAIN_CONFIG（可被行业配置覆盖）
   'core/globals.js',
   'core/state.js',
+  'core/evidence.js',         // V8.2 Evidence / Insight / Provenance / DataQuality
   'core/renderer.js',
   'core/framework.js',       // Module.register 框架 + renderAll 调度
   'effects/glow.js',
