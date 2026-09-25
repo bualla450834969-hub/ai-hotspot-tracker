@@ -4,7 +4,8 @@
   "private": true,
   "description": "AI 热点追踪 / 自媒体视频结构推荐工作台（多行业通用，纯前端，GitHub Pages）",
   "scripts": {
-    "build": "node scripts/build-bundle.js"
+    "build": "node scripts/build-bundle.js",
+    "test:v82": "node tests/v82-evidence.test.js"
   },
   "engines": {
     "node": ">=12"

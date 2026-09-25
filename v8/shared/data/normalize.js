@@ -18,6 +18,8 @@ window.normalizeData = function() {
       var author = w.author || w.accountName || '';
       var url = w.url || w.workUrl || '';
       return {
+        workId: w.workId || w.sourceId || w.work_id || '',
+        sourceId: w.sourceId || w.workId || w.work_id || '',
         title: w.title || w.name || '',
         author: author,
         accountName: author,
@@ -39,6 +41,24 @@ window.normalizeData = function() {
         cover: w.cover || w.coverUrl || ''
       };
     });
+  }
+  // hotwords兼容旧数据和最小local数据，缺失指标统一为可渲染的客观零值。
+  if (Array.isArray(d.hotwords)) {
+    d.hotwords = d.hotwords.filter(function(h) { return h && typeof h === 'object'; }).map(function(h) {
+      function number(value) {
+        var parsed = Number(value);
+        return isFinite(parsed) ? parsed : 0;
+      }
+      return Object.assign({}, h, {
+        keyword: String(h.keyword || ''),
+        category: String(h.category || '未分类'),
+        total: number(h.total != null ? h.total : h.works_count),
+        max_like: number(h.max_like),
+        collect_rate: number(h.collect_rate),
+        trend: h.trend || '稳定',
+        efficiency_tag: h.efficiency_tag || '适中'
+      });
+    }).filter(function(h) { return h.keyword; });
   }
   // ===== 统一 hot_breakdowns / comment_semantic / conversion_signals 契约 =====
   if (Array.isArray(d.hot_breakdowns)) {
