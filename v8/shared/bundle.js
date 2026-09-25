@@ -1022,6 +1022,9 @@ window.domainGuard = function(moduleId, renderFn) {
 
   // ===== 渲染调度 =====
   function renderAll() {
+    // V8.1：渲染前统一补齐数据契约并计数
+    try { if (window.normalizeDataContract) window.normalizeDataContract(); } catch (e) {}
+    if (window.AppStore) window.AppStore.renderCount++;
     const DATA = window.DASHBOARD_DATA || {};
     const config = window.DOMAIN_CONFIG || {};
     const mods = config.modules || {};
@@ -1052,6 +1055,7 @@ window.domainGuard = function(moduleId, renderFn) {
         mod.render(renderData);
       } catch (e) {
         console.error(`[Module] ${id} 渲染失败:`, e);
+        if (window.AppErrorHandler) window.AppErrorHandler.handle(e, 'render:' + id);
         // 单个模块崩溃不影响其他模块
       }
     });
@@ -2617,7 +2621,7 @@ if (document.readyState === 'loading') {
 
   // renderChecklist
   function renderChecklist() {
-    const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+    const saved = NS.get('publishChecklist', {}) || {};
     let html = '';
     CHECKLIST_ITEMS.forEach(item => {
       const checked = saved[item.id] ? 'checked' : '';
@@ -2633,15 +2637,15 @@ if (document.readyState === 'loading') {
 
   // toggleCheck
   function toggleCheck(id) {
-    const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+    const saved = NS.get('publishChecklist', {}) || {};
     saved[id] = !saved[id];
-    localStorage.setItem('publishChecklist', JSON.stringify(saved));
+    NS.set('publishChecklist', saved);
     renderChecklist();
   }
 
   // updateChecklistProgress
   function updateChecklistProgress() {
-    const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+    const saved = NS.get('publishChecklist', {}) || {};
     const done = Object.values(saved).filter(Boolean).length;
     document.getElementById('checklistProgress').innerHTML = '已完成 <b>' + done + '</b>/' + CHECKLIST_ITEMS.length + ' 项' + (done === CHECKLIST_ITEMS.length ? ' 可以发布了！' : '');
   }
@@ -3936,11 +3940,11 @@ if (document.readyState === 'loading') {
 
   // getPerfData
   function getPerfData() {
-    try { return JSON.parse(localStorage.getItem('topic_perf') || '{}'); } catch(e) { return {}; }
+    return NS.get('topic_perf', {}) || {};
   }
 
   // savePerfData
-  function savePerfData(d) { localStorage.setItem('topic_perf', JSON.stringify(d)); }
+  function savePerfData(d) { NS.set('topic_perf', d); }
 
   // 模块注册
   if (window.Module) {
@@ -4008,7 +4012,7 @@ if (document.readyState === 'loading') {
 
   // getAllKanbanStatus
   function getAllKanbanStatus() {
-    try { return JSON.parse(localStorage.getItem('ai_hotspot_status') || '{}'); } catch(e) { return {}; }
+    return NS.get('ai_hotspot_status', {}) || {};
   }
 
   // getTopicStatus
@@ -4021,7 +4025,7 @@ if (document.readyState === 'loading') {
   function setTopicStatus(title, status) {
     const all = getAllKanbanStatus();
     all[title] = status;
-    localStorage.setItem('ai_hotspot_status', JSON.stringify(all));
+    NS.set('ai_hotspot_status', all);
     renderKanban();
     renderTopics();
   }
@@ -4032,7 +4036,7 @@ if (document.readyState === 'loading') {
     const cur = status[title] || 'pending';
     const next = cur==='pending'?'shooting':cur==='shooting'?'published':'pending';
     if (next==='pending') delete status[title]; else status[title]=next;
-    localStorage.setItem('ai_hotspot_status', JSON.stringify(status));
+    NS.set('ai_hotspot_status', status);
     const card = document.getElementById('topic-'+i);
     card.className = card.className.replace(/status-\w+/, 'status-'+next);
     card.querySelector('.status-badge').textContent = next==='pending'?'待拍摄':next==='shooting'?'拍摄中':'已发布';
@@ -4048,10 +4052,10 @@ if (document.readyState === 'loading') {
   }
 
   // getKanbanStatus
-  function getKanbanStatus() { try { return JSON.parse(localStorage.getItem('ai_hotspot_status')||'{}'); } catch(e) { return {}; } }
+  function getKanbanStatus() { return NS.get('ai_hotspot_status', {}) || {}; }
 
   // resetKanbanStatus
-  function resetKanbanStatus() { localStorage.removeItem('ai_hotspot_status'); renderTopics(); }
+  function resetKanbanStatus() { NS.remove('ai_hotspot_status'); renderTopics(); }
 
   // 模块注册
   if (window.Module) {
@@ -4085,11 +4089,11 @@ if (document.readyState === 'loading') {
 
   // getFavorites
   function getFavorites() {
-    return JSON.parse(localStorage.getItem('viral_favorites') || '[]');
+    return NS.get('viral_favorites', []) || [];
   }
 
   // isFavorite
-  function isFavorite(i) { const favs = JSON.parse(localStorage.getItem("viral_favorites") || "[]"); return favs.some(f => f.title === DATA.hot_breakdowns[i]?.title); }
+  function isFavorite(i) { const favs = NS.get('viral_favorites', []) || []; return favs.some(f => f.title === DATA.hot_breakdowns[i]?.title); }
 
   // toggleFavorite
   function toggleFavorite(index) {
@@ -4097,7 +4101,7 @@ if (document.readyState === 'loading') {
     const work = DATA.hot_breakdowns[index];
     const exists = favs.findIndex(function(f) { return f.title === work.title; });
     if (exists >= 0) { favs.splice(exists, 1); } else { favs.push(work); }
-    localStorage.setItem('viral_favorites', JSON.stringify(favs));
+    NS.set('viral_favorites', favs);
     renderBreakdowns();
     renderFavorites();
   }
@@ -4131,7 +4135,7 @@ if (document.readyState === 'loading') {
   function removeFavorite(index) {
     const favs = getFavorites();
     favs.splice(index, 1);
-    localStorage.setItem('viral_favorites', JSON.stringify(favs));
+    NS.set('viral_favorites', favs);
     renderFavorites();
     renderBreakdowns();
   }

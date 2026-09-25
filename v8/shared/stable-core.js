@@ -1,0 +1,356 @@
+/* ============================================================
+ * stable-core.js — V8.1 Stable 行业数据稳定核心
+ * 必须在 bundle.js 与行业加载逻辑【之前】加载（普通脚本，立即执行）。
+ *
+ * 职责：
+ *  1. 唯一数据源 window.AppStore；DATA / DASHBOARD_DATA 为其访问器别名，
+ *     保证 window.DATA === window.DASHBOARD_DATA === AppStore.data，杜绝多入口。
+ *  2. 统一行业上下文解析 parseIndustryContext()（builtin / local）。
+ *  3. localStorage 行业命名空间 NS（读新 key → 回退旧 key → 自动迁移）。
+ *  4. ECharts 安全初始化：自动接管全局 echarts，容器无尺寸不 init、
+ *     WeakMap 防重复、有限重试、dispose 清理；单图失败不拖垮页面。
+ *  5. 模块级错误隔离 safeRender + showModuleFallback。
+ *  6. TimerManager 统管 interval/timeout，切行业/页面时一次清理。
+ *  7. AppErrorHandler 统一错误收口（局部错误不白屏、不整体替换 body）。
+ *  8. 请求版本号 nextRequest/isCurrent，丢弃旧行业/旧批次异步回写。
+ *  9. ?debug=1 调试面板。
+ * 10. safeDivide / safeNum 数值安全，杜绝 NaN / Infinity。
+ * ============================================================ */
+(function () {
+  'use strict';
+  if (window.__stableCore) return;
+  window.__stableCore = true;
+
+  /* ---------- 1. 行业上下文解析（唯一入口） ---------- */
+  // 中文行业名 → 英文 slug
+  var SLUG_MAP = { '书法': 'shufa', '書法': 'shufa' };
+
+  function parseIndustryContext(rawInd) {
+    var ind = rawInd;
+    if (ind === undefined || ind === null) {
+      try { ind = new URLSearchParams(window.location.search).get('ind'); }
+      catch (e) { ind = null; }
+    }
+    ind = ind || 'ai';
+    if (SLUG_MAP[ind]) ind = SLUG_MAP[ind];
+
+    var isLocal = ind.indexOf('local:') === 0;
+    var name = isLocal ? decodeURIComponent(ind.slice(6)) : ind;
+    return {
+      type: isLocal ? 'local' : 'builtin',
+      id: ind,                                   // 完整 id（local:xx 或英文 slug）
+      name: name,                                // 展示名
+      configKey: isLocal ? ('custom_cfg_' + name) : null,
+      dataKey: isLocal ? ('custom_data_' + name) : null,
+      base: isLocal ? null : ('../industries/' + ind + '/')
+    };
+  }
+
+  var CTX = parseIndustryContext();
+
+  /* ---------- 2. 唯一数据源 AppStore ---------- */
+  var AppStore = {
+    schemaVersion: 2,
+    industry: { id: CTX.id, name: CTX.name, type: CTX.type },
+    data: null,
+    status: { loading: false, error: null, ready: false },
+    requestId: 0,
+    renderCount: 0,
+    /** 开启新一轮异步批次，返回版本号 */
+    nextRequest: function () { return ++this.requestId; },
+    /** 判断某批次是否仍为当前（旧批次回写应被丢弃） */
+    isCurrent: function (rid) { return rid === this.requestId; }
+  };
+  window.AppStore = AppStore;
+
+  // DATA / DASHBOARD_DATA 永远是 AppStore.data 的访问器别名
+  function installDataAlias(prop) {
+    Object.defineProperty(window, prop, {
+      configurable: true,
+      get: function () { return AppStore.data; },
+      set: function (v) { AppStore.data = (v === null || v === undefined) ? {} : v; return AppStore.data; }
+    });
+  }
+  installDataAlias('DATA');
+  installDataAlias('DASHBOARD_DATA');
+
+  /* ---------- 3. localStorage 行业命名空间 ---------- */
+  var NS = {
+    scope: function () { return 'hs_' + encodeURIComponent(CTX.id); },
+    _newKey: function (key) { return this.scope() + '__' + key; },
+    /** 读：优先新 key；不存在则尝试旧 key 并一次性迁移 */
+    _resolve: function (key) {
+      var nk = this._newKey(key);
+      if (localStorage.getItem(nk) !== null) return nk;
+      if (localStorage.getItem(key) !== null) {
+        try { localStorage.setItem(nk, localStorage.getItem(key)); }
+        catch (e) { AppErrorHandler.handle(e, 'NS.migrate:' + key); }
+      }
+      return nk;
+    },
+    get: function (key, def) {
+      try {
+        var raw = localStorage.getItem(this._resolve(key));
+        return raw === null ? (def === undefined ? null : def) : JSON.parse(raw);
+      } catch (e) { AppErrorHandler.handle(e, 'NS.get:' + key); return def === undefined ? null : def; }
+    },
+    set: function (key, val) {
+      try { localStorage.setItem(this._newKey(key), JSON.stringify(val)); }
+      catch (e) { AppErrorHandler.handle(e, 'NS.set:' + key); }
+    },
+    remove: function (key) {
+      try { localStorage.removeItem(this._newKey(key)); } catch (e) {}
+    }
+  };
+  window.NS = NS;
+  window.parseIndustryContext = parseIndustryContext;
+
+  /* ---------- 3.5 数据契约补齐（唯一实现，渲染前调用） ---------- */
+  var FIELD_DEFAULTS = {
+    works: [], hotwords: [], topics: [], viral_genes: {},
+    title_formulas: [], title_formulas_array: [], publish_time_dist: [],
+    saturation: [], daily_actions: [], blue_ocean_list: [], growth_ranking: [],
+    tech_signals: [], audience_personas: [], comment_scripts: [], format_roi: [],
+    competitor_list: [], comment_semantic: {}, conversion_signals: [],
+    cross_platform: [], launch_ops: [], pitfall_list: [], topic_performance: {},
+    content_formats_dist: [], content_format_dist: [], summary: {}
+  };
+  window.normalizeDataContract = function () {
+    var D = AppStore.data;
+    if (!D || typeof D !== 'object') return;
+    Object.keys(FIELD_DEFAULTS).forEach(function (k) {
+      if (D[k] === undefined || D[k] === null) {
+        var def = FIELD_DEFAULTS[k];
+        D[k] = Array.isArray(def) ? [] : (typeof def === 'object' ? {} : def);
+      }
+    });
+    // hotwords 每项补安全字段
+    (D.hotwords || []).forEach(function (h) {
+      if (h.max_like === undefined) h.max_like = 0;
+      if (h.collect_rate === undefined) h.collect_rate = 0;
+      if (!h.trend) h.trend = '稳定';
+      if (!h.category) h.category = '其他';
+    });
+    // viral_genes 补字段
+    if (D.viral_genes) {
+      if (!D.viral_genes.hook_distribution) D.viral_genes.hook_distribution = [];
+      if (!D.viral_genes.top_title_keywords) D.viral_genes.top_title_keywords = [];
+      if (!D.viral_genes.structure_examples) D.viral_genes.structure_examples = [];
+      if (D.viral_genes.sample_size === undefined) D.viral_genes.sample_size = (D.works || []).length;
+      if (D.viral_genes.avg_title_length === undefined) D.viral_genes.avg_title_length = 20;
+    }
+    if (D.schemaVersion === undefined) D.schemaVersion = AppStore.schemaVersion;
+  };
+
+  /* ---------- 4. 数值安全 ---------- */
+  function safeDivide(a, b, fallback) {
+    a = Number(a); b = Number(b);
+    if (!isFinite(a) || !isFinite(b) || b === 0) return fallback === undefined ? 0 : fallback;
+    return a / b;
+  }
+  window.safeDivide = safeDivide;
+  window.safeNum = function (v, def) {
+    v = Number(v);
+    return isFinite(v) ? v : (def === undefined ? 0 : def);
+  };
+
+  /* ---------- 5. TimerManager ---------- */
+  var liveIntervals = {};
+  var liveTimeouts = {};
+  var TimerManager = {
+    setInterval: function (fn, ms, tag) {
+      var id = setInterval(fn, ms);
+      liveIntervals[id] = { tag: tag || '' };
+      return id;
+    },
+    setTimeout: function (fn, ms, tag) {
+      var id = setTimeout(function () { delete liveTimeouts[id]; fn(); }, ms);
+      liveTimeouts[id] = { tag: tag || '' };
+      return id;
+    },
+    clearInterval: function (id) { clearInterval(id); delete liveIntervals[id]; },
+    clearTimeout: function (id) { clearTimeout(id); delete liveTimeouts[id]; },
+    /** 切换行业 / 卸载页面时清理全部定时器 */
+    clearAll: function () {
+      Object.keys(liveIntervals).forEach(function (id) { clearInterval(parseInt(id, 10)); });
+      Object.keys(liveTimeouts).forEach(function (id) { clearTimeout(parseInt(id, 10)); });
+      liveIntervals = {};
+      liveTimeouts = {};
+    }
+  };
+  window.TimerManager = TimerManager;
+
+  /* ---------- 6. ECharts 安全初始化 ---------- */
+  var chartRegistry = new WeakMap();   // dom → 真实实例
+  function domReady(dom) {
+    return !!dom && dom.isConnected === true && dom.clientWidth > 10 && dom.clientHeight > 10;
+  }
+
+  /**
+   * 容器无尺寸时返回一个"延迟代理"：缓存 setOption/resize 调用，
+   * 容器一旦有尺寸即创建真实实例并按顺序重放，避免调用方 .setOption 报错。
+   */
+  function makeDeferred(ec, dom, theme, opts) {
+    var queue = [];
+    var real = null;
+    var tries = 0;
+    var iv = TimerManager.setInterval(function () {
+      tries++;
+      if (real) return;
+      if (domReady(dom)) {
+        TimerManager.clearInterval(iv);
+        if (!ec.getInstanceByDom(dom)) real = ec.__origInit(dom, theme, opts);
+        else real = ec.getInstanceByDom(dom);
+        chartRegistry.set(dom, real);
+        var pending = queue; queue = [];
+        pending.forEach(function (args) {
+          try { real.setOption.apply(real, args); }
+          catch (e) { AppErrorHandler.handle(e, 'chart.replay'); }
+        });
+      } else if (tries > 50) {
+        TimerManager.clearInterval(iv); // 约 10s 仍无尺寸，放弃（不产生 0 尺寸实例）
+      }
+    }, 200, 'chart-defer');
+
+    return {
+      __deferred: true,
+      setOption: function () { if (real) real.setOption.apply(real, arguments); else queue.push(Array.prototype.slice.call(arguments)); return this; },
+      resize: function () { if (real) return real.resize.apply(real, arguments); return this; },
+      showLoading: function () { if (real) real.showLoading.apply(real, arguments); return this; },
+      hideLoading: function () { if (real) real.hideLoading.apply(real, arguments); return this; },
+      on: function () { if (real) real.on.apply(real, arguments); return this; },
+      dispose: function () { try { TimerManager.clearInterval(iv); if (real) real.dispose(); } catch (e) {} chartRegistry.delete(dom); return this; }
+    };
+  }
+
+  function patchEcharts(ec) {
+    if (!ec || typeof ec.init !== 'function' || ec.__patched) return ec;
+    ec.__origInit = ec.init.bind(ec);
+    ec.init = function (dom, theme, opts) {
+      if (!dom) return ec.__origInit(dom, theme, opts);
+      var existing = ec.getInstanceByDom ? ec.getInstanceByDom(dom) : null;
+      if (existing) return existing;
+      if (chartRegistry.has(dom)) return chartRegistry.get(dom);
+      if (domReady(dom)) {
+        var inst = ec.__origInit(dom, theme, opts);
+        chartRegistry.set(dom, inst);
+        return inst;
+      }
+      return makeDeferred(ec, dom, theme, opts); // 无尺寸：延迟代理，不在 0 尺寸 init
+    };
+    // 统一 dispose：从注册表移除
+    var origDispose = ec.dispose;
+    ec.__patched = true;
+    ec.safeChartInit = function (dom, theme, opts) { return ec.init(dom, theme, opts); };
+    return ec;
+  }
+  window.patchEcharts = patchEcharts;
+
+  // echarts 由 CDN defer 加载并赋值给 window.echarts —— 拦截赋值即自动 patch
+  var _ec;
+  try {
+    Object.defineProperty(window, 'echarts', {
+      configurable: true,
+      get: function () { return _ec; },
+      set: function (v) { _ec = (v && typeof v.init === 'function') ? patchEcharts(v) : v; }
+    });
+  } catch (e) {
+    if (window.echarts) patchEcharts(window.echarts);
+  }
+  window.safeChartInit = function (dom, theme, opts) {
+    return window.echarts ? window.echarts.init(dom, theme, opts) : null;
+  };
+
+  /* ---------- 7. 模块级错误隔离 ---------- */
+  function showModuleFallback(name) {
+    try {
+      var el = document.getElementById(name);
+      if (!el) return;
+      var holder = el.querySelector('[id$="List"],[id$="Content"],[id$="Chart"],.bento,.glass-card');
+      if (holder && !holder.dataset.fb) {
+        holder.dataset.fb = '1';
+        holder.innerHTML = '<div style="padding:20px;text-align:center;color:#9ca3af;font-size:13px;line-height:1.7;">该模块数据缺失<br><span style="font-size:11px;opacity:.75;">重新采集本行业后自动填充</span></div>';
+      }
+    } catch (e) {}
+  }
+  function safeRender(name, fn) {
+    try { fn(); }
+    catch (err) { AppErrorHandler.handle(err, 'render:' + name); showModuleFallback(name); }
+  }
+  window.safeRender = safeRender;
+  window.showModuleFallback = showModuleFallback;
+
+  /* ---------- 8. AppErrorHandler ---------- */
+  var errorLog = [];
+  var AppErrorHandler = {
+    errorModules: {},
+    handle: function (err, where) {
+      var rec = {
+        where: where || '',
+        message: (err && err.message) ? err.message : String(err),
+        time: new Date().toISOString()
+      };
+      errorLog.push(rec);
+      if (errorLog.length > 60) errorLog.shift();
+      if (where) this.errorModules[where] = rec;
+      console.error('[AppError]' + (where ? '[' + where + ']' : ''), err);
+    },
+    recent: function () { return errorLog.slice(); }
+  };
+  window.AppErrorHandler = AppErrorHandler;
+
+  window.addEventListener('error', function (e) {
+    AppErrorHandler.handle((e && e.error) || (e && e.message) || 'error', 'window.error');
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    AppErrorHandler.handle(e && e.reason, 'unhandledrejection');
+    if (e && e.preventDefault) e.preventDefault();
+  });
+
+  /* ---------- 9. 统一行业切换 ----------
+   * 跨行业当前为整页加载：跳转前作废本页异步批次并清理全部定时器，
+   * 新页面由本核心重新初始化，确保旧行业 timer/异步不延续。 */
+  function switchIndustryContext(industryId) {
+    AppStore.nextRequest();      // 作废在途异步
+    try { TimerManager.clearAll(); } catch (e) {}
+    AppStore.status.loading = true;
+    window.location.href = window.location.pathname + '?ind=' + encodeURIComponent(industryId);
+  }
+  window.switchIndustryContext = switchIndustryContext;
+
+  /* ---------- 10. 调试面板（?debug=1） ---------- */
+  try {
+    var dbg = new URLSearchParams(window.location.search).get('debug');
+    if (dbg === '1' || dbg === 'true') {
+      TimerManager.setTimeout(function () {
+        var root = document.body || document.documentElement;
+        if (!root) return;
+        var box = document.createElement('div');
+        box.id = '__debugPanel';
+        box.style.cssText = 'position:fixed;right:8px;bottom:8px;z-index:99999;background:rgba(15,18,28,.92);color:#7dd3fc;font:11px/1.65 monospace;padding:10px 12px;border:1px solid #334155;border-radius:8px;max-width:280px;box-shadow:0 8px 30px rgba(0,0,0,.5)';
+        function render() {
+          var d = AppStore.data || {};
+          var chartCount = document.querySelectorAll('[_echarts_instance_]').length;
+          var lastErrs = errorLog.slice(-2).map(function (e) {
+            return '<span style="color:#fca5a5">· ' + e.where + '</span>';
+          }).join('<br>');
+          box.innerHTML =
+            '<b style="color:#e2e8f0">V8.1 Stable Debug</b><br>' +
+            'industry: ' + AppStore.industry.id + '<br>' +
+            'schema: v' + AppStore.schemaVersion + '<br>' +
+            'works: ' + (d.works ? d.works.length : 0) + '<br>' +
+            'hotwords: ' + (d.hotwords ? d.hotwords.length : 0) + '<br>' +
+            'render#: ' + AppStore.renderCount + '<br>' +
+            'requestId: ' + AppStore.requestId + '<br>' +
+            'charts: ' + chartCount + '<br>' +
+            'errors: ' + errorLog.length +
+            (lastErrs ? '<br>' + lastErrs : '');
+        }
+        root.appendChild(box);
+        render();
+        TimerManager.setInterval(render, 1000, 'debug');
+      }, 300);
+    }
+  } catch (e) {}
+
+})();

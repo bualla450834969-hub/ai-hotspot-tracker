@@ -1,6 +1,8 @@
 ﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+<!-- V8.1 Stable 稳定核心：必须最先加载（唯一数据源/图表安全/错误隔离/定时器管理） -->
+<script src="../shared/stable-core.js?v=1790410000"></script>
 <script>
 // Superpowers verification-before-completion: 全局错误兜底
 // 任何模块报错只影响自身，不拖垮整页
@@ -751,22 +753,25 @@ window.safeCall = function(fn, ctx) {
   <script>
 // ===== v6 动态行业配置加载器 =====
 (function() {
-  var params = new URLSearchParams(window.location.search);
-  var ind = params.get('ind') || 'ai';
-    // 中文行业名映射到英文slug
-    var slugMap = {'书法':'shufa', '書法':'shufa'};
-    if (slugMap[ind]) ind = slugMap[ind];
+  // V8.1：行业上下文统一由 stable-core 解析（builtin / local）
+  var CTX = window.parseIndustryContext();
+  var ind = CTX.id;
   window.CURRENT_INDUSTRY = ind;
 
   // ---- 本地采集的自定义行业（数据存浏览器 localStorage）----
-  if (ind.indexOf('local:') === 0) {
-    var cname = decodeURIComponent(ind.slice(6));
+  if (CTX.type === 'local') {
+    var cname = CTX.name;
     window.CURRENT_INDUSTRY = 'local';
     try {
-      window.DOMAIN_CONFIG = JSON.parse(localStorage.getItem('custom_cfg_' + cname) || '{}');
-      window.DASHBOARD_DATA = JSON.parse(localStorage.getItem('custom_data_' + cname) || '{}');
+      window.DOMAIN_CONFIG = JSON.parse(localStorage.getItem(CTX.configKey) || '{}');
+      window.DASHBOARD_DATA = JSON.parse(localStorage.getItem(CTX.dataKey) || '{}');
     } catch (e) {
-      document.body.innerHTML = '<div style="padding:60px;text-align:center;color:#888;font-family:sans-serif;">本地行业数据读取失败: ' + cname + '</div>';
+      // 局部错误：覆盖层提示，不整体替换 body、不白屏
+      window.AppErrorHandler.handle(e, 'local.read');
+      var _eb = document.createElement('div');
+      _eb.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,12,20,.9);color:#cbd5e1;font-family:sans-serif;z-index:99999;';
+      _eb.innerHTML = '<div style="text-align:center;line-height:2.1;">本地行业「' + cname + '」数据读取失败<br><span style="color:#94a3b8;font-size:13px;">数据可能已损坏，请重新采集该行业</span></div>';
+      document.body.appendChild(_eb);
       return;
     }
     window.cfg = function(path, defaultValue) {
@@ -798,26 +803,16 @@ window.safeCall = function(fn, ctx) {
         } catch(e) { console.warn('[REAGG] FAIL:', e); }
       }
       var _lastLen=-1,_stable=0,_tries=0;
-      var _iv=setInterval(function(){
+      var _iv=TimerManager.setInterval(function(){
         _tries++;
         var wl=(window.DASHBOARD_DATA&&window.DASHBOARD_DATA.works)?window.DASHBOARD_DATA.works.length:0;
         if(wl>0&&wl===_lastLen){_stable++;}else{_stable=0;_lastLen=wl;}
-        if(_stable>=2&&wl>0){clearInterval(_iv);_doReagg();}
-        else if(_tries>40){clearInterval(_iv);if(wl>0)_doReagg();else console.log('[REAGG] timeout no works');}
-      },400);
+        if(_stable>=2&&wl>0){TimerManager.clearInterval(_iv);_doReagg();}
+        else if(_tries>40){TimerManager.clearInterval(_iv);if(wl>0)_doReagg();else console.log('[REAGG] timeout no works');}
+      },400,'reagg');
     })();
-    if (window.normalizeData) window.normalizeData();
-    if (window.renderAll) window.renderAll();
-    // local 行业：取消"单 section 切换"模式，所有 section 垂直铺开
-    // renderAll 内部会 hideSection 隐藏无数据模块，这里用定时器持续覆盖 3 秒
-    var showTimer = setInterval(function(){
-      document.querySelectorAll('.section').forEach(function(s){
-        if (s.id === 'settingsPanel' || s.id === 'compareSection') return;
-        s.style.display = ''; s.style.opacity = '1'; s.style.visibility = 'visible';
-        s.style.transition = 'none';
-      });
-    }, 200);
-    setTimeout(function(){ clearInterval(showTimer); }, 2000);
+    // V8.1：local 行业所有有数据 section 由 renderAll 统一 show/hide（垂直铺开），
+    // 不再用定时器暴力覆盖，避免与 renderAll 对抗产生"有标题无数据"空模块。
     return;
   }
 
@@ -830,7 +825,10 @@ window.safeCall = function(fn, ctx) {
   if (xhr.status === 200) {
     window.DOMAIN_CONFIG = JSON.parse(xhr.responseText);
   } else {
-    document.body.innerHTML = '<div style="padding:60px;text-align:center;color:#888;font-family:sans-serif;">行业配置未找到: ' + ind + '</div>';
+    var _ce = document.createElement('div');
+    _ce.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,12,20,.9);color:#cbd5e1;font-family:sans-serif;z-index:99999;';
+    _ce.innerHTML = '<div style="text-align:center;line-height:2.1;">行业配置未找到：' + ind + '<br><span style="color:#94a3b8;font-size:13px;">请检查行业链接或返回 AI 工作台</span></div>';
+    document.body.appendChild(_ce);
     throw new Error('Config not found: ' + ind);
   }
 
@@ -958,7 +956,7 @@ window.safeCall = function(fn, ctx) {
   
 
 
-  <script src="../shared/bundle.js?v=1790322000"></script>
+  <script src="../shared/bundle.js?v=1790410000"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     if (window.initFramework) window.initFramework();
@@ -1197,7 +1195,7 @@ function buildDashboardData(works, hotwords, industryName){
     hourMap[hh]=(hourMap[hh]||0)+1;
   });
   var publishTimeDist = Object.keys(hourMap).sort(function(a,b){return a-b;}).map(function(k){
-    return {hour:parseInt(k), count:hourMap[k], pct:Math.round(hourMap[k]/n*100)};
+    return {hour:parseInt(k), count:hourMap[k], pct:Math.round(safeDivide(hourMap[k],n)*100)};
   });
 
   // 钩子分布
@@ -1250,7 +1248,7 @@ function buildDashboardData(works, hotwords, industryName){
   var saturation = hotwords.map(function(h){
     return {
       keyword: h.keyword,
-      saturation: Math.min(100, Math.round(h.total/50)),
+      saturation: Math.min(100, Math.round(safeNum(h.total)/50)),
       stage: h.efficiency_tag==='蓝海'?'萌芽期':(h.trend==='飙升'?'爆发期':(h.trend==='上升'?'上升期':'稳定期'))
     };
   }).sort(function(a,b){return a.saturation-b.saturation;});
@@ -1301,7 +1299,7 @@ function buildDashboardData(works, hotwords, industryName){
     {key:'爱好者与经营者',cat:'泛人群',needs:['行业趋势','经营方法','同行交流'],traits:['长期关注','重实用'],content:'经验分享、行业盘点',active:'周末及晚间',mon:'私域/接单',pain:['变现难','流量不稳']}
   ];
   var audiencePersonas=personaDef.map(function(d,i){
-    return {name:industryName+d.key,category:d.cat,proportion:Math.round(pcnt[i]/n*100),
+    return {name:industryName+d.key,category:d.cat,proportion:Math.round(safeDivide(pcnt[i],n)*100),
       age:'各年龄段',gender:'不限',traits:d.traits,needs:d.needs,content_pref:d.content,
       active_time:d.active,monetization:d.mon,pain_points:d.pain};
   }).filter(function(p,i){return pcnt[i]>0;});
@@ -1311,14 +1309,14 @@ function buildDashboardData(works, hotwords, industryName){
   var totalCollects=works.reduce(function(a,w){return a+(w.collectCount||w.collects||0);},0);
   var themeNames=['求教程/入门','问效果/成品','求技巧/避坑','交流/经营'];
   var commentSemantic={themes:pcnt.map(function(c,i){
-    return {name:industryName+themeNames[i],count:Math.round(totalComments*c/n)};
+    return {name:industryName+themeNames[i],count:Math.round(totalComments*safeDivide(c,n))};
   }).filter(function(t,i){return pcnt[i]>0;})};
   if(!commentSemantic.themes.length)commentSemantic.themes=[{name:industryName+'综合讨论',count:totalComments}];
 
   var conversionSignals=[
-    {signal:'求教程/方法',desc:'约'+Math.round(totalComments*pcnt[0]/n)+'条相关评论',impact:(pcnt[0]/n>0.2)?'高':'中'},
+    {signal:'求教程/方法',desc:'约'+Math.round(totalComments*safeDivide(pcnt[0],n))+'条相关评论',impact:(safeDivide(pcnt[0],n)>0.2)?'高':'中'},
     {signal:'求资料/链接',desc:'累计收藏 '+(totalCollects||0).toLocaleString()+'，资料需求强',impact:(totalCollects>totalLike*0.3)?'高':'中'},
-    {signal:'问效果/推荐',desc:'约'+Math.round(totalComments*pcnt[1]/n)+'条效果咨询',impact:(pcnt[1]/n>0.2)?'高':'中'}
+    {signal:'问效果/推荐',desc:'约'+Math.round(totalComments*safeDivide(pcnt[1],n))+'条效果咨询',impact:(safeDivide(pcnt[1],n)>0.2)?'高':'中'}
   ];
 
   // 私域引流话术（行业名动态，全行业通用）
@@ -1368,11 +1366,41 @@ function buildDashboardData(works, hotwords, industryName){
   };
 }
 
+/* ===== V8.1 采集：有限并发 + 超时/重试/退避 + 防重复 ===== */
+var collectionState = { running:false };
+
+function _searchOnceTimed(p,k,platform,kw,timeoutMs){
+  return new Promise(function(resolve,reject){
+    var settled=false;
+    var to=setTimeout(function(){ if(!settled){settled=true;reject(new Error('请求超时：'+kw));} },timeoutMs);
+    searchOnce(p,k,platform,kw).then(
+      function(d){ if(!settled){settled=true;clearTimeout(to);resolve(d);} },
+      function(e){ if(!settled){settled=true;clearTimeout(to);reject(e);} }
+    );
+  });
+}
+
+function _fetchWithRetry(p,k,platform,kw,retries){
+  var attempt=0, lastErr;
+  function loop(){
+    if(attempt>retries) return Promise.reject(lastErr||new Error('采集失败：'+kw));
+    return _searchOnceTimed(p,k,platform,kw,15000).catch(function(e){
+      lastErr=e; attempt++;
+      var msg=String(e&&e.message||e);
+      var isRate=/429|rate|limit|too many|频繁|频/i.test(msg);
+      var wait=isRate?Math.min(800*Math.pow(2,attempt-1),6000):400*attempt;
+      return new Promise(function(r){setTimeout(r,wait);}).then(loop);
+    });
+  }
+  return loop();
+}
+
 async function startCollection(){
-  var k = document.getElementById('apiKeyInput').value.trim();
-  var i = document.getElementById('industryInput').value.trim();
-  var p = document.getElementById('proxyUrlInput').value.trim().replace(/\/+$/,'');
-  var s = document.getElementById('collectStatus');
+  var s=document.getElementById('collectStatus');
+  if(collectionState.running){ s.style.display='block'; s.innerHTML='<span style="color:#fbbf24;">已有采集任务进行中，请稍候…</span>'; return; }
+  var k=document.getElementById('apiKeyInput').value.trim();
+  var i=document.getElementById('industryInput').value.trim();
+  var p=document.getElementById('proxyUrlInput').value.trim().replace(/\/+$/,'');
   s.style.display='block';
   if(!k){ s.innerHTML='<span style="color:#f87171;">请填写 API Key</span>'; return; }
   if(!i){ s.innerHTML='<span style="color:#f87171;">请填写行业名</span>'; return; }
@@ -1382,59 +1410,85 @@ async function startCollection(){
   if(document.getElementById('platform_xhs').checked) platforms.push('xiaohongshu');
   if(platforms.length===0){ s.innerHTML='<span style="color:#f87171;">请至少选一个平台</span>'; return; }
 
-  localStorage.setItem('redfox_api_key', k);
-  localStorage.setItem('redfox_proxy_url', p);
+  var btn=document.querySelector('button[onclick*="startCollection"]');
+  collectionState.running=true;
+  if(btn){ btn.disabled=true; btn.style.opacity='.6'; btn.style.cursor='not-allowed'; }
+  localStorage.setItem('redfox_api_key',k);
+  localStorage.setItem('redfox_proxy_url',p);
 
-  var keywords = [i, i+'教程', i+'推荐', i+'怎么选', i+'避坑', i+'排行榜'];
-  var allWorks = [], hotwords = [], done = 0, total = platforms.length*keywords.length;
-
-  for (const platform of platforms){
-    for (const kw of keywords){
-      try {
-        var data = await searchOnce(p, k, platform, kw);
-        var list = data.list || [];
-        list.forEach(function(w){ var nw=normalizeWork(w, platform); nw._keyword=kw; allWorks.push(nw); });
-        hotwords.push({keyword:kw, platform:platform, total:data.total||list.length, works:list.length, avg_like: list.length?Math.round(list.reduce((a,w)=>a+(w.likeCount||w.workLikedCount||0),0)/list.length):0});
-      } catch(e){
-        hotwords.push({keyword:kw, platform:platform, total:0, works:0, error:String(e.message||e)});
-      }
-      done++;
-      s.innerHTML='<span style="color:#a78bfa;">采集中 '+done+'/'+total+'：'+platform+' · '+kw+'</span>';
+  var keywords=[i,i+'教程',i+'推荐',i+'怎么选',i+'避坑',i+'排行榜'];
+  var jobs=[];
+  platforms.forEach(function(pl){ keywords.forEach(function(kw){ jobs.push({pl:pl,kw:kw}); }); });
+  var total=jobs.length, done=0, allWorks=[], hotwords=[], cursor=0;
+  var CONCURRENCY=3;
+  function worker(){
+    function next(){
+      if(cursor>=jobs.length) return Promise.resolve();
+      var job=jobs[cursor++];
+      return _fetchWithRetry(p,k,job.pl,job.kw,2).then(function(data){
+        var list=data.list||[];
+        list.forEach(function(w){ var nw=normalizeWork(w,job.pl); nw._keyword=job.kw; allWorks.push(nw); });
+        hotwords.push({keyword:job.kw,platform:job.pl,total:data.total||list.length,works:list.length,avg_like:list.length?Math.round(list.reduce(function(a,w){return a+(w.likeCount||w.workLikedCount||0);},0)/list.length):0});
+      },function(e){
+        hotwords.push({keyword:job.kw,platform:job.pl,total:0,works:0,error:String(e.message||e)});
+      }).then(function(){
+        done++;
+        s.innerHTML='<span style="color:#a78bfa;">采集中 '+done+'/'+total+'：'+job.pl+' · '+job.kw+'</span>';
+        return next();
+      });
     }
+    return next();
   }
+  var pool=[];
+  for(var w=0;w<Math.min(CONCURRENCY,total);w++) pool.push(worker());
+  await Promise.all(pool);
 
-  if (allWorks.length === 0){
-    s.innerHTML='<span style="color:#f87171;">没有采到作品，请检查 Key / 中转地址 / 行业名是否正确</span>';
-    return;
-  }
+  collectionState.running=false;
+  if(btn){ btn.disabled=false; btn.style.opacity=''; btn.style.cursor=''; }
 
-  var dashboard = buildDashboardData(allWorks, hotwords, i);
-  localStorage.setItem('custom_cfg_'+i, JSON.stringify({
+  if(allWorks.length===0){ s.innerHTML='<span style="color:#f87171;">没有采到作品，请检查 Key / 中转地址 / 行业名是否正确</span>'; return; }
+
+  var dashboard=buildDashboardData(allWorks,hotwords,i);
+  localStorage.setItem('custom_cfg_'+i,JSON.stringify({
     id:'local', display_name:i, name:i, language:'zh',
     nav_labels:{hotspot:'热点追踪',breakdown:'爆款拆解',content:'内容创作',publish:'对标与发布'},
     nav_order:['hotspot','breakdown','content','publish'],
     theme:{primary:'#8b5cf6'}
   }));
-  localStorage.setItem('custom_data_'+i, JSON.stringify(dashboard));
-  var list = JSON.parse(localStorage.getItem('custom_industries')||'[]');
+  localStorage.setItem('custom_data_'+i,JSON.stringify(dashboard));
+  var list=JSON.parse(localStorage.getItem('custom_industries')||'[]');
   if(list.indexOf(i)<0) list.push(i);
-  localStorage.setItem('custom_industries', JSON.stringify(list));
-  refreshIndustryDropdown();
+  localStorage.setItem('custom_industries',JSON.stringify(list));
 
-  s.innerHTML='<span style="color:#30d158;">采集完成！共 '+allWorks.length+' 条作品，正在跳转...</span>';
-  setTimeout(function(){ window.location.href = window.location.pathname + '?ind=local:' + encodeURIComponent(i); }, 1200);
+  // 记录本地历史快照（用于趋势图）
+  try{
+    var hist=window.NS.get('collect_history',[])||[];
+    var nW=allWorks.length;
+    hist.push({
+      date:new Date().toISOString().slice(0,10),
+      avg_likes:Math.round(allWorks.reduce(function(a,ww){return a+(ww.likeCount||0);},0)/(nW||1)),
+      avg_comments:Math.round(allWorks.reduce(function(a,ww){return a+(ww.commentCount||0);},0)/(nW||1)),
+      works_count:nW,
+      max_likes:Math.max.apply(null,allWorks.map(function(ww){return ww.likeCount||0;}))
+    });
+    window.NS.set('collect_history',hist);
+  }catch(e){ window.AppErrorHandler.handle(e,'collect.history'); }
+
+  refreshIndustryDropdown();
+  s.innerHTML='<span style="color:#30d158;">采集完成！共 '+allWorks.length+' 条作品，正在跳转…</span>';
+  setTimeout(function(){ switchIndustryContext('local:'+i); },1200);
 }
 
 function switchIndustry(){
   var i = document.getElementById('switchIndustryInput').value.trim();
   if(!i) return;
-  window.location.href = window.location.pathname + '?ind=' + encodeURIComponent(i);
+  switchIndustryContext(i);
 }
 
 function refreshIndustryDropdown(){
   var sel = document.getElementById('switchIndustryInput');
   if(!sel) return;
-  var cur = (location.search.match(/ind=([^&]+)/)||[])[1] || 'ai';
+  var cur = window.parseIndustryContext().id;
   // 保留内置项
   var html = '<option value="ai">AI 热点追踪</option><option value="shufa">书法 · 墨上花开</option>';
   var list = JSON.parse(localStorage.getItem('custom_industries')||'[]');
@@ -1449,43 +1503,50 @@ refreshIndustryDropdown();
 <script>
 // 采集数据趋势
 async function loadCollectTrend() {
-  try {
-    const ind = new URLSearchParams(location.search).get('ind') || 'ai';
-    const resp = await fetch('../industries/'+ind+'/history/index.json');
-    if (!resp.ok) { document.getElementById('collectTrendInfo').textContent = '首次采集中，明日可见趋势'; return; }
-    const snapshots = await resp.json();
-    if (!snapshots || snapshots.length < 1) {
-      document.getElementById('collectTrendInfo').textContent = '等待更多快照数据';
-      return;
-    }
-    snapshots.sort((a,b) => a.date.localeCompare(b.date));
-    const dates = snapshots.map(s => s.date.slice(5));
-    const likes = snapshots.map(s => s.avg_likes);
-    const comments = snapshots.map(s => s.avg_comments);
-    const works = snapshots.map(s => s.works_count);
-
-    // 简单折线图
+  var info = document.getElementById('collectTrendInfo');
+  function paint(snapshots){
+    if (!snapshots || snapshots.length < 1) { info.textContent = '等待更多快照数据'; return; }
+    snapshots.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+    const dates = snapshots.map(s=>String(s.date).slice(5));
+    const likes = snapshots.map(s=>s.avg_likes);
+    const comments = snapshots.map(s=>s.avg_comments);
+    const works = snapshots.map(s=>s.works_count);
     const el = document.getElementById('chartCollectTrend');
     el.innerHTML = '';
-    if (typeof echarts !== 'undefined') {
-      echarts.init(el).setOption({
-        grid: {left:40,right:20,top:30,bottom:25},
-        tooltip: {trigger:'axis'},
-        legend: {data:['均赞','均评论','作品数'],textStyle:{color:'#94a3b8',fontSize:10},top:0},
-        xAxis: {type:'category',data:dates,axisLabel:{color:'#94a3b8',fontSize:10}},
-        yAxis: {type:'value',axisLabel:{color:'#94a3b8',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.05)'}}},
-        series: [
-          {name:'均赞',type:'line',data:likes,smooth:true,itemStyle:{color:'#8b5cf6'}},
-          {name:'均评论',type:'line',data:comments,smooth:true,itemStyle:{color:'#30D158'}},
-          {name:'作品数',type:'line',data:works,smooth:true,itemStyle:{color:'#fbbf24'}}
-        ]
-      });
+    if (typeof echarts !== 'undefined' && el) {
+      try {
+        echarts.init(el).setOption({
+          grid: {left:40,right:20,top:30,bottom:25},
+          tooltip: {trigger:'axis'},
+          legend: {data:['均赞','均评论','作品数'],textStyle:{color:'#94a3b8',fontSize:10},top:0},
+          xAxis: {type:'category',data:dates,axisLabel:{color:'#94a3b8',fontSize:10}},
+          yAxis: {type:'value',axisLabel:{color:'#94a3b8',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.05)'}}},
+          series: [
+            {name:'均赞',type:'line',data:likes,smooth:true,itemStyle:{color:'#8b5cf6'}},
+            {name:'均评论',type:'line',data:comments,smooth:true,itemStyle:{color:'#30D158'}},
+            {name:'作品数',type:'line',data:works,smooth:true,itemStyle:{color:'#fbbf24'}}
+          ]
+        });
+      } catch(e){ AppErrorHandler.handle(e,'trend.chart'); }
     }
     const latest = snapshots[snapshots.length-1];
-    document.getElementById('collectTrendInfo').innerHTML =
-      '最新 '+latest.date.slice(5)+' · '+latest.works_count+' 条作品 · 均赞 '+latest.avg_likes+' · 最高赞 '+latest.max_likes;
+    info.innerHTML = '最新 '+String(latest.date).slice(5)+' · '+latest.works_count+' 条作品 · 均赞 '+latest.avg_likes+' · 最高赞 '+latest.max_likes;
+  }
+  try {
+    const tctx = window.parseIndustryContext();
+    if (tctx.type === 'local') {
+      // local 行业无静态 history：读本地采集快照，否则提示，不发起必然 404 的请求
+      const hist = window.NS.get('collect_history', []) || [];
+      if (!hist.length) { info.textContent = '暂无历史采集数据（每次采集后自动记录趋势）'; return; }
+      paint(hist);
+      return;
+    }
+    const resp = await fetch('../industries/'+tctx.id+'/history/index.json');
+    if (!resp.ok) { info.textContent = '首次采集中，明日可见趋势'; return; }
+    paint(await resp.json());
   } catch(e) {
-    document.getElementById('collectTrendInfo').textContent = '趋势数据加载中...';
+    info.textContent = '趋势数据加载中...';
+    AppErrorHandler.handle(e,'loadCollectTrend');
   }
 }
 loadCollectTrend();
@@ -1584,344 +1645,6 @@ loadCollectTrend();
     }
     ac.style.display = 'block';
   }, 1500);
-
-<script>
-/* ===== 卡片稳定层（防止换行业/数据缺失时卡片崩溃） ===== */
-(function(){
-  'use strict';
-
-  // 只在 local: 自定义行业生效；AI/书法等 config 驱动行业保持原生行为
-  var isLocalIndustry = /ind=local%3A/.test(location.search) || /ind=local:/.test(decodeURIComponent(location.search));
-  if (!isLocalIndustry) {
-    // 非 local 行业：稳定层完全不干预
-    window.__stableLayerDisabled = true;
-    return;
-  }
-
-  // 1. 数据契约：所有字段默认值，渲染前补齐，杜绝 undefined
-  var FIELD_DEFAULTS = {
-    works: [], hotwords: [], topics: [], viral_genes: {},
-    title_formulas: [], title_formulas_array: [], publish_time_dist: [],
-    saturation: [], daily_actions: [], blue_ocean_list: [], growth_ranking: [],
-    tech_signals: [], audience_personas: [], comment_scripts: [], format_roi: [],
-    competitor_list: [], comment_semantic: [], conversion_signals: [],
-    cross_platform: [], launch_ops: [], pitfall_list: [], topic_performance: {},
-    content_formats_dist: [], content_format_dist: [], summary: {}
-  };
-
-  window.normalizeDataContract = function(){
-    var D = window.DASHBOARD_DATA;
-    if (!D) return;
-    Object.keys(FIELD_DEFAULTS).forEach(function(k){
-      if (D[k] === undefined || D[k] === null) {
-        var def = FIELD_DEFAULTS[k];
-        D[k] = Array.isArray(def) ? [] : (typeof def === 'object' ? {} : def);
-      }
-    });
-    // hotwords 每项补安全字段
-    (D.hotwords||[]).forEach(function(h){
-      if (h.max_like === undefined) h.max_like = 0;
-      if (h.collect_rate === undefined) h.collect_rate = 0;
-      if (!h.trend) h.trend = '稳定';
-      if (!h.category) h.category = '其他';
-    });
-    // viral_genes 对象补字段
-    if (D.viral_genes) {
-      if (!D.viral_genes.hook_distribution) D.viral_genes.hook_distribution = [];
-      if (!D.viral_genes.top_title_keywords) D.viral_genes.top_title_keywords = [];
-      if (!D.viral_genes.structure_examples) D.viral_genes.structure_examples = [];
-      if (D.viral_genes.sample_size === undefined) D.viral_genes.sample_size = (D.works||[]).length;
-      if (D.viral_genes.avg_title_length === undefined) D.viral_genes.avg_title_length = 20;
-    }
-  };
-
-  // 2. echarts 安全初始化：容器 0 尺寸时等待，不画在 0 尺寸上
-  if (window.echarts) {
-    var origInit = echarts.init.bind(echarts);
-    echarts.init = function(dom, theme, opts){
-      function ready(){
-        return dom && dom.offsetWidth > 10 && dom.offsetHeight > 10;
-      }
-      if (ready()) return origInit(dom, theme, opts);
-      // 容器还没尺寸，轮询等待
-      var tries = 0;
-      var timer = setInterval(function(){
-        tries++;
-        if (ready()) {
-          clearInterval(timer);
-          if (!echarts.getInstanceByDom(dom)) {
-            var inst = origInit(dom, theme, opts);
-            // 标记是延迟创建的
-            dom._delayedInit = true;
-          }
-        } else if (tries > 50) {
-          clearInterval(timer); // 10秒还没尺寸放弃
-        }
-      }, 200);
-      // 先返回一个占位，避免调用方报错
-      return origInit(dom, theme, opts);
-    };
-  }
-
-  // 3. 渲染守卫：包装 renderAll，渲染前 normalize + 失败显示空状态而非白屏
-  var origRenderAll = window.renderAll;
-  window.renderAll = function(){
-    try { window.normalizeDataContract(); } catch(e){ console.warn('normalize err', e); }
-    if (typeof origRenderAll === 'function') {
-      try { origRenderAll(); } catch(e){ console.error('renderAll err', e); }
-    }
-    // 渲染后体检：找显示中的空 section，补空状态提示
-    setTimeout(function(){
-      document.querySelectorAll('.section').forEach(function(sec){
-        if (getComputedStyle(sec).display === 'none') return;
-        if (sec.id === 'settingsPanel' || sec.id === 'compareSection') return;
-        var text = sec.textContent.replace(/\s+/g,'').trim();
-        // 有标题但正文几乎为空
-        var title = sec.querySelector('.section-title, h2, h3');
-        var titleLen = title ? title.textContent.replace(/\s+/g,'').length : 0;
-        if (text.length - titleLen < 8) {
-          var holder = sec.querySelector('[id$="List"],[id$="Content"],[id$="Chart"],.bento,.glass-card');
-          if (holder && !holder.dataset.stableFilled) {
-            holder.dataset.stableFilled = '1';
-            holder.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-secondary,#9ca3af);font-size:13px;line-height:1.8;">📊 该卡片数据采集中或暂无数据<br><span style="font-size:11px;opacity:0.7;">重新采集本行业后自动填充</span></div>';
-          }
-        }
-      });
-      // echarts 延迟实例 resize
-      document.querySelectorAll('[id^="chart"]').forEach(function(el){
-        var inst = window.echarts && echarts.getInstanceByDom ? echarts.getInstanceByDom(el) : null;
-        if (inst) { try { inst.resize(); } catch(e){} }
-      });
-    }, 600);
-  };
-
-  // 4. 全局错误兜底：单个脚本错误不白屏
-  window.addEventListener('error', function(e){
-    console.warn('[stable] caught:', e.message);
-  });
-})();
-</script>
-
-
-<script>
-/* ===== 卡片稳定层（防止换行业/数据缺失时卡片崩溃） ===== */
-(function(){
-  'use strict';
-
-  // 1. 数据契约：所有字段默认值，渲染前补齐，杜绝 undefined
-  var FIELD_DEFAULTS = {
-    works: [], hotwords: [], topics: [], viral_genes: {},
-    title_formulas: [], title_formulas_array: [], publish_time_dist: [],
-    saturation: [], daily_actions: [], blue_ocean_list: [], growth_ranking: [],
-    tech_signals: [], audience_personas: [], comment_scripts: [], format_roi: [],
-    competitor_list: [], comment_semantic: [], conversion_signals: [],
-    cross_platform: [], launch_ops: [], pitfall_list: [], topic_performance: {},
-    content_formats_dist: [], content_format_dist: [], summary: {}
-  };
-
-  window.normalizeDataContract = function(){
-    var D = window.DASHBOARD_DATA;
-    if (!D) return;
-    Object.keys(FIELD_DEFAULTS).forEach(function(k){
-      if (D[k] === undefined || D[k] === null) {
-        var def = FIELD_DEFAULTS[k];
-        D[k] = Array.isArray(def) ? [] : (typeof def === 'object' ? {} : def);
-      }
-    });
-    // hotwords 每项补安全字段
-    (D.hotwords||[]).forEach(function(h){
-      if (h.max_like === undefined) h.max_like = 0;
-      if (h.collect_rate === undefined) h.collect_rate = 0;
-      if (!h.trend) h.trend = '稳定';
-      if (!h.category) h.category = '其他';
-    });
-    // viral_genes 对象补字段
-    if (D.viral_genes) {
-      if (!D.viral_genes.hook_distribution) D.viral_genes.hook_distribution = [];
-      if (!D.viral_genes.top_title_keywords) D.viral_genes.top_title_keywords = [];
-      if (!D.viral_genes.structure_examples) D.viral_genes.structure_examples = [];
-      if (D.viral_genes.sample_size === undefined) D.viral_genes.sample_size = (D.works||[]).length;
-      if (D.viral_genes.avg_title_length === undefined) D.viral_genes.avg_title_length = 20;
-    }
-  };
-
-  // 2. echarts 安全初始化：容器 0 尺寸时等待，不画在 0 尺寸上
-  if (window.echarts) {
-    var origInit = echarts.init.bind(echarts);
-    echarts.init = function(dom, theme, opts){
-      function ready(){
-        return dom && dom.offsetWidth > 10 && dom.offsetHeight > 10;
-      }
-      if (ready()) return origInit(dom, theme, opts);
-      // 容器还没尺寸，轮询等待
-      var tries = 0;
-      var timer = setInterval(function(){
-        tries++;
-        if (ready()) {
-          clearInterval(timer);
-          if (!echarts.getInstanceByDom(dom)) {
-            var inst = origInit(dom, theme, opts);
-            // 标记是延迟创建的
-            dom._delayedInit = true;
-          }
-        } else if (tries > 50) {
-          clearInterval(timer); // 10秒还没尺寸放弃
-        }
-      }, 200);
-      // 先返回一个占位，避免调用方报错
-      return origInit(dom, theme, opts);
-    };
-  }
-
-  // 3. 渲染守卫：包装 renderAll，渲染前 normalize + 失败显示空状态而非白屏
-  var origRenderAll = window.renderAll;
-  window.renderAll = function(){
-    try { window.normalizeDataContract(); } catch(e){ console.warn('normalize err', e); }
-    if (typeof origRenderAll === 'function') {
-      try { origRenderAll(); } catch(e){ console.error('renderAll err', e); }
-    }
-    // 渲染后体检：找显示中的空 section，补空状态提示
-    setTimeout(function(){
-      document.querySelectorAll('.section').forEach(function(sec){
-        if (getComputedStyle(sec).display === 'none') return;
-        if (sec.id === 'settingsPanel' || sec.id === 'compareSection') return;
-        var text = sec.textContent.replace(/\s+/g,'').trim();
-        // 有标题但正文几乎为空
-        var title = sec.querySelector('.section-title, h2, h3');
-        var titleLen = title ? title.textContent.replace(/\s+/g,'').length : 0;
-        if (text.length - titleLen < 8) {
-          var holder = sec.querySelector('[id$="List"],[id$="Content"],[id$="Chart"],.bento,.glass-card');
-          if (holder && !holder.dataset.stableFilled) {
-            holder.dataset.stableFilled = '1';
-            holder.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-secondary,#9ca3af);font-size:13px;line-height:1.8;">📊 该卡片数据采集中或暂无数据<br><span style="font-size:11px;opacity:0.7;">重新采集本行业后自动填充</span></div>';
-          }
-        }
-      });
-      // echarts 延迟实例 resize
-      document.querySelectorAll('[id^="chart"]').forEach(function(el){
-        var inst = window.echarts && echarts.getInstanceByDom ? echarts.getInstanceByDom(el) : null;
-        if (inst) { try { inst.resize(); } catch(e){} }
-      });
-    }, 600);
-  };
-
-  // 4. 全局错误兜底：单个脚本错误不白屏
-  window.addEventListener('error', function(e){
-    console.warn('[stable] caught:', e.message);
-  });
-})();
-</script>
-
-
-<script>
-/* ===== 卡片稳定层（防止换行业/数据缺失时卡片崩溃） ===== */
-(function(){
-  'use strict';
-
-  // 1. 数据契约：所有字段默认值，渲染前补齐，杜绝 undefined
-  var FIELD_DEFAULTS = {
-    works: [], hotwords: [], topics: [], viral_genes: {},
-    title_formulas: [], title_formulas_array: [], publish_time_dist: [],
-    saturation: [], daily_actions: [], blue_ocean_list: [], growth_ranking: [],
-    tech_signals: [], audience_personas: [], comment_scripts: [], format_roi: [],
-    competitor_list: [], comment_semantic: [], conversion_signals: [],
-    cross_platform: [], launch_ops: [], pitfall_list: [], topic_performance: {},
-    content_formats_dist: [], content_format_dist: [], summary: {}
-  };
-
-  window.normalizeDataContract = function(){
-    var D = window.DASHBOARD_DATA;
-    if (!D) return;
-    Object.keys(FIELD_DEFAULTS).forEach(function(k){
-      if (D[k] === undefined || D[k] === null) {
-        var def = FIELD_DEFAULTS[k];
-        D[k] = Array.isArray(def) ? [] : (typeof def === 'object' ? {} : def);
-      }
-    });
-    // hotwords 每项补安全字段
-    (D.hotwords||[]).forEach(function(h){
-      if (h.max_like === undefined) h.max_like = 0;
-      if (h.collect_rate === undefined) h.collect_rate = 0;
-      if (!h.trend) h.trend = '稳定';
-      if (!h.category) h.category = '其他';
-    });
-    // viral_genes 对象补字段
-    if (D.viral_genes) {
-      if (!D.viral_genes.hook_distribution) D.viral_genes.hook_distribution = [];
-      if (!D.viral_genes.top_title_keywords) D.viral_genes.top_title_keywords = [];
-      if (!D.viral_genes.structure_examples) D.viral_genes.structure_examples = [];
-      if (D.viral_genes.sample_size === undefined) D.viral_genes.sample_size = (D.works||[]).length;
-      if (D.viral_genes.avg_title_length === undefined) D.viral_genes.avg_title_length = 20;
-    }
-  };
-
-  // 2. echarts 安全初始化：容器 0 尺寸时等待，不画在 0 尺寸上
-  if (window.echarts) {
-    var origInit = echarts.init.bind(echarts);
-    echarts.init = function(dom, theme, opts){
-      function ready(){
-        return dom && dom.offsetWidth > 10 && dom.offsetHeight > 10;
-      }
-      if (ready()) return origInit(dom, theme, opts);
-      // 容器还没尺寸，轮询等待
-      var tries = 0;
-      var timer = setInterval(function(){
-        tries++;
-        if (ready()) {
-          clearInterval(timer);
-          if (!echarts.getInstanceByDom(dom)) {
-            var inst = origInit(dom, theme, opts);
-            // 标记是延迟创建的
-            dom._delayedInit = true;
-          }
-        } else if (tries > 50) {
-          clearInterval(timer); // 10秒还没尺寸放弃
-        }
-      }, 200);
-      // 先返回一个占位，避免调用方报错
-      return origInit(dom, theme, opts);
-    };
-  }
-
-  // 3. 渲染守卫：包装 renderAll，渲染前 normalize + 失败显示空状态而非白屏
-  var origRenderAll = window.renderAll;
-  window.renderAll = function(){
-    try { window.normalizeDataContract(); } catch(e){ console.warn('normalize err', e); }
-    if (typeof origRenderAll === 'function') {
-      try { origRenderAll(); } catch(e){ console.error('renderAll err', e); }
-    }
-    // 渲染后体检：找显示中的空 section，补空状态提示
-    setTimeout(function(){
-      document.querySelectorAll('.section').forEach(function(sec){
-        if (getComputedStyle(sec).display === 'none') return;
-        if (sec.id === 'settingsPanel' || sec.id === 'compareSection') return;
-        var text = sec.textContent.replace(/\s+/g,'').trim();
-        // 有标题但正文几乎为空
-        var title = sec.querySelector('.section-title, h2, h3');
-        var titleLen = title ? title.textContent.replace(/\s+/g,'').length : 0;
-        if (text.length - titleLen < 8) {
-          var holder = sec.querySelector('[id$="List"],[id$="Content"],[id$="Chart"],.bento,.glass-card');
-          if (holder && !holder.dataset.stableFilled) {
-            holder.dataset.stableFilled = '1';
-            holder.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-secondary,#9ca3af);font-size:13px;line-height:1.8;">📊 该卡片数据采集中或暂无数据<br><span style="font-size:11px;opacity:0.7;">重新采集本行业后自动填充</span></div>';
-          }
-        }
-      });
-      // echarts 延迟实例 resize
-      document.querySelectorAll('[id^="chart"]').forEach(function(el){
-        var inst = window.echarts && echarts.getInstanceByDom ? echarts.getInstanceByDom(el) : null;
-        if (inst) { try { inst.resize(); } catch(e){} }
-      });
-    }, 600);
-  };
-
-  // 4. 全局错误兜底：单个脚本错误不白屏
-  window.addEventListener('error', function(e){
-    console.warn('[stable] caught:', e.message);
-  });
-})();
-</script>
-
 
 <script>
 /* ===== DOM 归一化层：修正卡片错位，根治点A显B ===== */
