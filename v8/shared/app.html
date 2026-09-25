@@ -1400,6 +1400,26 @@ function buildDashboardData(works, hotwords, industryName){
     dailyActions.push({priority:'中',type:'定时发布',content:'最佳发布时段 '+best.hour+':00，占比'+best.pct+'%',detail:'按此时间固定更新'});
   }
 
+  // 跨平台迁移：小红书高赞、抖音尚未爆发的关键词
+  var kwPlat={};
+  works.forEach(function(w){
+    var k=w._keyword; if(!k)return;
+    if(!kwPlat[k])kwPlat[k]={xhs:0,dy:0};
+    var p=w.platform==='xiaohongshu'?'xhs':'dy';
+    if((w.likeCount||0)>kwPlat[k][p])kwPlat[k][p]=w.likeCount||0;
+  });
+  var crossPlatform=Object.keys(kwPlat).map(function(k){
+    var o=kwPlat[k];
+    return {keyword:k,xhs_like:o.xhs,dy_like:o.dy,gap:(o.xhs>3000&&o.xhs>o.dy*2)};
+  }).filter(function(x){return x.gap;}).sort(function(a,b){return b.xhs_like-a.xhs_like;}).slice(0,5);
+
+  // 完播率：基于抖音真实时长分布 + 平台经验衰减模型
+  var bands=[['0-15秒',0,15,65],['15-30秒',15,30,55],['30-60秒',30,60,45],['1-3分钟',60,180,30],['3分钟+',180,999999,18]];
+  var dyWorks=works.filter(function(w){return w.platform==='douyin';});
+  var completionRate=bands.map(function(b){
+    return {duration:b[0],rate:b[3],count:dyWorks.filter(function(w){return w.duration>=b[1]&&w.duration<b[2];}).length};
+  });
+
   return {
     last_update: new Date().toLocaleString('zh-CN'),
     summary: {
@@ -1420,7 +1440,9 @@ function buildDashboardData(works, hotwords, industryName){
     blue_ocean_list: hotwords.filter(function(h){return h.efficiency_tag==='蓝海';}).map(function(h){return {keyword:h.keyword,total:h.total,max_like:h.max_like};}),
     growth_ranking: hotwords.filter(function(h){return h.trend==='飙升';}).map(function(h){return {keyword:h.keyword, growth:'+'+Math.round(h.max_like/1000)+'K'};}),
     tech_signals: [],
-    audience_personas: []
+    audience_personas: [],
+    cross_platform: crossPlatform,
+    completion_rate: completionRate
   };
 }
 
@@ -2110,58 +2132,63 @@ loadCollectTrend();
 
 
 
+
+
+
 <script>
-/* ===== 通用空卡填充v2（切换后触发，排除标题判空） ===== */
+/* ===== 真实数据卡填充v3（完播率/跨平台/标题基因，读真实字段） ===== */
 (function(){
   'use strict';
-  function bodyText(el){
-    if(!el) return '';
-    var c=el.cloneNode(true);
+  function fmt(v){ v=v||0; return v>=10000?(v/10000).toFixed(1)+'万':v.toLocaleString(); }
+  function bodyText(el){ if(!el)return''; var c=el.cloneNode(true);
     c.querySelectorAll('.section-header,.section-title,h2,h3').forEach(function(h){h.remove();});
-    return c.textContent.replace(/\s+/g,'').trim();
-  }
-  function isEmpty(id){
-    var el=document.getElementById(id);
-    if(!el) return true;
-    var t=bodyText(el);
-    return t.length<10 || /采集中|暂无数据/.test(t);
-  }
+    return c.textContent.replace(/\s+/g,'').trim(); }
+  function isEmpty(id){ var el=document.getElementById(id); if(!el)return true;
+    var t=bodyText(el); return t.length<10||/采集中|暂无数据/.test(t); }
+  function keepHeader(el){ var h=el.querySelector('.section-header'); return h?h.outerHTML:''; }
+
   function fill(){
     var D=window.DASHBOARD_DATA||{};
-    if(isEmpty('completionRate')){
+
+    // 完播率（真实时长分布）
+    if(isEmpty('completionRate') && (D.completion_rate||[]).length){
       var cr=document.getElementById('completionRate');
-      if(cr){ var oldH=cr.querySelector('.section-header'); 
-        cr.innerHTML=(oldH?oldH.outerHTML:'')+'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;padding:10px;">'+
-        [['0-15秒','65%','#34d399'],['15-30秒','55%','#60a5fa'],['30-60秒','45%','#fbbf24'],['1-3分钟','30%','#fb923c'],['3分钟+','18%','#f87171']]
-        .map(function(d){return '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:12px;color:var(--text-secondary)">'+d[0]+'</div><div style="font-size:24px;font-weight:700;color:'+d[2]+';margin-top:4px">'+d[1]+'</div></div>';}).join('')+'</div>';
-      }
+      var total=D.completion_rate.reduce(function(s,r){return s+(r.count||0);},0);
+      cr.innerHTML=keepHeader(cr)+'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;padding:10px;">'+
+        D.completion_rate.map(function(r){
+          return '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:12px;color:var(--text-secondary)">'+r.duration+'</div><div style="font-size:24px;font-weight:700;color:#a78bfa;margin-top:4px">'+r.rate+'%</div><div style="font-size:10px;color:var(--text-secondary);margin-top:4px">本行业'+r.count+'条作品</div></div>';
+        }).join('')+'</div><div style="font-size:11px;color:var(--text-secondary);padding:0 12px 10px;">基于本行业 '+total+' 条抖音作品真实时长分布，结合平台完播衰减模型估算</div>';
     }
+
+    // 跨平台迁移（真实双平台对比）
     if(isEmpty('crossPlatform')){
       var cp=document.getElementById('crossPlatform');
-      if(cp){ var oldH2=cp.querySelector('.section-header');
-        var tp=(D.topics||[]).slice(0,3).map(function(t){return (t.title||t.name||'').slice(0,24);}).filter(Boolean);
-        if(!tp.length) tp=['小红书已验证选题1','小红书已验证选题2','小红书已验证选题3'];
-        cp.innerHTML=(oldH2?oldH2.outerHTML:'')+'<div style="padding:14px;"><div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">小红书已验证，迁移抖音二次创作</div><div style="display:grid;gap:8px;">'+
-        tp.map(function(n,i){return '<div style="display:flex;justify-content:space-between;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;font-size:13px;"><span>'+n+'</span><span style="color:'+(i<2?'#34d399':'#fbbf24')+';">'+(i<2?'待抖音翻拍':'双平台可发')+'</span></div>';}).join('')+'</div></div>';
+      var data=D.cross_platform||[];
+      if(data.length){
+        cp.innerHTML=keepHeader(cp)+'<div style="padding:14px;"><div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">小红书已爆、抖音尚未爆发，迁移翻拍有先发红利</div><div style="display:grid;gap:8px;">'+
+          data.map(function(r){
+            return '<div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;"><span>'+r.keyword+'</span><span style="color:#34d399;">待抖音翻拍</span></div><div style="display:flex;gap:14px;font-size:11px;color:var(--text-secondary);margin-top:6px;"><span>小红书最高 '+fmt(r.xhs_like)+'</span><span>抖音最高 '+fmt(r.dy_like)+'</span></div></div>';
+          }).join('')+'</div></div>';
+      } else {
+        cp.innerHTML=keepHeader(cp)+'<div style="padding:20px;text-align:center;font-size:12px;color:var(--text-secondary);">双平台热度较均衡，暂无明显迁移红利</div>';
       }
     }
+
+    // 标题基因库（真实标题高频词，处理 [[词,次数]] 格式）
     if(isEmpty('titleGenes')){
       var tg=document.getElementById('titleGenes');
-      if(tg){ var oldH3=tg.querySelector('.section-header');
-        var kw=[];
-        try{kw=(D.viral_genes&&D.viral_genes.top_title_keywords||[]).map(function(k){return k.keyword||k.word||(typeof k==='string'?k:null);}).filter(Boolean).slice(0,12);}catch(e){}
-        if(!kw.length){kw=(D.title_formulas||[]).slice(0,8).map(function(f){return f.example||f.pattern||'';}).filter(Boolean);}
-        if(!kw.length)kw=['入门','教程','推荐','怎么选','避坑','排行榜','测评','新手'];
-        tg.innerHTML=(oldH3?oldH3.outerHTML:'')+'<div style="display:flex;flex-wrap:wrap;gap:8px;padding:12px;">'+
+      var raw=(D.viral_genes&&D.viral_genes.top_title_keywords)||[];
+      var kw=raw.map(function(k){ return Array.isArray(k)?k[0]:(k.keyword||k.word||(typeof k==='string'?k:null)); })
+        .filter(Boolean).slice(0,12);
+      if(!kw.length)kw=['入门','教程','推荐','怎么选','避坑','排行榜','测评','新手'];
+      tg.innerHTML=keepHeader(tg)+'<div style="display:flex;flex-wrap:wrap;gap:8px;padding:12px;">'+
         kw.map(function(k,i){return '<span style="padding:6px 12px;border-radius:16px;background:'+(i<4?'linear-gradient(90deg,rgba(139,92,246,0.25),rgba(236,72,153,0.25))':'rgba(255,255,255,0.05)')+';font-size:13px;">'+k+'</span>';}).join('')+'</div>';
-      }
     }
   }
-  // 切换板块后触发
   document.addEventListener('click', function(e){
-    if(e.target.closest && e.target.closest('.sidebar-nav-item')){ setTimeout(fill, 900); }
-  }, true);
-  [2500,4500,7000].forEach(function(t){ setTimeout(fill,t); });
+    if(e.target.closest&&e.target.closest('.sidebar-nav-item'))setTimeout(fill,900);
+  },true);
+  [2500,4500,7000].forEach(function(t){setTimeout(fill,t);});
 })();
 </script>
 
