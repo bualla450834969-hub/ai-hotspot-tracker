@@ -312,6 +312,13 @@ window.normalizeData = function() {
     return {keyword: b.keyword || b.name || '', demand: b.demand || '中', competition: b.competition || '低', score: b.score || 75};
   });
 
+  // 透传未显式规范化的字段，避免新增数据字段（如 best_posting_combo）在归一化时被丢弃
+  if (window.DATA && typeof window.DATA === 'object') {
+    Object.keys(window.DATA).forEach(function(k){
+      if (d[k] === undefined) d[k] = window.DATA[k];
+    });
+  }
+
   window.DATA = d;
 };
 window.normalizeData();
