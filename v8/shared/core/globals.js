@@ -53,27 +53,6 @@
     requestAnimationFrame(tick);
   };
 
-  // ===== renderAll — 重新渲染所有已注册模块 =====
-  window.renderAll = function() {
-    if (window.Module && window.Module.all) {
-      var data = window.DASHBOARD_DATA || window.DATA || {};
-      window.DATA = data; DATA = data;
-      window.Module.all().forEach(function(m) {
-        if (m.render) {
-          try {
-            var renderData = data;
-            if (m.requiredFields && m.requiredFields.length === 1) {
-              renderData = data[m.requiredFields[0]] || data;
-            }
-            m.render(renderData);
-          } catch (e) {
-            console.error('[renderAll:' + m.id + ']', e);
-          }
-        }
-      });
-    }
-  };
-
   // ===== applyFilter — 分类筛选 =====
   window.applyFilter = function() {
     var sel = document.getElementById('categoryFilter');
