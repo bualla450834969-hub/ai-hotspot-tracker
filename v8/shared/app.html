@@ -762,6 +762,15 @@ window.safeCall = function(fn, ctx) {
   if (CTX.type === 'local') {
     var cname = CTX.name;
     window.CURRENT_INDUSTRY = 'local';
+    // V8.1：cfg/domainGuard 提前到 try 之前定义，数据损坏提前 return 时仍可用，避免 "cfg is not defined"
+    window.cfg = function(path, defaultValue) {
+      if (!window.DOMAIN_CONFIG) return defaultValue;
+      var parts = path.split('.');
+      var obj = window.DOMAIN_CONFIG;
+      for (var i = 0; i < parts.length; i++) { if (obj == null || typeof obj !== 'object') return defaultValue; obj = obj[parts[i]]; }
+      return obj === undefined ? defaultValue : obj;
+    };
+    window.domainGuard = function(moduleId, renderFn) { return renderFn; };
     try {
       window.DOMAIN_CONFIG = JSON.parse(localStorage.getItem(CTX.configKey) || '{}');
       window.DASHBOARD_DATA = JSON.parse(localStorage.getItem(CTX.dataKey) || '{}');
@@ -774,14 +783,6 @@ window.safeCall = function(fn, ctx) {
       document.body.appendChild(_eb);
       return;
     }
-    window.cfg = function(path, defaultValue) {
-      if (!window.DOMAIN_CONFIG) return defaultValue;
-      var parts = path.split('.');
-      var obj = window.DOMAIN_CONFIG;
-      for (var i = 0; i < parts.length; i++) { if (obj == null || typeof obj !== 'object') return defaultValue; obj = obj[parts[i]]; }
-      return obj === undefined ? defaultValue : obj;
-    };
-    window.domainGuard = function(moduleId, renderFn) { return renderFn; };
     window.DATA = window.DASHBOARD_DATA;
     // 用最新聚合逻辑对已存作品重算，补全新增真实字段（兼容旧采集数据，无需重新采集）
     (function(){
@@ -1419,7 +1420,7 @@ async function startCollection(){
   var keywords=[i,i+'教程',i+'推荐',i+'怎么选',i+'避坑',i+'排行榜'];
   var jobs=[];
   platforms.forEach(function(pl){ keywords.forEach(function(kw){ jobs.push({pl:pl,kw:kw}); }); });
-  var total=jobs.length, done=0, allWorks=[], hotwords=[], cursor=0;
+  var total=jobs.length, done=0, allWorks=[], hotwords=[], cursor=0, failedKws=[];
   var CONCURRENCY=3;
   function worker(){
     function next(){
@@ -1430,7 +1431,7 @@ async function startCollection(){
         list.forEach(function(w){ var nw=normalizeWork(w,job.pl); nw._keyword=job.kw; allWorks.push(nw); });
         hotwords.push({keyword:job.kw,platform:job.pl,total:data.total||list.length,works:list.length,avg_like:list.length?Math.round(list.reduce(function(a,w){return a+(w.likeCount||w.workLikedCount||0);},0)/list.length):0});
       },function(e){
-        hotwords.push({keyword:job.kw,platform:job.pl,total:0,works:0,error:String(e.message||e)});
+        hotwords.push({keyword:job.kw,platform:job.pl,total:0,works:0,error:String(e.message||e)}); failedKws.push(job.kw);
       }).then(function(){
         done++;
         s.innerHTML='<span style="color:#a78bfa;">采集中 '+done+'/'+total+'：'+job.pl+' · '+job.kw+'</span>';
@@ -1475,7 +1476,8 @@ async function startCollection(){
   }catch(e){ window.AppErrorHandler.handle(e,'collect.history'); }
 
   refreshIndustryDropdown();
-  s.innerHTML='<span style="color:#30d158;">采集完成！共 '+allWorks.length+' 条作品，正在跳转…</span>';
+  var _cw = failedKws.length ? ' <span style="color:#fbbf24;">（'+failedKws.length+' 个关键词失败：'+failedKws.join('、')+'，可重新采集补全）</span>' : '';
+  s.innerHTML='<span style="color:#30d158;">采集完成！共 '+allWorks.length+' 条作品</span>'+_cw+'<span style="color:#94a3b8;">，正在跳转…</span>';
   setTimeout(function(){ switchIndustryContext('local:'+i); },1200);
 }
 
@@ -1504,48 +1506,58 @@ refreshIndustryDropdown();
 // 采集数据趋势
 async function loadCollectTrend() {
   var info = document.getElementById('collectTrendInfo');
+  var chartHost = document.getElementById('chartCollectTrend');
+  // 本页没有任何趋势容器（卡片已移除）：无需加载，直接退出，避免 null 解引用
+  if (!info && !chartHost) return;
+  function setInfo(html){ if (info) info.innerHTML = html; }
+  function num(v){ v = Number(v); return isFinite(v) ? v : 0; }
+
   function paint(snapshots){
-    if (!snapshots || snapshots.length < 1) { info.textContent = '等待更多快照数据'; return; }
+    // 兼容：单个快照对象 -> 包装为数组
+    if (snapshots && !Array.isArray(snapshots) && snapshots.date) snapshots = [snapshots];
+    if (!Array.isArray(snapshots) || snapshots.length < 1) { setInfo('等待更多快照数据'); return; }
     snapshots.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
-    const dates = snapshots.map(s=>String(s.date).slice(5));
-    const likes = snapshots.map(s=>s.avg_likes);
-    const comments = snapshots.map(s=>s.avg_comments);
-    const works = snapshots.map(s=>s.works_count);
-    const el = document.getElementById('chartCollectTrend');
-    el.innerHTML = '';
-    if (typeof echarts !== 'undefined' && el) {
-      try {
-        echarts.init(el).setOption({
-          grid: {left:40,right:20,top:30,bottom:25},
-          tooltip: {trigger:'axis'},
-          legend: {data:['均赞','均评论','作品数'],textStyle:{color:'#94a3b8',fontSize:10},top:0},
-          xAxis: {type:'category',data:dates,axisLabel:{color:'#94a3b8',fontSize:10}},
-          yAxis: {type:'value',axisLabel:{color:'#94a3b8',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.05)'}}},
-          series: [
-            {name:'均赞',type:'line',data:likes,smooth:true,itemStyle:{color:'#8b5cf6'}},
-            {name:'均评论',type:'line',data:comments,smooth:true,itemStyle:{color:'#30D158'}},
-            {name:'作品数',type:'line',data:works,smooth:true,itemStyle:{color:'#fbbf24'}}
-          ]
-        });
-      } catch(e){ AppErrorHandler.handle(e,'trend.chart'); }
+    const dates = snapshots.map(x=>String(x.date).slice(5));
+    const likes = snapshots.map(x=>num(x.avg_likes));
+    const comments = snapshots.map(x=>num(x.avg_comments));
+    const works = snapshots.map(x=>num(x.works_count));
+    if (chartHost) {
+      chartHost.innerHTML = '';
+      if (typeof echarts !== 'undefined') {
+        try {
+          echarts.init(chartHost).setOption({
+            grid: {left:40,right:20,top:30,bottom:25},
+            tooltip: {trigger:'axis'},
+            legend: {data:['均赞','均评论','作品数'],textStyle:{color:'#94a3b8',fontSize:10},top:0},
+            xAxis: {type:'category',data:dates,axisLabel:{color:'#94a3b8',fontSize:10}},
+            yAxis: {type:'value',axisLabel:{color:'#94a3b8',fontSize:10},splitLine:{lineStyle:{color:'rgba(255,255,255,0.05)'}}},
+            series: [
+              {name:'均赞',type:'line',data:likes,smooth:true,itemStyle:{color:'#8b5cf6'}},
+              {name:'均评论',type:'line',data:comments,smooth:true,itemStyle:{color:'#30D158'}},
+              {name:'作品数',type:'line',data:works,smooth:true,itemStyle:{color:'#fbbf24'}}
+            ]
+          });
+        } catch(e){ AppErrorHandler.handle(e,'trend.chart'); }
+      }
     }
     const latest = snapshots[snapshots.length-1];
-    info.innerHTML = '最新 '+String(latest.date).slice(5)+' · '+latest.works_count+' 条作品 · 均赞 '+latest.avg_likes+' · 最高赞 '+latest.max_likes;
+    setInfo('最新 '+String(latest.date).slice(5)+' · '+num(latest.works_count)+' 条作品 · 均赞 '+num(latest.avg_likes)+' · 最高赞 '+num(latest.max_likes));
   }
+
   try {
     const tctx = window.parseIndustryContext();
     if (tctx.type === 'local') {
       // local 行业无静态 history：读本地采集快照，否则提示，不发起必然 404 的请求
       const hist = window.NS.get('collect_history', []) || [];
-      if (!hist.length) { info.textContent = '暂无历史采集数据（每次采集后自动记录趋势）'; return; }
+      if (!hist.length) { setInfo('暂无历史采集数据（每次采集后自动记录趋势）'); return; }
       paint(hist);
       return;
     }
     const resp = await fetch('../industries/'+tctx.id+'/history/index.json');
-    if (!resp.ok) { info.textContent = '首次采集中，明日可见趋势'; return; }
+    if (!resp.ok) { setInfo('首次采集中，明日可见趋势'); return; }
     paint(await resp.json());
   } catch(e) {
-    info.textContent = '趋势数据加载中...';
+    setInfo('趋势数据加载中...');
     AppErrorHandler.handle(e,'loadCollectTrend');
   }
 }
@@ -1645,7 +1657,7 @@ loadCollectTrend();
     }
     ac.style.display = 'block';
   }, 1500);
-
+</script>
 <script>
 /* ===== DOM 归一化层：修正卡片错位，根治点A显B ===== */
 (function(){
