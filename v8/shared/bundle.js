@@ -65,6 +65,47 @@ window.normalizeData = function() {
       };
     });
   }
+  // 无 hot_breakdowns 时，基于真实作品通用生成爆款拆解（任何行业通用）
+  if (!Array.isArray(d.hot_breakdowns) || !d.hot_breakdowns.length) {
+    var _ind0 = (d.summary && d.summary.industry) || '该领域';
+    var _topW = (d.works || []).slice().sort(function(a,b){return (b.likeCount||0)-(a.likeCount||0);}).slice(0,6);
+    d.hot_breakdowns = _topW.map(function(w){
+      var dur = w.duration || 0;
+      var durTxt = dur >= 60 ? Math.floor(dur/60)+'分'+(dur%60)+'秒' : dur+'秒';
+      var title = w.title || '';
+      var hook = '普通';
+      if (/避坑|千万别|踩坑|警告|注意/.test(title)) hook='避坑预警';
+      else if (/震惊|没想到|居然|竟然|原来/.test(title)) hook='情感共鸣';
+      else if (/\d|技巧|清单/.test(title)) hook='数字清单';
+      else if (/效果|成品|展示|成果/.test(title)) hook='效果展示';
+      var structure = dur > 180 ? '长视频深度教学（开场钩子→分步演示→成品展示→总结引导）'
+                                : '短视频快节奏（黄金3秒钩子→核心演示→结尾引导）';
+      return {
+        title: title, likes: w.likeCount || 0, hook: hook, structure: structure,
+        cta: '评论区引导（求教程/扣1/关注追更）',
+        target_persona: {name: _ind0+'受众', age: '', needs: ['教程','避坑']},
+        author: w.accountName || '', duration: durTxt,
+        interaction: '赞'+(w.likeCount||0)+' 评'+(w.commentCount||0),
+        work_url: w.workUrl || '', cover: w.cover || '', keyword: w._keyword || ''
+      };
+    });
+  }
+  // 无 keyword_matrix 时，按采集关键词聚合生成赛道矩阵（任何行业通用）
+  if (!Array.isArray(d.keyword_matrix) || !d.keyword_matrix.length) {
+    var _ind1 = (d.summary && d.summary.industry) || '综合';
+    var groups = {};
+    (d.works || []).forEach(function(w){
+      var k = w._keyword || _ind1;
+      if (!groups[k]) groups[k] = {n:0, max:0};
+      groups[k].n++;
+      if ((w.likeCount||0) > groups[k].max) groups[k].max = w.likeCount||0;
+    });
+    d.keyword_matrix = Object.keys(groups).map(function(k){
+      var total = groups[k].n;
+      var level = total>=20 ? '超热词' : total>=10 ? '热门词' : total>=5 ? '上升词' : '蓝海词';
+      return {category:k, level:level, count:1, total:total, max_like:groups[k].max, keywords:[k]};
+    }).sort(function(a,b){return b.total-a.total;}).slice(0,8);
+  }
   if (d.comment_semantic && Array.isArray(d.comment_semantic.themes)) {
     d.comment_semantic.themes = d.comment_semantic.themes.map(function(t) {
       return {name: t.name || t.theme || '', count: t.count || 0, sentiment: t.sentiment || 'neutral'};
