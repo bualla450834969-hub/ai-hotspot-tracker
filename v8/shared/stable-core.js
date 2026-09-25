@@ -246,13 +246,22 @@
   }
   window.patchEcharts = patchEcharts;
 
-  // echarts 由 CDN defer 加载并赋值给 window.echarts —— 拦截赋值即自动 patch
+  // echarts 由 CDN（UMD）加载。UMD 会先执行 `window.echarts = {}` 再由 factory 往该
+  // 对象上填充 init 等方法，故不能只在"赋值瞬间"patch（那时还是无 init 的空对象）。
+  // 改为：set 仅存引用；get（首次真正使用 echarts）时检测到已完整再懒 patch。
   var _ec;
+  function _ensureEc() {
+    if (_ec && typeof _ec.init === 'function' && !_ec.__patched) patchEcharts(_ec);
+    return _ec;
+  }
   try {
     Object.defineProperty(window, 'echarts', {
       configurable: true,
-      get: function () { return _ec; },
-      set: function (v) { _ec = (v && typeof v.init === 'function') ? patchEcharts(v) : v; }
+      get: _ensureEc,
+      set: function (v) {
+        _ec = v;
+        if (v && typeof v.init === 'function' && !v.__patched) patchEcharts(v);
+      }
     });
   } catch (e) {
     if (window.echarts) patchEcharts(window.echarts);
