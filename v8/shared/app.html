@@ -1646,6 +1646,14 @@ loadCollectTrend();
 (function(){
   'use strict';
 
+  // 只在 local: 自定义行业生效；AI/书法等 config 驱动行业保持原生行为
+  var isLocalIndustry = /ind=local%3A/.test(location.search) || /ind=local:/.test(decodeURIComponent(location.search));
+  if (!isLocalIndustry) {
+    // 非 local 行业：稳定层完全不干预
+    window.__stableLayerDisabled = true;
+    return;
+  }
+
   // 1. 数据契约：所有字段默认值，渲染前补齐，杜绝 undefined
   var FIELD_DEFAULTS = {
     works: [], hotwords: [], topics: [], viral_genes: {},
