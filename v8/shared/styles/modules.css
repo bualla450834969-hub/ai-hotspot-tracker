@@ -1644,6 +1644,48 @@ body[data-reveal="0"] section {
 .export-btn { padding: 4px 12px; background: rgba(139,92,246,0.15); border: 1px solid rgba(139,92,246,0.3); border-radius: 6px; color: #a78bfa; font-size: 11px; cursor: pointer; transition: all .2s; }
 .export-btn:hover { background: rgba(139,92,246,0.3); color: #fff; }
 
+/* V8.2 Alpha 1：可信洞察与证据抽屉 */
+.v82-evidence-insights { margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.1); }
+.v82-section-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.v82-section-head h2 { margin:0; font-size:16px; }
+.v82-section-head span, .v82-muted { color:var(--text-secondary); font-size:11px; }
+.v82-insight-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:12px; }
+.v82-insight { padding:14px; border:1px solid rgba(255,255,255,.1); border-radius:8px; background:rgba(255,255,255,.035); }
+.v82-insight-head { display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:10px; }
+.v82-source { color:#67e8f9; }
+.v82-strength { padding:2px 6px; border-radius:4px; background:rgba(148,163,184,.14); }
+.v82-strength-high { color:#4ade80; } .v82-strength-medium { color:#facc15; } .v82-strength-low { color:#fda4af; }
+.v82-insight h3 { margin:10px 0 6px; font-size:14px; line-height:1.45; }
+.v82-insight p { margin:0; min-height:44px; color:var(--text-secondary); font-size:12px; line-height:1.55; }
+.v82-insight-actions { display:flex; gap:8px; margin-top:12px; }
+.v82-insight-actions button { border:1px solid rgba(103,232,249,.28); border-radius:6px; padding:6px 9px; background:transparent; color:#a5f3fc; cursor:pointer; font-size:11px; }
+.v82-insight-actions button:hover { background:rgba(103,232,249,.1); }
+.v82-quality-gates { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.v82-insufficient { display:flex; align-items:center; gap:8px; padding:7px 9px; border-left:2px solid #f59e0b; background:rgba(245,158,11,.07); font-size:11px; }
+.v82-insufficient span { color:#fbbf24; } .v82-insufficient small { color:var(--text-secondary); }
+.v82-empty { padding:20px; text-align:center; color:var(--text-secondary); font-size:12px; }
+.v82-drawer { visibility:hidden; position:fixed; inset:0; z-index:100000; }
+.v82-drawer.is-open { visibility:visible; }
+.v82-drawer-backdrop { position:absolute; inset:0; background:rgba(0,0,0,.55); opacity:0; transition:opacity .2s; }
+.v82-drawer.is-open .v82-drawer-backdrop { opacity:1; }
+.v82-drawer-panel { position:absolute; top:0; right:0; width:min(520px,100%); height:100%; overflow:auto; transform:translateX(100%); transition:transform .2s; background:#111827; border-left:1px solid #334155; box-shadow:-12px 0 40px rgba(0,0,0,.35); }
+.v82-drawer.is-open .v82-drawer-panel { transform:translateX(0); }
+.v82-drawer header { position:sticky; top:0; z-index:1; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:18px; background:rgba(17,24,39,.96); border-bottom:1px solid #334155; }
+.v82-drawer header h2 { margin:3px 0 0; font-size:17px; line-height:1.4; }
+.v82-drawer-kicker { color:#67e8f9; font-size:10px; text-transform:uppercase; }
+.v82-close { width:32px; height:32px; border:0; background:transparent; color:#cbd5e1; cursor:pointer; font-size:24px; line-height:1; }
+.v82-drawer-body { padding:16px 18px 28px; }
+.v82-drawer-summary { margin-bottom:12px; color:#94a3b8; font-size:12px; }
+.v82-evidence-card { padding:14px 0; border-bottom:1px solid #293548; }
+.v82-evidence-card h3 { margin:7px 0; font-size:14px; line-height:1.5; }
+.v82-evidence-card p { color:#94a3b8; font-size:12px; line-height:1.55; }
+.v82-evidence-meta, .v82-metrics { display:flex; flex-wrap:wrap; gap:10px; color:#94a3b8; font-size:10px; }
+.v82-evidence-link { margin-top:9px; font-size:11px; } .v82-evidence-link a { color:#67e8f9; }
+.v82-basis dl { margin:0; } .v82-basis dl div { display:grid; grid-template-columns:84px 1fr; gap:12px; padding:11px 0; border-bottom:1px solid #293548; }
+.v82-basis dt { color:#94a3b8; font-size:11px; } .v82-basis dd { margin:0; overflow-wrap:anywhere; font-size:12px; line-height:1.55; }
+.v82-basis h3 { margin:20px 0 8px; font-size:13px; } .v82-basis ul { padding-left:18px; color:#cbd5e1; font-size:12px; line-height:1.7; }
+@media (max-width: 560px) { .v82-section-head { align-items:flex-start; flex-direction:column; } .v82-insight-grid { grid-template-columns:1fr; } }
+
 /* 移动端补充优化 */
 @media (max-width: 768px) {
   .export-btn { width: 100%; margin-top: 8px; padding: 8px; font-size: 12px; }

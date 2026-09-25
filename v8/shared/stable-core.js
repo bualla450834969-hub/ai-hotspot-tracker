@@ -372,7 +372,7 @@
             return '<span style="color:#fca5a5">· ' + e.where + '</span>';
           }).join('<br>');
           box.innerHTML =
-            '<b style="color:#e2e8f0">V8.1 Stable Debug</b><br>' +
+            '<b style="color:#e2e8f0">V8.2 Alpha Debug</b><br>' +
             'industry: ' + AppStore.industry.id + '<br>' +
             'schema: v' + AppStore.schemaVersion + '<br>' +
             'works: ' + (d.works ? d.works.length : 0) + '<br>' +
@@ -380,6 +380,10 @@
             'render#: ' + AppStore.renderCount + '<br>' +
             'requestId: ' + AppStore.requestId + '<br>' +
             'charts: ' + chartCount + '<br>' +
+            'evidence: ' + (AppStore.v82 ? AppStore.v82.evidenceStore.count() : 0) + '<br>' +
+            'insights: ' + (AppStore.v82 ? AppStore.v82.insights.length : 0) + '<br>' +
+            'unsupported: ' + (AppStore.v82 ? AppStore.v82.unsupportedInsights.length : 0) + '<br>' +
+            'quality: ' + (AppStore.v82 ? [AppStore.v82.dataQuality.worksCount, AppStore.v82.dataQuality.commentsCount, AppStore.v82.dataQuality.keywordsCount, AppStore.v82.dataQuality.platformsCount].join('/') : '0/0/0/0') + '<br>' +
             'errors: ' + errorLog.length +
             (lastErrs ? '<br>' + lastErrs : '');
         }
