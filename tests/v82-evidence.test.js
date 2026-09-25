@@ -102,4 +102,27 @@ test('923 works are indexed once within a practical budget', () => {
   assert.ok(Date.now() - started < 1500, 'index build exceeded 1500ms');
 });
 
+test('engagement content patterns use real work evidence', () => {
+  const works = [1, 2, 3].map(index => ({
+    workId:'avoid-' + index, title:'新手避坑第' + index + '条', platform:'douyin',
+    likeCount:index * 10, commentCount:index, collectCount:index * 2, shareCount:1, _keyword:'新手'
+  }));
+  const result = api.buildAnalysis(fixture({ works, hotwords:[] }));
+  assert.strictEqual(result.contentPatternInsights.length, 1);
+  assert.strictEqual(result.contentPatternInsights[0].metrics.pattern, '避坑');
+  assert.strictEqual(result.evidenceStore.getEvidenceByInsight(result.contentPatternInsights[0].id).length, 3);
+});
+
+test('user voice is generated only from comment evidence', () => {
+  const comments = [1, 2, 3].map(index => ({
+    commentId:'c-' + index, text:'清洁问题 ' + index, platform:'douyin', keyword:'清洁'
+  }));
+  const result = api.buildAnalysis(fixture({ comments }));
+  assert.strictEqual(result.userVoiceInsights.length, 1);
+  const evidence = result.evidenceStore.getEvidenceByInsight(result.userVoiceInsights[0].id);
+  assert.strictEqual(evidence.length, 3);
+  assert.ok(evidence.every(item => item.type === 'comment'));
+  assert.ok(!result.unsupportedInsights.some(item => item.type === 'user_voice'));
+});
+
 console.log('V8.2 evidence tests passed.');
