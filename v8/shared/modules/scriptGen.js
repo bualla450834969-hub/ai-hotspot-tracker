@@ -1,3 +1,4 @@
+/* ===== modules/scriptGen.js ===== */
 /**
  * modules/scriptGen.js
  * 函数: generateScript, closeScriptModal, copyScript
@@ -51,3 +52,5 @@
   window.closeScriptModal = closeScriptModal;
   window.copyScript = copyScript;
 })();
+
+

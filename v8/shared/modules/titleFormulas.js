@@ -1,3 +1,4 @@
+/* ===== modules/titleFormulas.js ===== */
 /**
  * modules/titleFormulas.js
  * 函数: renderTitleFormulas, copyFormula, genTitleVariants
@@ -8,7 +9,7 @@
 
   // renderTitleFormulas
   function renderTitleFormulas() {
-    var formulas = DATA.title_formulas || [];
+    var formulas = DATA.title_formulas_array || [];
     var examples = cfg('title_formula_examples', {
       '感叹句': '太绝了！这个工具让我效率提升10倍',
       '教程型': '手把手教你做XX，3分钟上手',
@@ -18,9 +19,11 @@
       '实测型': '我用这套工作流跑了一周，效率提升了200%',
       '免费型': '免费白嫖！这款工具比付费的还好用',
     });
+    var dataExamples = {};
+    (DATA.title_formulas||[]).forEach(function(f){ if(f.formula && f.example) dataExamples[f.formula]=f.example; });
     var html = formulas.map(function(f) {
       var name = f[0], count = f[1];
-      var ex = examples[name] || '点击查看套用示例';
+      var ex = dataExamples[name] || examples[name] || '点击查看套用示例';
       return '<div class="formula-item" onclick="copyFormula(\'' + name + '\')"><div class="fi-name">' + name + '</div><div class="fi-count">爆款中出现 ' + count + ' 次</div><div class="fi-example">示例：' + ex + '</div></div>';
     }).join('');
     var fg = document.getElementById('formulaGrid'); if (fg) fg.innerHTML = html || '<div style="color:var(--text-tertiary);">暂无数据</div>';
@@ -203,3 +206,5 @@ if (document.readyState === 'loading') {
 } else {
   initTitleGen();
 }
+
+

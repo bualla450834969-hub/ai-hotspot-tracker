@@ -1,3 +1,4 @@
+/* ===== modules/works.js ===== */
 /**
  * modules/works.js
  * 函数: renderWorksTable, renderSmallViral, renderAuthors, renderCompetitorWorks, renderFormatDist, filteredWorks
@@ -8,7 +9,7 @@
 
   // renderWorksTable
   function renderWorksTable(works) {
-    const sorted=[...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0)).slice(0,20);
+    const sorted=[...works].sort((a,b)=>((b.likes||b.likeCount||0))-((a.likes||a.likeCount||0))).slice(0,20);
     document.querySelector('#worksTable tbody').innerHTML=sorted.map((w,i)=>`
       <tr><td>${i+1}</td><td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="${w.workUrl||'#'}" target="_blank" class="work-link" title="${w.title||''}">${w.title||''}</a></td><td>${w.accountName||''}</td><td>${(w.followerCount||0).toLocaleString()}</td><td class="like-num">${(w.likeCount||0).toLocaleString()}</td><td class="collect-num">${(w.collectCount||0).toLocaleString()}</td><td class="share-num">${(w.shareCount||0).toLocaleString()}</td><td>${w._keyword||''}</td><td><span class="tag medium">${classifyHook(w.title||'')}</span></td></tr>`).join('');
   }
@@ -168,3 +169,5 @@
   window.renderFormatDist = renderFormatDist;
   window.filteredWorks = filteredWorks;
 })();
+
+

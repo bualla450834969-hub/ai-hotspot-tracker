@@ -1,3 +1,4 @@
+/* ===== core/globals.js ===== */
 /**
  * core/globals.js — 全局共享变量与常量
  * 所有模块共用的全局状态、ECharts配置、辅助函数
@@ -56,6 +57,7 @@
   window.renderAll = function() {
     if (window.Module && window.Module.all) {
       var data = window.DASHBOARD_DATA || window.DATA || {};
+      window.DATA = data; DATA = data;
       window.Module.all().forEach(function(m) {
         if (m.render) {
           try {
@@ -77,6 +79,7 @@
     var sel = document.getElementById('categoryFilter');
     if (sel) window.currentCategory = sel.value;
     window.renderAll();
+  window.renderCommentSemantic = renderCommentSemantic; window.renderConversionSignals = renderConversionSignals; try { renderCommentSemantic(); renderConversionSignals(); } catch(e) {}
   };
 
   // ===== setPlatform — 平台切换 =====
@@ -96,3 +99,5 @@
   };
 
 })();
+
+

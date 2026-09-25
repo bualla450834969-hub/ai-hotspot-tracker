@@ -1,3 +1,4 @@
+/* ===== modules/topicPerf.js ===== */
 /**
  * modules/topicPerf.js
  * 函数: renderTopicPerf, recordPerf, calcHitRate, getPerfData, savePerfData
@@ -50,11 +51,11 @@
 
   // getPerfData
   function getPerfData() {
-    try { return JSON.parse(localStorage.getItem('topic_perf') || '{}'); } catch(e) { return {}; }
+    return NS.get('topic_perf', {}) || {};
   }
 
   // savePerfData
-  function savePerfData(d) { localStorage.setItem('topic_perf', JSON.stringify(d)); }
+  function savePerfData(d) { NS.set('topic_perf', d); }
 
   // 模块注册
   if (window.Module) {
@@ -72,3 +73,5 @@
   window.getPerfData = getPerfData;
   window.savePerfData = savePerfData;
 })();
+
+

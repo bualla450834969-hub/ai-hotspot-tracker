@@ -1,3 +1,4 @@
+/* ===== modules/kanban.js ===== */
 /**
  * modules/kanban.js
  * 函数: renderKanban, getAllKanbanStatus, getTopicStatus, setTopicStatus, cycleKanbanStatus, cycleKanbanStatusByTitle, getKanbanStatus, resetKanbanStatus
@@ -45,7 +46,7 @@
 
   // getAllKanbanStatus
   function getAllKanbanStatus() {
-    try { return JSON.parse(localStorage.getItem('ai_hotspot_status') || '{}'); } catch(e) { return {}; }
+    return NS.get('ai_hotspot_status', {}) || {};
   }
 
   // getTopicStatus
@@ -58,7 +59,7 @@
   function setTopicStatus(title, status) {
     const all = getAllKanbanStatus();
     all[title] = status;
-    localStorage.setItem('ai_hotspot_status', JSON.stringify(all));
+    NS.set('ai_hotspot_status', all);
     renderKanban();
     renderTopics();
   }
@@ -69,7 +70,7 @@
     const cur = status[title] || 'pending';
     const next = cur==='pending'?'shooting':cur==='shooting'?'published':'pending';
     if (next==='pending') delete status[title]; else status[title]=next;
-    localStorage.setItem('ai_hotspot_status', JSON.stringify(status));
+    NS.set('ai_hotspot_status', status);
     const card = document.getElementById('topic-'+i);
     card.className = card.className.replace(/status-\w+/, 'status-'+next);
     card.querySelector('.status-badge').textContent = next==='pending'?'待拍摄':next==='shooting'?'拍摄中':'已发布';
@@ -85,10 +86,10 @@
   }
 
   // getKanbanStatus
-  function getKanbanStatus() { try { return JSON.parse(localStorage.getItem('ai_hotspot_status')||'{}'); } catch(e) { return {}; } }
+  function getKanbanStatus() { return NS.get('ai_hotspot_status', {}) || {}; }
 
   // resetKanbanStatus
-  function resetKanbanStatus() { localStorage.removeItem('ai_hotspot_status'); renderTopics(); }
+  function resetKanbanStatus() { NS.remove('ai_hotspot_status'); renderTopics(); }
 
   // 模块注册
   if (window.Module) {
@@ -109,3 +110,5 @@
   window.getKanbanStatus = getKanbanStatus;
   window.resetKanbanStatus = resetKanbanStatus;
 })();
+
+

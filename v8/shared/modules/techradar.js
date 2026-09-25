@@ -1,3 +1,4 @@
+/* ===== modules/techradar.js ===== */
 /**
  * modules/techradar.js
  * 函数: renderTechRadar
@@ -73,3 +74,5 @@
   }
   window.renderTechRadar = renderTechRadar;
 })();
+
+

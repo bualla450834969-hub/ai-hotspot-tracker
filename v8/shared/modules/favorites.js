@@ -1,3 +1,4 @@
+/* ===== modules/favorites.js ===== */
 /**
  * modules/favorites.js
  * 函数: getFavorites, isFavorite, toggleFavorite, renderFavorites, removeFavorite
@@ -8,11 +9,11 @@
 
   // getFavorites
   function getFavorites() {
-    return JSON.parse(localStorage.getItem('viral_favorites') || '[]');
+    return NS.get('viral_favorites', []) || [];
   }
 
   // isFavorite
-  function isFavorite(i) { const favs = JSON.parse(localStorage.getItem("viral_favorites") || "[]"); return favs.some(f => f.title === DATA.hot_breakdowns[i]?.title); }
+  function isFavorite(i) { const favs = NS.get('viral_favorites', []) || []; return favs.some(f => f.title === DATA.hot_breakdowns[i]?.title); }
 
   // toggleFavorite
   function toggleFavorite(index) {
@@ -20,7 +21,7 @@
     const work = DATA.hot_breakdowns[index];
     const exists = favs.findIndex(function(f) { return f.title === work.title; });
     if (exists >= 0) { favs.splice(exists, 1); } else { favs.push(work); }
-    localStorage.setItem('viral_favorites', JSON.stringify(favs));
+    NS.set('viral_favorites', favs);
     renderBreakdowns();
     renderFavorites();
   }
@@ -54,7 +55,7 @@
   function removeFavorite(index) {
     const favs = getFavorites();
     favs.splice(index, 1);
-    localStorage.setItem('viral_favorites', JSON.stringify(favs));
+    NS.set('viral_favorites', favs);
     renderFavorites();
     renderBreakdowns();
   }
@@ -76,3 +77,5 @@
   window.renderFavorites = renderFavorites;
   window.removeFavorite = removeFavorite;
 })();
+
+

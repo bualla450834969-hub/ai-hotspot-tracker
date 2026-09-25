@@ -1,3 +1,4 @@
+/* ===== modules/hero.js ===== */
 /**
  * modules/hero.js
  * 函数: renderHeroStats, renderActions, renderInsights
@@ -60,7 +61,7 @@
   function renderInsights(hw, works) {
     const ins = [];
     const topWork = [...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0))[0];
-    if (topWork) ins.push({type:'hot',text:`单条最高赞 <b>${(topWork.likeCount/10000).toFixed(1)}万</b> — 「${(topWork.title||'').slice(0,16)}…」· ${topWork._keyword}`});
+    if (topWork) ins.push({type:'hot',text:`单条最高赞 <b>${(topWork.likeCount/10000).toFixed(1)}万</b> — 「${(topWork.title||'').slice(0,16)}…」${topWork._keyword?' · '+topWork._keyword:''}`});
     const topCollect = [...hw].sort((a,b)=>(b.collect_rate||0)-(a.collect_rate||0))[0];
     if (topCollect && topCollect.collect_rate>0) ins.push({type:'value',text:`收藏率最高 <b>${topCollect.keyword}</b>（${topCollect.collect_rate}%），适合做教程型内容`});
     const blueOcean = hw.filter(h=>h.total<1000&&h.max_like>10000).sort((a,b)=>b.max_like-a.max_like)[0];
@@ -90,3 +91,5 @@
   window.renderActions = renderActions;
   window.renderInsights = renderInsights;
 })();
+
+

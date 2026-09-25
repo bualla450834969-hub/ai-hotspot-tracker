@@ -1,3 +1,4 @@
+/* ===== modules/credit.js ===== */
 /**
  * modules/credit.js
  * 函数: renderCreditMonitor
@@ -41,3 +42,5 @@
   }
   window.renderCreditMonitor = renderCreditMonitor;
 })();
+
+

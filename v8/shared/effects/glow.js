@@ -1,3 +1,4 @@
+/* ===== effects/glow.js ===== */
 /**
  * effects/glow.js — UFO动态光晕特效
  * 自动扫描所有卡片元素，绑定鼠标跟随光晕
@@ -142,3 +143,5 @@
   });
   observer.observe(document.body, { childList: true, subtree: true });
 })();
+
+

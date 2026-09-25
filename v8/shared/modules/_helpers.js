@@ -1,3 +1,4 @@
+/* ===== modules/_helpers.js ===== */
 /**
  * modules/_helpers.js — 通用辅助函数
  */
@@ -209,16 +210,6 @@
     alert('已复制 ' + topics.length + ' 条选题到剪贴板！');
   }
 
-  // domainGuard — 领域安全包装器，单模块崩溃不影响其他模块
-  function domainGuard(name, fn) {
-    return function(data) {
-      try { fn(data); } catch(e) {
-        console.error('[' + name + '] 渲染失败:', e);
-      }
-    };
-  }
-
-  window.domainGuard = domainGuard;
   window.animateNumber = animateNumber;
   window.trendClass = trendClass;
   window.classifyHook = classifyHook;
@@ -284,3 +275,5 @@
   window.exportTopicsCSV = exportTopicsCSV;
   window.downloadCSV = downloadCSV;
 })();
+
+

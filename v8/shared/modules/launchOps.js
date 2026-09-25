@@ -1,3 +1,4 @@
+/* ===== modules/launchOps.js ===== */
 /**
  * modules/launchOps.js
  * 函数: renderLaunchOps
@@ -9,9 +10,7 @@
   function renderLaunchOps() {
     // 如果有预计算的launch_ops则直接用，否则从数据生成
     var lo = DATA.launch_ops;
-    if (!lo) {
-      lo = generateLaunchOps();
-    }
+    if (!lo || !lo.phase || !lo.tag_health) { lo = generateLaunchOps(); }
     if (!lo) return;
 
     // 阶段横幅
@@ -154,3 +153,5 @@
   window.renderLaunchOps = renderLaunchOps;
   window.generateLaunchOps = generateLaunchOps;
 })();
+
+

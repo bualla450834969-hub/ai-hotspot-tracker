@@ -1,3 +1,4 @@
+/* ===== modules/audience.js ===== */
 /**
  * modules/audience.js
  * 函数: renderAudience
@@ -86,3 +87,5 @@
   }
   window.renderAudience = renderAudience;
 })();
+
+

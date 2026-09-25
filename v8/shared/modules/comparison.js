@@ -1,3 +1,4 @@
+/* ===== modules/comparison.js ===== */
 /**
  * modules/comparison.js
  * 函数: renderComparison
@@ -47,3 +48,5 @@
   }
   window.renderComparison = renderComparison;
 })();
+
+

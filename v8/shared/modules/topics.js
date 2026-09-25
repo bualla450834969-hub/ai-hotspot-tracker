@@ -1,3 +1,4 @@
+/* ===== modules/topics.js ===== */
 /**
  * modules/topics.js
  * 函数: renderTopics, calcTopicScore, generateTitles, getPlatformAdaptation, generateSchedule, renderCommentScripts, renderChecklist, toggleCheck, updateChecklistProgress, filteredTopics, generateShootList
@@ -252,7 +253,7 @@
 
   // renderChecklist
   function renderChecklist() {
-    const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+    const saved = NS.get('publishChecklist', {}) || {};
     let html = '';
     CHECKLIST_ITEMS.forEach(item => {
       const checked = saved[item.id] ? 'checked' : '';
@@ -268,15 +269,15 @@
 
   // toggleCheck
   function toggleCheck(id) {
-    const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+    const saved = NS.get('publishChecklist', {}) || {};
     saved[id] = !saved[id];
-    localStorage.setItem('publishChecklist', JSON.stringify(saved));
+    NS.set('publishChecklist', saved);
     renderChecklist();
   }
 
   // updateChecklistProgress
   function updateChecklistProgress() {
-    const saved = JSON.parse(localStorage.getItem('publishChecklist') || '{}');
+    const saved = NS.get('publishChecklist', {}) || {};
     const done = Object.values(saved).filter(Boolean).length;
     document.getElementById('checklistProgress').innerHTML = '已完成 <b>' + done + '</b>/' + CHECKLIST_ITEMS.length + ' 项' + (done === CHECKLIST_ITEMS.length ? ' 可以发布了！' : '');
   }
@@ -337,7 +338,9 @@
       id: "topics",
       requiredFields: ['topics'],
       render: function(data) {
-        try { renderTopics(data); generateSchedule(data); renderCommentScripts(data); renderChecklist(); } catch(e) { console.error("[topics]", e); }
+        [[renderTopics,data],[generateSchedule,data],[renderCommentScripts,data],[renderChecklist,null]].forEach(function(pair){
+          try { pair[0](pair[1]); } catch(e) { console.error('[topics:'+pair[0].name+']', e); }
+        });
       }
     });
   }
@@ -353,3 +356,5 @@
   window.filteredTopics = filteredTopics;
   window.generateShootList = generateShootList;
 })();
+
+

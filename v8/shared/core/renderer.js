@@ -1,3 +1,4 @@
+/* ===== core/renderer.js ===== */
 /**
  * 通用渲染器 — 表格、卡片、图表、数字动画、标签
  * 所有业务模块共用，不包含领域逻辑
@@ -121,3 +122,5 @@
   window.animateNumber = Renderer.animateNumber;
   window.toggleSection = Renderer.toggleSection;
 })();
+
+

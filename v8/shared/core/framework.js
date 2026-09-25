@@ -1,3 +1,4 @@
+/* ===== core/framework.js ===== */
 /**
  * 核心框架 — 模块注册、初始化、导航、筛选
  * 所有业务模块通过 Module.register() 注册，框架自动管理生命周期
@@ -64,6 +65,9 @@
 
   // ===== 渲染调度 =====
   function renderAll() {
+    // V8.1：渲染前统一补齐数据契约并计数
+    try { if (window.normalizeDataContract) window.normalizeDataContract(); } catch (e) {}
+    if (window.AppStore) window.AppStore.renderCount++;
     const DATA = window.DASHBOARD_DATA || {};
     const config = window.DOMAIN_CONFIG || {};
     const mods = config.modules || {};
@@ -94,6 +98,7 @@
         mod.render(renderData);
       } catch (e) {
         console.error(`[Module] ${id} 渲染失败:`, e);
+        if (window.AppErrorHandler) window.AppErrorHandler.handle(e, 'render:' + id);
         // 单个模块崩溃不影响其他模块
       }
     });
@@ -274,10 +279,14 @@
   window.initFramework = init;
   // 兼容原模板的全局DATA引用（所有模块IIFE内引用的DATA）
   // 必须用赋值而非const，避免遮蔽已存在的全局DATA
-  try { window.DATA = window.DASHBOARD_DATA || {}; } catch(e) {}
+  try { window.DATA = window.DASHBOARD_DATA || {};
+
+window.normalizeData(); } catch(e) {}
   // 同时尝试赋值给全局词法环境的DATA（如果是var声明的全局变量）
   if (typeof DATA !== 'undefined') {
     try { DATA = window.DASHBOARD_DATA || {}; } catch(e) {}
   }
   window.currentPlatform = 'all';
 })();
+
+

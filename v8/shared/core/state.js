@@ -1,3 +1,4 @@
+/* ===== core/state.js ===== */
 /**
  * 状态管理 — localStorage持久化
  * 看板状态、收藏、选题性能追踪、清单进度
@@ -104,3 +105,5 @@
 
   window.State = State;
 })();
+
+

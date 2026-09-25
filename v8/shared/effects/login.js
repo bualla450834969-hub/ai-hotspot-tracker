@@ -1,3 +1,4 @@
+/* ===== effects/login.js ===== */
 
 // 登录页Logo动效（通用版，支持多实例）
 
@@ -272,3 +273,5 @@ if (document.readyState === 'loading') {
   initScrollReveal();
   initNavHide();
 }
+
+

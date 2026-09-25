@@ -1,3 +1,4 @@
+/* ===== modules/sidebar.js ===== */
 /**
  * modules/sidebar.js
  * 左侧导航栏模块 - 动态创建sidebar，按分组切换显示section
@@ -15,6 +16,7 @@
       sections: ['hero', 'actionList', 'heroStats'],
       title: '数据概览'
     },
+
     {
       id: 'techradar',
       icon: '🛰️',
@@ -26,15 +28,36 @@
       id: 'hotspots',
       icon: '🔥',
       label: '热点追踪',
-      sections: ['works', 'hotwords', 'history', 'hotwordTable', 'worksTable', 'chartRanking', 'chartCategory', 'chartPublishTime', 'chartDuration', 'chartHook', 'insightsGrid', 'growthRanking', 'blueOcean', 'anomalyDetection'],
+      sections: ['works', 'hotwords', 'history', 'hotwordTable', 'worksTable', 'chartRanking', 'chartCategory', 'chartPublishTime', 'chartDuration', 'chartHook', 'insightsGrid', 'growthRanking', 'blueOcean', 'anomalyDetection', 'ownPerformance'],
       title: '热点追踪'
     },
     {
       id: 'breakdown',
       icon: '💥',
       label: '爆款拆解',
-      sections: ['breakdown', 'breakdownGrid', 'saturationList', 'commentDemands', 'commentKw', 'chartScatter', 'chartCollect', 'matrixGrid', 'commentSemantic', 'conversionSignals', 'viralGenes', 'viralGenesContent', 'completionRate', 'formatROI'],
+      sections: ['breakdown', 'breakdownGrid', 'viralGenes', 'saturationList', 'commentDemands', 'commentKw', 'chartScatter', 'chartCollect', 'matrixGrid', 'commentSemantic', 'conversionSignals'],
       title: '爆款拆解'
+    },
+    {
+      id: 'content',
+      icon: '✍️',
+      label: '内容创作',
+      sections: ['titleGen', 'titleFormulas', 'formulaGrid', 'leadScripts', 'scriptContainer', 'publishTime', 'ptChart', 'ptBestCards', 'ptPlatform', 'ptTips', 'titleGenes', 'bestPostingCombo', 'postingReminder', 'completionRate'],
+      title: '内容创作'
+    },
+    {
+      id: 'topics',
+      icon: '📋',
+      label: '选题管理',
+      sections: ['topics', 'topicsGrid', 'topicTracker', 'kanbanBoard', 'topicPerf', 'topicPerfContent', 'crossPlatform'],
+      title: '选题管理'
+    },
+    {
+      id: 'launch',
+      icon: '🚀',
+      label: '起号运营',
+      sections: ['launchOps', 'launchBanner', 'healthScore', 'healthBar', 'coreKwCloud', 'ratioBar', 'ratioLegend', 'launchTasks', 'pitfallList'],
+      title: '起号运营'
     },
     {
       id: 'audience',
@@ -44,32 +67,18 @@
       title: '人群洞察'
     },
     {
-      id: 'topics',
-      icon: '📋',
-      label: '选题管理',
-      sections: ['topics', 'topicsGrid', 'topicTracker', 'kanbanBoard', 'topicPerf', 'topicPerfContent', 'crossPlatform', 'ownPerformance'],
-      title: '选题管理'
-    },
-    {
-      id: 'content',
-      icon: '✍️',
-      label: '内容创作',
-      sections: ['titleGen', 'titleFormulas', 'formulaGrid', 'leadScripts', 'scriptContainer', 'titleGenes'],
-      title: '内容创作'
-    },
-    {
-      id: 'launch',
-      icon: '🚀',
-      label: '发布执行',
-      sections: ['publishTime', 'ptChart', 'ptBestCards', 'ptPlatform', 'ptTips', 'bestPostingCombo', 'postingReminder', 'contentCalendar', 'schedule', 'scheduleContent', 'commentScripts', 'commentScriptsContent', 'checklist', 'checklistContent', 'checklistProgress', 'favoritesGrid', 'launchOps', 'launchBanner', 'healthScore', 'healthBar', 'coreKwCloud', 'ratioBar', 'ratioLegend', 'launchTasks', 'pitfallList'],
-      title: '发布执行'
-    },
-    {
       id: 'benchmark',
       icon: '📚',
-      label: '对标分析',
-      sections: ['compareSection', 'compareSummary', 'overlapTable', 'dyOnlyList', 'xhsOnlyList', 'authorList', 'competitorWorks', 'smallViral', 'formatBars', 'competitorStrategy'],
-      title: '对标分析'
+      label: '对标与发布',
+      sections: ['compareSection', 'compareSummary', 'overlapTable', 'dyOnlyList', 'xhsOnlyList', 'authorList', 'competitorWorks', 'smallViral', 'formatBars', 'schedule', 'scheduleContent', 'commentScripts', 'commentScriptsContent', 'checklist', 'checklistContent', 'checklistProgress', 'favoritesGrid', 'formatROI', 'competitorStrategy', 'contentCalendar'],
+      title: '对标与发布'
+    },
+    {
+      id: 'settings',
+      icon: '⚙️',
+      label: '设置',
+      sections: ['settingsPanel'],
+      title: '设置'
     }
   ];
 
@@ -107,7 +116,16 @@
     const nav = document.createElement('nav');
     nav.className = 'sidebar-nav';
 
-    NAV_GROUPS.forEach(function(group) {
+    NAV_GROUPS.filter(function(g) {
+      var mods = (window.DOMAIN_CONFIG||{}).modules||{};
+      if (g.id === 'techradar') {
+        // 技术雷达由数据自动驱动：config未关闭且该行业确有技术信号才显示
+        var ts = (window.DASHBOARD_DATA||{}).tech_signals;
+        var hasTR = !!(ts && ts.signals && ts.signals.length);
+        return mods['techradar'] !== false && hasTR;
+      }
+      return mods[g.id] !== false;
+    }).forEach(function(group) {
       const item = document.createElement('div');
       item.className = 'sidebar-nav-item' + (group.id === currentPage ? ' active' : '');
       item.dataset.page = group.id;
@@ -125,7 +143,7 @@
     footer.className = 'sidebar-footer';
     footer.innerHTML = `
       <div class="sb-update-time" id="sbUpdateTime">数据加载中...</div>
-      <div class="sb-version">v4.0 · Sidebar Layout</div>
+      <div class="sb-version">v6.0 · Config Driven</div>
     `;
     sidebar.appendChild(footer);
 
@@ -184,6 +202,14 @@
     if (updateTime && sbUpdateTime) {
       sbUpdateTime.textContent = updateTime.textContent;
     }
+
+    // 进入工作台后自动体检（createSidebar 仅执行一次）
+    setTimeout(function(){
+      if (typeof window.runFullAudit === 'function' && !window.__auditAutoDone) {
+        window.__auditAutoDone = true;
+        window.runFullAudit({auto:true});
+      }
+    }, 1300);
   }
 
   // 切换页面
@@ -301,3 +327,5 @@
     initSidebar();
   }
 })();
+
+

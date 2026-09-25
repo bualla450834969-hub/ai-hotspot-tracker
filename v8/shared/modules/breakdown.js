@@ -1,3 +1,4 @@
+/* ===== modules/breakdown.js ===== */
 /**
  * modules/breakdown.js
  * 函数: renderBreakdowns, renderMatrix, renderFormulas, renderCollect, renderScatter, renderSaturation, renderCommentDemands, renderCommentKw, renderHook, renderDuration, renderPublishTime
@@ -57,10 +58,37 @@
       </div>`).join('');
   }
 
+  // renderCommentSemantic
+  function renderCommentSemantic() {
+    var el = document.getElementById('commentSemanticContent');
+    if (!el) return;
+    var data = DATA.comment_semantic || {};
+    var themes = data.themes || [];
+    var html = '<div class="cs-grid">';
+    themes.forEach(function(t) {
+      html += '<div class="cs-item"><span class="cs-name">' + t.name + '</span><span class="cs-count">' + t.count + '</span></div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
+  // renderConversionSignals
+  function renderConversionSignals() {
+    var el = document.getElementById('conversionSignalList');
+    if (!el) return;
+    var signals = DATA.conversion_signals || [];
+    var html = '<div class="cs-list">';
+    signals.forEach(function(s) {
+      html += '<div class="cs-item"><div class="cs-signal">' + s.signal + '</div><div class="cs-desc">' + s.desc + '</div><span class="cs-impact impact-' + (s.impact||'中') + '">' + (s.impact||'中') + '影响</span></div>';
+    });
+    html += '</div>';
+    el.innerHTML = html;
+  }
+
   // renderCollect
   function renderCollect(hw) {
     const sorted=[...hw].filter(h=>h.collect_rate>0).sort((a,b)=>b.collect_rate-a.collect_rate).slice(0,10);
-    if (charts.collect) charts.collect.dispose();
+    if (charts.collect) { try { charts.collect.dispose(); } catch(e) {} charts.collect = null; }
     charts.collect=echarts.init(document.getElementById('chartCollect'));
     charts.collect.setOption({color:PALETTE,grid:{left:75,right:30,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:'{value}%'},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.collect_rate).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#30D158'},{offset:1,color:'#64D2FF'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:'{c}%',fontSize:10,color:'rgba(48,209,88,0.8)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:'rgba(48,209,88,0.3)',textStyle:{color:TOOLTIP_TEXT}}});
   }
@@ -69,7 +97,7 @@
   function renderScatter(works) {
     const top=[...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0)).slice(0,30);
     const data=top.map(w=>[w.likeCount||0,w.collectCount||0,w.title||'']);
-    if (charts.scatter) charts.scatter.dispose();
+    if (charts.scatter) { try { charts.scatter.dispose(); } catch(e) {} charts.scatter = null; }
     charts.scatter=echarts.init(document.getElementById('chartScatter'));
     charts.scatter.setOption({color:PALETTE,grid:{left:50,right:15,top:15,bottom:30},xAxis:{name:'点赞',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{name:'收藏',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'scatter',data,symbolSize:d=>Math.max(8,Math.min(28,Math.sqrt(d[0])/12)),itemStyle:{color:'rgba(10,132,255,0.5)',borderColor:'#64D2FF',borderWidth:1}}],tooltip:{backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${(p.data[2]||'').slice(0,25)}<br/>点赞 ${p.data[0].toLocaleString()}<br/>收藏 ${p.data[1].toLocaleString()}`}});
   }
@@ -140,7 +168,7 @@
   function renderHook(works) {
     const hs={}; works.forEach(w=>{const h=classifyHook(w.title||'');if(!hs[h])hs[h]={count:0,likes:0};hs[h].count++;hs[h].likes+=(w.likeCount||0);});
     const data=Object.entries(hs).map(([n,v])=>({name:n,value:Math.round(v.likes/v.count)}));
-    if (charts.hook) charts.hook.dispose();
+    if (charts.hook) { try { charts.hook.dispose(); } catch(e) {} charts.hook = null; }
     charts.hook=echarts.init(document.getElementById('chartHook'));
     charts.hook.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:data.map(d=>d.name),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:data.map(d=>d.value),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#FF9F0A'},{offset:1,color:'#FF453A'}]),borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:'rgba(255,255,255,0.5)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}型<br/>平均点赞 ${p[0].value.toLocaleString()}`}});
   }
@@ -200,7 +228,7 @@
       viral_count: hourViral[h],
       viral_rate: cnt > 0 ? Math.round(hourViral[h] / cnt * 100) : 0
     }));
-    if (charts.pt) charts.pt.dispose();
+    if (charts.pt) { try { charts.pt.dispose(); } catch(e) {} charts.pt = null; }
     charts.pt = echarts.init(document.getElementById('chartPublishTime'));
     charts.pt.setOption({
       color: PALETTE,
@@ -248,7 +276,8 @@
       id: "breakdown",
       requiredFields: ['works'],
       render: function(data) {
-        try { renderBreakdowns(); renderMatrix(); renderFormulas(); renderCollect(DATA.hotwords); renderScatter(data); renderSaturation(DATA.hotwords); renderCommentDemands(); renderCommentKw(); renderHook(data); renderDuration(data); renderPublishTime(data); } catch(e) { console.error("[breakdown]", e); }
+        var steps = [renderBreakdowns, renderMatrix, renderFormulas, renderCommentSemantic, renderConversionSignals, function(){renderCollect(DATA.hotwords);}, function(){renderScatter(data);}, function(){renderSaturation(DATA.hotwords);}, renderCommentDemands, function(){renderCommentKw(data);}, function(){renderHook(data);}, function(){renderDuration(data);}, function(){renderPublishTime(data);}];
+        steps.forEach(function(fn){ try { fn(); } catch(e) { console.error("[bd]", e.message); } });
       }
     });
   }
@@ -264,3 +293,5 @@
   window.renderDuration = renderDuration;
   window.renderPublishTime = renderPublishTime;
 })();
+
+
