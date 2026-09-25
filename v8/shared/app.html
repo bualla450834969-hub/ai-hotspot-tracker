@@ -1978,5 +1978,133 @@ loadCollectTrend();
 })();
 </script>
 
+
+<script>
+/* ===== DOM 归一化层：修正卡片错位，根治点A显B ===== */
+(function(){
+  'use strict';
+  if (window.__domNormalized) return;
+
+  function disposeChartsIn(el){
+    if(!el || !window.echarts) return;
+    el.querySelectorAll('[_echarts_instance_],canvas').forEach(function(c){
+      var host = c.closest('[_echarts_instance_]') || c;
+      var inst = echarts.getInstanceByDom ? echarts.getInstanceByDom(host) : null;
+      if(inst){ try{ inst.dispose(); }catch(e){} }
+    });
+  }
+
+  // 找“包含某标题文字”的顶层 section
+  function findSectionByTitle(txt){
+    var arr = document.querySelectorAll('body > .section');
+    for(var i=0;i<arr.length;i++){
+      var h=arr[i].querySelector('.section-title,h2,h3');
+      if(h && h.textContent.replace(/\s+/g,'').indexOf(txt)>=0) return arr[i];
+    }
+    return null;
+  }
+
+  function move(id, targetSec){
+    var el=document.getElementById(id);
+    if(!el || !targetSec) return false;
+    var cur=el; while(cur.parentElement!==document.body) cur=cur.parentElement;
+    if(cur===targetSec) return false;
+    disposeChartsIn(el);
+    targetSec.appendChild(el);
+    el.style.display='';
+    return true;
+  }
+
+  function run(){
+    if(window.__domNormalized) return;
+    var changed=false;
+    var secBreakdown = findSectionByTitle('爆款结构拆解');
+    var secGenes     = findSectionByTitle('爆款基因库');
+    var secTopicSug  = findSectionByTitle('选题建议');
+    var secBench     = findSectionByTitle('对标与评论');
+    var secAudience  = findSectionByTitle('人群画像');
+
+    // 1) 爆款拆解：把 breakdownGrid/matrixGrid 移到“爆款结构拆解”
+    if(secBreakdown){
+      changed |= move('breakdownGrid', secBreakdown);
+      changed |= move('matrixGrid', secBreakdown);
+      changed |= move('saturationList', secGenes||secBreakdown);
+      changed |= move('commentDemands', secGenes||secBreakdown);
+      changed |= move('commentKw', secGenes||secBreakdown);
+      // 腾空原占位（选题网格移走）
+      var tg=document.getElementById('topicsGrid');
+      if(tg){ var tp=tg; while(tp.parentElement!==document.body)tp=tp.parentElement;
+        if(tp===secBreakdown && secTopicSug){ changed |= move('topicsGrid', secTopicSug); changed |= move('topicTracker', secTopicSug); } }
+    }
+    // 2) 人群：highCommentList 移到人群画像
+    if(secAudience) changed |= move('highCommentList', secAudience);
+
+    window.__domNormalized=true;
+
+    // 3) 给每个顶层 section 打 data-nav（按其包含的关键容器判定）
+    var MAP={
+      breakdown:['breakdownGrid','matrixGrid','viralGenes','saturationList','commentDemands','commentKw','commentSemantic','conversionSignals'],
+      topics:['topicsGrid','kanbanBoard','topicTracker','crossPlatform','topicPerfContent'],
+      content:['titleGen','formulaGrid','scriptContainer','ptChart','titleGenes','bestPostingCombo','completionRate'],
+      launch:['launchBanner','healthScore','coreKwCloud','ratioBar','launchTasks','pitfallList'],
+      audience:['audienceChart','personaGrid','highCommentList'],
+      benchmark:['compareSummary','overlapTable','authorList','smallViral','scheduleContent','commentScriptsContent','checklistContent','favoritesGrid','formatROI','competitorStrategy','contentCalendar']
+    };
+    document.querySelectorAll('body > .section').forEach(function(sec){
+      var nav='';
+      Object.keys(MAP).forEach(function(n){
+        for(var i=0;i<MAP[n].length;i++){ if(sec.querySelector('#'+MAP[n][i])){ nav=n; return; } }
+      });
+      // 标题兜底
+      if(!nav){
+        var h=sec.querySelector('.section-title,h2,h3');
+        var t=h?h.textContent:'';
+        if(/爆款|基因/.test(t))nav='breakdown';
+        else if(/选题|看板|排期|命中率|迁移/.test(t))nav='topics';
+        else if(/标题|话术|发布时间|完播/.test(t))nav='content';
+        else if(/起号/.test(t))nav='launch';
+        else if(/人群|画像/.test(t))nav='audience';
+        else if(/对标|对比|自检|日历|ROI|策略|收藏/.test(t))nav='benchmark';
+        else if(/热度|趋势|洞察|蓝海|上升|行动/.test(t))nav='hotspots';
+      }
+      if(nav) sec.setAttribute('data-nav',nav);
+    });
+    // hero 归 overview
+    document.querySelectorAll('body > .hero').forEach(function(h){ h.setAttribute('data-nav','overview'); });
+
+    if(changed && typeof window.renderAll==='function'){
+      setTimeout(function(){ try{ window.renderAll(); }catch(e){ console.warn('rerender',e);} },100);
+    }
+  }
+
+  // 渲染后纠正：拦截侧边栏点击，按 data-nav 精确显隐
+  document.addEventListener('click', function(e){
+    var item=e.target.closest && e.target.closest('.sidebar-nav-item');
+    if(!item) return;
+    var page=item.dataset.page;
+    setTimeout(function(){
+      // overview / settings 走原生
+      if(page==='overview'||page==='settings'||page==='techradar'||page==='hotspots') return;
+      document.querySelectorAll('body > .section').forEach(function(sec){
+        var nav=sec.getAttribute('data-nav');
+        if(!nav) return;
+        var shouldShow = (nav===page);
+        sec.style.display = shouldShow ? '' : 'none';
+      });
+      window.scrollTo(0,0);
+      setTimeout(function(){
+        if(window.echarts){ document.querySelectorAll('body > .section[style*="block"], body > .section:not([style*="none"])').forEach(function(s){
+          s.querySelectorAll('[_echarts_instance_]').forEach(function(el){ var i=echarts.getInstanceByDom(el); if(i)try{i.resize();}catch(e){} });
+        });}
+      },200);
+    }, 60);
+  }, true);
+
+  // 首次执行（等首渲染）
+  setTimeout(run, 1600);
+  setTimeout(run, 3500);
+})();
+</script>
+
 </body>
 </html>
