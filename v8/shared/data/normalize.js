@@ -153,9 +153,17 @@ window.normalizeData = function() {
       note: '发布作品并记录效果后，将在此自动统计命中率'
     };
   }
-  // ===== 从 title_formulas 派生 title_formulas_array（缺失时，任何行业通用）=====
-  if (Array.isArray(d.title_formulas) && !d.title_formulas_array) {
-    d.title_formulas_array = d.title_formulas.map(function(f){ return [f.formula, f.count || 1]; });
+  // ===== 统一 title_formulas 字段契约，并派生旧版数组结构 =====
+  if (Array.isArray(d.title_formulas)) {
+    d.title_formulas = d.title_formulas.map(function(f){
+      return Object.assign({}, f, {
+        count: f && f.count != null ? safeNum(f.count, 0) : 0,
+        avg_likes: f && f.avg_likes != null ? safeNum(f.avg_likes, 0) : 0
+      });
+    });
+    if (!d.title_formulas_array) {
+      d.title_formulas_array = d.title_formulas.map(function(f){ return [f.formula, f.count || 1]; });
+    }
   }
   // ===== 统一 format_roi / competitor_list 字段契约（任何行业通用）=====
   if (Array.isArray(d.format_roi)) {

@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <!-- V8.1 Stable 稳定核心：必须最先加载（唯一数据源/图表安全/错误隔离/定时器管理） -->
-<script src="../shared/stable-core.js?v=1790420000"></script>
+<script src="../shared/stable-core.js?v=1790450000"></script>
 <script>
 // Superpowers verification-before-completion: 全局错误兜底
 // 任何模块报错只影响自身，不拖垮整页
@@ -957,11 +957,10 @@ window.safeCall = function(fn, ctx) {
   
 
 
-  <script src="../shared/bundle.js?v=1790410000"></script>
+  <script src="../shared/bundle.js?v=1790450000"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
-    if (window.initFramework) window.initFramework();
-    else window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework());
+    window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework(), { once: true });
     setTimeout(function() {
       if (window.renderOpsStatus) renderOpsStatus();
       if (window.renderBlueOcean) renderBlueOcean();
@@ -1213,7 +1212,16 @@ function buildDashboardData(works, hotwords, industryName){
     '情感共鸣':'学'+industryName+'这条路，真的很累但值得',
     '普通':industryName+'入门指南：从零开始'
   };
-  var titleFormulas = hookNames.map(function(k){return {formula:k, example:formulaExamples[k]||''};}).sort(function(a,b){return hookMap[b.formula]-hookMap[a.formula];});
+  var titleFormulas = hookNames.map(function(k){
+    var matchedWorks = works.filter(function(w){ return classifyHook(w.title || '') === k; });
+    var likes = matchedWorks.reduce(function(sum,w){ return sum + (w.likeCount || 0); }, 0);
+    return {
+      formula:k,
+      example:formulaExamples[k]||'',
+      count:matchedWorks.length,
+      avg_likes:Math.round(safeDivide(likes, matchedWorks.length))
+    };
+  }).sort(function(a,b){return b.count-a.count;});
 
   // viral_genes：bundle.js 期望 hook_distribution / avg_title_length / sample_size / top_title_keywords / structure_examples
   var totalTitleLen = works.reduce(function(s,w){return s+(w.title||'').length;},0);
@@ -1412,6 +1420,7 @@ async function startCollection(){
   if(platforms.length===0){ s.innerHTML='<span style="color:#f87171;">请至少选一个平台</span>'; return; }
 
   var btn=document.querySelector('button[onclick*="startCollection"]');
+  var requestId=AppStore.nextRequest();
   collectionState.running=true;
   if(btn){ btn.disabled=true; btn.style.opacity='.6'; btn.style.cursor='not-allowed'; }
   localStorage.setItem('redfox_api_key',k);
@@ -1427,12 +1436,15 @@ async function startCollection(){
       if(cursor>=jobs.length) return Promise.resolve();
       var job=jobs[cursor++];
       return _fetchWithRetry(p,k,job.pl,job.kw,2).then(function(data){
+        if(!AppStore.isCurrent(requestId)) return;
         var list=data.list||[];
         list.forEach(function(w){ var nw=normalizeWork(w,job.pl); nw._keyword=job.kw; allWorks.push(nw); });
         hotwords.push({keyword:job.kw,platform:job.pl,total:data.total||list.length,works:list.length,avg_like:list.length?Math.round(list.reduce(function(a,w){return a+(w.likeCount||w.workLikedCount||0);},0)/list.length):0});
       },function(e){
+        if(!AppStore.isCurrent(requestId)) return;
         hotwords.push({keyword:job.kw,platform:job.pl,total:0,works:0,error:String(e.message||e)}); failedKws.push(job.kw);
       }).then(function(){
+        if(!AppStore.isCurrent(requestId)) return;
         done++;
         s.innerHTML='<span style="color:#a78bfa;">采集中 '+done+'/'+total+'：'+job.pl+' · '+job.kw+'</span>';
         return next();
@@ -1446,6 +1458,7 @@ async function startCollection(){
 
   collectionState.running=false;
   if(btn){ btn.disabled=false; btn.style.opacity=''; btn.style.cursor=''; }
+  if(!AppStore.isCurrent(requestId)) return;
 
   if(allWorks.length===0){ s.innerHTML='<span style="color:#f87171;">没有采到作品，请检查 Key / 中转地址 / 行业名是否正确</span>'; return; }
 

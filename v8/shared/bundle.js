@@ -153,9 +153,17 @@ window.normalizeData = function() {
       note: '发布作品并记录效果后，将在此自动统计命中率'
     };
   }
-  // ===== 从 title_formulas 派生 title_formulas_array（缺失时，任何行业通用）=====
-  if (Array.isArray(d.title_formulas) && !d.title_formulas_array) {
-    d.title_formulas_array = d.title_formulas.map(function(f){ return [f.formula, f.count || 1]; });
+  // ===== 统一 title_formulas 字段契约，并派生旧版数组结构 =====
+  if (Array.isArray(d.title_formulas)) {
+    d.title_formulas = d.title_formulas.map(function(f){
+      return Object.assign({}, f, {
+        count: f && f.count != null ? safeNum(f.count, 0) : 0,
+        avg_likes: f && f.avg_likes != null ? safeNum(f.avg_likes, 0) : 0
+      });
+    });
+    if (!d.title_formulas_array) {
+      d.title_formulas_array = d.title_formulas.map(function(f){ return [f.formula, f.count || 1]; });
+    }
   }
   // ===== 统一 format_roi / competitor_list 字段契约（任何行业通用）=====
   if (Array.isArray(d.format_roi)) {
@@ -599,6 +607,18 @@ window.cfg = function(path, defaultValue) {
     obj = obj[p];
   }
   return obj === undefined ? defaultValue : obj;
+};
+
+/**
+ * 文本配置读取工具。标签配置允许使用模板字符串或字符串数组。
+ */
+window.cfgText = function(path, defaultValue) {
+  const value = cfg(path, defaultValue);
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value) && value.every(item => typeof item === 'string')) {
+    return value.join(' ');
+  }
+  return defaultValue;
 };
 
 /**
@@ -1682,12 +1702,17 @@ if (document.readyState === 'loading') {
   function getMonetization(topic) {
     const kw = (topic.keyword || '').toLowerCase();
     const cat = topic.keyword || '';
-    const rules = cfg('monetization_rules', [
+    const fallbackRules = [
       { match: ['工具','教程','入门','怎么做','做图','视频','ppt'], type: 'affiliate', score: 85, desc: '带货：工具会员/affiliate佣金' },
       { match: ['资讯','新闻','发布','agent'], type: 'ad', score: 70, desc: '广告：品牌合作、商单植入' },
       { match: ['工作流','自动化','效率'], type: 'private', score: 90, desc: '私域：引流微信，卖方案/咨询' },
       { match: ['提示词','prompt'], type: 'course', score: 75, desc: '知识付费：课程/社群' },
-    ]);
+    ];
+    const configuredRules = cfg('monetization_rules', fallbackRules);
+    const rules = Array.isArray(configuredRules)
+      ? configuredRules.filter(r => r && Array.isArray(r.match) && r.match.every(m => typeof m === 'string'))
+      : [];
+    if (!rules.length) rules.push(...fallbackRules);
     let type = 'affiliate', score = 60, desc = '带货：通用工具推荐';
     for (let i = 0; i < rules.length; i++) {
       const r = rules[i];
@@ -2033,6 +2058,10 @@ if (document.readyState === 'loading') {
 (function() {
   'use strict';
 
+  function chartingReady() {
+    return !!(window.echarts && typeof window.echarts.init === 'function');
+  }
+
   // renderHotwordTable
   function renderHotwordTable(hw) {
     const sorted=[...hw].sort((a,b)=>b.total-a.total);
@@ -2044,25 +2073,28 @@ if (document.readyState === 'loading') {
 
   // renderCategory
   function renderCategory(hw) {
+    if (!chartingReady()) return;
     const m={}; hw.forEach(h=>{m[h.category]=(m[h.category]||0)+h.total;});
     const data=Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([n,v])=>({name:n,value:v}));
-    if (charts.category) { try { charts.category.dispose(); } catch(e) {} charts.category = null; }
+    if (charts.category) { safeChartDispose(charts.category); charts.category = null; }
     charts.category=echarts.init(document.getElementById('chartCategory'));
     charts.category.setOption({color:PALETTE,tooltip:{trigger:'item',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:'{b}<br/>{c} ({d}%)'},legend:{type:'scroll',orient:'vertical',right:5,top:'center',textStyle:{color:'rgba(255,255,255,0.6)',fontSize:10}},series:[{type:'pie',radius:['38%','65%'],center:['38%','50%'],data,label:{color:'rgba(255,255,255,0.6)',fontSize:10,formatter:'{d}%'},itemStyle:{borderColor:'rgba(10,10,18,0.6)',borderWidth:2},animationDuration:1200}]});
   }
 
   // renderRanking
   function renderRanking(hw) {
+    if (!chartingReady()) return;
     const sorted=[...hw].sort((a,b)=>b.total-a.total).slice(0,15);
-    if (charts.ranking) { try { charts.ranking.dispose(); } catch(e) {} charts.ranking = null; }
+    if (charts.ranking) { safeChartDispose(charts.ranking); charts.ranking = null; }
     charts.ranking=echarts.init(document.getElementById('chartRanking'));
     charts.ranking.setOption({color:PALETTE,grid:{left:90,right:50,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:11},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.total).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#0A84FF'},{offset:1,color:'#BF5AF2'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:p=>p.value>=10000?(p.value/10000).toFixed(1)+'万':p.value,fontSize:10,color:'rgba(255,255,255,0.6)'},animationDuration:1200,animationEasing:'cubicOut'}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}<br/>作品总数 ${p[0].value.toLocaleString()}`}});
   }
 
   // renderHistory
   function renderHistory(hw) {
+    if (!chartingReady()) return;
     const hist = DATA.historical_trend || [];
-    if (charts.hist) charts.hist.dispose();
+    if (charts.hist) safeChartDispose(charts.hist);
     charts.hist = echarts.init(document.getElementById('chartHistory'));
     if (hist.length < 2) {
       charts.hist.setOption({title:{text:'数据积累中，跑满 2 天后显示趋势曲线',left:'center',top:'center',textStyle:{color:AXIS_COLOR,fontSize:13,fontWeight:'normal'}}});
@@ -2492,14 +2524,14 @@ if (document.readyState === 'loading') {
     const dy = {
       title_style: '口语化+悬念，前3秒必须有钩子',
       cover: '大字报封面，关键词突出',
-      tags: cfg('hashtags.core', '#AI #人工智能 #干货分享').replace('{cat}', '#' + cat.replace(/\s/g,'')),
+      tags: cfgText('hashtags.core', '#AI #人工智能 #干货分享').replace('{cat}', '#' + cat.replace(/\s/g,'')),
       time: '12:00-13:00 或 19:00-21:00',
       format: cfg('content_format', '15-40秒口播+素材混剪'),
     };
     const xhs = {
       title_style: '干货体+emoji，标题控制在20字内',
       cover: '精致图文，3-5图轮播',
-      tags: cfg('hashtags.tool', '#AI工具 #效率神器 #新手必看').replace('{cat}', '#' + cat.replace(/\s/g,'')),
+      tags: cfgText('hashtags.tool', '#AI工具 #效率神器 #新手必看').replace('{cat}', '#' + cat.replace(/\s/g,'')),
       time: '7:30-9:00 或 20:00-22:30',
       format: '图文笔记为主，视频为辅',
     };
@@ -2792,6 +2824,10 @@ if (document.readyState === 'loading') {
 (function() {
   'use strict';
 
+  function chartingReady() {
+    return !!(window.echarts && typeof window.echarts.init === 'function');
+  }
+
   // renderBreakdowns
   function renderBreakdowns() {
     const list = DATA.hot_breakdowns || [];
@@ -2872,17 +2908,19 @@ if (document.readyState === 'loading') {
 
   // renderCollect
   function renderCollect(hw) {
+    if (!chartingReady()) return;
     const sorted=[...hw].filter(h=>h.collect_rate>0).sort((a,b)=>b.collect_rate-a.collect_rate).slice(0,10);
-    if (charts.collect) { try { charts.collect.dispose(); } catch(e) {} charts.collect = null; }
+    if (charts.collect) { safeChartDispose(charts.collect); charts.collect = null; }
     charts.collect=echarts.init(document.getElementById('chartCollect'));
     charts.collect.setOption({color:PALETTE,grid:{left:75,right:30,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:'{value}%'},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.collect_rate).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#30D158'},{offset:1,color:'#64D2FF'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:'{c}%',fontSize:10,color:'rgba(48,209,88,0.8)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:'rgba(48,209,88,0.3)',textStyle:{color:TOOLTIP_TEXT}}});
   }
 
   // renderScatter
   function renderScatter(works) {
+    if (!chartingReady()) return;
     const top=[...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0)).slice(0,30);
     const data=top.map(w=>[w.likeCount||0,w.collectCount||0,w.title||'']);
-    if (charts.scatter) { try { charts.scatter.dispose(); } catch(e) {} charts.scatter = null; }
+    if (charts.scatter) { safeChartDispose(charts.scatter); charts.scatter = null; }
     charts.scatter=echarts.init(document.getElementById('chartScatter'));
     charts.scatter.setOption({color:PALETTE,grid:{left:50,right:15,top:15,bottom:30},xAxis:{name:'点赞',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{name:'收藏',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'scatter',data,symbolSize:d=>Math.max(8,Math.min(28,Math.sqrt(d[0])/12)),itemStyle:{color:'rgba(10,132,255,0.5)',borderColor:'#64D2FF',borderWidth:1}}],tooltip:{backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${(p.data[2]||'').slice(0,25)}<br/>点赞 ${p.data[0].toLocaleString()}<br/>收藏 ${p.data[1].toLocaleString()}`}});
   }
@@ -2951,15 +2989,17 @@ if (document.readyState === 'loading') {
 
   // renderHook
   function renderHook(works) {
+    if (!chartingReady()) return;
     const hs={}; works.forEach(w=>{const h=classifyHook(w.title||'');if(!hs[h])hs[h]={count:0,likes:0};hs[h].count++;hs[h].likes+=(w.likeCount||0);});
     const data=Object.entries(hs).map(([n,v])=>({name:n,value:Math.round(v.likes/v.count)}));
-    if (charts.hook) { try { charts.hook.dispose(); } catch(e) {} charts.hook = null; }
+    if (charts.hook) { safeChartDispose(charts.hook); charts.hook = null; }
     charts.hook=echarts.init(document.getElementById('chartHook'));
     charts.hook.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:data.map(d=>d.name),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:data.map(d=>d.value),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#FF9F0A'},{offset:1,color:'#FF453A'}]),borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:'rgba(255,255,255,0.5)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}型<br/>平均点赞 ${p[0].value.toLocaleString()}`}});
   }
 
   // renderDuration
   function renderDuration(works) {
+    if (!chartingReady()) return;
     const ranges = [
       { range: '0-15秒', min: 0, max: 15 },
       { range: '15-30秒', min: 15, max: 30 },
@@ -2985,13 +3025,14 @@ if (document.readyState === 'loading') {
       range: r.range, count: counts[i],
       avg_likes: counts[i] > 0 ? Math.round(likes[i] / counts[i]) : 0
     }));
-    if (charts.dur) charts.dur.dispose();
+    if (charts.dur) safeChartDispose(charts.dur);
     charts.dur = echarts.init(document.getElementById('chartDuration'));
     charts.dur.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:dist.map(d=>d.range),axisLabel:{color:AXIS_COLOR,fontSize:9,interval:0,rotate:15},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:dist.map(d=>({value:d.count,itemStyle:{color:d.avg_likes>5000?'#30D158':'#0A84FF'}})),label:{show:true,position:'top',fontSize:9,color:'rgba(255,255,255,0.5)',formatter:p=>`${p.value}条`},barWidth:'50%',animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>{const d=dist[p[0].dataIndex];return `${d.range}<br/>作品数 ${d.count}<br/>平均点赞 ${d.avg_likes.toLocaleString()}`;}}});
   }
 
   // renderPublishTime
   function renderPublishTime(works) {
+    if (!chartingReady()) return;
     // 从works实时计算发布时间分布
     const hourCount = new Array(24).fill(0);
     const hourLikes = new Array(24).fill(0);
@@ -3013,7 +3054,7 @@ if (document.readyState === 'loading') {
       viral_count: hourViral[h],
       viral_rate: cnt > 0 ? Math.round(hourViral[h] / cnt * 100) : 0
     }));
-    if (charts.pt) { try { charts.pt.dispose(); } catch(e) {} charts.pt = null; }
+    if (charts.pt) { safeChartDispose(charts.pt); charts.pt = null; }
     charts.pt = echarts.init(document.getElementById('chartPublishTime'));
     charts.pt.setOption({
       color: PALETTE,
@@ -4566,7 +4607,7 @@ if (document.readyState === 'loading') {
     setTimeout(function() {
       if (window.charts) {
         Object.values(window.charts).forEach(function(chart) {
-          if (chart && chart.resize) chart.resize();
+          safeChartResize(chart);
         });
       }
       if (window.initGlow) window.initGlow();

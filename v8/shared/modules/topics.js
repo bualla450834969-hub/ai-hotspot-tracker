@@ -145,14 +145,14 @@
     const dy = {
       title_style: '口语化+悬念，前3秒必须有钩子',
       cover: '大字报封面，关键词突出',
-      tags: cfg('hashtags.core', '#AI #人工智能 #干货分享').replace('{cat}', '#' + cat.replace(/\s/g,'')),
+      tags: cfgText('hashtags.core', '#AI #人工智能 #干货分享').replace('{cat}', '#' + cat.replace(/\s/g,'')),
       time: '12:00-13:00 或 19:00-21:00',
       format: cfg('content_format', '15-40秒口播+素材混剪'),
     };
     const xhs = {
       title_style: '干货体+emoji，标题控制在20字内',
       cover: '精致图文，3-5图轮播',
-      tags: cfg('hashtags.tool', '#AI工具 #效率神器 #新手必看').replace('{cat}', '#' + cat.replace(/\s/g,'')),
+      tags: cfgText('hashtags.tool', '#AI工具 #效率神器 #新手必看').replace('{cat}', '#' + cat.replace(/\s/g,'')),
       time: '7:30-9:00 或 20:00-22:30',
       format: '图文笔记为主，视频为辅',
     };

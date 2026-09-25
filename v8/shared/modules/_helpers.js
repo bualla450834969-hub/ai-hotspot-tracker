@@ -30,12 +30,17 @@
   function getMonetization(topic) {
     const kw = (topic.keyword || '').toLowerCase();
     const cat = topic.keyword || '';
-    const rules = cfg('monetization_rules', [
+    const fallbackRules = [
       { match: ['工具','教程','入门','怎么做','做图','视频','ppt'], type: 'affiliate', score: 85, desc: '带货：工具会员/affiliate佣金' },
       { match: ['资讯','新闻','发布','agent'], type: 'ad', score: 70, desc: '广告：品牌合作、商单植入' },
       { match: ['工作流','自动化','效率'], type: 'private', score: 90, desc: '私域：引流微信，卖方案/咨询' },
       { match: ['提示词','prompt'], type: 'course', score: 75, desc: '知识付费：课程/社群' },
-    ]);
+    ];
+    const configuredRules = cfg('monetization_rules', fallbackRules);
+    const rules = Array.isArray(configuredRules)
+      ? configuredRules.filter(r => r && Array.isArray(r.match) && r.match.every(m => typeof m === 'string'))
+      : [];
+    if (!rules.length) rules.push(...fallbackRules);
     let type = 'affiliate', score = 60, desc = '带货：通用工具推荐';
     for (let i = 0; i < rules.length; i++) {
       const r = rules[i];

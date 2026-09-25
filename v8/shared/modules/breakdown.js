@@ -7,6 +7,10 @@
 (function() {
   'use strict';
 
+  function chartingReady() {
+    return !!(window.echarts && typeof window.echarts.init === 'function');
+  }
+
   // renderBreakdowns
   function renderBreakdowns() {
     const list = DATA.hot_breakdowns || [];
@@ -87,17 +91,19 @@
 
   // renderCollect
   function renderCollect(hw) {
+    if (!chartingReady()) return;
     const sorted=[...hw].filter(h=>h.collect_rate>0).sort((a,b)=>b.collect_rate-a.collect_rate).slice(0,10);
-    if (charts.collect) { try { charts.collect.dispose(); } catch(e) {} charts.collect = null; }
+    if (charts.collect) { safeChartDispose(charts.collect); charts.collect = null; }
     charts.collect=echarts.init(document.getElementById('chartCollect'));
     charts.collect.setOption({color:PALETTE,grid:{left:75,right:30,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:'{value}%'},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.collect_rate).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#30D158'},{offset:1,color:'#64D2FF'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:'{c}%',fontSize:10,color:'rgba(48,209,88,0.8)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:'rgba(48,209,88,0.3)',textStyle:{color:TOOLTIP_TEXT}}});
   }
 
   // renderScatter
   function renderScatter(works) {
+    if (!chartingReady()) return;
     const top=[...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0)).slice(0,30);
     const data=top.map(w=>[w.likeCount||0,w.collectCount||0,w.title||'']);
-    if (charts.scatter) { try { charts.scatter.dispose(); } catch(e) {} charts.scatter = null; }
+    if (charts.scatter) { safeChartDispose(charts.scatter); charts.scatter = null; }
     charts.scatter=echarts.init(document.getElementById('chartScatter'));
     charts.scatter.setOption({color:PALETTE,grid:{left:50,right:15,top:15,bottom:30},xAxis:{name:'点赞',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{name:'收藏',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'scatter',data,symbolSize:d=>Math.max(8,Math.min(28,Math.sqrt(d[0])/12)),itemStyle:{color:'rgba(10,132,255,0.5)',borderColor:'#64D2FF',borderWidth:1}}],tooltip:{backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${(p.data[2]||'').slice(0,25)}<br/>点赞 ${p.data[0].toLocaleString()}<br/>收藏 ${p.data[1].toLocaleString()}`}});
   }
@@ -166,15 +172,17 @@
 
   // renderHook
   function renderHook(works) {
+    if (!chartingReady()) return;
     const hs={}; works.forEach(w=>{const h=classifyHook(w.title||'');if(!hs[h])hs[h]={count:0,likes:0};hs[h].count++;hs[h].likes+=(w.likeCount||0);});
     const data=Object.entries(hs).map(([n,v])=>({name:n,value:Math.round(v.likes/v.count)}));
-    if (charts.hook) { try { charts.hook.dispose(); } catch(e) {} charts.hook = null; }
+    if (charts.hook) { safeChartDispose(charts.hook); charts.hook = null; }
     charts.hook=echarts.init(document.getElementById('chartHook'));
     charts.hook.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:data.map(d=>d.name),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:data.map(d=>d.value),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#FF9F0A'},{offset:1,color:'#FF453A'}]),borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:'rgba(255,255,255,0.5)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}型<br/>平均点赞 ${p[0].value.toLocaleString()}`}});
   }
 
   // renderDuration
   function renderDuration(works) {
+    if (!chartingReady()) return;
     const ranges = [
       { range: '0-15秒', min: 0, max: 15 },
       { range: '15-30秒', min: 15, max: 30 },
@@ -200,13 +208,14 @@
       range: r.range, count: counts[i],
       avg_likes: counts[i] > 0 ? Math.round(likes[i] / counts[i]) : 0
     }));
-    if (charts.dur) charts.dur.dispose();
+    if (charts.dur) safeChartDispose(charts.dur);
     charts.dur = echarts.init(document.getElementById('chartDuration'));
     charts.dur.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:dist.map(d=>d.range),axisLabel:{color:AXIS_COLOR,fontSize:9,interval:0,rotate:15},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:dist.map(d=>({value:d.count,itemStyle:{color:d.avg_likes>5000?'#30D158':'#0A84FF'}})),label:{show:true,position:'top',fontSize:9,color:'rgba(255,255,255,0.5)',formatter:p=>`${p.value}条`},barWidth:'50%',animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>{const d=dist[p[0].dataIndex];return `${d.range}<br/>作品数 ${d.count}<br/>平均点赞 ${d.avg_likes.toLocaleString()}`;}}});
   }
 
   // renderPublishTime
   function renderPublishTime(works) {
+    if (!chartingReady()) return;
     // 从works实时计算发布时间分布
     const hourCount = new Array(24).fill(0);
     const hourLikes = new Array(24).fill(0);
@@ -228,7 +237,7 @@
       viral_count: hourViral[h],
       viral_rate: cnt > 0 ? Math.round(hourViral[h] / cnt * 100) : 0
     }));
-    if (charts.pt) { try { charts.pt.dispose(); } catch(e) {} charts.pt = null; }
+    if (charts.pt) { safeChartDispose(charts.pt); charts.pt = null; }
     charts.pt = echarts.init(document.getElementById('chartPublishTime'));
     charts.pt.setOption({
       color: PALETTE,

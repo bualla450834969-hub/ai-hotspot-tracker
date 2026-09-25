@@ -272,7 +272,7 @@
     setTimeout(function() {
       if (window.charts) {
         Object.values(window.charts).forEach(function(chart) {
-          if (chart && chart.resize) chart.resize();
+          safeChartResize(chart);
         });
       }
       if (window.initGlow) window.initGlow();

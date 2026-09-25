@@ -186,6 +186,20 @@
     return !!dom && dom.isConnected === true && dom.clientWidth > 10 && dom.clientHeight > 10;
   }
 
+  function registerChart(dom, inst) {
+    if (!dom || !inst) return inst;
+    chartRegistry.set(dom, inst);
+    if (!inst.__stableDisposeWrapped && typeof inst.dispose === 'function') {
+      var originalDispose = inst.dispose.bind(inst);
+      inst.dispose = function () {
+        chartRegistry.delete(dom);
+        return originalDispose();
+      };
+      inst.__stableDisposeWrapped = true;
+    }
+    return inst;
+  }
+
   /**
    * 容器无尺寸时返回一个"延迟代理"：缓存 setOption/resize 调用，
    * 容器一旦有尺寸即创建真实实例并按顺序重放，避免调用方 .setOption 报错。
@@ -194,14 +208,20 @@
     var queue = [];
     var real = null;
     var tries = 0;
+    var requestId = AppStore.requestId;
     var iv = TimerManager.setInterval(function () {
       tries++;
       if (real) return;
+      if (!AppStore.isCurrent(requestId) || !dom || !dom.isConnected) {
+        TimerManager.clearInterval(iv);
+        queue = [];
+        chartRegistry.delete(dom);
+        return;
+      }
       if (domReady(dom)) {
         TimerManager.clearInterval(iv);
-        if (!ec.getInstanceByDom(dom)) real = ec.__origInit(dom, theme, opts);
-        else real = ec.getInstanceByDom(dom);
-        chartRegistry.set(dom, real);
+        if (!ec.getInstanceByDom(dom)) real = registerChart(dom, ec.__origInit(dom, theme, opts));
+        else real = registerChart(dom, ec.getInstanceByDom(dom));
         var pending = queue; queue = [];
         pending.forEach(function (args) {
           try { real.setOption.apply(real, args); }
@@ -229,17 +249,13 @@
     ec.init = function (dom, theme, opts) {
       if (!dom) return ec.__origInit(dom, theme, opts);
       var existing = ec.getInstanceByDom ? ec.getInstanceByDom(dom) : null;
-      if (existing) return existing;
-      if (chartRegistry.has(dom)) return chartRegistry.get(dom);
+      if (existing) return registerChart(dom, existing);
+      if (chartRegistry.has(dom)) chartRegistry.delete(dom);
       if (domReady(dom)) {
-        var inst = ec.__origInit(dom, theme, opts);
-        chartRegistry.set(dom, inst);
-        return inst;
+        return registerChart(dom, ec.__origInit(dom, theme, opts));
       }
       return makeDeferred(ec, dom, theme, opts); // 无尺寸：延迟代理，不在 0 尺寸 init
     };
-    // 统一 dispose：从注册表移除
-    var origDispose = ec.dispose;
     ec.__patched = true;
     ec.safeChartInit = function (dom, theme, opts) { return ec.init(dom, theme, opts); };
     return ec;
@@ -268,6 +284,18 @@
   }
   window.safeChartInit = function (dom, theme, opts) {
     return window.echarts ? window.echarts.init(dom, theme, opts) : null;
+  };
+  window.safeChartDispose = function (chart) {
+    if (!chart || typeof chart.dispose !== 'function') return;
+    try { chart.dispose(); }
+    catch (e) { AppErrorHandler.handle(e, 'chart.dispose'); }
+  };
+  window.safeChartResize = function (chart) {
+    if (!chart || typeof chart.resize !== 'function') return;
+    try {
+      if (typeof chart.isDisposed === 'function' && chart.isDisposed()) return;
+      chart.resize();
+    } catch (e) { AppErrorHandler.handle(e, 'chart.resize'); }
   };
 
   /* ---------- 7. 模块级错误隔离 ---------- */

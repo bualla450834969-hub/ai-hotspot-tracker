@@ -237,6 +237,18 @@ window.cfg = function(path, defaultValue) {
 };
 
 /**
+ * 文本配置读取工具。标签配置允许使用模板字符串或字符串数组。
+ */
+window.cfgText = function(path, defaultValue) {
+  const value = cfg(path, defaultValue);
+  if (typeof value === 'string') return value;
+  if (Array.isArray(value) && value.every(item => typeof item === 'string')) {
+    return value.join(' ');
+  }
+  return defaultValue;
+};
+
+/**
  * 领域守卫 — AI专属模块调用，非AI领域显示提示而非崩溃
  */
 window.domainGuard = function(moduleId, renderFn) {
