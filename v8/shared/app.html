@@ -888,16 +888,6 @@ window.safeCall = function(fn, ctx) {
         var techRadar = document.getElementById('techRadar');
         if (techRadar) techRadar.style.display = 'none';
 
-        // 6. 人群画像覆盖为烘焙人群
-        var aud = document.getElementById('audiencePersonas') || document.getElementById('audience');
-        if (aud) {
-          aud.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:8px;">' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;"><div style="font-weight:600;">烘焙新手妈妈</div><div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">25-35岁 · 女性 · 占比35%</div><div style="font-size:12px;margin-top:8px;color:#fbbf24;">需求：简单配方、家用工具、孩子爱吃</div></div>' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;"><div style="font-weight:600;">甜品爱好者</div><div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">18-30岁 · 女性 · 占比28%</div><div style="font-size:12px;margin-top:8px;color:#fbbf24;">需求：颜值高、教程详细、拍照好看</div></div>' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;"><div style="font-weight:600;">烘焙进阶者</div><div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">20-40岁 · 男女各半 · 占比22%</div><div style="font-size:12px;margin-top:8px;color:#fbbf24;">需求：专业技巧、失败原因、原料选择</div></div>' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;"><div style="font-weight:600;">私房创业者</div><div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">25-45岁 · 女性 · 占比15%</div><div style="font-size:12px;margin-top:8px;color:#fbbf24;">需求：定价、引流、接单技巧</div></div>' +
-            '</div>';
-        }
 
         // 7. 跨平台选题迁移
         // 跨平台迁移交由真实数据填充层（基于 D.cross_platform）渲染，不写死
@@ -912,31 +902,11 @@ window.safeCall = function(fn, ctx) {
           tg.parentNode.appendChild(gen);
         }
 
-        // 9. 评论语义挖掘补全
-        var cs = document.getElementById('commentSemanticContent');
-        if (cs && cs.textContent.length < 50) {
-          cs.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;padding:8px;">' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">求教程</div><div style="font-size:22px;color:#fbbf24;font-weight:700;margin-top:6px;">35</div><div style="font-size:11px;color:var(--text-secondary);">高频需求</div></div>' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">问工具/材料</div><div style="font-size:22px;color:#60a5fa;font-weight:700;margin-top:6px;">22</div><div style="font-size:11px;color:var(--text-secondary);">购买意向</div></div>' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">分享经验</div><div style="font-size:22px;color:#34d399;font-weight:700;margin-top:6px;">18</div><div style="font-size:11px;color:var(--text-secondary);">互动活跃</div></div>' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">求配方</div><div style="font-size:22px;color:#ec4899;font-weight:700;margin-top:6px;">15</div><div style="font-size:11px;color:var(--text-secondary);">可做选题</div></div>' +
-            '</div>';
-        }
 
         // 5. 隐藏 AI 技术雷达（非技术行业）
         var techRadar = document.getElementById('techRadar');
         if (techRadar) techRadar.style.display = 'none';
 
-        // 6. 人群画像覆盖为烘焙人群
-        var aud = document.getElementById('audiencePersonas') || document.getElementById('audience');
-        if (aud) {
-          aud.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;padding:8px;">' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;"><div style="font-weight:600;">烘焙新手妈妈</div><div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">25-35岁 · 女性 · 占比35%</div><div style="font-size:12px;margin-top:8px;color:#fbbf24;">需求：简单配方、家用工具、孩子爱吃</div></div>' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;"><div style="font-weight:600;">甜品爱好者</div><div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">18-30岁 · 女性 · 占比28%</div><div style="font-size:12px;margin-top:8px;color:#fbbf24;">需求：颜值高、教程详细、拍照好看</div></div>' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;"><div style="font-weight:600;">烘焙进阶者</div><div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">20-40岁 · 男女各半 · 占比22%</div><div style="font-size:12px;margin-top:8px;color:#fbbf24;">需求：专业技巧、失败原因、原料选择</div></div>' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:16px;"><div style="font-weight:600;">私房创业者</div><div style="font-size:12px;color:var(--text-secondary);margin-top:6px;">25-45岁 · 女性 · 占比15%</div><div style="font-size:12px;margin-top:8px;color:#fbbf24;">需求：定价、引流、接单技巧</div></div>' +
-            '</div>';
-        }
 
         // 7. 跨平台选题迁移
         // 跨平台迁移交由真实数据填充层（基于 D.cross_platform）渲染，不写死
@@ -951,16 +921,6 @@ window.safeCall = function(fn, ctx) {
           tg.parentNode.appendChild(gen);
         }
 
-        // 9. 评论语义挖掘补全
-        var cs = document.getElementById('commentSemanticContent');
-        if (cs && cs.textContent.length < 50) {
-          cs.innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;padding:8px;">' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">求教程</div><div style="font-size:22px;color:#fbbf24;font-weight:700;margin-top:6px;">35</div><div style="font-size:11px;color:var(--text-secondary);">高频需求</div></div>' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">问工具/材料</div><div style="font-size:22px;color:#60a5fa;font-weight:700;margin-top:6px;">22</div><div style="font-size:11px;color:var(--text-secondary);">购买意向</div></div>' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">分享经验</div><div style="font-size:22px;color:#34d399;font-weight:700;margin-top:6px;">18</div><div style="font-size:11px;color:var(--text-secondary);">互动活跃</div></div>' +
-            '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;"><div style="font-weight:600;">求配方</div><div style="font-size:22px;color:#ec4899;font-weight:700;margin-top:6px;">15</div><div style="font-size:11px;color:var(--text-secondary);">可做选题</div></div>' +
-            '</div>';
-        }
       } catch(e){ console.error('fallback render err', e); }
       setTimeout(function(){ window.dispatchEvent(new Event('resize')); }, 200);
     }, 3000);
@@ -1429,6 +1389,42 @@ function buildDashboardData(works, hotwords, industryName){
     return {duration:b[0],rate:b[3],count:dyWorks.filter(function(w){return w.duration>=b[1]&&w.duration<b[2];}).length};
   });
 
+  // ===== 人群画像 / 评论语义 / 转化信号：基于真实作品分类与互动计数建模 =====
+  function _catOf(t){
+    if(/教程|入门|怎么|基础|新手|初学/.test(t))return 0;
+    if(/效果|作品|展示|成品|颜值|欣赏/.test(t))return 1;
+    if(/技巧|进阶|揭秘|避坑|对比|区别|评测|测评/.test(t))return 2;
+    return 3;
+  }
+  var pcnt=[0,0,0,0];
+  works.forEach(function(w){pcnt[_catOf(w.title||'')]++;});
+  var personaDef=[
+    {key:'入门新手',cat:'初学者',needs:['基础教程','入门指引','常见问题'],traits:['零基础','求详细'],content:'新手教程、入门清单',active:'晚间 19:00-22:00',mon:'工具/材料带货',pain:['看不懂术语','上手失败']},
+    {key:'效果关注者',cat:'兴趣人群',needs:['成品效果','创作灵感','颜值展示'],traits:['看效果','爱收藏'],content:'作品展示、效果对比',active:'午休 12:00-14:00',mon:'成品/周边',pain:['效果难复刻','缺灵感']},
+    {key:'进阶学习者',cat:'进阶人群',needs:['进阶技巧','避坑指南','深度测评'],traits:['有基础','重细节'],content:'技巧拆解、避坑测评',active:'工作日晚间',mon:'进阶课程',pain:['遇到瓶颈','细节不到位']},
+    {key:'爱好者与经营者',cat:'泛人群',needs:['行业趋势','经营方法','同行交流'],traits:['长期关注','重实用'],content:'经验分享、行业盘点',active:'周末及晚间',mon:'私域/接单',pain:['变现难','流量不稳']}
+  ];
+  var audiencePersonas=personaDef.map(function(d,i){
+    return {name:industryName+d.key,category:d.cat,proportion:Math.round(pcnt[i]/n*100),
+      age:'各年龄段',gender:'不限',traits:d.traits,needs:d.needs,content_pref:d.content,
+      active_time:d.active,monetization:d.mon,pain_points:d.pain};
+  }).filter(function(p,i){return pcnt[i]>0;});
+  if(!audiencePersonas.length)audiencePersonas=[{name:industryName+'关注者',category:'泛人群',proportion:100,age:'各年龄段',gender:'不限',traits:['关注'+industryName],needs:['优质内容'],content_pref:'教程与作品',active_time:'晚间',monetization:'内容带货',pain_points:['信息分散']}];
+
+  var totalComments=works.reduce(function(a,w){return a+(w.commentCount||w.comments||0);},0);
+  var totalCollects=works.reduce(function(a,w){return a+(w.collectCount||w.collects||0);},0);
+  var themeNames=['求教程/入门','问效果/成品','求技巧/避坑','交流/经营'];
+  var commentSemantic={themes:pcnt.map(function(c,i){
+    return {name:industryName+themeNames[i],count:Math.round(totalComments*c/n)};
+  }).filter(function(t,i){return pcnt[i]>0;})};
+  if(!commentSemantic.themes.length)commentSemantic.themes=[{name:industryName+'综合讨论',count:totalComments}];
+
+  var conversionSignals=[
+    {signal:'求教程/方法',desc:'约'+Math.round(totalComments*pcnt[0]/n)+'条相关评论',impact:(pcnt[0]/n>0.2)?'高':'中'},
+    {signal:'求资料/链接',desc:'累计收藏 '+(totalCollects||0).toLocaleString()+'，资料需求强',impact:(totalCollects>totalLike*0.3)?'高':'中'},
+    {signal:'问效果/推荐',desc:'约'+Math.round(totalComments*pcnt[1]/n)+'条效果咨询',impact:(pcnt[1]/n>0.2)?'高':'中'}
+  ];
+
   return {
     last_update: new Date().toLocaleString('zh-CN'),
     summary: {
@@ -1449,7 +1445,9 @@ function buildDashboardData(works, hotwords, industryName){
     blue_ocean_list: hotwords.filter(function(h){return h.efficiency_tag==='蓝海';}).map(function(h){return {keyword:h.keyword,total:h.total,max_like:h.max_like};}),
     growth_ranking: hotwords.filter(function(h){return h.trend==='飙升';}).map(function(h){return {keyword:h.keyword, growth:'+'+Math.round(h.max_like/1000)+'K'};}),
     tech_signals: [],
-    audience_personas: [],
+    audience_personas: audiencePersonas,
+    comment_semantic: commentSemantic,
+    conversion_signals: conversionSignals,
     cross_platform: crossPlatform,
     completion_rate: completionRate
   };
