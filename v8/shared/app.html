@@ -27,7 +27,7 @@ window.safeCall = function(fn, ctx) {
   <link rel="stylesheet" href="../shared/styles/components.css?v=1788677800">
   <link rel="stylesheet" href="../shared/styles/glass.css?v=1788677800">
   <link rel="stylesheet" href="../shared/styles/login.css?v=1788677800">
-  <link rel="stylesheet" href="../shared/styles/modules.css?v=1790571000">
+  <link rel="stylesheet" href="../shared/styles/modules.css?v=1790660000">
 <link rel="stylesheet" href="../shared/styles/sidebar.css?v=1788842270">
   <link rel="stylesheet" href="../shared/styles/advanced.css?v=1788757957">
   <!-- ECharts -->
@@ -971,7 +971,7 @@ window.safeCall = function(fn, ctx) {
 
 
 
-  <script src="../shared/bundle.js?v=1790572000"></script>
+  <script src="../shared/bundle.js?v=1790660000"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework(), { once: true });
@@ -1104,6 +1104,8 @@ function normalizeWork(w, platform){
     return {
       workId: w.workId || '',
       title: w.workTitle || w.workDesc || '',
+      caption: w.content || w.workDesc || w.workTitle || '',
+      transcript: w.transcript || w.subtitle || '',
       accountName: w.accountNickname || '',
       likeCount: w.workLikedCount || 0,
       collectCount: w.workCollectedCount || 0,
@@ -1119,6 +1121,8 @@ function normalizeWork(w, platform){
   return {
     workId: w.workId || w.awemeId || '',
     title: w.title || w.desc || '',
+    caption: w.content || w.desc || w.title || '',
+    transcript: w.transcript || w.subtitle || '',
     accountName: w.accountName || w.nickname || '',
     likeCount: w.likeCount || w.diggCount || 0,
     collectCount: w.collectCount || w.collectCount || 0,

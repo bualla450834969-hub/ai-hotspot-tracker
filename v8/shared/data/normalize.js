@@ -30,6 +30,8 @@ window.normalizeData = function() {
         workId: w.workId || w.sourceId || w.work_id || '',
         sourceId: w.sourceId || w.workId || w.work_id || '',
         title: w.title || w.name || '',
+        caption: w.caption || w.content || w.workDesc || w.desc || w.description || '',
+        transcript: w.transcript || w.subtitle || w.subtitles || '',
         author: author,
         accountName: author,
         platform: w.platform || 'douyin',
