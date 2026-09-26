@@ -2028,6 +2028,16 @@ function initLoginLogo() {
 function initScrollReveal() {
   var vh = window.innerHeight;
   function update() {
+    if (document.body.classList.contains('v82-research')) {
+      document.body.setAttribute('data-reveal', '1');
+      var researchSections = document.querySelectorAll('#v82ResearchHome section');
+      for (var r = 0; r < researchSections.length; r++) {
+        researchSections[r].style.filter = 'none';
+        researchSections[r].style.opacity = '1';
+        researchSections[r].style.transform = 'none';
+      }
+      return;
+    }
     if (document.getElementById('appSidebar')) {
       document.body.setAttribute('data-reveal', '1');
       var els = document.querySelectorAll('.hero, section');
@@ -2579,7 +2589,7 @@ if (document.readyState === 'loading') {
     drawer.className = 'v82-drawer';
     drawer.setAttribute('aria-hidden', 'true');
     drawer.innerHTML = '<div class="v82-drawer-backdrop" data-v82-close></div><div class="v82-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="v82DrawerTitle">' +
-      '<header><div><span class="v82-drawer-kicker">Evidence</span><h2 id="v82DrawerTitle">证据</h2></div><button type="button" class="v82-close" data-v82-close aria-label="关闭">×</button></header>' +
+      '<header><div><span class="v82-drawer-kicker" id="v82DrawerKicker">原始证据</span><h2 id="v82DrawerTitle">证据</h2></div><button type="button" class="v82-close" data-v82-close aria-label="关闭">×</button></header>' +
       '<div class="v82-drawer-body" id="v82DrawerBody"></div></div>';
     document.body.appendChild(drawer);
     return drawer;
@@ -2598,8 +2608,15 @@ if (document.readyState === 'loading') {
     return '<article class="v82-evidence-card"><div class="v82-evidence-meta"><span>' + escapeHTML(item.platform || 'unknown') + '</span><span>' + escapeHTML(item.keyword || '未标注关键词') + '</span></div>' +
       '<h3>' + escapeHTML(title) + '</h3>' +
       (item.text && item.text !== item.title ? '<p>' + escapeHTML(item.text).slice(0, 180) + '</p>' : '') +
-      '<div class="v82-metrics"><span>赞 ' + fmt(item.metrics.likes) + '</span><span>评 ' + fmt(item.metrics.comments) + '</span><span>藏 ' + fmt(item.metrics.favorites) + '</span><span>分享 ' + fmt(item.metrics.shares) + '</span></div>' +
+      '<div class="v82-metrics"><span>赞 ' + fmt(item.metrics.likes) + '</span><span>评 ' + fmt(item.metrics.comments) + '</span><span>藏 ' + fmt(item.metrics.favorites) + '</span></div>' +
       '<div class="v82-evidence-link">' + link + '</div></article>';
+  }
+
+  function interactionValue(item) {
+    return ['likes', 'comments', 'favorites', 'shares'].reduce(function(total, key) {
+      var value = item.metrics && item.metrics[key];
+      return total + (value == null || !isFinite(Number(value)) ? 0 : Number(value));
+    }, 0);
   }
 
   function renderBasis(insight, evidence) {
@@ -2607,15 +2624,16 @@ if (document.readyState === 'loading') {
     var s = insight.evidenceStrength || {};
     var limitations = (p.limitations || []).concat((AppStore.v82.dataQuality && AppStore.v82.dataQuality.limitations) || []);
     var sourceName = insight.sourceType === 'REAL' ? '原始采集数据' : insight.sourceType === 'DERIVED' ? '由原始样本计算得出' : '基于现有样本推断';
+    var strengthName = { HIGH:'高', MEDIUM:'中', LOW:'低' }[s.level] || '低';
     var method = insight.metrics && insight.metrics.averageEngagement != null
       ? '分析了 ' + evidence.length + ' 条相关作品标题，并计算点赞、评论、收藏和分享的平均互动。'
       : '分析了 ' + evidence.length + ' 条相关原始样本，按明确的采集关键词归组。';
     return '<section class="v82-basis"><p class="v82-basis-summary">' + escapeHTML(method) + '</p><dl>' +
       '<div><dt>数据来源</dt><dd>' + escapeHTML(sourceName) + '</dd></div>' +
       '<div><dt>样本数量</dt><dd>' + evidence.length + ' 条</dd></div>' +
-      '<div><dt>依据强度</dt><dd>' + escapeHTML(s.level || 'LOW') + '：来源 ' + (s.sourceCount || 0) + ' 个平台，字段完整度 ' + Math.round((s.completeness || 0) * 100) + '%</dd></div>' +
+      '<div><dt>依据强度</dt><dd>' + strengthName + '：来源 ' + (s.sourceCount || 0) + ' 个平台，字段完整度 ' + Math.round((s.completeness || 0) * 100) + '%</dd></div>' +
       '</dl><h3>需要注意</h3>' + (limitations.length ? '<ul>' + limitations.map(function(item) { return '<li>' + escapeHTML(item) + '</li>'; }).join('') + '</ul>' : '<p class="v82-muted">无额外限制记录</p>') +
-      '<details class="v82-advanced"><summary>高级信息</summary><dl><div><dt>来源字段</dt><dd>' + escapeHTML((p.sourceFields || []).join('、') || '未记录') + '</dd></div><div><dt>计算公式</dt><dd>' + escapeHTML(p.formula || '未使用公式') + '</dd></div><div><dt>生成模块</dt><dd>' + escapeHTML(p.generatedBy || '未记录') + '</dd></div></dl></details></section>';
+      '<details class="v82-advanced"><summary>高级信息</summary><dl><div><dt>内部强度</dt><dd>' + escapeHTML(s.level || 'LOW') + '</dd></div><div><dt>来源字段</dt><dd>' + escapeHTML((p.sourceFields || []).join('、') || '未记录') + '</dd></div><div><dt>计算公式</dt><dd>' + escapeHTML(p.formula || '未使用公式') + '</dd></div><div><dt>生成模块</dt><dd>' + escapeHTML(p.generatedBy || '未记录') + '</dd></div></dl></details></section>';
   }
 
   function open(insightId, mode) {
@@ -2625,10 +2643,15 @@ if (document.readyState === 'loading') {
     if (!insight || !body) {
       if (body) body.innerHTML = '<div class="v82-empty">未找到对应洞察或证据。</div>';
     } else {
-      var evidence = AppStore.getEvidenceByInsight(insightId);
+      var evidence = AppStore.getEvidenceByInsight(insightId).slice().sort(function(a, b) {
+        return interactionValue(b) - interactionValue(a);
+      });
+      document.getElementById('v82DrawerKicker').textContent = mode === 'basis' ? '计算依据' : '原始证据';
       document.getElementById('v82DrawerTitle').textContent = insight.title;
       body.innerHTML = mode === 'basis' ? renderBasis(insight, evidence) :
-        '<div class="v82-drawer-summary">共 ' + evidence.length + ' 条原始证据</div>' +
+        '<div class="v82-drawer-summary"><strong>' + evidence.length + ' 条原始证据</strong>' +
+        (insight.metrics && insight.metrics.keyword ? '<span>主要关键词：' + escapeHTML(insight.metrics.keyword) + '</span>' : '') +
+        '<small>按互动量从高到低排列</small></div>' +
         (evidence.length ? evidence.map(evidenceCard).join('') : '<div class="v82-empty">该洞察当前没有可展示的原始证据。</div>');
     }
     drawer.classList.add('is-open');
@@ -2682,11 +2705,13 @@ if (document.readyState === 'loading') {
   function strengthLabel(value) { return { HIGH:'高', MEDIUM:'中', LOW:'低' }[value] || '低'; }
 
   function insightCard(insight) {
-    return '<article class="v82-research-card"><div class="v82-card-meta"><span>' + insight.evidenceIds.length + ' 条证据</span>' +
-      '<button type="button" class="v82-strength-button" data-v82-action="basis" data-insight-id="' + esc(insight.id) + '">证据强度 ' + strengthLabel(insight.evidenceStrength.level) + '</button></div>' +
-      '<h3>' + esc(insight.title) + '</h3><p>' + esc(insight.description) + '</p><div class="v82-card-actions">' +
+    var sourceLabel = insight.type === 'need' ? '基于真实评论' : '基于真实作品 · 推导分析';
+    return '<article class="v82-research-card"><span class="v82-data-source">' + sourceLabel + '</span>' +
+      '<h3>' + esc(insight.title) + '</h3><p>' + esc(insight.description) + '</p>' +
+      '<div class="v82-card-meta"><span>' + insight.evidenceIds.length + ' 条原始证据</span><span>证据强度：' + strengthLabel(insight.evidenceStrength.level) + '</span></div>' +
+      '<div class="v82-card-actions">' +
       '<button type="button" data-v82-action="evidence" data-insight-id="' + esc(insight.id) + '">查看证据</button>' +
-      '<button type="button" data-v82-action="basis" data-insight-id="' + esc(insight.id) + '">查看依据</button></div></article>';
+      '<button type="button" class="v82-secondary-action" data-v82-action="basis" data-insight-id="' + esc(insight.id) + '">计算依据</button></div></article>';
   }
 
   function section(number, id, title, summary, content) {
@@ -2700,7 +2725,7 @@ if (document.readyState === 'loading') {
     var platformNames = { douyin:'抖音', xiaohongshu:'小红书' };
     var platforms = quality.platforms && quality.platforms.length ? quality.platforms.map(function(item) { return platformNames[item] || item; }).join('、') : '暂无平台信息';
     return '<header class="v82-research-header"><div><span class="v82-eyebrow">Industry Research</span><h1>' + esc(industry) + '</h1>' +
-      '<p>基于 ' + quality.worksCount + ' 条作品与 ' + quality.keywordsCount + ' 个关键词的行业研究</p></div>' +
+      '<p>行业内容研究 · 基于真实采集数据</p></div>' +
       '<div class="v82-context"><div><span>最后采集</span><strong>' + esc(quality.collectionTime || '未记录') + '</strong></div><div><span>数据来源</span><strong>' + esc(platforms) + '</strong></div></div>' +
       '<div class="v82-header-actions"><button type="button" class="v82-primary" data-v82-home-action="collect">重新采集</button><button type="button" data-v82-home-action="settings">行业设置</button></div></header>';
   }
@@ -2723,7 +2748,7 @@ if (document.readyState === 'loading') {
   function renderUserVoice(analysis) {
     var content;
     if (!analysis.dataQuality.commentsCount) {
-      content = state('DATA_INSUFFICIENT', '当前暂无足够评论样本', '采集到真实评论后，这里将分析高频问题、需求、痛点和常见表达。作品标题不会被当作用户评论。');
+      content = state('DATA_INSUFFICIENT', '当前暂无评论样本', '因此暂时无法分析高频问题、用户痛点和用户需求。采集到真实评论后，这里将展示常见表达。');
     } else if (!analysis.userVoiceInsights.length) {
       content = state('DATA_INSUFFICIENT', '评论主题尚不足以形成结论', '已有评论样本，但没有达到可重复验证的主题门槛。');
     } else content = '<div class="v82-research-grid">' + analysis.userVoiceInsights.map(insightCard).join('') + '</div>';
@@ -2738,8 +2763,11 @@ if (document.readyState === 'loading') {
       return '<tr><td>' + esc(work.platform) + '</td><td>' + esc(work.title || '未提供标题') + '</td><td>' + esc(work.keyword || '未标注') + '</td><td>' + (work.metrics.likes == null ? '未采集' : work.metrics.likes.toLocaleString()) + '</td></tr>';
     }).join('');
     var tags = keywords.map(function(item) { return '<span>' + esc(item.keyword) + '</span>'; }).join('');
-    return section('06', 'v82DeepDive', '深入研究', '快速理解之后，再查看原始记录与完整研究范围。', '<div class="v82-deep-grid"><div><h3>原始作品</h3><div class="v82-table-wrap"><table><thead><tr><th>平台</th><th>标题</th><th>关键词</th><th>点赞</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>' +
-      '<aside><h3>研究入口</h3><dl><div><dt>Evidence</dt><dd>' + analysis.evidenceStore.count() + ' 条</dd></div><div><dt>全部关键词</dt><dd>' + analysis.dataQuality.keywordsCount + ' 个</dd></div><div><dt>历史数据</dt><dd>' + (analysis.dataQuality.historyDays >= 2 ? analysis.dataQuality.historyDays + ' 天' : '数据不足') + '</dd></div></dl><div class="v82-keyword-list">' + tags + '</div></aside></div>');
+    return section('06', 'v82DeepDive', '进一步研究', '按需展开原始记录，首页默认保持简洁。', '<div class="v82-deep-links">' +
+      '<details><summary><strong>浏览原始作品</strong><span>' + analysis.dataQuality.worksCount + ' 条记录</span></summary><div class="v82-table-wrap"><table><thead><tr><th>平台</th><th>标题</th><th>关键词</th><th>点赞</th></tr></thead><tbody>' + rows + '</tbody></table></div></details>' +
+      '<details><summary><strong>查看全部关键词</strong><span>' + analysis.dataQuality.keywordsCount + ' 个关键词</span></summary><div class="v82-keyword-list">' + tags + '</div></details>' +
+      '<div class="v82-deep-link"><strong>Evidence 索引</strong><span>' + analysis.evidenceStore.count() + ' 条可追溯证据</span></div>' +
+      '<div class="v82-deep-link"><strong>历史数据</strong><span>' + (analysis.dataQuality.historyDays >= 2 ? analysis.dataQuality.historyDays + ' 天记录' : '当前数据不足') + '</span></div></div>');
   }
 
   function render(data) {

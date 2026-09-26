@@ -218,6 +218,16 @@ function initLoginLogo() {
 function initScrollReveal() {
   var vh = window.innerHeight;
   function update() {
+    if (document.body.classList.contains('v82-research')) {
+      document.body.setAttribute('data-reveal', '1');
+      var researchSections = document.querySelectorAll('#v82ResearchHome section');
+      for (var r = 0; r < researchSections.length; r++) {
+        researchSections[r].style.filter = 'none';
+        researchSections[r].style.opacity = '1';
+        researchSections[r].style.transform = 'none';
+      }
+      return;
+    }
     if (document.getElementById('appSidebar')) {
       document.body.setAttribute('data-reveal', '1');
       var els = document.querySelectorAll('.hero, section');

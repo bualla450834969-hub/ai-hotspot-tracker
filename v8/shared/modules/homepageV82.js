@@ -29,11 +29,13 @@
   function strengthLabel(value) { return { HIGH:'高', MEDIUM:'中', LOW:'低' }[value] || '低'; }
 
   function insightCard(insight) {
-    return '<article class="v82-research-card"><div class="v82-card-meta"><span>' + insight.evidenceIds.length + ' 条证据</span>' +
-      '<button type="button" class="v82-strength-button" data-v82-action="basis" data-insight-id="' + esc(insight.id) + '">证据强度 ' + strengthLabel(insight.evidenceStrength.level) + '</button></div>' +
-      '<h3>' + esc(insight.title) + '</h3><p>' + esc(insight.description) + '</p><div class="v82-card-actions">' +
+    var sourceLabel = insight.type === 'need' ? '基于真实评论' : '基于真实作品 · 推导分析';
+    return '<article class="v82-research-card"><span class="v82-data-source">' + sourceLabel + '</span>' +
+      '<h3>' + esc(insight.title) + '</h3><p>' + esc(insight.description) + '</p>' +
+      '<div class="v82-card-meta"><span>' + insight.evidenceIds.length + ' 条原始证据</span><span>证据强度：' + strengthLabel(insight.evidenceStrength.level) + '</span></div>' +
+      '<div class="v82-card-actions">' +
       '<button type="button" data-v82-action="evidence" data-insight-id="' + esc(insight.id) + '">查看证据</button>' +
-      '<button type="button" data-v82-action="basis" data-insight-id="' + esc(insight.id) + '">查看依据</button></div></article>';
+      '<button type="button" class="v82-secondary-action" data-v82-action="basis" data-insight-id="' + esc(insight.id) + '">计算依据</button></div></article>';
   }
 
   function section(number, id, title, summary, content) {
@@ -47,7 +49,7 @@
     var platformNames = { douyin:'抖音', xiaohongshu:'小红书' };
     var platforms = quality.platforms && quality.platforms.length ? quality.platforms.map(function(item) { return platformNames[item] || item; }).join('、') : '暂无平台信息';
     return '<header class="v82-research-header"><div><span class="v82-eyebrow">Industry Research</span><h1>' + esc(industry) + '</h1>' +
-      '<p>基于 ' + quality.worksCount + ' 条作品与 ' + quality.keywordsCount + ' 个关键词的行业研究</p></div>' +
+      '<p>行业内容研究 · 基于真实采集数据</p></div>' +
       '<div class="v82-context"><div><span>最后采集</span><strong>' + esc(quality.collectionTime || '未记录') + '</strong></div><div><span>数据来源</span><strong>' + esc(platforms) + '</strong></div></div>' +
       '<div class="v82-header-actions"><button type="button" class="v82-primary" data-v82-home-action="collect">重新采集</button><button type="button" data-v82-home-action="settings">行业设置</button></div></header>';
   }
@@ -70,7 +72,7 @@
   function renderUserVoice(analysis) {
     var content;
     if (!analysis.dataQuality.commentsCount) {
-      content = state('DATA_INSUFFICIENT', '当前暂无足够评论样本', '采集到真实评论后，这里将分析高频问题、需求、痛点和常见表达。作品标题不会被当作用户评论。');
+      content = state('DATA_INSUFFICIENT', '当前暂无评论样本', '因此暂时无法分析高频问题、用户痛点和用户需求。采集到真实评论后，这里将展示常见表达。');
     } else if (!analysis.userVoiceInsights.length) {
       content = state('DATA_INSUFFICIENT', '评论主题尚不足以形成结论', '已有评论样本，但没有达到可重复验证的主题门槛。');
     } else content = '<div class="v82-research-grid">' + analysis.userVoiceInsights.map(insightCard).join('') + '</div>';
@@ -85,8 +87,11 @@
       return '<tr><td>' + esc(work.platform) + '</td><td>' + esc(work.title || '未提供标题') + '</td><td>' + esc(work.keyword || '未标注') + '</td><td>' + (work.metrics.likes == null ? '未采集' : work.metrics.likes.toLocaleString()) + '</td></tr>';
     }).join('');
     var tags = keywords.map(function(item) { return '<span>' + esc(item.keyword) + '</span>'; }).join('');
-    return section('06', 'v82DeepDive', '深入研究', '快速理解之后，再查看原始记录与完整研究范围。', '<div class="v82-deep-grid"><div><h3>原始作品</h3><div class="v82-table-wrap"><table><thead><tr><th>平台</th><th>标题</th><th>关键词</th><th>点赞</th></tr></thead><tbody>' + rows + '</tbody></table></div></div>' +
-      '<aside><h3>研究入口</h3><dl><div><dt>Evidence</dt><dd>' + analysis.evidenceStore.count() + ' 条</dd></div><div><dt>全部关键词</dt><dd>' + analysis.dataQuality.keywordsCount + ' 个</dd></div><div><dt>历史数据</dt><dd>' + (analysis.dataQuality.historyDays >= 2 ? analysis.dataQuality.historyDays + ' 天' : '数据不足') + '</dd></div></dl><div class="v82-keyword-list">' + tags + '</div></aside></div>');
+    return section('06', 'v82DeepDive', '进一步研究', '按需展开原始记录，首页默认保持简洁。', '<div class="v82-deep-links">' +
+      '<details><summary><strong>浏览原始作品</strong><span>' + analysis.dataQuality.worksCount + ' 条记录</span></summary><div class="v82-table-wrap"><table><thead><tr><th>平台</th><th>标题</th><th>关键词</th><th>点赞</th></tr></thead><tbody>' + rows + '</tbody></table></div></details>' +
+      '<details><summary><strong>查看全部关键词</strong><span>' + analysis.dataQuality.keywordsCount + ' 个关键词</span></summary><div class="v82-keyword-list">' + tags + '</div></details>' +
+      '<div class="v82-deep-link"><strong>Evidence 索引</strong><span>' + analysis.evidenceStore.count() + ' 条可追溯证据</span></div>' +
+      '<div class="v82-deep-link"><strong>历史数据</strong><span>' + (analysis.dataQuality.historyDays >= 2 ? analysis.dataQuality.historyDays + ' 天记录' : '当前数据不足') + '</span></div></div>');
   }
 
   function render(data) {
