@@ -98,6 +98,7 @@
   function initSectionCollapse() {
     var sections = document.querySelectorAll('.hero, section');
     sections.forEach(function(sec, idx) {
+      if (sec.closest && sec.closest('#v82ResearchHome')) return;
       var header = sec.querySelector('.section-title, h2, .hero-title');
       if (!header) return;
       if (header.querySelector('.section-collapse-btn')) return;
@@ -110,7 +111,7 @@
       header.style.gap = '8px';
       header.appendChild(btn);
 
-      var isCollapsed = localStorage.getItem('sec_collapse_' + idx) === '1';
+      var isCollapsed = StorageAdapter.getRaw('sec_collapse_' + idx, '0') === '1';
       if (isCollapsed) {
         sec.classList.add('collapsed');
         btn.textContent = '展开';
@@ -120,7 +121,7 @@
         e.stopPropagation();
         var collapsed = sec.classList.toggle('collapsed');
         btn.textContent = collapsed ? '展开' : '收起';
-        localStorage.setItem('sec_collapse_' + idx, collapsed ? '1' : '0');
+        StorageAdapter.setRaw('sec_collapse_' + idx, collapsed ? '1' : '0');
       });
     });
   }

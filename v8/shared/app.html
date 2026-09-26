@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <!-- V8.1 Stable 稳定核心：必须最先加载（唯一数据源/图表安全/错误隔离/定时器管理） -->
-<script src="../shared/stable-core.js?v=1790450000"></script>
+<script src="../shared/stable-core.js?v=1790571000"></script>
 <script>
 // Superpowers verification-before-completion: 全局错误兜底
 // 任何模块报错只影响自身，不拖垮整页
@@ -27,7 +27,7 @@ window.safeCall = function(fn, ctx) {
   <link rel="stylesheet" href="../shared/styles/components.css?v=1788677800">
   <link rel="stylesheet" href="../shared/styles/glass.css?v=1788677800">
   <link rel="stylesheet" href="../shared/styles/login.css?v=1788677800">
-  <link rel="stylesheet" href="../shared/styles/modules.css?v=1788932132">
+  <link rel="stylesheet" href="../shared/styles/modules.css?v=1790571000">
 <link rel="stylesheet" href="../shared/styles/sidebar.css?v=1788842270">
   <link rel="stylesheet" href="../shared/styles/advanced.css?v=1788757957">
   <!-- ECharts -->
@@ -749,19 +749,19 @@ window.safeCall = function(fn, ctx) {
 </div>
 
   <!-- ===== 脚本层（模块化，按依赖顺序）===== -->
-  
+
   <script>
 // ===== v6 动态行业配置加载器 =====
 (function() {
-  // V8.1：行业上下文统一由 stable-core 解析（builtin / local）
+  // V8.2：行业上下文统一由 stable-core 解析（builtin / local / dynamic）
   var CTX = window.parseIndustryContext();
   var ind = CTX.id;
   window.CURRENT_INDUSTRY = ind;
 
   // ---- 本地采集的自定义行业（数据存浏览器 localStorage）----
-  if (CTX.type === 'local') {
+  if (CTX.type !== 'builtin') {
     var cname = CTX.name;
-    window.CURRENT_INDUSTRY = 'local';
+    window.CURRENT_INDUSTRY = CTX.type === 'dynamic' ? CTX.id : 'local';
     // V8.1：cfg/domainGuard 提前到 try 之前定义，数据损坏提前 return 时仍可用，避免 "cfg is not defined"
     window.cfg = function(path, defaultValue) {
       if (!window.DOMAIN_CONFIG) return defaultValue;
@@ -772,14 +772,18 @@ window.safeCall = function(fn, ctx) {
     };
     window.domainGuard = function(moduleId, renderFn) { return renderFn; };
     try {
-      window.DOMAIN_CONFIG = JSON.parse(localStorage.getItem(CTX.configKey) || '{}');
-      window.DASHBOARD_DATA = JSON.parse(localStorage.getItem(CTX.dataKey) || '{}');
+      window.DOMAIN_CONFIG = StorageAdapter.getIndustryConfig(CTX);
+      window.DASHBOARD_DATA = StorageAdapter.getIndustryData(CTX);
+      cname = (window.DOMAIN_CONFIG && (window.DOMAIN_CONFIG.display_name || window.DOMAIN_CONFIG.name)) || cname;
+      CTX.name = cname;
+      IndustryStore.current.name = cname;
+      AppStore.industry.name = cname;
     } catch (e) {
       // 局部错误：覆盖层提示，不整体替换 body、不白屏
       window.AppErrorHandler.handle(e, 'local.read');
       var _eb = document.createElement('div');
       _eb.style.cssText = 'position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,12,20,.9);color:#cbd5e1;font-family:sans-serif;z-index:99999;';
-      _eb.innerHTML = '<div style="text-align:center;line-height:2.1;">本地行业「' + cname + '」数据读取失败<br><span style="color:#94a3b8;font-size:13px;">数据可能已损坏，请重新采集该行业</span></div>';
+      _eb.innerHTML = '<div style="text-align:center;line-height:2.1;">行业「' + cname + '」数据读取失败<br><span style="color:#94a3b8;font-size:13px;">数据可能已损坏，请重新采集该行业</span></div>';
       document.body.appendChild(_eb);
       return;
     }
@@ -790,15 +794,23 @@ window.safeCall = function(fn, ctx) {
         if (typeof buildDashboardData !== 'function' || !window.DASHBOARD_DATA || !window.DASHBOARD_DATA.works || !window.DASHBOARD_DATA.works.length){ console.log('[REAGG] skipped'); return; }
         try {
           var _indName = (window.DASHBOARD_DATA.summary && window.DASHBOARD_DATA.summary.industry) || cname;
+          var _oldTrend = {};
+          if (CTX.type === 'dynamic') {
+            (window.DASHBOARD_DATA.hotwords || []).forEach(function(h){ _oldTrend[h.keyword+'|'+(h.platform||'')] = h.trend; });
+          }
           var _fresh = buildDashboardData(window.DASHBOARD_DATA.works.slice(),
                                           (window.DASHBOARD_DATA.hotwords || []).slice(), _indName);
+          if (CTX.type === 'dynamic') {
+            _fresh.hotwords.forEach(function(h){ var t=_oldTrend[h.keyword+'|'+(h.platform||'')]; if(t) h.trend=t; });
+            _fresh.history_available = !!window.DASHBOARD_DATA.history_available;
+          }
           _fresh._cross_checked = true;
           Object.keys(window.DASHBOARD_DATA).forEach(function(k){ if (_fresh[k] === undefined) _fresh[k] = window.DASHBOARD_DATA[k]; });
           window.DASHBOARD_DATA = _fresh;
           window.DATA = _fresh;
-          try { localStorage.setItem('custom_data_' + cname, JSON.stringify(_fresh)); } catch(e){}
-          if (window.normalizeData) window.normalizeData();
-          if (window.renderAll) window.renderAll();
+          StorageAdapter.saveIndustryData(CTX, _fresh);
+          if (window.AppLifecycle) { AppLifecycle.prepare(_fresh); AppLifecycle.render(); }
+          else { if (window.normalizeData) window.normalizeData(); if (window.renderAll) window.renderAll(); }
           if (window.fillExtraCards) window.fillExtraCards();
           console.log('[REAGG] done works='+_fresh.works.length+' cr='+(_fresh.completion_rate?'yes':'no')+' crossLen='+_fresh.cross_platform.length);
         } catch(e) { console.warn('[REAGG] FAIL:', e); }
@@ -887,11 +899,12 @@ window.safeCall = function(fn, ctx) {
   // 数据全部加载完成后的初始化（原 data.js onload 逻辑）
   function initAfterData() {
   window.DATA = window.DASHBOARD_DATA;
-  if (window.normalizeData) window.normalizeData();
+  if (window.AppLifecycle) AppLifecycle.prepare(window.DASHBOARD_DATA);
+  else if (window.normalizeData) window.normalizeData();
   // 解析阶段由 DOMContentLoaded 的 initFramework 统一首渲染；异步数据晚到时才补渲染。
   if (document.readyState !== 'loading' && window.renderAll) window.renderAll();
-    setTimeout(function(){ if(typeof renderArchifyTopic==='function') renderArchifyTopic(); }, 600);
-  setTimeout(function() {
+    TimerManager.setTimeout(function(){ if(typeof renderArchifyTopic==='function') renderArchifyTopic(); }, 600);
+  TimerManager.setTimeout(function() {
   // Archify 技术雷达卡片（仅AI行业）
   try {
     var _params = new URLSearchParams(location.search);
@@ -954,15 +967,15 @@ window.safeCall = function(fn, ctx) {
     })();
   </script>
 
-  
-  
 
 
-  <script src="../shared/bundle.js?v=1790450000"></script>
+
+
+  <script src="../shared/bundle.js?v=1790572000"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework(), { once: true });
-    setTimeout(function() {
+    TimerManager.setTimeout(function() {
       if (window.renderOpsStatus) renderOpsStatus();
       if (window.renderBlueOcean) renderBlueOcean();
       if (window.renderCrossPlatform) renderCrossPlatform();
@@ -981,7 +994,7 @@ window.safeCall = function(fn, ctx) {
   </script>
 
   <script>
-  setTimeout(function() {
+  TimerManager.setTimeout(function() {
     var grid = document.getElementById('calendarGrid');
     if (grid) {
       var topics = (window.DATA && DASHBOARD_DATA.topics) ? DASHBOARD_DATA.topics.slice(0, 7) : [];
@@ -994,7 +1007,7 @@ window.safeCall = function(fn, ctx) {
   }, 1000);
   </script>
 
-    
+
 
 
   <script>
@@ -1030,61 +1043,30 @@ window.safeCall = function(fn, ctx) {
     }
   }
   window.fillExtraCards = fillExtraCards;
-  setTimeout(fillExtraCards, 1200);
+  TimerManager.setTimeout(fillExtraCards, 1200);
   </script>
 
 <!-- 设置面板 -->
 <section class="section" id="settingsPanel" style="display:none;padding:40px;max-width:600px;margin:0 auto;">
   <div class="card glass-card" style="padding:32px;">
     <h2 style="font-size:20px;font-weight:600;margin-bottom:24px;">⚙️ 工作台设置</h2>
-    
-    <div style="margin-bottom:20px;">
-      <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">RedFox API Key</label>
-      <input type="password" id="apiKeyInput" placeholder="ak_xxxxxxxx..." style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box;">
-    </div>
+    <div id="dynamicIndustryManager"></div>
 
-    <div style="margin-bottom:20px;">
-      <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">采集中转地址（部署后填 Worker 网址）</label>
-      <input type="text" id="proxyUrlInput" placeholder="https://redfox-proxy.xxx.workers.dev" style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box;">
-      <p style="font-size:11px;color:#64748b;margin-top:6px;">首次使用需按说明部署一次免费中转，把网址填这里</p>
-    </div>
-
-    <div style="margin-bottom:20px;">
-      <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">新建行业名称</label>
-      <input type="text" id="industryInput" placeholder="如：书法 / 健身 / 美妆..." style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box;">
-      <p style="font-size:11px;color:#64748b;margin-top:6px;">输入行业名后点击采集，自动生成关键词并采集数据</p>
-    </div>
-
-    <div style="margin-bottom:16px;">
-      <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:8px;">采集平台</label>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);">
-          <input type="checkbox" id="platform_dy" checked style="accent-color:#8b5cf6;"> 抖音
-        </label>
-        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);">
-          <input type="checkbox" id="platform_xhs" checked style="accent-color:#8b5cf6;"> 小红书
-        </label>
-        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);">
-          <input type="checkbox" id="platform_sph" disabled style="accent-color:#8b5cf6;"> 视频号 <span style="font-size:10px;color:#64748b;">(待接入)</span>
-        </label>
-        <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;font-size:13px;color:#e2e8f0;background:rgba(255,255,255,0.03);">
-          <input type="checkbox" id="platform_gzh" disabled style="accent-color:#8b5cf6;"> 公众号 <span style="font-size:10px;color:#64748b;">(待接入)</span>
-        </label>
+    <details class="industry-advanced-settings">
+      <summary>高级采集设置</summary>
+      <div style="margin-top:16px;">
+        <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">RedFox API Key</label>
+        <input type="password" id="apiKeyInput" placeholder="ak_xxxxxxxx..." class="industry-flow-input">
       </div>
-    </div>
+      <div style="margin-top:16px;">
+        <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">采集中转地址</label>
+        <input type="text" id="proxyUrlInput" placeholder="https://redfox-proxy.xxx.workers.dev" class="industry-flow-input">
+        <p style="font-size:11px;color:#64748b;margin-top:6px;">首次使用需部署一次中转服务。</p>
+      </div>
+    </details>
 
-    <button onclick="startCollection()" style="width:100%;padding:12px;background:linear-gradient(135deg,#8b5cf6,#6366f1);border:none;border-radius:10px;color:white;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:16px;">🚀 开始采集</button>
-
-    <div id="collectStatus" style="display:none;padding:12px;border-radius:8px;background:rgba(255,255,255,0.05);font-size:12px;line-height:1.6;"></div>
-
-    <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);">
-      <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">切换当前行业</label>
-      <select id="switchIndustryInput" style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(30,30,45,0.95);color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box;margin-bottom:8px;cursor:pointer;">
-        <option value="ai">AI 热点追踪</option>
-        <option value="shufa">书法 · 墨上花开</option>
-      </select>
-      <button onclick="switchIndustry()" style="width:100%;padding:10px;background:rgba(255,255,255,0.1);border:none;border-radius:8px;color:#f1f5f9;font-size:13px;cursor:pointer;">切换行业</button>
-    </div>
+    <input type="hidden" id="industryInput">
+    <div id="legacyIndustrySwitch" style="display:none;"><select id="switchIndustryInput"></select></div>
 
     <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);">
       <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:8px;">工作台体检</label>
@@ -1094,19 +1076,15 @@ window.safeCall = function(fn, ctx) {
     </div>
 
     <div style="margin-top:24px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);font-size:11px;color:#64748b;line-height:1.6;">
-      <p style="font-weight:600;margin-bottom:8px;">使用说明</p>
-      <p>1. 部署一次免费中转（Worker），把网址填到上方「采集中转地址」</p>
-      <p>2. 填入你自己的 RedFox API Key，输入行业名，点采集</p>
-      <p>3. 采集完自动存入浏览器，并出现在下方行业下拉里，随时切换</p>
-      <p>当前行业：<span id="currentIndLabel" style="color:#a78bfa;"></span></p>
+      当前行业：<span id="currentIndLabel" style="color:#a78bfa;"></span>
     </div>
   </div>
 </section>
 
 <script>
 document.getElementById('currentIndLabel').textContent = window.CURRENT_INDUSTRY || 'ai';
-document.getElementById('apiKeyInput').value = localStorage.getItem('redfox_api_key') || '';
-document.getElementById('proxyUrlInput').value = localStorage.getItem('redfox_proxy_url') || '';
+document.getElementById('apiKeyInput').value = StorageAdapter.getRaw('redfox_api_key', '');
+document.getElementById('proxyUrlInput').value = StorageAdapter.getRaw('redfox_proxy_url', '');
 
 // 钩子分类
 function classifyHook(title){
@@ -1155,11 +1133,12 @@ function normalizeWork(w, platform){
 }
 
 // 调中转搜一个关键词
-async function searchOnce(proxyUrl, apiKey, platform, keyword){
+async function searchOnce(proxyUrl, apiKey, platform, keyword, signal){
   const resp = await fetch(proxyUrl, {
     method: 'POST',
     headers: {'Content-Type':'application/json'},
-    body: JSON.stringify({platform:platform, keyword:keyword, apiKey:apiKey, offset:0})
+    body: JSON.stringify({platform:platform, keyword:keyword, apiKey:apiKey, offset:0}),
+    signal: signal
   });
   const j = await resp.json();
   if (j.code === 2000) return j.data || {};
@@ -1377,77 +1356,111 @@ function buildDashboardData(works, hotwords, industryName){
 }
 
 /* ===== V8.1 采集：有限并发 + 超时/重试/退避 + 防重复 ===== */
-var collectionState = { running:false };
+var collectionState = window.collectionState = { running:false, task:null, retryCount:0, controller:null };
 
-function _searchOnceTimed(p,k,platform,kw,timeoutMs){
+window.abortCollectionTask=function(){
+  if(collectionState.controller){ try{ collectionState.controller.abort(); }catch(e){} }
+  collectionState.running=false;
+  collectionState.task=null;
+  collectionState.controller=null;
+};
+
+function _collectionCurrent(task){
+  return !!task && collectionState.task === task && AppStore.isCurrent(task.requestId);
+}
+
+function _collectionStatus(task, current){
+  var s=document.getElementById('collectStatus');
+  if(!s || !_collectionCurrent(task)) return;
+  s.style.display='block';
+  s.innerHTML='<strong>正在采集：'+task.name+'</strong><span>任务 '+task.done+'/'+task.total+'</span>'+
+    '<span>当前：'+(current ? current.pl+' · '+current.kw : '准备中')+'</span>'+
+    '<span>成功 '+task.success+' · 失败 '+task.failed+' · Retry '+task.retryCount+'</span>';
+}
+
+function _searchOnceTimed(p,k,platform,kw,timeoutMs,task){
   return new Promise(function(resolve,reject){
     var settled=false;
-    var to=setTimeout(function(){ if(!settled){settled=true;reject(new Error('请求超时：'+kw));} },timeoutMs);
-    searchOnce(p,k,platform,kw).then(
-      function(d){ if(!settled){settled=true;clearTimeout(to);resolve(d);} },
-      function(e){ if(!settled){settled=true;clearTimeout(to);reject(e);} }
+    var to=TimerManager.setTimeout(function(){ if(!settled){settled=true;reject(new Error('请求超时：'+kw));} },timeoutMs,'collection-request');
+    searchOnce(p,k,platform,kw,task&&task.controller&&task.controller.signal).then(
+      function(d){ if(!settled){settled=true;TimerManager.clearTimeout(to);resolve(d);} },
+      function(e){ if(!settled){settled=true;TimerManager.clearTimeout(to);reject(e);} }
     );
   });
 }
 
-function _fetchWithRetry(p,k,platform,kw,retries){
+function _fetchWithRetry(p,k,platform,kw,retries,task){
   var attempt=0, lastErr;
   function loop(){
     if(attempt>retries) return Promise.reject(lastErr||new Error('采集失败：'+kw));
-    return _searchOnceTimed(p,k,platform,kw,15000).catch(function(e){
+    return _searchOnceTimed(p,k,platform,kw,15000,task).catch(function(e){
+      if(!_collectionCurrent(task)) return Promise.reject(e);
       lastErr=e; attempt++;
+      if(attempt<=retries && _collectionCurrent(task)){ task.retryCount++; collectionState.retryCount=task.retryCount; _collectionStatus(task,{pl:platform,kw:kw}); }
       var msg=String(e&&e.message||e);
       var isRate=/429|rate|limit|too many|频繁|频/i.test(msg);
       var wait=isRate?Math.min(800*Math.pow(2,attempt-1),6000):400*attempt;
-      return new Promise(function(r){setTimeout(r,wait);}).then(loop);
+      return new Promise(function(r){TimerManager.setTimeout(r,wait,'collection-backoff');}).then(loop);
     });
   }
   return loop();
 }
 
-async function startCollection(){
+async function startCollection(options){
+  options=options||{};
   var s=document.getElementById('collectStatus');
-  if(collectionState.running){ s.style.display='block'; s.innerHTML='<span style="color:#fbbf24;">已有采集任务进行中，请稍候…</span>'; return; }
+  if(collectionState.running){ if(s){s.style.display='block';s.innerHTML='<span class="is-warning">已有采集任务进行中，请稍候…</span>';} return; }
   var k=document.getElementById('apiKeyInput').value.trim();
-  var i=document.getElementById('industryInput').value.trim();
+  var i=String(options.name||document.getElementById('industryInput').value||'').trim();
   var p=document.getElementById('proxyUrlInput').value.trim().replace(/\/+$/,'');
   s.style.display='block';
-  if(!k){ s.innerHTML='<span style="color:#f87171;">请填写 API Key</span>'; return; }
-  if(!i){ s.innerHTML='<span style="color:#f87171;">请填写行业名</span>'; return; }
-  if(!p){ s.innerHTML='<span style="color:#f87171;">请填写采集中转地址（Worker 网址）</span>'; return; }
-  var platforms=[];
-  if(document.getElementById('platform_dy').checked) platforms.push('douyin');
-  if(document.getElementById('platform_xhs').checked) platforms.push('xiaohongshu');
-  if(platforms.length===0){ s.innerHTML='<span style="color:#f87171;">请至少选一个平台</span>'; return; }
+  if(!k){ s.innerHTML='<span class="is-error">请先在高级采集设置中填写 API Key</span>'; return; }
+  if(!i){ s.innerHTML='<span class="is-error">请填写行业名</span>'; return; }
+  if(!p){ s.innerHTML='<span class="is-error">请先在高级采集设置中填写采集中转地址</span>'; return; }
+  var platforms=(options.platforms||[]).slice();
+  if(!platforms.length){
+    if(document.getElementById('platform_dy')&&document.getElementById('platform_dy').checked) platforms.push('douyin');
+    if(document.getElementById('platform_xhs')&&document.getElementById('platform_xhs').checked) platforms.push('xiaohongshu');
+  }
+  if(platforms.length===0){ s.innerHTML='<span class="is-error">请至少选一个平台</span>'; return; }
 
-  var btn=document.querySelector('button[onclick*="startCollection"]');
+  var btn=document.querySelector('[data-industry-collect],button[onclick*="startCollection"]');
   var requestId=AppStore.nextRequest();
+  var industryId=options.industryId||('local:'+i);
+  var keywords=(options.keywords||[i,i+'教程',i+'推荐',i+'怎么选',i+'避坑',i+'排行榜']).filter(Boolean).slice(0,10);
+  var controller=typeof AbortController!=='undefined'?new AbortController():null;
+  var task={industryId:industryId,name:i,keywords:keywords,platforms:platforms,requestId:requestId,startedAt:new Date().toISOString(),done:0,total:keywords.length*platforms.length,success:0,failed:0,retryCount:0,controller:controller};
   collectionState.running=true;
+  collectionState.task=task;
+  collectionState.retryCount=0;
+  collectionState.controller=controller;
   if(btn){ btn.disabled=true; btn.style.opacity='.6'; btn.style.cursor='not-allowed'; }
-  localStorage.setItem('redfox_api_key',k);
-  localStorage.setItem('redfox_proxy_url',p);
+  StorageAdapter.setRaw('redfox_api_key',k);
+  StorageAdapter.setRaw('redfox_proxy_url',p);
 
-  var keywords=[i,i+'教程',i+'推荐',i+'怎么选',i+'避坑',i+'排行榜'];
   var jobs=[];
   platforms.forEach(function(pl){ keywords.forEach(function(kw){ jobs.push({pl:pl,kw:kw}); }); });
-  var total=jobs.length, done=0, allWorks=[], hotwords=[], cursor=0, failedKws=[];
+  var total=jobs.length, allWorks=[], hotwords=[], cursor=0, failedKws=[];
+  _collectionStatus(task,null);
   var CONCURRENCY=3;
   function worker(){
     function next(){
       if(cursor>=jobs.length) return Promise.resolve();
       var job=jobs[cursor++];
-      return _fetchWithRetry(p,k,job.pl,job.kw,2).then(function(data){
-        if(!AppStore.isCurrent(requestId)) return;
+      return _fetchWithRetry(p,k,job.pl,job.kw,2,task).then(function(data){
+        if(!_collectionCurrent(task)) return;
         var list=data.list||[];
         list.forEach(function(w){ var nw=normalizeWork(w,job.pl); nw._keyword=job.kw; allWorks.push(nw); });
         hotwords.push({keyword:job.kw,platform:job.pl,total:data.total||list.length,works:list.length,avg_like:list.length?Math.round(list.reduce(function(a,w){return a+(w.likeCount||w.workLikedCount||0);},0)/list.length):0});
+        task.success++;
       },function(e){
-        if(!AppStore.isCurrent(requestId)) return;
+        if(!_collectionCurrent(task)) return;
         hotwords.push({keyword:job.kw,platform:job.pl,total:0,works:0,error:String(e.message||e)}); failedKws.push(job.kw);
+        task.failed++;
       }).then(function(){
-        if(!AppStore.isCurrent(requestId)) return;
-        done++;
-        s.innerHTML='<span style="color:#a78bfa;">采集中 '+done+'/'+total+'：'+job.pl+' · '+job.kw+'</span>';
+        if(!_collectionCurrent(task)) return;
+        task.done++;
+        _collectionStatus(task,job);
         return next();
       });
     }
@@ -1457,42 +1470,53 @@ async function startCollection(){
   for(var w=0;w<Math.min(CONCURRENCY,total);w++) pool.push(worker());
   await Promise.all(pool);
 
-  collectionState.running=false;
+  if(collectionState.task===task){ collectionState.running=false; collectionState.controller=null; }
   if(btn){ btn.disabled=false; btn.style.opacity=''; btn.style.cursor=''; }
-  if(!AppStore.isCurrent(requestId)) return;
+  if(!_collectionCurrent(task)) return;
 
   if(allWorks.length===0){ s.innerHTML='<span style="color:#f87171;">没有采到作品，请检查 Key / 中转地址 / 行业名是否正确</span>'; return; }
 
   var dashboard=buildDashboardData(allWorks,hotwords,i);
-  localStorage.setItem('custom_cfg_'+i,JSON.stringify({
-    id:'local', display_name:i, name:i, language:'zh',
+  var newIndustry=IndustryStore.resolve(industryId);
+  var previousHistory=industryId.indexOf('ind_')===0&&window.DynamicIndustryService ? DynamicIndustryService.history(industryId) : [];
+  if(industryId.indexOf('ind_')===0){
+    var previous=previousHistory.length ? previousHistory[previousHistory.length-1] : null;
+    dashboard.hotwords.forEach(function(h){
+      var old=previous&&previous.keywordMetrics&&previous.keywordMetrics[h.keyword];
+      h.trend=old==null?'当前热点':(h.total>old?'上升':(h.total<old?'下降':'稳定'));
+    });
+    dashboard.history_available=previousHistory.length>0;
+  }
+  StorageAdapter.saveIndustryConfig(newIndustry,{
+    id:industryId, display_name:i, name:i, keywords:keywords, platforms:platforms, language:'zh',
     nav_labels:{hotspot:'热点追踪',breakdown:'爆款拆解',content:'内容创作',publish:'对标与发布'},
     nav_order:['hotspot','breakdown','content','publish'],
     theme:{primary:'#8b5cf6'}
-  }));
-  localStorage.setItem('custom_data_'+i,JSON.stringify(dashboard));
-  var list=JSON.parse(localStorage.getItem('custom_industries')||'[]');
-  if(list.indexOf(i)<0) list.push(i);
-  localStorage.setItem('custom_industries',JSON.stringify(list));
+  });
+  StorageAdapter.saveIndustryData(newIndustry,dashboard);
+  if(industryId.indexOf('ind_')!==0){ var list=StorageAdapter.listIndustries(); if(list.indexOf(i)<0) list.push(i); StorageAdapter.saveIndustryList(list); }
 
   // 记录本地历史快照（用于趋势图）
   try{
-    var hist=window.NS.get('collect_history',[])||[];
+    var hist=industryId.indexOf('ind_')===0 ? previousHistory : (window.NS.get('collect_history',[])||[]);
     var nW=allWorks.length;
+    var keywordMetrics={}; hotwords.forEach(function(h){keywordMetrics[h.keyword]=h.total||0;});
     hist.push({
+      timestamp:new Date().toISOString(), keywordMetrics:keywordMetrics,
+      topicMetrics:{count:dashboard.topics.length}, engagementMetrics:{likes:dashboard.summary.total_likes,comments:allWorks.reduce(function(a,ww){return a+(ww.commentCount||0);},0)},
       date:new Date().toISOString().slice(0,10),
       avg_likes:Math.round(allWorks.reduce(function(a,ww){return a+(ww.likeCount||0);},0)/(nW||1)),
       avg_comments:Math.round(allWorks.reduce(function(a,ww){return a+(ww.commentCount||0);},0)/(nW||1)),
       works_count:nW,
       max_likes:Math.max.apply(null,allWorks.map(function(ww){return ww.likeCount||0;}))
     });
-    window.NS.set('collect_history',hist);
+    if(industryId.indexOf('ind_')===0&&window.DynamicIndustryService) DynamicIndustryService.saveHistory(industryId,hist); else window.NS.set('collect_history',hist);
   }catch(e){ window.AppErrorHandler.handle(e,'collect.history'); }
 
   refreshIndustryDropdown();
   var _cw = failedKws.length ? ' <span style="color:#fbbf24;">（'+failedKws.length+' 个关键词失败：'+failedKws.join('、')+'，可重新采集补全）</span>' : '';
   s.innerHTML='<span style="color:#30d158;">采集完成！共 '+allWorks.length+' 条作品</span>'+_cw+'<span style="color:#94a3b8;">，正在跳转…</span>';
-  setTimeout(function(){ switchIndustryContext('local:'+i); },1200);
+  switchIndustryContext(industryId);
 }
 
 function switchIndustry(){
@@ -1507,7 +1531,7 @@ function refreshIndustryDropdown(){
   var cur = window.parseIndustryContext().id;
   // 保留内置项
   var html = '<option value="ai">AI 热点追踪</option><option value="shufa">书法 · 墨上花开</option>';
-  var list = JSON.parse(localStorage.getItem('custom_industries')||'[]');
+  var list = StorageAdapter.listIndustries();
   list.forEach(function(n){
     html += '<option value="local:'+encodeURIComponent(n)+'">'+n+'（本地）</option>';
   });
@@ -1539,7 +1563,7 @@ async function loadCollectTrend() {
       chartHost.innerHTML = '';
       if (typeof echarts !== 'undefined') {
         try {
-          echarts.init(chartHost).setOption({
+          ChartManager.update(chartHost,{
             grid: {left:40,right:20,top:30,bottom:25},
             tooltip: {trigger:'axis'},
             legend: {data:['均赞','均评论','作品数'],textStyle:{color:'#94a3b8',fontSize:10},top:0},
@@ -1560,9 +1584,9 @@ async function loadCollectTrend() {
 
   try {
     const tctx = window.parseIndustryContext();
-    if (tctx.type === 'local') {
-      // local 行业无静态 history：读本地采集快照，否则提示，不发起必然 404 的请求
-      const hist = window.NS.get('collect_history', []) || [];
+    if (tctx.type !== 'builtin') {
+      // 浏览器行业无静态 history：按行业隔离读取快照，不发起必然 404 的请求
+      const hist = tctx.type === 'dynamic' && window.DynamicIndustryService ? DynamicIndustryService.history(tctx.id) : (window.NS.get('collect_history', []) || []);
       if (!hist.length) { setInfo('暂无历史采集数据（每次采集后自动记录趋势）'); return; }
       paint(hist);
       return;
@@ -1585,25 +1609,25 @@ loadCollectTrend();
   // 从data中找异常（高赞低竞争=蓝海，突然爆发的词）
   let html = '<div style="padding:20px;">';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">';
-  
+
   // 蓝海关键词
   html += '<div style="background:rgba(48,209,88,0.08);border:1px solid rgba(48,209,88,0.2);border-radius:12px;padding:16px;">';
   html += '<div style="font-size:13px;color:#30d158;font-weight:600;margin-bottom:8px;">🟢 蓝海机会</div>';
   html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">低竞争高需求关键词，优先制作内容抢占流量。建议本周内发布相关视频。</div>';
   html += '</div>';
-  
+
   // 突发热点
   html += '<div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:12px;padding:16px;">';
   html += '<div style="font-size:13px;color:#fbbf24;font-weight:600;margin-bottom:8px;">🟡 突发热点</div>';
   html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">数据出现异常增长的关键词，建议快速跟进，24小时内发布相关内容。</div>';
   html += '</div>';
-  
+
   // 衰退信号
   html += '<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:12px;padding:16px;">';
   html += '<div style="font-size:13px;color:#f87171;font-weight:600;margin-bottom:8px;">🔴 衰退预警</div>';
   html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">热度持续下降的关键词，减少投入，避免浪费创作精力。</div>';
   html += '</div>';
-  
+
   html += '</div>';
   html += '<div style="margin-top:16px;font-size:11px;color:#64748b;">* 异常检测基于历史快照对比，采集次数越多越精准</div>';
   html += '</div>';
@@ -1616,17 +1640,17 @@ loadCollectTrend();
   if (!el) return;
   let html = '<div style="padding:20px;">';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px;">';
-  
+
   html += '<div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:16px;">';
   html += '<div style="font-size:13px;color:#a78bfa;font-weight:600;margin-bottom:8px;">📊 飞书多维表格</div>';
   html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">已连接飞书多维表格，发布后数据自动回传，追踪真实表现。</div>';
   html += '</div>';
-  
+
   html += '<div style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:12px;padding:16px;">';
   html += '<div style="font-size:13px;color:#60a5fa;font-weight:600;margin-bottom:8px;">📈 表现追踪</div>';
   html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">发布后自动记录播放量、点赞、评论、转化，对比外部数据验证选题准确性。</div>';
   html += '</div>';
-  
+
   html += '</div>';
   html += '<div style="font-size:11px;color:#64748b;">* 在飞书多维表格中填写发布记录，系统自动关联分析</div>';
   html += '</div>';
@@ -1635,7 +1659,7 @@ loadCollectTrend();
 </script>
 <script>
   // Show archify card only for AI industry
-  setTimeout(function() {
+  TimerManager.setTimeout(function() {
     var params = new URLSearchParams(location.search);
     var ind = params.get('ind') || 'ai';
     if (ind !== 'ai' && ind !== '') return;
@@ -1766,7 +1790,7 @@ loadCollectTrend();
     document.querySelectorAll('body > .hero').forEach(function(h){ h.setAttribute('data-nav','overview'); });
 
     if(changed){
-      setTimeout(function(){
+      TimerManager.setTimeout(function(){
         if(!window.charts) return;
         Object.values(window.charts).forEach(function(chart){ safeChartResize(chart); });
       },100);
@@ -1778,7 +1802,7 @@ loadCollectTrend();
     var item=e.target.closest && e.target.closest('.sidebar-nav-item');
     if(!item) return;
     var page=item.dataset.page;
-    setTimeout(function(){
+    TimerManager.setTimeout(function(){
       // overview / settings 走原生
       if(page==='overview'||page==='settings'||page==='techradar'||page==='hotspots') return;
       document.querySelectorAll('body > .section').forEach(function(sec){
@@ -1788,7 +1812,7 @@ loadCollectTrend();
         sec.style.display = shouldShow ? '' : 'none';
       });
       window.scrollTo(0,0);
-      setTimeout(function(){
+      TimerManager.setTimeout(function(){
         if(window.echarts){ document.querySelectorAll('body > .section[style*="block"], body > .section:not([style*="none"])').forEach(function(s){
           s.querySelectorAll('[_echarts_instance_]').forEach(function(el){ var i=echarts.getInstanceByDom(el); if(i)try{i.resize();}catch(e){} });
         });}
@@ -1797,8 +1821,8 @@ loadCollectTrend();
   }, true);
 
   // 首次执行（等首渲染）
-  setTimeout(run, 1600);
-  setTimeout(run, 3500);
+  TimerManager.setTimeout(run, 1600);
+  TimerManager.setTimeout(run, 3500);
 })();
 </script>
 
@@ -1860,9 +1884,9 @@ loadCollectTrend();
     }
   }
   document.addEventListener('click', function(e){
-    if(e.target.closest&&e.target.closest('.sidebar-nav-item'))setTimeout(fill,900);
+    if(e.target.closest&&e.target.closest('.sidebar-nav-item'))TimerManager.setTimeout(fill,900);
   },true);
-  [2500,4500,7000].forEach(function(t){setTimeout(fill,t);});
+  [2500,4500,7000].forEach(function(t){TimerManager.setTimeout(fill,t);});
 })();
 </script>
 

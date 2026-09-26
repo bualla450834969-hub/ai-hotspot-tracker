@@ -76,9 +76,9 @@
     let pct = 0;
     const steps = ['连接RedFox API...', '采集抖音数据...', '采集小红书数据...', '分析数据...', '部署到GitHub...'];
     let step = 0;
-    const interval = setInterval(() => {
+    const interval = TimerManager.setInterval(() => {
       pct += randomInt(5, 15);
-      if (pct >= 100) { pct = 100; clearInterval(interval); status.textContent = '✅ 采集完成！页面将在3秒后刷新'; setTimeout(()=>location.reload(), 3000); }
+      if (pct >= 100) { pct = 100; TimerManager.clearInterval(interval); status.textContent = '✅ 采集完成！页面将在3秒后刷新'; TimerManager.setTimeout(()=>location.reload(), 3000); }
       bar.style.width = pct + '%';
       if (pct > (step+1)*20 && step < steps.length-1) { step++; status.textContent = steps[step]; }
     }, 800);

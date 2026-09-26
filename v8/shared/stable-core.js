@@ -5,7 +5,7 @@
  * 职责：
  *  1. 唯一数据源 window.AppStore；DATA / DASHBOARD_DATA 为其访问器别名，
  *     保证 window.DATA === window.DASHBOARD_DATA === AppStore.data，杜绝多入口。
- *  2. 统一行业上下文解析 parseIndustryContext()（builtin / local）。
+ *  2. 统一行业上下文解析 parseIndustryContext()（builtin / local / dynamic）。
  *  3. localStorage 行业命名空间 NS（读新 key → 回退旧 key → 自动迁移）。
  *  4. ECharts 安全初始化：自动接管全局 echarts，容器无尺寸不 init、
  *     WeakMap 防重复、有限重试、dispose 清理；单图失败不拖垮页面。
@@ -28,25 +28,42 @@
   function parseIndustryContext(rawInd) {
     var ind = rawInd;
     if (ind === undefined || ind === null) {
-      try { ind = new URLSearchParams(window.location.search).get('ind'); }
+      try {
+        var params = new URLSearchParams(window.location.search);
+        ind = params.get('industry') || params.get('ind');
+      }
       catch (e) { ind = null; }
     }
     ind = ind || 'ai';
     if (SLUG_MAP[ind]) ind = SLUG_MAP[ind];
 
     var isLocal = ind.indexOf('local:') === 0;
+    var isDynamic = /^ind_[a-z0-9]+$/i.test(ind);
     var name = isLocal ? decodeURIComponent(ind.slice(6)) : ind;
     return {
-      type: isLocal ? 'local' : 'builtin',
+      type: isLocal ? 'local' : (isDynamic ? 'dynamic' : 'builtin'),
       id: ind,                                   // 完整 id（local:xx 或英文 slug）
       name: name,                                // 展示名
-      configKey: isLocal ? ('custom_cfg_' + name) : null,
-      dataKey: isLocal ? ('custom_data_' + name) : null,
-      base: isLocal ? null : ('../industries/' + ind + '/')
+      configKey: isLocal ? ('custom_cfg_' + name) : (isDynamic ? ('industry_' + ind + '_config') : null),
+      dataKey: isLocal ? ('custom_data_' + name) : (isDynamic ? ('industry_' + ind + '_data') : null),
+      historyKey: isDynamic ? ('industry_' + ind + '_history') : null,
+      base: (isLocal || isDynamic) ? null : ('../industries/' + ind + '/')
     };
   }
 
   var CTX = parseIndustryContext();
+
+  /* ---------- 1.5 Industry Layer ---------- */
+  var IndustryStore = {
+    current: CTX,
+    getCurrent: function () { return this.current; },
+    resolve: function (raw) { return parseIndustryContext(raw); },
+    setCurrent: function (raw) {
+      this.current = parseIndustryContext(raw);
+      return this.current;
+    }
+  };
+  window.IndustryStore = IndustryStore;
 
   /* ---------- 2. 唯一数据源 AppStore ---------- */
   var AppStore = {
@@ -75,31 +92,77 @@
   installDataAlias('DASHBOARD_DATA');
 
   /* ---------- 3. localStorage 行业命名空间 ---------- */
+  var StorageAdapter = {
+    getRaw: function (key, fallback) {
+      try {
+        var value = localStorage.getItem(key);
+        return value === null ? (fallback === undefined ? null : fallback) : value;
+      } catch (e) { AppErrorHandler.handle(e, 'StorageAdapter.getRaw:' + key); return fallback === undefined ? null : fallback; }
+    },
+    setRaw: function (key, value) {
+      try { localStorage.setItem(key, String(value)); return true; }
+      catch (e) { AppErrorHandler.handle(e, 'StorageAdapter.setRaw:' + key); return false; }
+    },
+    getJSON: function (key, fallback) {
+      var raw = this.getRaw(key, null);
+      if (raw === null) return fallback === undefined ? null : fallback;
+      try { return JSON.parse(raw); }
+      catch (e) { AppErrorHandler.handle(e, 'StorageAdapter.getJSON:' + key); return fallback === undefined ? null : fallback; }
+    },
+    setJSON: function (key, value) {
+      try { return this.setRaw(key, JSON.stringify(value)); }
+      catch (e) { AppErrorHandler.handle(e, 'StorageAdapter.setJSON:' + key); return false; }
+    },
+    remove: function (key) {
+      try { localStorage.removeItem(key); return true; }
+      catch (e) { AppErrorHandler.handle(e, 'StorageAdapter.remove:' + key); return false; }
+    },
+    getIndustryConfig: function (industry) {
+      var ctx = typeof industry === 'string' ? parseIndustryContext(industry) : (industry || IndustryStore.getCurrent());
+      return ctx.type !== 'builtin' ? this.getJSON(ctx.configKey, {}) : null;
+    },
+    saveIndustryConfig: function (industry, value) {
+      var ctx = typeof industry === 'string' ? parseIndustryContext(industry) : industry;
+      return !!ctx && ctx.type !== 'builtin' && this.setJSON(ctx.configKey, value);
+    },
+    getIndustryData: function (industry) {
+      var ctx = typeof industry === 'string' ? parseIndustryContext(industry) : (industry || IndustryStore.getCurrent());
+      return ctx.type !== 'builtin' ? this.getJSON(ctx.dataKey, {}) : null;
+    },
+    saveIndustryData: function (industry, value) {
+      var ctx = typeof industry === 'string' ? parseIndustryContext(industry) : industry;
+      return !!ctx && ctx.type !== 'builtin' && this.setJSON(ctx.dataKey, value);
+    },
+    listIndustries: function () { return this.getJSON('custom_industries', []) || []; },
+    saveIndustryList: function (value) { return this.setJSON('custom_industries', value || []); }
+  };
+  window.StorageAdapter = StorageAdapter;
+
   var NS = {
-    scope: function () { return 'hs_' + encodeURIComponent(CTX.id); },
+    scope: function () { return 'hs_' + encodeURIComponent(IndustryStore.getCurrent().id); },
     _newKey: function (key) { return this.scope() + '__' + key; },
     /** 读：优先新 key；不存在则尝试旧 key 并一次性迁移 */
     _resolve: function (key) {
       var nk = this._newKey(key);
-      if (localStorage.getItem(nk) !== null) return nk;
-      if (localStorage.getItem(key) !== null) {
-        try { localStorage.setItem(nk, localStorage.getItem(key)); }
+      if (StorageAdapter.getRaw(nk, null) !== null) return nk;
+      if (StorageAdapter.getRaw(key, null) !== null) {
+        try { StorageAdapter.setRaw(nk, StorageAdapter.getRaw(key)); }
         catch (e) { AppErrorHandler.handle(e, 'NS.migrate:' + key); }
       }
       return nk;
     },
     get: function (key, def) {
       try {
-        var raw = localStorage.getItem(this._resolve(key));
+        var raw = StorageAdapter.getRaw(this._resolve(key), null);
         return raw === null ? (def === undefined ? null : def) : JSON.parse(raw);
       } catch (e) { AppErrorHandler.handle(e, 'NS.get:' + key); return def === undefined ? null : def; }
     },
     set: function (key, val) {
-      try { localStorage.setItem(this._newKey(key), JSON.stringify(val)); }
+      try { StorageAdapter.setJSON(this._newKey(key), val); }
       catch (e) { AppErrorHandler.handle(e, 'NS.set:' + key); }
     },
     remove: function (key) {
-      try { localStorage.removeItem(this._newKey(key)); } catch (e) {}
+      try { StorageAdapter.remove(this._newKey(key)); } catch (e) {}
     }
   };
   window.NS = NS;
@@ -176,12 +239,64 @@
       Object.keys(liveTimeouts).forEach(function (id) { clearTimeout(parseInt(id, 10)); });
       liveIntervals = {};
       liveTimeouts = {};
+    },
+    stats: function () {
+      return { intervals: Object.keys(liveIntervals).length, timeouts: Object.keys(liveTimeouts).length,
+        total: Object.keys(liveIntervals).length + Object.keys(liveTimeouts).length };
     }
   };
   window.TimerManager = TimerManager;
 
+  /* ---------- 5.5 Event / Effects lifecycle ---------- */
+  var managedEvents = [];
+  var EventManager = {
+    on: function (target, type, handler, options, tag) {
+      if (!target || !target.addEventListener) return function () {};
+      var existing = managedEvents.find(function (record) {
+        return record.target === target && record.type === type && record.handler === handler && record.tag === (tag || '');
+      });
+      if (existing) return function () { EventManager.off(existing); };
+      target.addEventListener(type, handler, options);
+      var record = { target: target, type: type, handler: handler, options: options, tag: tag || '' };
+      managedEvents.push(record);
+      return function () { EventManager.off(record); };
+    },
+    off: function (record) {
+      if (!record) return;
+      try { record.target.removeEventListener(record.type, record.handler, record.options); } catch (e) {}
+      var index = managedEvents.indexOf(record);
+      if (index >= 0) managedEvents.splice(index, 1);
+    },
+    clear: function (tag) {
+      managedEvents.slice().forEach(function (record) {
+        if (!tag || record.tag === tag) EventManager.off(record);
+      });
+    },
+    count: function () { return managedEvents.length; }
+  };
+  window.EventManager = EventManager;
+
+  var effectCleanups = [];
+  var EffectsManager = {
+    register: function (cleanup, tag) {
+      if (typeof cleanup === 'function') effectCleanups.push({ cleanup: cleanup, tag: tag || '' });
+      return cleanup;
+    },
+    initPage: function () {
+      if (typeof window.initCardGlow === 'function') window.initCardGlow();
+    },
+    destroyPage: function () {
+      effectCleanups.splice(0).forEach(function (item) {
+        try { item.cleanup(); } catch (e) { AppErrorHandler.handle(e, 'EffectsManager.destroy:' + item.tag); }
+      });
+      EventManager.clear('effect');
+    },
+    count: function () { return effectCleanups.length; }
+  };
+  window.EffectsManager = EffectsManager;
+
   /* ---------- 6. ECharts 安全初始化 ---------- */
-  var chartRegistry = new WeakMap();   // dom → 真实实例
+  var chartRegistry = new Map();   // dom → 真实实例；可枚举以便统一销毁和泄漏计数
   function domReady(dom) {
     return !!dom && dom.isConnected === true && dom.clientWidth > 10 && dom.clientHeight > 10;
   }
@@ -298,6 +413,49 @@
     } catch (e) { AppErrorHandler.handle(e, 'chart.resize'); }
   };
 
+  var ChartManager = {
+    create: function (dom, theme, opts) { return window.safeChartInit(dom, theme, opts); },
+    get: function (dom) { return chartRegistry.get(dom) || (window.echarts && window.echarts.getInstanceByDom ? window.echarts.getInstanceByDom(dom) : null); },
+    update: function (dom, option, replace) {
+      var chart = this.get(dom) || this.create(dom);
+      if (chart && typeof chart.setOption === 'function') chart.setOption(option, !!replace);
+      return chart;
+    },
+    resize: function (dom) { window.safeChartResize(this.get(dom)); },
+    dispose: function (dom) {
+      var chart = dom && typeof dom.dispose === 'function' ? dom : this.get(dom);
+      window.safeChartDispose(chart);
+      if (dom && dom.nodeType) chartRegistry.delete(dom);
+    },
+    disposeAll: function () {
+      Array.from(chartRegistry.entries()).forEach(function (entry) {
+        try { window.safeChartDispose(entry[1]); } catch (e) {}
+        chartRegistry.delete(entry[0]);
+      });
+    },
+    count: function () { return chartRegistry.size; }
+  };
+  window.ChartManager = ChartManager;
+
+  /* ---------- 6.5 Data pipeline facade ---------- */
+  var DataPipeline = {
+    normalize: function (data) {
+      if (data !== undefined) AppStore.data = data;
+      if (typeof window.normalizeData === 'function') window.normalizeData();
+      if (typeof window.normalizeDataContract === 'function') window.normalizeDataContract();
+      return AppStore.data;
+    },
+    validate: function (data) {
+      var value = data || AppStore.data;
+      return { valid: !!value && typeof value === 'object', data: value || {} };
+    },
+    prepare: function (data) {
+      var normalized = this.normalize(data);
+      return this.validate(normalized).data;
+    }
+  };
+  window.DataPipeline = DataPipeline;
+
   /* ---------- 7. 模块级错误隔离 ---------- */
   function showModuleFallback(name) {
     try {
@@ -348,12 +506,44 @@
    * 跨行业当前为整页加载：跳转前作废本页异步批次并清理全部定时器，
    * 新页面由本核心重新初始化，确保旧行业 timer/异步不延续。 */
   function switchIndustryContext(industryId) {
+    try { if (typeof window.closeEvidenceDrawer === 'function') window.closeEvidenceDrawer(); } catch (e) {}
+    try { if (typeof window.abortCollectionTask === 'function') window.abortCollectionTask(); } catch (e) {}
     AppStore.nextRequest();      // 作废在途异步
+    try { EffectsManager.destroyPage(); } catch (e) {}
+    try { ChartManager.disposeAll(); } catch (e) {}
+    try { EventManager.clear(); } catch (e) {}
     try { TimerManager.clearAll(); } catch (e) {}
+    IndustryStore.setCurrent(industryId);
     AppStore.status.loading = true;
-    window.location.href = window.location.pathname + '?ind=' + encodeURIComponent(industryId);
+    var param = /^ind_[a-z0-9]+$/i.test(industryId) ? 'industry' : 'ind';
+    window.location.href = window.location.pathname + '?' + param + '=' + encodeURIComponent(industryId);
   }
   window.switchIndustryContext = switchIndustryContext;
+
+  var AppLifecycle = {
+    prepare: function (data) {
+      AppStore.status.loading = true;
+      AppStore.status.error = null;
+      return DataPipeline.prepare(data);
+    },
+    render: function () {
+      if (typeof window.renderAll === 'function') window.renderAll();
+      AppStore.status.loading = false;
+      AppStore.status.ready = true;
+    },
+    destroy: function () {
+      EffectsManager.destroyPage();
+      ChartManager.disposeAll();
+      EventManager.clear();
+      TimerManager.clearAll();
+      AppStore.status.ready = false;
+    },
+    metrics: function () {
+      return { activeTimers: TimerManager.stats().total, activeCharts: ChartManager.count(),
+        eventListeners: EventManager.count(), activeEffects: EffectsManager.count() };
+    }
+  };
+  window.AppLifecycle = AppLifecycle;
 
   /* ---------- 10. 调试面板（?debug=1） ---------- */
   try {
@@ -372,7 +562,7 @@
             return '<span style="color:#fca5a5">· ' + e.where + '</span>';
           }).join('<br>');
           box.innerHTML =
-            '<b style="color:#e2e8f0">V8.1 Stable Debug</b><br>' +
+            '<b style="color:#e2e8f0">V8.2 Alpha Debug</b><br>' +
             'industry: ' + AppStore.industry.id + '<br>' +
             'schema: v' + AppStore.schemaVersion + '<br>' +
             'works: ' + (d.works ? d.works.length : 0) + '<br>' +
@@ -380,6 +570,14 @@
             'render#: ' + AppStore.renderCount + '<br>' +
             'requestId: ' + AppStore.requestId + '<br>' +
             'charts: ' + chartCount + '<br>' +
+            'managedCharts: ' + ChartManager.count() + '<br>' +
+            'activeTimers: ' + TimerManager.stats().total + '<br>' +
+            'eventListeners: ' + EventManager.count() + '<br>' +
+            'activeEffects: ' + EffectsManager.count() + '<br>' +
+            'evidence: ' + (AppStore.v82 ? AppStore.v82.evidenceStore.count() : 0) + '<br>' +
+            'insights: ' + (AppStore.v82 ? AppStore.v82.insights.length : 0) + '<br>' +
+            'unsupported: ' + (AppStore.v82 ? AppStore.v82.unsupportedInsights.length : 0) + '<br>' +
+            'quality: ' + (AppStore.v82 ? [AppStore.v82.dataQuality.worksCount, AppStore.v82.dataQuality.commentsCount, AppStore.v82.dataQuality.keywordsCount, AppStore.v82.dataQuality.platformsCount].join('/') : '0/0/0/0') + '<br>' +
             'errors: ' + errorLog.length +
             (lastErrs ? '<br>' + lastErrs : '');
         }

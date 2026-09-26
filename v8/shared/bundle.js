@@ -7,6 +7,15 @@ window.DATA = window.DASHBOARD_DATA || {};
 // ===== 数据适配层：统一不同行业的数据字段 =====
 window.normalizeData = function() {
   var d = window.DATA;
+  function normalizePublishTime(value) {
+    if (typeof value !== 'number' || !isFinite(value)) return value || '';
+    var millis = value < 1000000000000 ? value * 1000 : value;
+    var date = new Date(millis);
+    if (isNaN(date.getTime())) return '';
+    function pad(number) { return String(number).padStart(2, '0'); }
+    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + ' ' +
+      pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds());
+  }
   // works 字段映射：统一标准字段（likes/comments/collects/shares），
   // 同时保留 likeCount 等兼容别名，供历史渲染函数读取（适配层是唯一契约边界）
   if (d.works && d.works.length > 0) {
@@ -18,6 +27,8 @@ window.normalizeData = function() {
       var author = w.author || w.accountName || '';
       var url = w.url || w.workUrl || '';
       return {
+        workId: w.workId || w.sourceId || w.work_id || '',
+        sourceId: w.sourceId || w.workId || w.work_id || '',
         title: w.title || w.name || '',
         author: author,
         accountName: author,
@@ -32,13 +43,31 @@ window.normalizeData = function() {
         shareCount: shares,
         followerCount: w.followerCount || w.followers || 0,
         duration: w.duration || 0,
-        publishTime: w.publishTime || w.published_at || '',
+        publishTime: normalizePublishTime(w.publishTime || w.published_at || w.releaseTime || ''),
         _keyword: w._keyword || '',
         url: url,
         workUrl: url,
         cover: w.cover || w.coverUrl || ''
       };
     });
+  }
+  // hotwords兼容旧数据和最小local数据，缺失指标统一为可渲染的客观零值。
+  if (Array.isArray(d.hotwords)) {
+    d.hotwords = d.hotwords.filter(function(h) { return h && typeof h === 'object'; }).map(function(h) {
+      function number(value) {
+        var parsed = Number(value);
+        return isFinite(parsed) ? parsed : 0;
+      }
+      return Object.assign({}, h, {
+        keyword: String(h.keyword || ''),
+        category: String(h.category || '未分类'),
+        total: number(h.total != null ? h.total : h.works_count),
+        max_like: number(h.max_like),
+        collect_rate: number(h.collect_rate),
+        trend: h.trend || '稳定',
+        efficiency_tag: h.efficiency_tag || '适中'
+      });
+    }).filter(function(h) { return h.keyword; });
   }
   // ===== 统一 hot_breakdowns / comment_semantic / conversion_signals 契约 =====
   if (Array.isArray(d.hot_breakdowns)) {
@@ -732,12 +761,14 @@ window.domainGuard = function(moduleId, renderFn) {
   const State = {
     get(key, def) {
       try {
-        const raw = localStorage.getItem(PREFIX + key);
+        const raw = StorageAdapter.getRaw(PREFIX + key, null);
         return raw ? JSON.parse(raw) : def;
       } catch (e) { return def; }
     },
     set(key, val) {
-      try { localStorage.setItem(PREFIX + key, JSON.stringify(val)); } catch (e) {}
+      try {
+        StorageAdapter.setJSON(PREFIX + key, val);
+      } catch (e) {}
     },
 
     // ===== 选题看板状态 =====
@@ -828,6 +859,397 @@ window.domainGuard = function(moduleId, renderFn) {
 })();
 
 
+/* ===== core/evidence.js ===== */
+/**
+ * V8.2 Alpha 1可信数据层：Evidence / Insight / Provenance / DataQuality。
+ * 只读取V8.1数据，不修改works、hotwords或localStorage。
+ */
+(function() {
+  'use strict';
+
+  var SOURCE_TYPES = ['REAL', 'DERIVED', 'INFERRED'];
+  var EVIDENCE_TYPES = ['work', 'comment', 'keyword'];
+  var INSIGHT_TYPES = ['trend', 'pain_point', 'need', 'content_pattern', 'opportunity'];
+
+  function text(value) {
+    return value === undefined || value === null ? '' : String(value);
+  }
+
+  function nullableNumber(value) {
+    if (value === undefined || value === null || value === '') return null;
+    var number = Number(value);
+    return isFinite(number) ? number : null;
+  }
+
+  function stableHash(value) {
+    var input = text(value);
+    var hash = 2166136261;
+    for (var i = 0; i < input.length; i++) {
+      hash ^= input.charCodeAt(i);
+      hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(36);
+  }
+
+  function stableId(type, platform, sourceId, fallbackParts) {
+    var identity = text(sourceId).trim();
+    if (!identity) identity = 'key-' + stableHash((fallbackParts || []).map(text).join('|'));
+    return ['evidence', type, text(platform || 'unknown'), encodeURIComponent(identity)].join(':');
+  }
+
+  function createProvenance(input) {
+    input = input || {};
+    var sourceType = SOURCE_TYPES.indexOf(input.sourceType) >= 0 ? input.sourceType : 'DERIVED';
+    return {
+      sourceType: sourceType,
+      sourceFields: Array.isArray(input.sourceFields) ? input.sourceFields.slice() : [],
+      formula: input.formula || null,
+      sampleSize: nullableNumber(input.sampleSize) || 0,
+      generatedBy: input.generatedBy || 'v8.2-analysis',
+      generatedAt: input.generatedAt || new Date().toISOString(),
+      limitations: Array.isArray(input.limitations) ? input.limitations.slice() : []
+    };
+  }
+
+  function createEvidence(input) {
+    input = input || {};
+    if (EVIDENCE_TYPES.indexOf(input.type) < 0) return null;
+    var platform = text(input.platform || 'unknown');
+    var id = input.id || stableId(input.type, platform, input.sourceId, input.fallbackParts);
+    return {
+      id: id,
+      type: input.type,
+      platform: platform,
+      sourceId: input.sourceId ? text(input.sourceId) : null,
+      title: input.title ? text(input.title) : null,
+      text: input.text ? text(input.text) : null,
+      metrics: {
+        likes: nullableNumber(input.metrics && input.metrics.likes),
+        comments: nullableNumber(input.metrics && input.metrics.comments),
+        shares: nullableNumber(input.metrics && input.metrics.shares),
+        favorites: nullableNumber(input.metrics && input.metrics.favorites),
+        views: nullableNumber(input.metrics && input.metrics.views)
+      },
+      keyword: input.keyword ? text(input.keyword) : null,
+      author: input.author ? text(input.author) : null,
+      url: input.url ? text(input.url) : null,
+      publishedAt: input.publishedAt ? text(input.publishedAt) : null,
+      collectedAt: input.collectedAt ? text(input.collectedAt) : null,
+      provenance: createProvenance(input.provenance || { sourceType: 'REAL' })
+    };
+  }
+
+  function EvidenceStore() {
+    this.byId = new Map();
+    this.byType = new Map();
+    this.insightEvidence = new Map();
+  }
+  EvidenceStore.prototype.add = function(evidence) {
+    if (!evidence || !evidence.id) return null;
+    this.byId.set(evidence.id, evidence);
+    if (!this.byType.has(evidence.type)) this.byType.set(evidence.type, []);
+    var ids = this.byType.get(evidence.type);
+    if (ids.indexOf(evidence.id) < 0) ids.push(evidence.id);
+    return evidence;
+  };
+  EvidenceStore.prototype.getEvidence = function(id) { return this.byId.get(id) || null; };
+  EvidenceStore.prototype.getEvidenceByIds = function(ids) {
+    var self = this;
+    return (ids || []).map(function(id) { return self.getEvidence(id); }).filter(Boolean);
+  };
+  EvidenceStore.prototype.getEvidenceByType = function(type) {
+    return this.getEvidenceByIds(this.byType.get(type) || []);
+  };
+  EvidenceStore.prototype.linkInsight = function(insightId, evidenceIds) {
+    this.insightEvidence.set(insightId, (evidenceIds || []).filter(function(id) { return this.byId.has(id); }, this));
+  };
+  EvidenceStore.prototype.getEvidenceByInsight = function(insightId) {
+    return this.getEvidenceByIds(this.insightEvidence.get(insightId) || []);
+  };
+  EvidenceStore.prototype.count = function() { return this.byId.size; };
+
+  function adaptV81Evidence(data) {
+    data = data && typeof data === 'object' ? data : {};
+    var store = new EvidenceStore();
+    var collectedAt = data.last_update || null;
+    var works = Array.isArray(data.works) ? data.works : [];
+    works.forEach(function(work) {
+      if (!work || typeof work !== 'object') return;
+      store.add(createEvidence({
+        type: 'work',
+        platform: work.platform || work._platform || 'unknown',
+        sourceId: work.workId || work.sourceId || null,
+        fallbackParts: [work.workUrl || work.url, work.title, work.accountName || work.author, work.publishTime, work._keyword],
+        title: work.title || work.name || null,
+        text: work.content || work.title || null,
+        metrics: {
+          likes: work.likes != null ? work.likes : work.likeCount,
+          comments: work.comments != null ? work.comments : work.commentCount,
+          shares: work.shares != null ? work.shares : work.shareCount,
+          favorites: work.collects != null ? work.collects : work.collectCount,
+          views: work.views != null ? work.views : work.viewCount
+        },
+        keyword: work._keyword || work.keyword || null,
+        author: work.author || work.accountName || null,
+        url: work.url || work.workUrl || null,
+        publishedAt: work.publishTime || work.published_at || null,
+        collectedAt: work.crawlTime || collectedAt,
+        provenance: { sourceType: 'REAL', sourceFields: ['works'], formula: null, sampleSize: 1, generatedBy: 'v8.1-compat' }
+      }));
+    });
+
+    var comments = Array.isArray(data.comments) ? data.comments : [];
+    comments.forEach(function(comment) {
+      if (!comment || typeof comment !== 'object' || !text(comment.text || comment.content).trim()) return;
+      store.add(createEvidence({
+        type: 'comment',
+        platform: comment.platform || 'unknown',
+        sourceId: comment.commentId || comment.id || null,
+        fallbackParts: [comment.workId, comment.text || comment.content, comment.author, comment.publishTime],
+        text: comment.text || comment.content,
+        metrics: { likes: comment.likes || comment.likeCount },
+        keyword: comment.keyword || null,
+        author: comment.author || comment.accountName || null,
+        url: comment.url || null,
+        publishedAt: comment.publishTime || null,
+        collectedAt: comment.crawlTime || collectedAt,
+        provenance: { sourceType: 'REAL', sourceFields: ['comments'], formula: null, sampleSize: 1, generatedBy: 'v8.1-compat' }
+      }));
+    });
+
+    var hotwords = Array.isArray(data.hotwords) ? data.hotwords : [];
+    hotwords.forEach(function(keyword) {
+      if (!keyword || typeof keyword !== 'object' || !text(keyword.keyword).trim()) return;
+      store.add(createEvidence({
+        type: 'keyword',
+        platform: keyword.platform || 'unknown',
+        sourceId: [keyword.platform || 'unknown', keyword.keyword].join(':'),
+        title: keyword.keyword,
+        text: keyword.keyword,
+        metrics: { likes: keyword.avg_like, comments: keyword.avg_comment, favorites: keyword.avg_collect, views: null },
+        keyword: keyword.keyword,
+        collectedAt: collectedAt,
+        provenance: { sourceType: 'DERIVED', sourceFields: ['hotwords'], formula: 'keyword_aggregation', sampleSize: nullableNumber(keyword.works_count) || 0, generatedBy: 'v8.1-compat' }
+      }));
+    });
+    return store;
+  }
+
+  function deriveDataQuality(data, store) {
+    data = data && typeof data === 'object' ? data : {};
+    var works = store.getEvidenceByType('work');
+    var comments = store.getEvidenceByType('comment');
+    var keywords = store.getEvidenceByType('keyword');
+    var platforms = new Set(works.map(function(item) { return item.platform; }).filter(function(p) { return p && p !== 'unknown'; }));
+    var history = Array.isArray(data.historical_trend) ? data.historical_trend : [];
+    var missingFields = [];
+    ['url', 'publishedAt', 'keyword'].forEach(function(field) {
+      if (works.length && works.every(function(work) { return !work[field]; })) missingFields.push('works.' + field);
+    });
+    ['views'].forEach(function(field) {
+      if (works.length && works.every(function(work) { return work.metrics[field] === null; })) missingFields.push('works.metrics.' + field);
+    });
+    var limitations = [];
+    if (!works.length) limitations.push('作品样本不足，无法生成内容分析');
+    if (!comments.length) limitations.push('评论样本不足，无法可靠分析用户声音');
+    if (history.length < 2) limitations.push('缺少历史数据，无法判断增长趋势');
+    if (platforms.size < 2) limitations.push('仅有单一平台样本，无法进行跨平台判断');
+    return {
+      worksCount: Array.isArray(data.works) ? data.works.filter(function(item) { return item && typeof item === 'object'; }).length : 0,
+      uniqueWorksCount: works.length,
+      commentsCount: comments.length,
+      keywordsCount: keywords.length,
+      platformsCount: platforms.size,
+      platforms: Array.from(platforms).sort(),
+      collectionTime: data.last_update || null,
+      historyDays: history.length,
+      missingFields: missingFields,
+      availableSignals: {
+        contentPatterns: works.length > 0,
+        userVoice: comments.length > 0,
+        trend: history.length >= 2,
+        crossPlatform: platforms.size >= 2
+      },
+      limitations: limitations
+    };
+  }
+
+  function evidenceCompleteness(evidence) {
+    if (!evidence || !evidence.length) return 0;
+    var total = evidence.length * 4;
+    var present = evidence.reduce(function(sum, item) {
+      return sum + (item.title ? 1 : 0) + (item.keyword ? 1 : 0) + (item.platform !== 'unknown' ? 1 : 0) + (item.url ? 1 : 0);
+    }, 0);
+    return total ? present / total : 0;
+  }
+
+  function deriveEvidenceStrength(evidence) {
+    evidence = Array.isArray(evidence) ? evidence : [];
+    var sources = new Set(evidence.map(function(item) { return item.platform; }).filter(function(p) { return p && p !== 'unknown'; })).size;
+    var completeness = evidenceCompleteness(evidence);
+    var level = evidence.length >= 20 && sources >= 2 && completeness >= 0.75 ? 'HIGH'
+      : evidence.length >= 5 && completeness >= 0.5 ? 'MEDIUM' : 'LOW';
+    return { level: level, sampleSize: evidence.length, sourceCount: sources, completeness: Math.round(completeness * 100) / 100 };
+  }
+
+  function createInsight(input, store) {
+    input = input || {};
+    if (INSIGHT_TYPES.indexOf(input.type) < 0 || SOURCE_TYPES.indexOf(input.sourceType) < 0) return null;
+    var evidenceIds = Array.isArray(input.evidenceIds) ? input.evidenceIds.filter(function(id) { return !!store.getEvidence(id); }) : [];
+    if (!evidenceIds.length) return null;
+    var evidence = store.getEvidenceByIds(evidenceIds);
+    var id = input.id || ['insight', input.type, stableHash([input.title, evidenceIds.join(',')].join('|'))].join(':');
+    var insight = {
+      id: id,
+      type: input.type,
+      title: text(input.title),
+      description: text(input.description),
+      sourceType: input.sourceType,
+      evidenceStrength: deriveEvidenceStrength(evidence),
+      metrics: input.metrics && typeof input.metrics === 'object' ? input.metrics : {},
+      evidenceIds: evidenceIds,
+      provenance: createProvenance(input.provenance),
+      createdAt: input.createdAt || new Date().toISOString()
+    };
+    store.linkInsight(id, evidenceIds);
+    return insight;
+  }
+
+  function buildContentPatternInsights(data, store) {
+    var works = store.getEvidenceByType('work');
+    var groups = new Map();
+    works.forEach(function(work) {
+      if (!work.keyword) return;
+      if (!groups.has(work.keyword)) groups.set(work.keyword, []);
+      groups.get(work.keyword).push(work.id);
+    });
+    return Array.from(groups.entries()).sort(function(a, b) { return b[1].length - a[1].length; }).slice(0, 5).map(function(entry) {
+      var keyword = entry[0];
+      var ids = entry[1];
+      return createInsight({
+        type: 'content_pattern',
+        title: '“' + keyword + '”相关内容样本集中',
+        description: '采集作品中有 ' + ids.length + ' 条由关键词“' + keyword + '”命中，可查看原始作品验证内容表现。',
+        sourceType: 'DERIVED',
+        metrics: { keyword: keyword, worksCount: ids.length },
+        evidenceIds: ids,
+        provenance: {
+          sourceType: 'DERIVED',
+          sourceFields: ['works._keyword', 'works.title', 'works.likeCount'],
+          formula: 'group works by exact collection keyword; rank by matched work count',
+          sampleSize: ids.length,
+          generatedBy: 'v8.2-content-pattern',
+          limitations: ['关键词来自采集任务，不等同于自然语言主题聚类']
+        }
+      }, store);
+    }).filter(Boolean);
+  }
+
+  function engagementValue(work) {
+    var metrics = work.metrics || {};
+    return ['likes', 'comments', 'favorites', 'shares'].reduce(function(total, key) {
+      return total + (metrics[key] === null ? 0 : metrics[key]);
+    }, 0);
+  }
+
+  function buildEngagementPatternInsights(data, store) {
+    var works = store.getEvidenceByType('work');
+    var patterns = [
+      { key:'避坑', label:'避坑提醒', test:/避坑|踩坑|别再|不要|千万别/ },
+      { key:'教程', label:'教程讲解', test:/教程|教学|入门|怎么|方法|步骤/ },
+      { key:'清单', label:'数字清单', test:/\d+个|\d+种|清单|合集|盘点/ },
+      { key:'测评', label:'测评对比', test:/测评|对比|横评|哪个好|值不值/ }
+    ];
+    return patterns.map(function(pattern) {
+      var matched = works.filter(function(work) { return pattern.test.test(work.title || ''); });
+      if (matched.length < 3) return null;
+      var total = matched.reduce(function(sum, work) { return sum + engagementValue(work); }, 0);
+      var average = Math.round(total / matched.length);
+      return createInsight({
+        type: 'content_pattern',
+        title: pattern.label + '内容模式',
+        description: matched.length + ' 条标题包含相关表达，样本平均互动 ' + average.toLocaleString() + '。',
+        sourceType: 'DERIVED',
+        metrics: { pattern: pattern.key, worksCount: matched.length, averageEngagement: average },
+        evidenceIds: matched.map(function(work) { return work.id; }),
+        provenance: {
+          sourceType: 'DERIVED',
+          sourceFields: ['works.title', 'works.likeCount', 'works.commentCount', 'works.collectCount', 'works.shareCount'],
+          formula: 'match title expressions; average likes + comments + favorites + shares',
+          sampleSize: matched.length,
+          generatedBy: 'v8.2-engagement-pattern',
+          limitations: ['互动值为已有互动字段之和，不代表播放量或转化率', '标题模式使用明确词组匹配，不是语义分类模型']
+        }
+      }, store);
+    }).filter(Boolean).sort(function(a, b) { return b.metrics.averageEngagement - a.metrics.averageEngagement; });
+  }
+
+  function buildUserVoiceInsights(data, store) {
+    var comments = store.getEvidenceByType('comment');
+    var groups = new Map();
+    comments.forEach(function(comment) {
+      if (!comment.keyword) return;
+      if (!groups.has(comment.keyword)) groups.set(comment.keyword, []);
+      groups.get(comment.keyword).push(comment.id);
+    });
+    return Array.from(groups.entries()).filter(function(entry) { return entry[1].length >= 3; }).sort(function(a, b) {
+      return b[1].length - a[1].length;
+    }).slice(0, 5).map(function(entry) {
+      return createInsight({
+        type: 'need',
+        title: '评论集中提到“' + entry[0] + '”',
+        description: entry[1].length + ' 条真实评论带有该采集关键词，可查看原文确认具体表达。',
+        sourceType: 'DERIVED',
+        metrics: { keyword: entry[0], commentsCount: entry[1].length },
+        evidenceIds: entry[1],
+        provenance: {
+          sourceType: 'DERIVED', sourceFields: ['comments.text', 'comments.keyword'],
+          formula: 'group comments by explicit collection keyword', sampleSize: entry[1].length,
+          generatedBy: 'v8.2-user-voice', limitations: ['关键词分组不等同于情绪、痛点或购买意图判断']
+        }
+      }, store);
+    }).filter(Boolean);
+  }
+
+  function buildAnalysis(data) {
+    var store = adaptV81Evidence(data);
+    var dataQuality = deriveDataQuality(data, store);
+    var hotInsights = dataQuality.availableSignals.contentPatterns ? buildContentPatternInsights(data, store) : [];
+    var contentPatternInsights = dataQuality.availableSignals.contentPatterns ? buildEngagementPatternInsights(data, store) : [];
+    var userVoiceInsights = dataQuality.availableSignals.userVoice ? buildUserVoiceInsights(data, store) : [];
+    var insights = hotInsights.concat(contentPatternInsights, userVoiceInsights);
+    var unsupportedInsights = [];
+    if (!dataQuality.availableSignals.userVoice) unsupportedInsights.push({ type: 'user_voice', status: 'DATA_INSUFFICIENT', reason: '评论样本不足' });
+    else if (!userVoiceInsights.length) unsupportedInsights.push({ type: 'user_voice', status: 'DATA_INSUFFICIENT', reason: '评论缺少可验证的重复主题' });
+    if (!dataQuality.availableSignals.trend) unsupportedInsights.push({ type: 'trend', status: 'DATA_INSUFFICIENT', reason: '历史数据不足' });
+    return {
+      evidenceStore: store,
+      insights: insights,
+      hotInsights: hotInsights,
+      contentPatternInsights: contentPatternInsights,
+      userVoiceInsights: userVoiceInsights,
+      unsupportedInsights: unsupportedInsights,
+      dataQuality: dataQuality
+    };
+  }
+
+  var api = {
+    stableHash: stableHash,
+    stableId: stableId,
+    createProvenance: createProvenance,
+    createEvidence: createEvidence,
+    createInsight: createInsight,
+    EvidenceStore: EvidenceStore,
+    adaptV81Evidence: adaptV81Evidence,
+    deriveDataQuality: deriveDataQuality,
+    deriveEvidenceStrength: deriveEvidenceStrength,
+    buildContentPatternInsights: buildContentPatternInsights,
+    buildEngagementPatternInsights: buildEngagementPatternInsights,
+    buildUserVoiceInsights: buildUserVoiceInsights,
+    buildAnalysis: buildAnalysis
+  };
+  window.V82Evidence = api;
+})();
 /* ===== core/renderer.js ===== */
 /**
  * 通用渲染器 — 表格、卡片、图表、数字动画、标签
@@ -908,7 +1330,7 @@ window.domainGuard = function(moduleId, renderFn) {
         if (btnEl) {
           const orig = btnEl.textContent;
           btnEl.textContent = '✓ 已复制';
-          setTimeout(() => btnEl.textContent = orig, 1500);
+          TimerManager.setTimeout(() => btnEl.textContent = orig, 1500, 'button-feedback');
         }
       });
     },
@@ -1031,6 +1453,10 @@ window.domainGuard = function(moduleId, renderFn) {
     moduleOrder.forEach(id => {
       const mod = modules[id];
       if (!mod) return;
+
+      // V8.2研究首页只执行可信数据管线和首页编排。
+      if (document.body && document.body.classList.contains('v82-research') &&
+          id !== 'evidenceInsights' && id !== 'homepageV82') return;
 
       // 模块开关检查
       if (mods[id] === false) {
@@ -1162,8 +1588,13 @@ window.domainGuard = function(moduleId, renderFn) {
     // 页面标题
     document.title = config.display_name || '热点追踪工作台';
 
-    // 渲染所有模块
-    renderAll();
+    // 数据准备与渲染由统一生命周期收口；兼容旧页面时仍可直接 renderAll。
+    if (window.AppLifecycle) {
+      window.AppLifecycle.prepare(DATA);
+      window.AppLifecycle.render();
+    } else {
+      renderAll();
+    }
 
     // 滚动动画
     initScrollReveal();
@@ -1171,10 +1602,13 @@ window.domainGuard = function(moduleId, renderFn) {
     // 导航隐藏
     initNavHide();
 
-    // 延迟初始化
-    setTimeout(() => { if (typeof initSectionCollapse === 'function') initSectionCollapse(); }, 1500);
-    setTimeout(() => { if (typeof checkDataFreshness === 'function') checkDataFreshness(); }, 2000);
-    setTimeout(() => { if (typeof initCardGlow === 'function') initCardGlow(); }, 500);
+    // 表现层在 DOM 渲染后的下一帧初始化，不参与数据就绪判断。
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (typeof initSectionCollapse === 'function') initSectionCollapse();
+      if (typeof checkDataFreshness === 'function') checkDataFreshness();
+      if (window.EffectsManager) window.EffectsManager.initPage();
+      else if (typeof initCardGlow === 'function') initCardGlow();
+    }));
   }
 
   // ===== 滚动显现动画 =====
@@ -1190,6 +1624,7 @@ window.domainGuard = function(moduleId, renderFn) {
       el.classList.add('anim-item');
       observer.observe(el);
     });
+    if (window.EffectsManager) window.EffectsManager.register(() => observer.disconnect(), 'framework-reveal');
   }
 
   // ===== 导航栏滚动隐藏 =====
@@ -1197,11 +1632,13 @@ window.domainGuard = function(moduleId, renderFn) {
     let lastScroll = 0;
     const nav = document.querySelector('.top-nav');
     if (!nav) return;
-    window.addEventListener('scroll', () => {
+    const onScroll = () => {
       const cur = window.scrollY;
       nav.style.transform = cur > lastScroll && cur > 100 ? 'translateY(-100%)' : 'translateY(0)';
       lastScroll = cur;
-    });
+    };
+    if (window.EventManager) window.EventManager.on(window, 'scroll', onScroll, { passive: true }, 'effect');
+    else window.addEventListener('scroll', onScroll, { passive: true });
   }
 
   // ===== 全局搜索 =====
@@ -1297,24 +1734,33 @@ window.normalizeData(); } catch(e) {}
       breathPhase: Math.random() * Math.PI * 2
     };
 
-    card.addEventListener('mouseenter', () => {
+    const enter = () => {
       card._glowState.isHovering = true;
       activeCards.add(card);
-    });
+    };
 
-    card.addEventListener('mouseleave', () => {
+    const leave = () => {
       card._glowState.isHovering = false;
       card._glowState.targetX = 50;
       card._glowState.targetY = 50;
-    });
+    };
 
-    card.addEventListener('mousemove', (e) => {
+    const move = (e) => {
       const rect = card.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 100;
       const y = ((e.clientY - rect.top) / rect.height) * 100;
       card._glowState.targetX = Math.max(0, Math.min(100, x));
       card._glowState.targetY = Math.max(0, Math.min(100, y));
-    });
+    };
+    if (window.EventManager) {
+      window.EventManager.on(card, 'mouseenter', enter, false, 'effect');
+      window.EventManager.on(card, 'mouseleave', leave, false, 'effect');
+      window.EventManager.on(card, 'mousemove', move, false, 'effect');
+    } else {
+      card.addEventListener('mouseenter', enter);
+      card.addEventListener('mouseleave', leave);
+      card.addEventListener('mousemove', move);
+    }
   }
 
   /** 全局动画循环 — 所有卡片共享一个rAF */
@@ -1371,9 +1817,9 @@ window.normalizeData(); } catch(e) {}
 
   // DOM就绪后自动初始化（延迟等模块渲染完成）
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(initCardGlow, 800));
+    document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(initCardGlow), { once: true });
   } else {
-    setTimeout(initCardGlow, 800);
+    requestAnimationFrame(initCardGlow);
   }
 
   // 监听DOM变化，自动给新元素绑定光晕
@@ -1387,9 +1833,17 @@ window.normalizeData(); } catch(e) {}
         }
       });
     });
-    if (needsRefresh) setTimeout(initCardGlow, 200);
+    if (needsRefresh) requestAnimationFrame(initCardGlow);
   });
   observer.observe(document.body, { childList: true, subtree: true });
+  if (window.EffectsManager) {
+    window.EffectsManager.register(() => {
+      observer.disconnect();
+      if (animationId) cancelAnimationFrame(animationId);
+      animationId = null;
+      activeCards.clear();
+    }, 'card-glow');
+  }
 })();
 
 
@@ -1613,6 +2067,16 @@ function initLoginLogo() {
 function initScrollReveal() {
   var vh = window.innerHeight;
   function update() {
+    if (document.body.classList.contains('v82-research')) {
+      document.body.setAttribute('data-reveal', '1');
+      var researchSections = document.querySelectorAll('#v82ResearchHome section');
+      for (var r = 0; r < researchSections.length; r++) {
+        researchSections[r].style.filter = 'none';
+        researchSections[r].style.opacity = '1';
+        researchSections[r].style.transform = 'none';
+      }
+      return;
+    }
     if (document.getElementById('appSidebar')) {
       document.body.setAttribute('data-reveal', '1');
       var els = document.querySelectorAll('.hero, section');
@@ -1770,6 +2234,7 @@ if (document.readyState === 'loading') {
   function initSectionCollapse() {
     var sections = document.querySelectorAll('.hero, section');
     sections.forEach(function(sec, idx) {
+      if (sec.closest && sec.closest('#v82ResearchHome')) return;
       var header = sec.querySelector('.section-title, h2, .hero-title');
       if (!header) return;
       if (header.querySelector('.section-collapse-btn')) return;
@@ -1782,7 +2247,7 @@ if (document.readyState === 'loading') {
       header.style.gap = '8px';
       header.appendChild(btn);
 
-      var isCollapsed = localStorage.getItem('sec_collapse_' + idx) === '1';
+      var isCollapsed = StorageAdapter.getRaw('sec_collapse_' + idx, '0') === '1';
       if (isCollapsed) {
         sec.classList.add('collapsed');
         btn.textContent = '展开';
@@ -1792,7 +2257,7 @@ if (document.readyState === 'loading') {
         e.stopPropagation();
         var collapsed = sec.classList.toggle('collapsed');
         btn.textContent = collapsed ? '展开' : '收起';
-        localStorage.setItem('sec_collapse_' + idx, collapsed ? '1' : '0');
+        StorageAdapter.setRaw('sec_collapse_' + idx, collapsed ? '1' : '0');
       });
     });
   }
@@ -1954,6 +2419,230 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== modules/industryCreation.js ===== */
+(function () {
+  'use strict';
+
+  var REGISTRY_KEY = 'v82_industries';
+  var draft = null;
+
+  function esc(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+    });
+  }
+
+  function now() { return new Date().toISOString(); }
+
+  function generateId() {
+    var suffix = Date.now().toString(36);
+    if (window.crypto && crypto.getRandomValues) {
+      var bytes = new Uint32Array(1);
+      crypto.getRandomValues(bytes);
+      suffix += bytes[0].toString(36);
+    } else {
+      suffix += Math.floor(Math.random() * 0xFFFFFF).toString(36);
+    }
+    return 'ind_' + suffix.toLowerCase();
+  }
+
+  var KeywordSuggestionAdapter = {
+    suggest: function (name) {
+      var base = String(name || '').trim();
+      var suggestions = [base, base + '教程', base + '推荐', base + '趋势', base + '案例', base + '避坑', base + '怎么选', base + '设计师'];
+      if (/工业设计/.test(base)) suggestions = ['工业设计','产品设计','产品外观设计','CMF设计','设计趋势','工业设计案例','产品设计案例','设计师'];
+      return suggestions.filter(function (item, index, list) { return item && list.indexOf(item) === index; }).slice(0, 8);
+    }
+  };
+
+  var DynamicIndustryService = {
+    list: function (includeArchived) {
+      var items = StorageAdapter.getJSON(REGISTRY_KEY, []) || [];
+      return includeArchived ? items : items.filter(function (item) { return !item.archived; });
+    },
+    get: function (id) {
+      return this.list(true).find(function (item) { return item.id === id; }) || null;
+    },
+    save: function (record) {
+      var items = this.list(true);
+      var index = items.findIndex(function (item) { return item.id === record.id; });
+      if (index >= 0) items[index] = record; else items.push(record);
+      StorageAdapter.setJSON(REGISTRY_KEY, items);
+      StorageAdapter.saveIndustryConfig(IndustryStore.resolve(record.id), {
+        id: record.id,
+        name: record.name,
+        display_name: record.name,
+        keywords: record.keywords.slice(),
+        platforms: record.platforms.slice(),
+        createdAt: record.createdAt,
+        updatedAt: record.updatedAt,
+        archived: !!record.archived,
+        language: 'zh',
+        theme: { primary: '#8b5cf6' }
+      });
+      return record;
+    },
+    create: function (name) {
+      var stamp = now();
+      return this.save({ id: generateId(), name: name.trim(), keywords: KeywordSuggestionAdapter.suggest(name), platforms: ['douyin','xiaohongshu'], createdAt: stamp, updatedAt: stamp, archived: false });
+    },
+    draft: function (name) {
+      var stamp = now();
+      return { id: generateId(), name:name.trim(), keywords:KeywordSuggestionAdapter.suggest(name), platforms:['douyin','xiaohongshu'], createdAt:stamp, updatedAt:stamp, archived:false, _new:true };
+    },
+    update: function (id, patch) {
+      var record = this.get(id);
+      if (!record) return null;
+      Object.keys(patch || {}).forEach(function (key) { record[key] = patch[key]; });
+      record.updatedAt = now();
+      return this.save(record);
+    },
+    archive: function (id) { return this.update(id, { archived: true }); },
+    history: function (id) { return StorageAdapter.getJSON('industry_' + id + '_history', []) || []; },
+    saveHistory: function (id, history) { return StorageAdapter.setJSON('industry_' + id + '_history', history || []); }
+  };
+
+  function currentId() { return IndustryStore.getCurrent().id; }
+
+  function row(record, kind) {
+    var active = record.id === currentId();
+    var actions = '<button type="button" data-industry-switch="' + esc(record.id) + '">' + (active ? '当前' : '切换') + '</button>';
+    if (kind === 'dynamic') {
+      actions += '<button type="button" data-industry-edit="' + esc(record.id) + '">编辑</button>' +
+        '<button type="button" data-industry-archive="' + esc(record.id) + '">归档</button>';
+    }
+    return '<div class="my-industry-row' + (active ? ' is-active' : '') + '"><div><strong>' + esc(record.name) + '</strong><span>' + esc(kind === 'builtin' ? '内置行业' : (kind === 'legacy' ? '兼容行业' : ((record.keywords || []).length + ' 个关键词'))) + '</span></div><div class="my-industry-actions">' + actions + '</div></div>';
+  }
+
+  function renderManager() {
+    var root = document.getElementById('dynamicIndustryManager');
+    if (!root) return;
+    var html = '<div class="my-industry-heading"><div><h3>我的行业</h3><p>切换、创建和管理独立行业工作台</p></div><button type="button" class="v82-primary" data-industry-add>+ 添加行业</button></div>';
+    html += '<div class="my-industry-list">' + row({id:'ai',name:'AI'}, 'builtin') + row({id:'shufa',name:'书法'}, 'builtin');
+    (StorageAdapter.listIndustries() || []).forEach(function (name) { html += row({id:'local:' + name,name:name}, 'legacy'); });
+    DynamicIndustryService.list().forEach(function (record) { html += row(record, 'dynamic'); });
+    root.innerHTML = html + '</div>';
+  }
+
+  function ensureDrawer() {
+    var shell = document.getElementById('industryFlowShell');
+    if (shell) return shell;
+    shell = document.createElement('div');
+    shell.id = 'industryFlowShell';
+    shell.className = 'industry-flow-shell';
+    shell.setAttribute('aria-hidden', 'true');
+    shell.innerHTML = '<div class="industry-flow-backdrop" data-industry-close></div><section class="industry-flow-drawer" role="dialog" aria-modal="true" aria-labelledby="industryFlowTitle"><header><div><span class="v82-eyebrow">Dynamic Industry</span><h2 id="industryFlowTitle">添加行业</h2></div><button type="button" class="industry-flow-close" data-industry-close aria-label="关闭">×</button></header><div id="industryFlowBody"></div></section>';
+    document.body.appendChild(shell);
+    return shell;
+  }
+
+  function show(html) {
+    var shell = ensureDrawer();
+    document.getElementById('industryFlowBody').innerHTML = html;
+    shell.classList.add('is-open');
+    shell.setAttribute('aria-hidden', 'false');
+  }
+
+  function close() {
+    var shell = document.getElementById('industryFlowShell');
+    if (!shell || (window.collectionState && window.collectionState.running)) return;
+    shell.classList.remove('is-open');
+    shell.setAttribute('aria-hidden', 'true');
+    draft = null;
+  }
+
+  function renderNameStep(value, error) {
+    show('<div class="industry-flow-step"><span class="industry-flow-step-label">步骤 1 / 2</span><h3>你想追踪什么行业？</h3><p>只需输入行业名称，系统会生成一组可编辑的建议关键词。</p>' +
+      '<input class="industry-flow-input" id="newIndustryName" value="' + esc(value || '') + '" placeholder="例如：工业设计、宠物用品、咖啡机、AI Agent" autocomplete="off">' +
+      (error ? '<div class="industry-flow-error">' + esc(error) + '</div>' : '') +
+      '<div class="industry-flow-footer"><button type="button" data-industry-close>取消</button><button type="button" class="v82-primary" data-industry-next>下一步</button></div></div>');
+    var input = document.getElementById('newIndustryName');
+    if (input) input.focus();
+  }
+
+  function keywordRows(keywords) {
+    return keywords.map(function (keyword, index) {
+      return '<div class="industry-keyword-row"><input class="industry-flow-input" data-keyword-index="' + index + '" value="' + esc(keyword) + '"><button type="button" data-keyword-remove="' + index + '" aria-label="删除关键词">×</button></div>';
+    }).join('');
+  }
+
+  function renderKeywordStep() {
+    if (!draft) return;
+    show('<div class="industry-flow-step"><span class="industry-flow-step-label">步骤 2 / 2</span><h3>确认行业与关键词</h3><p>以下是系统建议。你可以修改、删除或添加关键词，确认后才会开始采集。</p>' +
+      '<label class="industry-flow-label">行业名称</label><input class="industry-flow-input" id="editIndustryName" value="' + esc(draft.name) + '">' +
+      '<label class="industry-flow-label">系统建议关键词</label><div id="industryKeywordList">' + keywordRows(draft.keywords) + '</div>' +
+      '<button type="button" class="industry-add-keyword" data-keyword-add>+ 添加关键词</button>' +
+      '<label class="industry-flow-label">采集平台</label><div class="industry-platforms"><label><input type="checkbox" id="platform_dy"' + (draft.platforms.indexOf('douyin') >= 0 ? ' checked' : '') + '> 抖音</label><label><input type="checkbox" id="platform_xhs"' + (draft.platforms.indexOf('xiaohongshu') >= 0 ? ' checked' : '') + '> 小红书</label></div>' +
+      '<div id="collectStatus" class="industry-collect-status" style="display:none;"></div>' +
+      '<div class="industry-flow-footer"><button type="button" data-industry-back>上一步</button><button type="button" class="v82-primary" data-industry-collect>确认并开始采集</button></div></div>');
+  }
+
+  function syncDraft() {
+    if (!draft) return;
+    var name = document.getElementById('editIndustryName');
+    if (name && name.value.trim()) draft.name = name.value.trim();
+    draft.keywords = Array.from(document.querySelectorAll('[data-keyword-index]')).map(function (input) { return input.value.trim(); }).filter(Boolean).slice(0, 10);
+    draft.platforms = [];
+    var dy = document.getElementById('platform_dy');
+    var xhs = document.getElementById('platform_xhs');
+    if (dy && dy.checked) draft.platforms.push('douyin');
+    if (xhs && xhs.checked) draft.platforms.push('xiaohongshu');
+  }
+
+  function openCreate() { draft = null; renderNameStep(''); }
+  function openEdit(id) { var record = DynamicIndustryService.get(id); draft = record ? JSON.parse(JSON.stringify(record)) : null; if (draft) renderKeywordStep(); }
+  function openRecollect() {
+    var ctx = IndustryStore.getCurrent();
+    if (ctx.type === 'dynamic') openEdit(ctx.id);
+    else {
+      var panel = document.getElementById('settingsPanel');
+      if (panel) { panel.style.display = 'block'; panel.scrollIntoView({behavior:'smooth',block:'start'}); }
+    }
+  }
+
+  function beginCollection() {
+    syncDraft();
+    if (!draft || !draft.name || !draft.keywords.length || !draft.platforms.length) {
+      var status = document.getElementById('collectStatus');
+      if (status) { status.style.display = 'block'; status.innerHTML = '<span class="is-error">请保留至少一个关键词，并选择至少一个采集平台。</span>'; }
+      return;
+    }
+    if (draft._new) { delete draft._new; draft = DynamicIndustryService.save(draft); renderManager(); }
+    else draft = DynamicIndustryService.update(draft.id, { name:draft.name, keywords:draft.keywords, platforms:draft.platforms });
+    document.getElementById('industryInput').value = draft.name;
+    window.startCollection({ industryId:draft.id, name:draft.name, keywords:draft.keywords.slice(), platforms:draft.platforms.slice() });
+  }
+
+  function handleClick(event) {
+    var target = event.target;
+    if (target.closest('[data-industry-add]')) return openCreate();
+    if (target.closest('[data-industry-close]')) return close();
+    if (target.closest('[data-industry-next]')) {
+      var input = document.getElementById('newIndustryName');
+      var name = input ? input.value.trim() : '';
+      if (!name) return renderNameStep('', '请输入行业名称');
+      draft = DynamicIndustryService.draft(name);
+      return renderKeywordStep();
+    }
+    if (target.closest('[data-industry-back]')) { syncDraft(); return renderNameStep(draft ? draft.name : ''); }
+    var remove = target.closest('[data-keyword-remove]');
+    if (remove) { syncDraft(); draft.keywords.splice(Number(remove.getAttribute('data-keyword-remove')), 1); return renderKeywordStep(); }
+    if (target.closest('[data-keyword-add]')) { syncDraft(); if (draft.keywords.length < 10) draft.keywords.push(''); return renderKeywordStep(); }
+    if (target.closest('[data-industry-collect]')) return beginCollection();
+    var switchButton = target.closest('[data-industry-switch]');
+    if (switchButton && switchButton.textContent !== '当前') return switchIndustryContext(switchButton.getAttribute('data-industry-switch'));
+    var edit = target.closest('[data-industry-edit]');
+    if (edit) return openEdit(edit.getAttribute('data-industry-edit'));
+    var archive = target.closest('[data-industry-archive]');
+    if (archive && window.confirm('归档这个行业？数据会保留。')) { DynamicIndustryService.archive(archive.getAttribute('data-industry-archive')); renderManager(); }
+  }
+
+  window.KeywordSuggestionAdapter = KeywordSuggestionAdapter;
+  window.DynamicIndustryService = DynamicIndustryService;
+  window.DynamicIndustryFlow = { openCreate:openCreate, openEdit:openEdit, openRecollect:openRecollect, renderManager:renderManager, close:close };
+  EventManager.on(document, 'click', handleClick, false, 'industry-flow');
+  renderManager();
+})();
 /* ===== modules/hero.js ===== */
 /**
  * modules/hero.js
@@ -1990,11 +2679,11 @@ if (document.readyState === 'loading') {
         <div class="hs-value orange" id="heroTopicsVal">${topics.length}</div>
         <div class="hs-sub">标题 + 钩子 + 形式</div><span class="export-btn" onclick="exportTopics()" style="margin-left:12px;">📋 导出选题</span>
       </div>`;
-    setTimeout(()=>{
+    TimerManager.setTimeout(()=>{
       animateNumber(document.getElementById('heroWorksVal'), works.length);
       animateNumber(document.getElementById('heroSurgingVal'), surging);
       animateNumber(document.getElementById('heroTopicsVal'), topics.length);
-    }, 300);
+    }, 300, 'hero-counter');
   }
 
   // renderActions
@@ -2049,6 +2738,296 @@ if (document.readyState === 'loading') {
 })();
 
 
+/* ===== modules/evidenceInsights.js ===== */
+/**
+ * V8.2 Alpha 1可信洞察管线。
+ * 每份DATA对象只建立一次Evidence索引，并通过AppStore提供查询API。
+ */
+(function() {
+  'use strict';
+
+  var cachedData = null;
+  var cachedAnalysis = null;
+
+  function exposeStore(analysis) {
+    if (!window.AppStore) return;
+    var store = analysis.evidenceStore;
+    AppStore.v82 = analysis;
+    AppStore.evidenceStore = store;
+    AppStore.getEvidence = function(id) { return store.getEvidence(id); };
+    AppStore.getEvidenceByIds = function(ids) { return store.getEvidenceByIds(ids); };
+    AppStore.getEvidenceByType = function(type) { return store.getEvidenceByType(type); };
+    AppStore.getEvidenceByInsight = function(id) { return store.getEvidenceByInsight(id); };
+  }
+
+  function ensureAnalysis(data) {
+    data = data && typeof data === 'object' ? data : {};
+    if (cachedData !== data || !cachedAnalysis) {
+      cachedData = data;
+      cachedAnalysis = window.V82Evidence.buildAnalysis(data);
+    }
+    exposeStore(cachedAnalysis);
+    return cachedAnalysis;
+  }
+
+  function render(data) {
+    // 默认首页只保留分析能力和 AppStore 查询接口，不插入 Alpha 研究卡片。
+    ensureAnalysis(data);
+  }
+
+  if (window.Module && window.V82Evidence) {
+    Module.register({ id:'evidenceInsights', requiredFields:[], render:render });
+  }
+  window.ensureV82Analysis = ensureAnalysis;
+})();
+/* ===== modules/evidenceDrawer.js ===== */
+(function() {
+  'use strict';
+
+  function escapeHTML(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char];
+    });
+  }
+
+  function fmt(value) {
+    if (value === null || value === undefined) return '未采集';
+    var number = Number(value);
+    return isFinite(number) ? number.toLocaleString() : '未采集';
+  }
+
+  function safeUrl(value) {
+    try {
+      var url = new URL(String(value || ''), window.location.href);
+      return url.protocol === 'http:' || url.protocol === 'https:' ? url.href : '';
+    } catch (e) { return ''; }
+  }
+
+  function ensureDrawer() {
+    var drawer = document.getElementById('v82EvidenceDrawer');
+    if (drawer) return drawer;
+    drawer = document.createElement('aside');
+    drawer.id = 'v82EvidenceDrawer';
+    drawer.className = 'v82-drawer';
+    drawer.setAttribute('aria-hidden', 'true');
+    drawer.innerHTML = '<div class="v82-drawer-backdrop" data-v82-close></div><div class="v82-drawer-panel" role="dialog" aria-modal="true" aria-labelledby="v82DrawerTitle">' +
+      '<header><div><span class="v82-drawer-kicker" id="v82DrawerKicker">原始证据</span><h2 id="v82DrawerTitle">证据</h2></div><button type="button" class="v82-close" data-v82-close aria-label="关闭">×</button></header>' +
+      '<div class="v82-drawer-body" id="v82DrawerBody"></div></div>';
+    document.body.appendChild(drawer);
+    return drawer;
+  }
+
+  function insightById(id) {
+    var analysis = window.AppStore && AppStore.v82;
+    if (!analysis) return null;
+    return analysis.insights.find(function(item) { return item.id === id; }) || null;
+  }
+
+  function evidenceCard(item) {
+    var title = item.title || item.text || '未提供标题';
+    var originalUrl = safeUrl(item.url);
+    var link = originalUrl ? '<a href="' + escapeHTML(originalUrl) + '" target="_blank" rel="noopener noreferrer">查看原始内容</a>' : '<span class="v82-muted">原始链接未采集</span>';
+    return '<article class="v82-evidence-card"><div class="v82-evidence-meta"><span>' + escapeHTML(item.platform || 'unknown') + '</span><span>' + escapeHTML(item.keyword || '未标注关键词') + '</span></div>' +
+      '<h3>' + escapeHTML(title) + '</h3>' +
+      (item.text && item.text !== item.title ? '<p>' + escapeHTML(item.text).slice(0, 180) + '</p>' : '') +
+      '<div class="v82-metrics"><span>赞 ' + fmt(item.metrics.likes) + '</span><span>评 ' + fmt(item.metrics.comments) + '</span><span>藏 ' + fmt(item.metrics.favorites) + '</span></div>' +
+      '<div class="v82-evidence-link">' + link + '</div></article>';
+  }
+
+  function interactionValue(item) {
+    return ['likes', 'comments', 'favorites', 'shares'].reduce(function(total, key) {
+      var value = item.metrics && item.metrics[key];
+      return total + (value == null || !isFinite(Number(value)) ? 0 : Number(value));
+    }, 0);
+  }
+
+  function renderBasis(insight, evidence) {
+    var p = insight.provenance || {};
+    var s = insight.evidenceStrength || {};
+    var limitations = (p.limitations || []).concat((AppStore.v82.dataQuality && AppStore.v82.dataQuality.limitations) || []);
+    var sourceName = insight.sourceType === 'REAL' ? '原始采集数据' : insight.sourceType === 'DERIVED' ? '由原始样本计算得出' : '基于现有样本推断';
+    var strengthName = { HIGH:'高', MEDIUM:'中', LOW:'低' }[s.level] || '低';
+    var method = insight.metrics && insight.metrics.averageEngagement != null
+      ? '分析了 ' + evidence.length + ' 条相关作品标题，并计算点赞、评论、收藏和分享的平均互动。'
+      : '分析了 ' + evidence.length + ' 条相关原始样本，按明确的采集关键词归组。';
+    return '<section class="v82-basis"><p class="v82-basis-summary">' + escapeHTML(method) + '</p><dl>' +
+      '<div><dt>数据来源</dt><dd>' + escapeHTML(sourceName) + '</dd></div>' +
+      '<div><dt>样本数量</dt><dd>' + evidence.length + ' 条</dd></div>' +
+      '<div><dt>依据强度</dt><dd>' + strengthName + '：来源 ' + (s.sourceCount || 0) + ' 个平台，字段完整度 ' + Math.round((s.completeness || 0) * 100) + '%</dd></div>' +
+      '</dl><h3>需要注意</h3>' + (limitations.length ? '<ul>' + limitations.map(function(item) { return '<li>' + escapeHTML(item) + '</li>'; }).join('') + '</ul>' : '<p class="v82-muted">无额外限制记录</p>') +
+      '<details class="v82-advanced"><summary>高级信息</summary><dl><div><dt>内部强度</dt><dd>' + escapeHTML(s.level || 'LOW') + '</dd></div><div><dt>来源字段</dt><dd>' + escapeHTML((p.sourceFields || []).join('、') || '未记录') + '</dd></div><div><dt>计算公式</dt><dd>' + escapeHTML(p.formula || '未使用公式') + '</dd></div><div><dt>生成模块</dt><dd>' + escapeHTML(p.generatedBy || '未记录') + '</dd></div></dl></details></section>';
+  }
+
+  function open(insightId, mode) {
+    var drawer = ensureDrawer();
+    var insight = insightById(insightId);
+    var body = document.getElementById('v82DrawerBody');
+    if (!insight || !body) {
+      if (body) body.innerHTML = '<div class="v82-empty">未找到对应洞察或证据。</div>';
+    } else {
+      var evidence = AppStore.getEvidenceByInsight(insightId).slice().sort(function(a, b) {
+        return interactionValue(b) - interactionValue(a);
+      });
+      document.getElementById('v82DrawerKicker').textContent = mode === 'basis' ? '计算依据' : '原始证据';
+      document.getElementById('v82DrawerTitle').textContent = insight.title;
+      body.innerHTML = mode === 'basis' ? renderBasis(insight, evidence) :
+        '<div class="v82-drawer-summary"><strong>' + evidence.length + ' 条原始证据</strong>' +
+        (insight.metrics && insight.metrics.keyword ? '<span>主要关键词：' + escapeHTML(insight.metrics.keyword) + '</span>' : '') +
+        '<small>按互动量从高到低排列</small></div>' +
+        (evidence.length ? evidence.map(evidenceCard).join('') : '<div class="v82-empty">该洞察当前没有可展示的原始证据。</div>');
+    }
+    drawer.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+  }
+
+  function close() {
+    var drawer = document.getElementById('v82EvidenceDrawer');
+    if (!drawer) return;
+    drawer.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+  }
+
+  document.addEventListener('click', function(event) {
+    var action = event.target.closest && event.target.closest('[data-v82-action]');
+    if (action) open(action.getAttribute('data-insight-id'), action.getAttribute('data-v82-action'));
+    if (event.target.closest && event.target.closest('[data-v82-close]')) close();
+  });
+  document.addEventListener('keydown', function(event) { if (event.key === 'Escape') close(); });
+  window.openEvidenceDrawer = open;
+  window.closeEvidenceDrawer = close;
+})();
+/* ===== modules/homepageV82.js ===== */
+(function() {
+  'use strict';
+
+  // Research Workspace 保留为显式预览，不再替代默认的原版工作台。
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('view') !== 'research') return;
+
+  document.body.classList.add('v82-research');
+
+  function esc(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char];
+    });
+  }
+
+  function ensureRoot() {
+    var root = document.getElementById('v82ResearchHome');
+    if (root) return root;
+    root = document.createElement('main');
+    root.id = 'v82ResearchHome';
+    root.className = 'v82-home';
+    var hero = document.querySelector('.hero');
+    if (hero && hero.parentNode) hero.parentNode.insertBefore(root, hero);
+    else document.body.appendChild(root);
+    return root;
+  }
+
+  function state(type, title, description) {
+    return '<div class="v82-state v82-state-' + type.toLowerCase() + '" data-state="' + type + '"><strong>' + esc(title) + '</strong><p>' + esc(description) + '</p></div>';
+  }
+
+  function strengthLabel(value) { return { HIGH:'高', MEDIUM:'中', LOW:'低' }[value] || '低'; }
+
+  function insightCard(insight) {
+    var sourceLabel = insight.type === 'need' ? '基于真实评论' : '基于真实作品 · 推导分析';
+    return '<article class="v82-research-card"><span class="v82-data-source">' + sourceLabel + '</span>' +
+      '<h3>' + esc(insight.title) + '</h3><p>' + esc(insight.description) + '</p>' +
+      '<div class="v82-card-meta"><span>' + insight.evidenceIds.length + ' 条原始证据</span><span>证据强度：' + strengthLabel(insight.evidenceStrength.level) + '</span></div>' +
+      '<div class="v82-card-actions">' +
+      '<button type="button" data-v82-action="evidence" data-insight-id="' + esc(insight.id) + '">查看证据</button>' +
+      '<button type="button" class="v82-secondary-action" data-v82-action="basis" data-insight-id="' + esc(insight.id) + '">计算依据</button></div></article>';
+  }
+
+  function section(number, id, title, summary, content) {
+    return '<section class="v82-home-section" id="' + id + '"><header class="v82-home-section-head"><span>' + number + '</span><div><h2>' + title + '</h2><p>' + summary + '</p></div></header>' + content + '</section>';
+  }
+
+  function renderHeader(data, quality) {
+    var industry = (data.summary && data.summary.industry) || (AppStore.industry && AppStore.industry.name) || '当前行业';
+    if (AppStore.industry.id === 'ai') industry = 'AI';
+    if (AppStore.industry.id === 'shufa') industry = '书法';
+    var platformNames = { douyin:'抖音', xiaohongshu:'小红书' };
+    var platforms = quality.platforms && quality.platforms.length ? quality.platforms.map(function(item) { return platformNames[item] || item; }).join('、') : '暂无平台信息';
+    return '<header class="v82-research-header"><div><span class="v82-eyebrow">Industry Research</span><h1>' + esc(industry) + '</h1>' +
+      '<p>行业内容研究 · 基于真实采集数据</p></div>' +
+      '<div class="v82-context"><div><span>最后采集</span><strong>' + esc(quality.collectionTime || '未记录') + '</strong></div><div><span>数据来源</span><strong>' + esc(platforms) + '</strong></div></div>' +
+      '<div class="v82-header-actions"><button type="button" class="v82-primary" data-v82-home-action="collect">重新采集</button><button type="button" data-v82-home-action="settings">行业设置</button></div></header>';
+  }
+
+  function renderQuality(quality) {
+    var items = [[quality.worksCount,'作品'],[quality.keywordsCount,'关键词'],[quality.commentsCount,'评论'],[quality.platformsCount,'平台']].map(function(item) {
+      return '<div><strong>' + item[0].toLocaleString() + '</strong><span>' + item[1] + '</span></div>';
+    }).join('');
+    var limitations = quality.limitations.map(function(item) { return '<li>' + esc(item) + '</li>'; }).join('');
+    return section('02', 'v82DataQuality', '数据质量', '结论范围由当前样本决定，不使用综合评分。', '<div class="v82-quality-strip">' + items +
+      '<div class="v82-quality-time"><span>最后采集</span><strong>' + esc(quality.collectionTime || '未记录') + '</strong></div></div>' +
+      (limitations ? '<ul class="v82-limitations">' + limitations + '</ul>' : ''));
+  }
+
+  function renderInsights(number, id, title, summary, insights, emptyText) {
+    var content = insights.length ? '<div class="v82-research-grid">' + insights.map(insightCard).join('') + '</div>' : state('NO_DATA', '暂无可验证结论', emptyText);
+    return section(number, id, title, summary, content);
+  }
+
+  function renderUserVoice(analysis) {
+    var content;
+    if (!analysis.dataQuality.commentsCount) {
+      content = state('DATA_INSUFFICIENT', '当前暂无评论样本', '因此暂时无法分析高频问题、用户痛点和用户需求。采集到真实评论后，这里将展示常见表达。');
+    } else if (!analysis.userVoiceInsights.length) {
+      content = state('DATA_INSUFFICIENT', '评论主题尚不足以形成结论', '已有评论样本，但没有达到可重复验证的主题门槛。');
+    } else content = '<div class="v82-research-grid">' + analysis.userVoiceInsights.map(insightCard).join('') + '</div>';
+    return section('05', 'v82UserVoice', '用户声音', '只分析真实评论 Evidence。', content);
+  }
+
+  function renderDeepDive(analysis) {
+    if (!analysis.evidenceStore.count()) return section('06', 'v82DeepDive', '深入研究', '原始记录与完整研究范围。', state('NO_DATA', '暂无原始数据', '完成采集后可在这里查看作品、关键词和 Evidence。'));
+    var works = analysis.evidenceStore.getEvidenceByType('work').slice(0, 8);
+    var keywords = analysis.evidenceStore.getEvidenceByType('keyword').slice(0, 16);
+    var rows = works.map(function(work) {
+      return '<tr><td>' + esc(work.platform) + '</td><td>' + esc(work.title || '未提供标题') + '</td><td>' + esc(work.keyword || '未标注') + '</td><td>' + (work.metrics.likes == null ? '未采集' : work.metrics.likes.toLocaleString()) + '</td></tr>';
+    }).join('');
+    var tags = keywords.map(function(item) { return '<span>' + esc(item.keyword) + '</span>'; }).join('');
+    return section('06', 'v82DeepDive', '进一步研究', '按需展开原始记录，首页默认保持简洁。', '<div class="v82-deep-links">' +
+      '<details><summary><strong>浏览原始作品</strong><span>' + analysis.dataQuality.worksCount + ' 条记录</span></summary><div class="v82-table-wrap"><table><thead><tr><th>平台</th><th>标题</th><th>关键词</th><th>点赞</th></tr></thead><tbody>' + rows + '</tbody></table></div></details>' +
+      '<details><summary><strong>查看全部关键词</strong><span>' + analysis.dataQuality.keywordsCount + ' 个关键词</span></summary><div class="v82-keyword-list">' + tags + '</div></details>' +
+      '<div class="v82-deep-link"><strong>Evidence 索引</strong><span>' + analysis.evidenceStore.count() + ' 条可追溯证据</span></div>' +
+      '<div class="v82-deep-link"><strong>历史数据</strong><span>' + (analysis.dataQuality.historyDays >= 2 ? analysis.dataQuality.historyDays + ' 天记录' : '当前数据不足') + '</span></div></div>');
+  }
+
+  function render(data) {
+    var root = ensureRoot();
+    if (!window.ensureV82Analysis) { root.innerHTML = state('ERROR', '分析模块加载失败', '请刷新页面后重试。'); return; }
+    var analysis = window.ensureV82Analysis(data);
+    root.innerHTML = renderHeader(data, analysis.dataQuality) + renderQuality(analysis.dataQuality) +
+      renderInsights('03', 'v82WhatsHot', '现在值得关注', '按真实作品样本量排序，每条结论均可查看证据。', analysis.hotInsights.slice(0, 4), '当前没有作品或采集关键词，无法判断热点。') +
+      renderInsights('04', 'v82ContentPatterns', '内容表现模式', '只使用标题和真实互动字段，不推断播放量或转化。', analysis.contentPatternInsights.slice(0, 4), '当前样本尚未形成可验证的标题互动模式。') +
+      renderUserVoice(analysis) + renderDeepDive(analysis);
+  }
+
+  function openSettings(prefill) {
+    var panel = document.getElementById('settingsPanel');
+    if (!panel) return;
+    document.body.classList.add('v82-settings-open');
+    panel.style.display = 'block';
+    if (prefill) { var input = document.getElementById('industryInput'); if (input) input.value = AppStore.industry.name || ''; }
+    panel.scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  document.addEventListener('click', function(event) {
+    var action = event.target.closest && event.target.closest('[data-v82-home-action]');
+    if (!action) return;
+    var type = action.getAttribute('data-v82-home-action');
+    openSettings(type === 'collect');
+    if (window.DynamicIndustryFlow) {
+      DynamicIndustryFlow.renderManager();
+      if (type === 'collect') DynamicIndustryFlow.openRecollect();
+    }
+  });
+
+  if (window.Module) Module.register({ id:'homepageV82', requiredFields:[], render:render });
+})();
 /* ===== modules/hotwords.js ===== */
 /**
  * modules/hotwords.js
@@ -2077,7 +3056,7 @@ if (document.readyState === 'loading') {
     const m={}; hw.forEach(h=>{m[h.category]=(m[h.category]||0)+h.total;});
     const data=Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([n,v])=>({name:n,value:v}));
     if (charts.category) { safeChartDispose(charts.category); charts.category = null; }
-    charts.category=echarts.init(document.getElementById('chartCategory'));
+    charts.category=ChartManager.create(document.getElementById('chartCategory'));
     charts.category.setOption({color:PALETTE,tooltip:{trigger:'item',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:'{b}<br/>{c} ({d}%)'},legend:{type:'scroll',orient:'vertical',right:5,top:'center',textStyle:{color:'rgba(255,255,255,0.6)',fontSize:10}},series:[{type:'pie',radius:['38%','65%'],center:['38%','50%'],data,label:{color:'rgba(255,255,255,0.6)',fontSize:10,formatter:'{d}%'},itemStyle:{borderColor:'rgba(10,10,18,0.6)',borderWidth:2},animationDuration:1200}]});
   }
 
@@ -2086,7 +3065,7 @@ if (document.readyState === 'loading') {
     if (!chartingReady()) return;
     const sorted=[...hw].sort((a,b)=>b.total-a.total).slice(0,15);
     if (charts.ranking) { safeChartDispose(charts.ranking); charts.ranking = null; }
-    charts.ranking=echarts.init(document.getElementById('chartRanking'));
+    charts.ranking=ChartManager.create(document.getElementById('chartRanking'));
     charts.ranking.setOption({color:PALETTE,grid:{left:90,right:50,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:11},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.total).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#0A84FF'},{offset:1,color:'#BF5AF2'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:p=>p.value>=10000?(p.value/10000).toFixed(1)+'万':p.value,fontSize:10,color:'rgba(255,255,255,0.6)'},animationDuration:1200,animationEasing:'cubicOut'}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}<br/>作品总数 ${p[0].value.toLocaleString()}`}});
   }
 
@@ -2095,7 +3074,7 @@ if (document.readyState === 'loading') {
     if (!chartingReady()) return;
     const hist = DATA.historical_trend || [];
     if (charts.hist) safeChartDispose(charts.hist);
-    charts.hist = echarts.init(document.getElementById('chartHistory'));
+    charts.hist = ChartManager.create(document.getElementById('chartHistory'));
     if (hist.length < 2) {
       charts.hist.setOption({title:{text:'数据积累中，跑满 2 天后显示趋势曲线',left:'center',top:'center',textStyle:{color:AXIS_COLOR,fontSize:13,fontWeight:'normal'}}});
       return;
@@ -2483,7 +3462,7 @@ if (document.readyState === 'loading') {
     const genes = DATA.viral_genes || {};
     const hooks = genes.hook_distribution || {};
     const topKws = (genes.top_title_keywords || []).map(k => k[0]);
-  
+
     const templates = [
       { type: '提问式', titles: [kw+'又更新了？这次的功能太离谱了', '为什么高手都在用'+kw+'？3个原因告诉你', kw+'到底怎么选？一篇讲透'] },
       { type: '数字清单', titles: ['3个'+kw+'隐藏技巧，90%的人不知道', '5个'+kw+'神器，最后一个绝了', kw+'入门必看的7个要点'] },
@@ -2492,7 +3471,7 @@ if (document.readyState === 'loading') {
       { type: '恐惧焦虑', titles: ['还不会'+kw+'？你已经落后了', kw+'踩坑指南，这些错误别再犯', '再不学'+kw+'就晚了'] },
       { type: '福利诱惑', titles: [kw+'全套资料整理好了，免费领', '花了3天整理的'+kw+'笔记，分享给你', kw+'资源合集，建议收藏'] },
     ];
-  
+
     const hookLines = {
       '提问式': '开头直接抛问题，3秒抓住好奇心',
       '数字清单': '用数字建立预期，清单体完播率高',
@@ -2501,14 +3480,14 @@ if (document.readyState === 'loading') {
       '恐惧焦虑': '戳中痛点，紧迫感驱动行动',
       '福利诱惑': '利益点前置，收藏率最高',
     };
-  
+
     // 取前5种类型各1个标题
     const result = templates.slice(0, 5).map(t => ({
       type: t.type,
       title: t.titles[Math.floor(Math.random() * t.titles.length)],
       hook: hookLines[t.type] || '',
     }));
-  
+
     const html = result.map(r => `
       <div class="gen-title-item">
         <div><b>[${r.type}]</b> ${r.title}</div>
@@ -2545,7 +3524,7 @@ if (document.readyState === 'loading') {
     const today = new Date();
     const publishTimes = ['08:00', '12:00', '19:00', '21:00'];
     const platforms = ['抖音', '小红书'];
-  
+
     let html = '<div class="schedule-grid">';
     for (let i = 0; i < 7; i++) {
       const d = new Date(today);
@@ -2553,7 +3532,7 @@ if (document.readyState === 'loading') {
       const dateStr = (d.getMonth()+1) + '/' + d.getDate();
       const topic1 = topics[i % topics.length];
       const topic2 = topics[(i + 3) % topics.length];
-    
+
       html += `<div class="schedule-day">
         <div class="day-name">${days[i]}</div>
         <div class="day-date">${dateStr}</div>
@@ -2576,7 +3555,7 @@ if (document.readyState === 'loading') {
   function renderCommentScripts() {
     const demands = DATA.comment_demands || [];
     const topics = DATA.topics || [];
-  
+
     // 高赞回复模式
     const replyPatterns = [
       { type: '补充干货型', text: '补充一个：用XX工具的XX功能效果更好，亲测有效！' },
@@ -2585,7 +3564,7 @@ if (document.readyState === 'loading') {
       { type: '反转惊喜型', text: '其实还有个隐藏功能，90%的人不知道，看我主页' },
       { type: '福利引导型', text: '整理了全套资料，需要的评论区扣"想要"' },
     ];
-  
+
     let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
     html += '<div>';
     html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">高赞回复模式（直接套用）</h4>';
@@ -2593,7 +3572,7 @@ if (document.readyState === 'loading') {
       html += '<div class="comment-tpl"><div class="ct-type">' + p.type + '</div><div class="ct-text">' + p.text + '</div></div>';
     });
     html += '</div>';
-  
+
     // 置顶评论话术（基于当前TOP选题）
     html += '<div>';
     html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">置顶评论引导话术</h4>';
@@ -2606,7 +3585,7 @@ if (document.readyState === 'loading') {
       html += '</div>';
     });
     html += '</div></div>';
-  
+
     // 评论区需求洞察
     if (demands.length) {
       html += '<div style="margin-top:16px"><h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">评论区高频需求（下期选题参考）</h4>';
@@ -2616,7 +3595,7 @@ if (document.readyState === 'loading') {
       });
       html += '</div></div>';
     }
-  
+
     document.getElementById('commentScriptsContent').innerHTML = html;
   }
 
@@ -2702,7 +3681,7 @@ if (document.readyState === 'loading') {
         var orig = btn.textContent;
         btn.textContent = '✅ 已复制';
         btn.style.background = 'rgba(16,185,129,0.2)';
-        setTimeout(function(){ btn.textContent = orig; btn.style.background = ''; }, 1500);
+        TimerManager.setTimeout(function(){ btn.textContent = orig; btn.style.background = ''; }, 1500, 'button-feedback');
       }
     } catch(e) { console.warn('[copy]', e); }
   }
@@ -2911,7 +3890,7 @@ if (document.readyState === 'loading') {
     if (!chartingReady()) return;
     const sorted=[...hw].filter(h=>h.collect_rate>0).sort((a,b)=>b.collect_rate-a.collect_rate).slice(0,10);
     if (charts.collect) { safeChartDispose(charts.collect); charts.collect = null; }
-    charts.collect=echarts.init(document.getElementById('chartCollect'));
+    charts.collect=ChartManager.create(document.getElementById('chartCollect'));
     charts.collect.setOption({color:PALETTE,grid:{left:75,right:30,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:'{value}%'},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.collect_rate).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#30D158'},{offset:1,color:'#64D2FF'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:'{c}%',fontSize:10,color:'rgba(48,209,88,0.8)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:'rgba(48,209,88,0.3)',textStyle:{color:TOOLTIP_TEXT}}});
   }
 
@@ -2921,7 +3900,7 @@ if (document.readyState === 'loading') {
     const top=[...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0)).slice(0,30);
     const data=top.map(w=>[w.likeCount||0,w.collectCount||0,w.title||'']);
     if (charts.scatter) { safeChartDispose(charts.scatter); charts.scatter = null; }
-    charts.scatter=echarts.init(document.getElementById('chartScatter'));
+    charts.scatter=ChartManager.create(document.getElementById('chartScatter'));
     charts.scatter.setOption({color:PALETTE,grid:{left:50,right:15,top:15,bottom:30},xAxis:{name:'点赞',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{name:'收藏',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'scatter',data,symbolSize:d=>Math.max(8,Math.min(28,Math.sqrt(d[0])/12)),itemStyle:{color:'rgba(10,132,255,0.5)',borderColor:'#64D2FF',borderWidth:1}}],tooltip:{backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${(p.data[2]||'').slice(0,25)}<br/>点赞 ${p.data[0].toLocaleString()}<br/>收藏 ${p.data[1].toLocaleString()}`}});
   }
 
@@ -2993,7 +3972,7 @@ if (document.readyState === 'loading') {
     const hs={}; works.forEach(w=>{const h=classifyHook(w.title||'');if(!hs[h])hs[h]={count:0,likes:0};hs[h].count++;hs[h].likes+=(w.likeCount||0);});
     const data=Object.entries(hs).map(([n,v])=>({name:n,value:Math.round(v.likes/v.count)}));
     if (charts.hook) { safeChartDispose(charts.hook); charts.hook = null; }
-    charts.hook=echarts.init(document.getElementById('chartHook'));
+    charts.hook=ChartManager.create(document.getElementById('chartHook'));
     charts.hook.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:data.map(d=>d.name),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:data.map(d=>d.value),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#FF9F0A'},{offset:1,color:'#FF453A'}]),borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:'rgba(255,255,255,0.5)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}型<br/>平均点赞 ${p[0].value.toLocaleString()}`}});
   }
 
@@ -3026,7 +4005,7 @@ if (document.readyState === 'loading') {
       avg_likes: counts[i] > 0 ? Math.round(likes[i] / counts[i]) : 0
     }));
     if (charts.dur) safeChartDispose(charts.dur);
-    charts.dur = echarts.init(document.getElementById('chartDuration'));
+    charts.dur = ChartManager.create(document.getElementById('chartDuration'));
     charts.dur.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:dist.map(d=>d.range),axisLabel:{color:AXIS_COLOR,fontSize:9,interval:0,rotate:15},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:dist.map(d=>({value:d.count,itemStyle:{color:d.avg_likes>5000?'#30D158':'#0A84FF'}})),label:{show:true,position:'top',fontSize:9,color:'rgba(255,255,255,0.5)',formatter:p=>`${p.value}条`},barWidth:'50%',animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>{const d=dist[p[0].dataIndex];return `${d.range}<br/>作品数 ${d.count}<br/>平均点赞 ${d.avg_likes.toLocaleString()}`;}}});
   }
 
@@ -3055,7 +4034,7 @@ if (document.readyState === 'loading') {
       viral_rate: cnt > 0 ? Math.round(hourViral[h] / cnt * 100) : 0
     }));
     if (charts.pt) { safeChartDispose(charts.pt); charts.pt = null; }
-    charts.pt = echarts.init(document.getElementById('chartPublishTime'));
+    charts.pt = ChartManager.create(document.getElementById('chartPublishTime'));
     charts.pt.setOption({
       color: PALETTE,
       grid: { left: 40, right: 15, top: 25, bottom: 25 },
@@ -3487,7 +4466,7 @@ if (document.readyState === 'loading') {
       document.querySelectorAll('.gen-title-item').forEach(function(el) {
         if (el.querySelector('.gen-title-text').textContent === text) {
           el.querySelector('.gen-copy-btn').textContent = '已复制';
-          setTimeout(function(){ el.querySelector('.gen-copy-btn').textContent = '复制'; }, 1500);
+          TimerManager.setTimeout(function(){ el.querySelector('.gen-copy-btn').textContent = '复制'; }, 1500, 'button-feedback');
         }
       });
     });
@@ -3768,11 +4747,11 @@ if (document.readyState === 'loading') {
       document.getElementById('personaGrid').innerHTML = '<p style="color:var(--text-secondary)">暂无人群画像数据</p>';
       return;
     }
-  
+
     // 分布柱状图
     const chartDom = document.getElementById('audienceChart');
     if (chartDom && typeof echarts !== 'undefined') {
-      const chart = echarts.init(chartDom);
+      const chart = ChartManager.create(chartDom);
       chart.setOption({
         grid: { left: 80, right: 20, top: 10, bottom: 20 },
         xAxis: { type: 'value', axisLabel: { color: '#9ca3af', fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
@@ -3786,7 +4765,7 @@ if (document.readyState === 'loading') {
         }]
       });
     }
-  
+
     // 画像卡片
     const grid = document.getElementById('personaGrid');
     grid.innerHTML = personas.map(p => `
@@ -4272,7 +5251,7 @@ if (document.readyState === 'loading') {
     ta.value = text; document.body.appendChild(ta); ta.select();
     document.execCommand('copy'); document.body.removeChild(ta);
     el.textContent = '✅ 已复制';
-    setTimeout(function(){ el.textContent = '📋 复制话术'; }, 2000);
+    TimerManager.setTimeout(function(){ el.textContent = '📋 复制话术'; }, 2000, 'button-feedback');
   }
 
   window.generateScript = generateScript;
@@ -4491,7 +5470,7 @@ if (document.readyState === 'loading') {
     if (carousel && slideLogo && slideText) {
       var currentSlide = 0;
       var slides = [slideLogo, slideText];
-      setInterval(function() {
+      TimerManager.setInterval(function() {
         slides[currentSlide].classList.remove('active');
         currentSlide = (currentSlide + 1) % slides.length;
         slides[currentSlide].classList.add('active');
@@ -4539,7 +5518,7 @@ if (document.readyState === 'loading') {
     }
 
     // 进入工作台后自动体检（createSidebar 仅执行一次）
-    setTimeout(function(){
+    TimerManager.setTimeout(function(){
       if (typeof window.runFullAudit === 'function' && !window.__auditAutoDone) {
         window.__auditAutoDone = true;
         window.runFullAudit({auto:true});
@@ -4553,6 +5532,10 @@ if (document.readyState === 'loading') {
     if (!group) return;
 
     currentPage = pageId;
+
+    if (pageId === 'settings' && window.DynamicIndustryFlow) {
+      DynamicIndustryFlow.renderManager();
+    }
 
     // 确保登录页已隐藏（进入工作台后不再显示）
     const loginScreen = document.getElementById('loginScreen');
@@ -4604,7 +5587,7 @@ if (document.readyState === 'loading') {
     if (pageTitle) pageTitle.textContent = group.title + ' - 热点追踪工作台';
 
     // 延迟resize图表
-    setTimeout(function() {
+    TimerManager.setTimeout(function() {
       if (window.charts) {
         Object.values(window.charts).forEach(function(chart) {
           safeChartResize(chart);
@@ -4616,7 +5599,7 @@ if (document.readyState === 'loading') {
     window.scrollTo(0, 0);
 
     // 强制anim元素完成动画（避免隐藏/显示后停留在初始状态）
-    setTimeout(function() {
+    TimerManager.setTimeout(function() {
       document.querySelectorAll('.anim').forEach(function(el) {
         el.style.opacity = '1';
         el.style.transform = 'none';
@@ -4634,7 +5617,7 @@ if (document.readyState === 'loading') {
     if (isPastLogin()) {
       // 已滚过登录页，直接创建
       createSidebar();
-      setTimeout(function() { switchPage('overview'); }, 200);
+      TimerManager.setTimeout(function() { switchPage('overview'); }, 200);
     } else {
       // 等待滚动过登录页
       let created = false;
@@ -4642,7 +5625,7 @@ if (document.readyState === 'loading') {
         if (!created && isPastLogin()) {
           created = true;
           createSidebar();
-          setTimeout(function() { switchPage('overview'); }, 200);
+          TimerManager.setTimeout(function() { switchPage('overview'); }, 200);
           window.removeEventListener('scroll', onScroll);
         }
       }
@@ -4738,9 +5721,9 @@ if (document.readyState === 'loading') {
   function start() {
     safeRender();
     // Re-run after a delay to catch late-loading sections
-    setTimeout(safeRender, 1000);
+    TimerManager.setTimeout(safeRender, 1000, 'blue-ocean-render');
   }
-  
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start);
   } else {
@@ -4804,7 +5787,7 @@ if (document.readyState === 'loading') {
   }
 
   // ---------- 工具 ----------
-  function delay(ms){ return new Promise(function(res){ setTimeout(res,ms); }); }
+  function delay(ms){ return new Promise(function(res){ TimerManager.setTimeout(res,ms); }); }
   function getPages(){
     return Array.from(document.querySelectorAll('.sidebar-nav-item')).map(function(it){
       return { page:it.dataset.page, label:it.textContent.trim() };
@@ -4823,9 +5806,9 @@ if (document.readyState === 'loading') {
   }
   function toast(html){ ensureToast().innerHTML=html; toastEl.style.opacity='1'; toastEl.style.transform='translateY(0)'; }
   function dismissToast(ms){
-    setTimeout(function(){
+    TimerManager.setTimeout(function(){
       if(toastEl){ toastEl.style.opacity='0'; toastEl.style.transform='translateY(10px)';
-        setTimeout(function(){ if(toastEl&&toastEl.parentNode) toastEl.parentNode.removeChild(toastEl); toastEl=null; },350); }
+        TimerManager.setTimeout(function(){ if(toastEl&&toastEl.parentNode) toastEl.parentNode.removeChild(toastEl); toastEl=null; },350); }
     }, ms);
   }
 

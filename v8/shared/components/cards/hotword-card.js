@@ -12,16 +12,16 @@
     const sorted = [...hw].sort((a, b) => b.total - a.total);
     const satMap = {};
     (window.DataLoader.getDashboardData().saturation || []).forEach(s => satMap[s.keyword] = s.stage);
-    
+
     const tbody = document.querySelector('#hotwordTable tbody');
     if (!tbody) return;
-    
+
     tbody.innerHTML = sorted.map((h, i) => `
       <tr>
         <td>${i + 1}</td>
         <td>
-          <b style="color:var(--text);cursor:pointer;text-decoration:underline dotted" 
-             onclick="showKeywordTrend('${h.keyword.replace(/'/g, "\\'")}')" 
+          <b style="color:var(--text);cursor:pointer;text-decoration:underline dotted"
+             onclick="showKeywordTrend('${h.keyword.replace(/'/g, "\\'")}')"
              title="点击查看趋势">
             ${h.keyword}
           </b>
@@ -53,12 +53,12 @@
     const m = {};
     hw.forEach(h => { m[h.category] = (m[h.category] || 0) + h.total; });
     const data = Object.entries(m).sort((a, b) => b[1] - a[1]).map(([n, v]) => ({ name: n, value: v }));
-    
+
     if (charts.category) charts.category.dispose();
     const el = document.getElementById('chartCategory');
     if (!el) return;
-    
-    charts.category = echarts.init(el);
+
+    charts.category = ChartManager.create(el);
     charts.category.setOption({
       color: PALETTE,
       tooltip: { trigger: 'item', backgroundColor: TOOLTIP_BG, borderColor: TOOLTIP_BORDER, textStyle: { color: TOOLTIP_TEXT }, formatter: '{b}<br/>{c} ({d}%)' },
@@ -76,12 +76,12 @@
   function renderRanking() {
     const hw = window.DataLoader.getHotwords();
     const sorted = [...hw].sort((a, b) => b.total - a.total).slice(0, 15);
-    
+
     if (charts.ranking) charts.ranking.dispose();
     const el = document.getElementById('chartRanking');
     if (!el) return;
-    
-    charts.ranking = echarts.init(el);
+
+    charts.ranking = ChartManager.create(el);
     charts.ranking.setOption({
       color: PALETTE,
       grid: { left: 90, right: 50, top: 10, bottom: 20 },
@@ -101,19 +101,19 @@
   function renderHistory() {
     const hw = window.DataLoader.getHotwords();
     const hist = window.DataLoader.getDashboardData().historical_trend || [];
-    
+
     if (charts.hist) charts.hist.dispose();
     const el = document.getElementById('chartHistory');
     if (!el) return;
-    
-    charts.hist = echarts.init(el);
+
+    charts.hist = ChartManager.create(el);
     if (hist.length < 2) {
       charts.hist.setOption({
         title: { text: '数据积累中，跑满 2 天后显示趋势曲线', left: 'center', top: 'center', textStyle: { color: AXIS_COLOR, fontSize: 13, fontWeight: 'normal' } }
       });
       return;
     }
-    
+
     // 合并每天的重复关键词
     const mergedHist = hist.map(h => {
       const map = {};
@@ -123,11 +123,11 @@
       });
       return { date: h.date, hotwords: Object.keys(map).map(k => ({ keyword: k, total: map[k] })) };
     });
-    
+
     const dates = mergedHist.map(h => h.date.slice(5));
     const kwSet = new Set();
     mergedHist.forEach(h => h.hotwords.forEach(x => kwSet.add(x.keyword)));
-    
+
     const kwVolatility = [];
     kwSet.forEach(kw => {
       if (cfg('exclude_keywords', ['AI']).includes(kw)) return;
@@ -142,14 +142,14 @@
       const cv = Math.sqrt(variance) / avg;
       kwVolatility.push({ kw, cv, avg, vals });
     });
-    
+
     kwVolatility.sort((a, b) => b.cv - a.cv);
     let topKws = kwVolatility.slice(0, 5).map(x => x.kw);
     if (topKws.length < 5) {
       const currentTop = [...hw].sort((a, b) => b.total - a.total).map(h => h.keyword).filter(k => !cfg('exclude_keywords', ['AI']).includes(k) && !topKws.includes(k));
       topKws = topKws.concat(currentTop).slice(0, 5);
     }
-    
+
     const series = topKws.map((kw, i) => {
       const vals = mergedHist.map(h => {
         const f = h.hotwords.find(x => x.keyword === kw);
@@ -161,7 +161,7 @@
         connectNulls: true,
       };
     });
-    
+
     charts.hist.setOption({
       color: PALETTE,
       tooltip: { trigger: 'axis', backgroundColor: TOOLTIP_BG, borderColor: TOOLTIP_BORDER, textStyle: { color: TOOLTIP_TEXT } },
@@ -179,7 +179,7 @@
     const t = trends[keyword];
     const modal = document.getElementById('trendModal');
     document.getElementById('trendModalTitle').textContent = keyword + ' · 热度趋势';
-    
+
     if (!t || !t.data || t.data.length < 2) {
       document.getElementById('trendModalBody').innerHTML = '<p style="color:var(--text-secondary)">历史数据不足，需积累更多天数据后显示趋势曲线。</p>';
     } else {

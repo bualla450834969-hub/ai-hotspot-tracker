@@ -25,12 +25,17 @@ const FILES = [
   'core/domainConfig.js',    // 领域默认配置 DOMAIN_CONFIG（可被行业配置覆盖）
   'core/globals.js',
   'core/state.js',
+  'core/evidence.js',         // V8.2 Evidence / Insight / Provenance / DataQuality
   'core/renderer.js',
   'core/framework.js',       // Module.register 框架 + renderAll 调度
   'effects/glow.js',
   'effects/login.js',
   'modules/_helpers.js',
+  'modules/industryCreation.js', // V8.2动态行业创建/关键词确认/行业管理
   'modules/hero.js',
+  'modules/evidenceInsights.js', // V8.2可信洞察管线（复用一次性证据索引）
+  'modules/evidenceDrawer.js',   // V8.2最小证据抽屉
+  'modules/homepageV82.js',      // V8.2研究工作台首页编排
   'modules/hotwords.js',
   'modules/works.js',
   'modules/topics.js',

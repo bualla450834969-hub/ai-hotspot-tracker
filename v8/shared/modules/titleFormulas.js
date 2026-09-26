@@ -174,7 +174,7 @@
       document.querySelectorAll('.gen-title-item').forEach(function(el) {
         if (el.querySelector('.gen-title-text').textContent === text) {
           el.querySelector('.gen-copy-btn').textContent = '已复制';
-          setTimeout(function(){ el.querySelector('.gen-copy-btn').textContent = '复制'; }, 1500);
+          TimerManager.setTimeout(function(){ el.querySelector('.gen-copy-btn').textContent = '复制'; }, 1500, 'button-feedback');
         }
       });
     });

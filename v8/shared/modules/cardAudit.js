@@ -53,7 +53,7 @@
   }
 
   // ---------- 工具 ----------
-  function delay(ms){ return new Promise(function(res){ setTimeout(res,ms); }); }
+  function delay(ms){ return new Promise(function(res){ TimerManager.setTimeout(res,ms); }); }
   function getPages(){
     return Array.from(document.querySelectorAll('.sidebar-nav-item')).map(function(it){
       return { page:it.dataset.page, label:it.textContent.trim() };
@@ -72,9 +72,9 @@
   }
   function toast(html){ ensureToast().innerHTML=html; toastEl.style.opacity='1'; toastEl.style.transform='translateY(0)'; }
   function dismissToast(ms){
-    setTimeout(function(){
+    TimerManager.setTimeout(function(){
       if(toastEl){ toastEl.style.opacity='0'; toastEl.style.transform='translateY(10px)';
-        setTimeout(function(){ if(toastEl&&toastEl.parentNode) toastEl.parentNode.removeChild(toastEl); toastEl=null; },350); }
+        TimerManager.setTimeout(function(){ if(toastEl&&toastEl.parentNode) toastEl.parentNode.removeChild(toastEl); toastEl=null; },350); }
     }, ms);
   }
 

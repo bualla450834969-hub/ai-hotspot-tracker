@@ -48,7 +48,7 @@ npm run build
 # 等价于：node scripts/build-bundle.js
 ```
 
-脚本读取 `v8/shared` 下 32 个源文件（清单见 `scripts/build-bundle.js`），
+脚本读取 `v8/shared` 下 37 个源文件（清单见 `scripts/build-bundle.js`），
 按固定顺序拼接并覆盖写入 `v8/shared/bundle.js`。
 
 ### 日常开发步骤
@@ -60,13 +60,14 @@ npm run build
 
 > 环境要求：Node.js >= 12，无任何第三方依赖（`package.json` 中无 dependencies）。
 
-### 参与构建的源文件（32）
+### 参与构建的源文件（36）
 
 ```
 data/normalize.js
-core/domainConfig.js  core/globals.js  core/state.js  core/renderer.js  core/framework.js
+core/domainConfig.js  core/globals.js  core/state.js  core/evidence.js  core/renderer.js  core/framework.js
 effects/glow.js  effects/login.js
-modules/_helpers.js  hero.js  hotwords.js  works.js  topics.js  techradar.js
+modules/_helpers.js  industryCreation.js  hero.js  evidenceInsights.js  evidenceDrawer.js  homepageV82.js
+modules/hotwords.js  works.js  topics.js  techradar.js
 modules/breakdown.js  viralGenes.js  publishTime.js  titleFormulas.js  leadScripts.js
 modules/benchmarkExtras.js  launchOps.js  audience.js  engagement.js  topicPerf.js
 modules/kanban.js  favorites.js  credit.js  scriptGen.js  comparison.js
@@ -105,10 +106,18 @@ modules/advanced/crossPlatform.js  publishOptimization.js
 设置面板内填写 Worker 地址与 RedFox API Key、勾选平台（抖音 / 小红书）后开始采集；
 浏览器将结果聚合成 dashboard 存入该行业的 `custom_data_<名>`。Worker 仅做请求透传。
 
+V8.2 新建行业通过“行业设置 → 添加行业”完成。系统先生成可编辑关键词，用户确认后才开始采集；
+新行业使用稳定的 `ind_*` ID，配置、数据和历史分别存入
+`industry_<id>_config`、`industry_<id>_data`、`industry_<id>_history`。重命名不改变 ID，
+因此不会丢失历史或与同名行业串数据。新 URL 使用 `?industry=<id>`，旧 `?ind=` 地址继续兼容。
+
 ## 五、调试模式
 
-在 URL 加 `?debug=1`（可与 `ind=` 并用），右上角显示：当前行业、works / charts 数量、
-render 次数、当前 requestId、采集状态、错误模块、最近错误。正常用户（无 debug）完全不可见。
+在 URL 加 `?debug=1`（可与 `industry=` 或旧 `ind=` 并用），右上角显示：当前行业、works / charts 数量、
+render 次数、当前 requestId、采集状态、错误模块、最近错误，以及受管的 Timer、Chart、Event、Effect 数量。正常用户（无 debug）完全不可见。
+
+V8.2 的运行时分层、行业生命周期和兼容约定见
+[`docs/v8.2-dynamic-industry-architecture.md`](docs/v8.2-dynamic-industry-architecture.md)。
 
 ## 六、部署（GitHub Pages）
 

@@ -104,7 +104,7 @@
     const genes = DATA.viral_genes || {};
     const hooks = genes.hook_distribution || {};
     const topKws = (genes.top_title_keywords || []).map(k => k[0]);
-  
+
     const templates = [
       { type: '提问式', titles: [kw+'又更新了？这次的功能太离谱了', '为什么高手都在用'+kw+'？3个原因告诉你', kw+'到底怎么选？一篇讲透'] },
       { type: '数字清单', titles: ['3个'+kw+'隐藏技巧，90%的人不知道', '5个'+kw+'神器，最后一个绝了', kw+'入门必看的7个要点'] },
@@ -113,7 +113,7 @@
       { type: '恐惧焦虑', titles: ['还不会'+kw+'？你已经落后了', kw+'踩坑指南，这些错误别再犯', '再不学'+kw+'就晚了'] },
       { type: '福利诱惑', titles: [kw+'全套资料整理好了，免费领', '花了3天整理的'+kw+'笔记，分享给你', kw+'资源合集，建议收藏'] },
     ];
-  
+
     const hookLines = {
       '提问式': '开头直接抛问题，3秒抓住好奇心',
       '数字清单': '用数字建立预期，清单体完播率高',
@@ -122,14 +122,14 @@
       '恐惧焦虑': '戳中痛点，紧迫感驱动行动',
       '福利诱惑': '利益点前置，收藏率最高',
     };
-  
+
     // 取前5种类型各1个标题
     const result = templates.slice(0, 5).map(t => ({
       type: t.type,
       title: t.titles[Math.floor(Math.random() * t.titles.length)],
       hook: hookLines[t.type] || '',
     }));
-  
+
     const html = result.map(r => `
       <div class="gen-title-item">
         <div><b>[${r.type}]</b> ${r.title}</div>
@@ -166,7 +166,7 @@
     const today = new Date();
     const publishTimes = ['08:00', '12:00', '19:00', '21:00'];
     const platforms = ['抖音', '小红书'];
-  
+
     let html = '<div class="schedule-grid">';
     for (let i = 0; i < 7; i++) {
       const d = new Date(today);
@@ -174,7 +174,7 @@
       const dateStr = (d.getMonth()+1) + '/' + d.getDate();
       const topic1 = topics[i % topics.length];
       const topic2 = topics[(i + 3) % topics.length];
-    
+
       html += `<div class="schedule-day">
         <div class="day-name">${days[i]}</div>
         <div class="day-date">${dateStr}</div>
@@ -197,7 +197,7 @@
   function renderCommentScripts() {
     const demands = DATA.comment_demands || [];
     const topics = DATA.topics || [];
-  
+
     // 高赞回复模式
     const replyPatterns = [
       { type: '补充干货型', text: '补充一个：用XX工具的XX功能效果更好，亲测有效！' },
@@ -206,7 +206,7 @@
       { type: '反转惊喜型', text: '其实还有个隐藏功能，90%的人不知道，看我主页' },
       { type: '福利引导型', text: '整理了全套资料，需要的评论区扣"想要"' },
     ];
-  
+
     let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
     html += '<div>';
     html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">高赞回复模式（直接套用）</h4>';
@@ -214,7 +214,7 @@
       html += '<div class="comment-tpl"><div class="ct-type">' + p.type + '</div><div class="ct-text">' + p.text + '</div></div>';
     });
     html += '</div>';
-  
+
     // 置顶评论话术（基于当前TOP选题）
     html += '<div>';
     html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">置顶评论引导话术</h4>';
@@ -227,7 +227,7 @@
       html += '</div>';
     });
     html += '</div></div>';
-  
+
     // 评论区需求洞察
     if (demands.length) {
       html += '<div style="margin-top:16px"><h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">评论区高频需求（下期选题参考）</h4>';
@@ -237,7 +237,7 @@
       });
       html += '</div></div>';
     }
-  
+
     document.getElementById('commentScriptsContent').innerHTML = html;
   }
 
@@ -323,7 +323,7 @@
         var orig = btn.textContent;
         btn.textContent = '✅ 已复制';
         btn.style.background = 'rgba(16,185,129,0.2)';
-        setTimeout(function(){ btn.textContent = orig; btn.style.background = ''; }, 1500);
+        TimerManager.setTimeout(function(){ btn.textContent = orig; btn.style.background = ''; }, 1500, 'button-feedback');
       }
     } catch(e) { console.warn('[copy]', e); }
   }

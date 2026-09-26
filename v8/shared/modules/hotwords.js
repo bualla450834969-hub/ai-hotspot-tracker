@@ -26,7 +26,7 @@
     const m={}; hw.forEach(h=>{m[h.category]=(m[h.category]||0)+h.total;});
     const data=Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([n,v])=>({name:n,value:v}));
     if (charts.category) { safeChartDispose(charts.category); charts.category = null; }
-    charts.category=echarts.init(document.getElementById('chartCategory'));
+    charts.category=ChartManager.create(document.getElementById('chartCategory'));
     charts.category.setOption({color:PALETTE,tooltip:{trigger:'item',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:'{b}<br/>{c} ({d}%)'},legend:{type:'scroll',orient:'vertical',right:5,top:'center',textStyle:{color:'rgba(255,255,255,0.6)',fontSize:10}},series:[{type:'pie',radius:['38%','65%'],center:['38%','50%'],data,label:{color:'rgba(255,255,255,0.6)',fontSize:10,formatter:'{d}%'},itemStyle:{borderColor:'rgba(10,10,18,0.6)',borderWidth:2},animationDuration:1200}]});
   }
 
@@ -35,7 +35,7 @@
     if (!chartingReady()) return;
     const sorted=[...hw].sort((a,b)=>b.total-a.total).slice(0,15);
     if (charts.ranking) { safeChartDispose(charts.ranking); charts.ranking = null; }
-    charts.ranking=echarts.init(document.getElementById('chartRanking'));
+    charts.ranking=ChartManager.create(document.getElementById('chartRanking'));
     charts.ranking.setOption({color:PALETTE,grid:{left:90,right:50,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:11},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.total).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#0A84FF'},{offset:1,color:'#BF5AF2'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:p=>p.value>=10000?(p.value/10000).toFixed(1)+'万':p.value,fontSize:10,color:'rgba(255,255,255,0.6)'},animationDuration:1200,animationEasing:'cubicOut'}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}<br/>作品总数 ${p[0].value.toLocaleString()}`}});
   }
 
@@ -44,7 +44,7 @@
     if (!chartingReady()) return;
     const hist = DATA.historical_trend || [];
     if (charts.hist) safeChartDispose(charts.hist);
-    charts.hist = echarts.init(document.getElementById('chartHistory'));
+    charts.hist = ChartManager.create(document.getElementById('chartHistory'));
     if (hist.length < 2) {
       charts.hist.setOption({title:{text:'数据积累中，跑满 2 天后显示趋势曲线',left:'center',top:'center',textStyle:{color:AXIS_COLOR,fontSize:13,fontWeight:'normal'}}});
       return;

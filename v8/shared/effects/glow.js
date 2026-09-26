@@ -49,24 +49,33 @@
       breathPhase: Math.random() * Math.PI * 2
     };
 
-    card.addEventListener('mouseenter', () => {
+    const enter = () => {
       card._glowState.isHovering = true;
       activeCards.add(card);
-    });
+    };
 
-    card.addEventListener('mouseleave', () => {
+    const leave = () => {
       card._glowState.isHovering = false;
       card._glowState.targetX = 50;
       card._glowState.targetY = 50;
-    });
+    };
 
-    card.addEventListener('mousemove', (e) => {
+    const move = (e) => {
       const rect = card.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 100;
       const y = ((e.clientY - rect.top) / rect.height) * 100;
       card._glowState.targetX = Math.max(0, Math.min(100, x));
       card._glowState.targetY = Math.max(0, Math.min(100, y));
-    });
+    };
+    if (window.EventManager) {
+      window.EventManager.on(card, 'mouseenter', enter, false, 'effect');
+      window.EventManager.on(card, 'mouseleave', leave, false, 'effect');
+      window.EventManager.on(card, 'mousemove', move, false, 'effect');
+    } else {
+      card.addEventListener('mouseenter', enter);
+      card.addEventListener('mouseleave', leave);
+      card.addEventListener('mousemove', move);
+    }
   }
 
   /** 全局动画循环 — 所有卡片共享一个rAF */
@@ -123,9 +132,9 @@
 
   // DOM就绪后自动初始化（延迟等模块渲染完成）
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(initCardGlow, 800));
+    document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(initCardGlow), { once: true });
   } else {
-    setTimeout(initCardGlow, 800);
+    requestAnimationFrame(initCardGlow);
   }
 
   // 监听DOM变化，自动给新元素绑定光晕
@@ -139,9 +148,17 @@
         }
       });
     });
-    if (needsRefresh) setTimeout(initCardGlow, 200);
+    if (needsRefresh) requestAnimationFrame(initCardGlow);
   });
   observer.observe(document.body, { childList: true, subtree: true });
+  if (window.EffectsManager) {
+    window.EffectsManager.register(() => {
+      observer.disconnect();
+      if (animationId) cancelAnimationFrame(animationId);
+      animationId = null;
+      activeCards.clear();
+    }, 'card-glow');
+  }
 })();
 
 
