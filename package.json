@@ -1,6 +1,6 @@
 {
   "name": "ai-hotspot-tracker",
-  "version": "8.1.0",
+  "version": "8.2.0",
   "private": true,
   "description": "AI 热点追踪 / 自媒体视频结构推荐工作台（多行业通用，纯前端，GitHub Pages）",
   "scripts": {

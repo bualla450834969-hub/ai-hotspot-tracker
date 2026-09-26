@@ -1,6 +1,6 @@
 # AI 热点追踪工作台 · ai-hotspot-tracker
 
-一个**多行业通用**的「热点追踪 + 自媒体视频结构推荐」纯前端工作台。当前主版本为 **V8.1 Stable**，位于 `v8/`。
+一个**多行业通用**的「热点追踪 + 自媒体视频结构推荐」纯前端工作台。当前主版本为 **V8.2 Dynamic Industry Workspace**，位于 `v8/`。
 通过 GitHub Pages 直接访问，无需后端（数据采集经 Cloudflare Worker 中转，见下）。
 
 - AI 行业示例：`v8/shared/app.html?ind=ai`
