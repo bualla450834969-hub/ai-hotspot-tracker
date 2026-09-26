@@ -5,7 +5,7 @@
  * 职责：
  *  1. 唯一数据源 window.AppStore；DATA / DASHBOARD_DATA 为其访问器别名，
  *     保证 window.DATA === window.DASHBOARD_DATA === AppStore.data，杜绝多入口。
- *  2. 统一行业上下文解析 parseIndustryContext()（builtin / local）。
+ *  2. 统一行业上下文解析 parseIndustryContext()（builtin / local / dynamic）。
  *  3. localStorage 行业命名空间 NS（读新 key → 回退旧 key → 自动迁移）。
  *  4. ECharts 安全初始化：自动接管全局 echarts，容器无尺寸不 init、
  *     WeakMap 防重复、有限重试、dispose 清理；单图失败不拖垮页面。
@@ -28,21 +28,26 @@
   function parseIndustryContext(rawInd) {
     var ind = rawInd;
     if (ind === undefined || ind === null) {
-      try { ind = new URLSearchParams(window.location.search).get('ind'); }
+      try {
+        var params = new URLSearchParams(window.location.search);
+        ind = params.get('industry') || params.get('ind');
+      }
       catch (e) { ind = null; }
     }
     ind = ind || 'ai';
     if (SLUG_MAP[ind]) ind = SLUG_MAP[ind];
 
     var isLocal = ind.indexOf('local:') === 0;
+    var isDynamic = /^ind_[a-z0-9]+$/i.test(ind);
     var name = isLocal ? decodeURIComponent(ind.slice(6)) : ind;
     return {
-      type: isLocal ? 'local' : 'builtin',
+      type: isLocal ? 'local' : (isDynamic ? 'dynamic' : 'builtin'),
       id: ind,                                   // 完整 id（local:xx 或英文 slug）
       name: name,                                // 展示名
-      configKey: isLocal ? ('custom_cfg_' + name) : null,
-      dataKey: isLocal ? ('custom_data_' + name) : null,
-      base: isLocal ? null : ('../industries/' + ind + '/')
+      configKey: isLocal ? ('custom_cfg_' + name) : (isDynamic ? ('industry_' + ind + '_config') : null),
+      dataKey: isLocal ? ('custom_data_' + name) : (isDynamic ? ('industry_' + ind + '_data') : null),
+      historyKey: isDynamic ? ('industry_' + ind + '_history') : null,
+      base: (isLocal || isDynamic) ? null : ('../industries/' + ind + '/')
     };
   }
 
@@ -114,19 +119,19 @@
     },
     getIndustryConfig: function (industry) {
       var ctx = typeof industry === 'string' ? parseIndustryContext(industry) : (industry || IndustryStore.getCurrent());
-      return ctx.type === 'local' ? this.getJSON(ctx.configKey, {}) : null;
+      return ctx.type !== 'builtin' ? this.getJSON(ctx.configKey, {}) : null;
     },
     saveIndustryConfig: function (industry, value) {
       var ctx = typeof industry === 'string' ? parseIndustryContext(industry) : industry;
-      return !!ctx && ctx.type === 'local' && this.setJSON(ctx.configKey, value);
+      return !!ctx && ctx.type !== 'builtin' && this.setJSON(ctx.configKey, value);
     },
     getIndustryData: function (industry) {
       var ctx = typeof industry === 'string' ? parseIndustryContext(industry) : (industry || IndustryStore.getCurrent());
-      return ctx.type === 'local' ? this.getJSON(ctx.dataKey, {}) : null;
+      return ctx.type !== 'builtin' ? this.getJSON(ctx.dataKey, {}) : null;
     },
     saveIndustryData: function (industry, value) {
       var ctx = typeof industry === 'string' ? parseIndustryContext(industry) : industry;
-      return !!ctx && ctx.type === 'local' && this.setJSON(ctx.dataKey, value);
+      return !!ctx && ctx.type !== 'builtin' && this.setJSON(ctx.dataKey, value);
     },
     listIndustries: function () { return this.getJSON('custom_industries', []) || []; },
     saveIndustryList: function (value) { return this.setJSON('custom_industries', value || []); }
@@ -502,6 +507,7 @@
    * 新页面由本核心重新初始化，确保旧行业 timer/异步不延续。 */
   function switchIndustryContext(industryId) {
     try { if (typeof window.closeEvidenceDrawer === 'function') window.closeEvidenceDrawer(); } catch (e) {}
+    try { if (typeof window.abortCollectionTask === 'function') window.abortCollectionTask(); } catch (e) {}
     AppStore.nextRequest();      // 作废在途异步
     try { EffectsManager.destroyPage(); } catch (e) {}
     try { ChartManager.disposeAll(); } catch (e) {}
@@ -509,7 +515,8 @@
     try { TimerManager.clearAll(); } catch (e) {}
     IndustryStore.setCurrent(industryId);
     AppStore.status.loading = true;
-    window.location.href = window.location.pathname + '?ind=' + encodeURIComponent(industryId);
+    var param = /^ind_[a-z0-9]+$/i.test(industryId) ? 'industry' : 'ind';
+    window.location.href = window.location.pathname + '?' + param + '=' + encodeURIComponent(industryId);
   }
   window.switchIndustryContext = switchIndustryContext;
 

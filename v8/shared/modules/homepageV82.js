@@ -115,7 +115,13 @@
 
   document.addEventListener('click', function(event) {
     var action = event.target.closest && event.target.closest('[data-v82-home-action]');
-    if (action) openSettings(action.getAttribute('data-v82-home-action') === 'collect');
+    if (!action) return;
+    var type = action.getAttribute('data-v82-home-action');
+    openSettings(type === 'collect');
+    if (window.DynamicIndustryFlow) {
+      DynamicIndustryFlow.renderManager();
+      if (type === 'collect') DynamicIndustryFlow.openRecollect();
+    }
   });
 
   if (window.Module) Module.register({ id:'homepageV82', requiredFields:[], render:render });

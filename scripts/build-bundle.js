@@ -31,6 +31,7 @@ const FILES = [
   'effects/glow.js',
   'effects/login.js',
   'modules/_helpers.js',
+  'modules/industryCreation.js', // V8.2动态行业创建/关键词确认/行业管理
   'modules/hero.js',
   'modules/evidenceInsights.js', // V8.2可信洞察管线（复用一次性证据索引）
   'modules/evidenceDrawer.js',   // V8.2最小证据抽屉

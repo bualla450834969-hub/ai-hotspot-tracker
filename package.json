@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node scripts/build-bundle.js",
     "test:v82": "node tests/v82-evidence.test.js",
-    "test:v82:runtime": "node tests/v82-runtime.test.js"
+    "test:v82:runtime": "node tests/v82-runtime.test.js",
+    "test:v82:industry": "node tests/v82-industry-creation.test.js"
   },
   "engines": {
     "node": ">=12"

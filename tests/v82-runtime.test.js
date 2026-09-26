@@ -52,6 +52,11 @@ vm.runInContext(source, context, { filename: 'stable-core.js' });
 
 assert.strictEqual(window.IndustryStore.getCurrent().id, 'ai');
 assert.strictEqual(window.IndustryStore.resolve('local:工业设计').name, '工业设计');
+assert.strictEqual(window.IndustryStore.resolve('ind_abc123').type, 'dynamic');
+window.location.search = '?industry=ind_abc123&ind=ai';
+assert.strictEqual(window.parseIndustryContext().id, 'ind_abc123');
+window.location.search = '?ind=shufa';
+assert.strictEqual(window.parseIndustryContext().id, 'shufa');
 
 const localA = window.IndustryStore.resolve('local:工业设计');
 const localB = window.IndustryStore.resolve('local:烘焙');
