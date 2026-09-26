@@ -64,7 +64,10 @@ function main() {
   const chunks = FILES.map((f) => {
     const p = path.join(SHARED, f);
     if (!fs.existsSync(p)) throw new Error('缺少构建源文件: ' + f);
-    return fs.readFileSync(p);
+    // Git 的 Windows checkout 可能把源码变成 CRLF；统一换行后再拼接，
+    // 保证不同 worktree / CI 环境生成完全相同的 bundle。
+    const source = fs.readFileSync(p, 'utf8').replace(/\r\n/g, '\n');
+    return Buffer.from(source, 'utf8');
   });
   const out = Buffer.concat(chunks);
   const target = path.join(SHARED, 'bundle.js');
