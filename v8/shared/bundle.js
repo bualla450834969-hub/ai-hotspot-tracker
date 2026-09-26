@@ -7,6 +7,15 @@ window.DATA = window.DASHBOARD_DATA || {};
 // ===== 数据适配层：统一不同行业的数据字段 =====
 window.normalizeData = function() {
   var d = window.DATA;
+  function normalizePublishTime(value) {
+    if (typeof value !== 'number' || !isFinite(value)) return value || '';
+    var millis = value < 1000000000000 ? value * 1000 : value;
+    var date = new Date(millis);
+    if (isNaN(date.getTime())) return '';
+    function pad(number) { return String(number).padStart(2, '0'); }
+    return date.getFullYear() + '-' + pad(date.getMonth() + 1) + '-' + pad(date.getDate()) + ' ' +
+      pad(date.getHours()) + ':' + pad(date.getMinutes()) + ':' + pad(date.getSeconds());
+  }
   // works 字段映射：统一标准字段（likes/comments/collects/shares），
   // 同时保留 likeCount 等兼容别名，供历史渲染函数读取（适配层是唯一契约边界）
   if (d.works && d.works.length > 0) {
@@ -34,7 +43,7 @@ window.normalizeData = function() {
         shareCount: shares,
         followerCount: w.followerCount || w.followers || 0,
         duration: w.duration || 0,
-        publishTime: w.publishTime || w.published_at || '',
+        publishTime: normalizePublishTime(w.publishTime || w.published_at || w.releaseTime || ''),
         _keyword: w._keyword || '',
         url: url,
         workUrl: url,

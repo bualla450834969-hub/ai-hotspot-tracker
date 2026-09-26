@@ -103,4 +103,19 @@ window.ChartManager.disposeAll();
 assert.strictEqual(window.ChartManager.count(), 0);
 assert.strictEqual(disposeCount, 1);
 
+window.DATA = {
+  summary: { industry: '工业设计真实测试' },
+  works: [{ title: '真实作品', publishTime: 1777033256 }],
+  hotwords: [],
+  topics: []
+};
+context.DATA = window.DATA;
+context.DOMAIN_CONFIG = window.DOMAIN_CONFIG = {};
+context.safeNum = window.safeNum;
+context.safeDivide = window.safeDivide;
+context.cfg = function() { return ''; };
+const normalizeSource = fs.readFileSync(path.join(root, 'v8/shared/data/normalize.js'), 'utf8');
+vm.runInContext(normalizeSource, context, { filename: 'normalize.js' });
+assert.match(window.DATA.works[0].publishTime, /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/);
+
 console.log('V8.2 runtime architecture tests passed.');
