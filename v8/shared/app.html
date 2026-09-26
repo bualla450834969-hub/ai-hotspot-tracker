@@ -749,7 +749,7 @@ window.safeCall = function(fn, ctx) {
 </div>
 
   <!-- ===== 脚本层（模块化，按依赖顺序）===== -->
-  
+
   <script>
 // ===== v6 动态行业配置加载器 =====
 (function() {
@@ -772,8 +772,8 @@ window.safeCall = function(fn, ctx) {
     };
     window.domainGuard = function(moduleId, renderFn) { return renderFn; };
     try {
-      window.DOMAIN_CONFIG = JSON.parse(localStorage.getItem(CTX.configKey) || '{}');
-      window.DASHBOARD_DATA = JSON.parse(localStorage.getItem(CTX.dataKey) || '{}');
+      window.DOMAIN_CONFIG = StorageAdapter.getIndustryConfig(CTX);
+      window.DASHBOARD_DATA = StorageAdapter.getIndustryData(CTX);
     } catch (e) {
       // 局部错误：覆盖层提示，不整体替换 body、不白屏
       window.AppErrorHandler.handle(e, 'local.read');
@@ -796,9 +796,9 @@ window.safeCall = function(fn, ctx) {
           Object.keys(window.DASHBOARD_DATA).forEach(function(k){ if (_fresh[k] === undefined) _fresh[k] = window.DASHBOARD_DATA[k]; });
           window.DASHBOARD_DATA = _fresh;
           window.DATA = _fresh;
-          try { localStorage.setItem('custom_data_' + cname, JSON.stringify(_fresh)); } catch(e){}
-          if (window.normalizeData) window.normalizeData();
-          if (window.renderAll) window.renderAll();
+          StorageAdapter.saveIndustryData(CTX, _fresh);
+          if (window.AppLifecycle) { AppLifecycle.prepare(_fresh); AppLifecycle.render(); }
+          else { if (window.normalizeData) window.normalizeData(); if (window.renderAll) window.renderAll(); }
           if (window.fillExtraCards) window.fillExtraCards();
           console.log('[REAGG] done works='+_fresh.works.length+' cr='+(_fresh.completion_rate?'yes':'no')+' crossLen='+_fresh.cross_platform.length);
         } catch(e) { console.warn('[REAGG] FAIL:', e); }
@@ -887,11 +887,12 @@ window.safeCall = function(fn, ctx) {
   // 数据全部加载完成后的初始化（原 data.js onload 逻辑）
   function initAfterData() {
   window.DATA = window.DASHBOARD_DATA;
-  if (window.normalizeData) window.normalizeData();
+  if (window.AppLifecycle) AppLifecycle.prepare(window.DASHBOARD_DATA);
+  else if (window.normalizeData) window.normalizeData();
   // 解析阶段由 DOMContentLoaded 的 initFramework 统一首渲染；异步数据晚到时才补渲染。
   if (document.readyState !== 'loading' && window.renderAll) window.renderAll();
-    setTimeout(function(){ if(typeof renderArchifyTopic==='function') renderArchifyTopic(); }, 600);
-  setTimeout(function() {
+    TimerManager.setTimeout(function(){ if(typeof renderArchifyTopic==='function') renderArchifyTopic(); }, 600);
+  TimerManager.setTimeout(function() {
   // Archify 技术雷达卡片（仅AI行业）
   try {
     var _params = new URLSearchParams(location.search);
@@ -954,15 +955,15 @@ window.safeCall = function(fn, ctx) {
     })();
   </script>
 
-  
-  
+
+
 
 
   <script src="../shared/bundle.js?v=1790470000"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework(), { once: true });
-    setTimeout(function() {
+    TimerManager.setTimeout(function() {
       if (window.renderOpsStatus) renderOpsStatus();
       if (window.renderBlueOcean) renderBlueOcean();
       if (window.renderCrossPlatform) renderCrossPlatform();
@@ -981,7 +982,7 @@ window.safeCall = function(fn, ctx) {
   </script>
 
   <script>
-  setTimeout(function() {
+  TimerManager.setTimeout(function() {
     var grid = document.getElementById('calendarGrid');
     if (grid) {
       var topics = (window.DATA && DASHBOARD_DATA.topics) ? DASHBOARD_DATA.topics.slice(0, 7) : [];
@@ -994,7 +995,7 @@ window.safeCall = function(fn, ctx) {
   }, 1000);
   </script>
 
-    
+
 
 
   <script>
@@ -1030,14 +1031,14 @@ window.safeCall = function(fn, ctx) {
     }
   }
   window.fillExtraCards = fillExtraCards;
-  setTimeout(fillExtraCards, 1200);
+  TimerManager.setTimeout(fillExtraCards, 1200);
   </script>
 
 <!-- 设置面板 -->
 <section class="section" id="settingsPanel" style="display:none;padding:40px;max-width:600px;margin:0 auto;">
   <div class="card glass-card" style="padding:32px;">
     <h2 style="font-size:20px;font-weight:600;margin-bottom:24px;">⚙️ 工作台设置</h2>
-    
+
     <div style="margin-bottom:20px;">
       <label style="display:block;font-size:13px;color:#94a3b8;margin-bottom:6px;">RedFox API Key</label>
       <input type="password" id="apiKeyInput" placeholder="ak_xxxxxxxx..." style="width:100%;padding:10px 12px;border:1px solid rgba(255,255,255,0.1);border-radius:8px;background:rgba(255,255,255,0.05);color:#f1f5f9;font-size:13px;outline:none;box-sizing:border-box;">
@@ -1105,8 +1106,8 @@ window.safeCall = function(fn, ctx) {
 
 <script>
 document.getElementById('currentIndLabel').textContent = window.CURRENT_INDUSTRY || 'ai';
-document.getElementById('apiKeyInput').value = localStorage.getItem('redfox_api_key') || '';
-document.getElementById('proxyUrlInput').value = localStorage.getItem('redfox_proxy_url') || '';
+document.getElementById('apiKeyInput').value = StorageAdapter.getRaw('redfox_api_key', '');
+document.getElementById('proxyUrlInput').value = StorageAdapter.getRaw('redfox_proxy_url', '');
 
 // 钩子分类
 function classifyHook(title){
@@ -1382,10 +1383,10 @@ var collectionState = { running:false };
 function _searchOnceTimed(p,k,platform,kw,timeoutMs){
   return new Promise(function(resolve,reject){
     var settled=false;
-    var to=setTimeout(function(){ if(!settled){settled=true;reject(new Error('请求超时：'+kw));} },timeoutMs);
+    var to=TimerManager.setTimeout(function(){ if(!settled){settled=true;reject(new Error('请求超时：'+kw));} },timeoutMs,'collection-request');
     searchOnce(p,k,platform,kw).then(
-      function(d){ if(!settled){settled=true;clearTimeout(to);resolve(d);} },
-      function(e){ if(!settled){settled=true;clearTimeout(to);reject(e);} }
+      function(d){ if(!settled){settled=true;TimerManager.clearTimeout(to);resolve(d);} },
+      function(e){ if(!settled){settled=true;TimerManager.clearTimeout(to);reject(e);} }
     );
   });
 }
@@ -1399,7 +1400,7 @@ function _fetchWithRetry(p,k,platform,kw,retries){
       var msg=String(e&&e.message||e);
       var isRate=/429|rate|limit|too many|频繁|频/i.test(msg);
       var wait=isRate?Math.min(800*Math.pow(2,attempt-1),6000):400*attempt;
-      return new Promise(function(r){setTimeout(r,wait);}).then(loop);
+      return new Promise(function(r){TimerManager.setTimeout(r,wait,'collection-backoff');}).then(loop);
     });
   }
   return loop();
@@ -1424,8 +1425,8 @@ async function startCollection(){
   var requestId=AppStore.nextRequest();
   collectionState.running=true;
   if(btn){ btn.disabled=true; btn.style.opacity='.6'; btn.style.cursor='not-allowed'; }
-  localStorage.setItem('redfox_api_key',k);
-  localStorage.setItem('redfox_proxy_url',p);
+  StorageAdapter.setRaw('redfox_api_key',k);
+  StorageAdapter.setRaw('redfox_proxy_url',p);
 
   var keywords=[i,i+'教程',i+'推荐',i+'怎么选',i+'避坑',i+'排行榜'];
   var jobs=[];
@@ -1464,16 +1465,17 @@ async function startCollection(){
   if(allWorks.length===0){ s.innerHTML='<span style="color:#f87171;">没有采到作品，请检查 Key / 中转地址 / 行业名是否正确</span>'; return; }
 
   var dashboard=buildDashboardData(allWorks,hotwords,i);
-  localStorage.setItem('custom_cfg_'+i,JSON.stringify({
+  var newIndustry=IndustryStore.resolve('local:'+i);
+  StorageAdapter.saveIndustryConfig(newIndustry,{
     id:'local', display_name:i, name:i, language:'zh',
     nav_labels:{hotspot:'热点追踪',breakdown:'爆款拆解',content:'内容创作',publish:'对标与发布'},
     nav_order:['hotspot','breakdown','content','publish'],
     theme:{primary:'#8b5cf6'}
-  }));
-  localStorage.setItem('custom_data_'+i,JSON.stringify(dashboard));
-  var list=JSON.parse(localStorage.getItem('custom_industries')||'[]');
+  });
+  StorageAdapter.saveIndustryData(newIndustry,dashboard);
+  var list=StorageAdapter.listIndustries();
   if(list.indexOf(i)<0) list.push(i);
-  localStorage.setItem('custom_industries',JSON.stringify(list));
+  StorageAdapter.saveIndustryList(list);
 
   // 记录本地历史快照（用于趋势图）
   try{
@@ -1492,7 +1494,7 @@ async function startCollection(){
   refreshIndustryDropdown();
   var _cw = failedKws.length ? ' <span style="color:#fbbf24;">（'+failedKws.length+' 个关键词失败：'+failedKws.join('、')+'，可重新采集补全）</span>' : '';
   s.innerHTML='<span style="color:#30d158;">采集完成！共 '+allWorks.length+' 条作品</span>'+_cw+'<span style="color:#94a3b8;">，正在跳转…</span>';
-  setTimeout(function(){ switchIndustryContext('local:'+i); },1200);
+  TimerManager.setTimeout(function(){ switchIndustryContext('local:'+i); },1200,'collection-redirect');
 }
 
 function switchIndustry(){
@@ -1507,7 +1509,7 @@ function refreshIndustryDropdown(){
   var cur = window.parseIndustryContext().id;
   // 保留内置项
   var html = '<option value="ai">AI 热点追踪</option><option value="shufa">书法 · 墨上花开</option>';
-  var list = JSON.parse(localStorage.getItem('custom_industries')||'[]');
+  var list = StorageAdapter.listIndustries();
   list.forEach(function(n){
     html += '<option value="local:'+encodeURIComponent(n)+'">'+n+'（本地）</option>';
   });
@@ -1539,7 +1541,7 @@ async function loadCollectTrend() {
       chartHost.innerHTML = '';
       if (typeof echarts !== 'undefined') {
         try {
-          echarts.init(chartHost).setOption({
+          ChartManager.update(chartHost,{
             grid: {left:40,right:20,top:30,bottom:25},
             tooltip: {trigger:'axis'},
             legend: {data:['均赞','均评论','作品数'],textStyle:{color:'#94a3b8',fontSize:10},top:0},
@@ -1585,25 +1587,25 @@ loadCollectTrend();
   // 从data中找异常（高赞低竞争=蓝海，突然爆发的词）
   let html = '<div style="padding:20px;">';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;">';
-  
+
   // 蓝海关键词
   html += '<div style="background:rgba(48,209,88,0.08);border:1px solid rgba(48,209,88,0.2);border-radius:12px;padding:16px;">';
   html += '<div style="font-size:13px;color:#30d158;font-weight:600;margin-bottom:8px;">🟢 蓝海机会</div>';
   html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">低竞争高需求关键词，优先制作内容抢占流量。建议本周内发布相关视频。</div>';
   html += '</div>';
-  
+
   // 突发热点
   html += '<div style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:12px;padding:16px;">';
   html += '<div style="font-size:13px;color:#fbbf24;font-weight:600;margin-bottom:8px;">🟡 突发热点</div>';
   html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">数据出现异常增长的关键词，建议快速跟进，24小时内发布相关内容。</div>';
   html += '</div>';
-  
+
   // 衰退信号
   html += '<div style="background:rgba(248,113,113,0.08);border:1px solid rgba(248,113,113,0.2);border-radius:12px;padding:16px;">';
   html += '<div style="font-size:13px;color:#f87171;font-weight:600;margin-bottom:8px;">🔴 衰退预警</div>';
   html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">热度持续下降的关键词，减少投入，避免浪费创作精力。</div>';
   html += '</div>';
-  
+
   html += '</div>';
   html += '<div style="margin-top:16px;font-size:11px;color:#64748b;">* 异常检测基于历史快照对比，采集次数越多越精准</div>';
   html += '</div>';
@@ -1616,17 +1618,17 @@ loadCollectTrend();
   if (!el) return;
   let html = '<div style="padding:20px;">';
   html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:16px;">';
-  
+
   html += '<div style="background:rgba(139,92,246,0.08);border:1px solid rgba(139,92,246,0.2);border-radius:12px;padding:16px;">';
   html += '<div style="font-size:13px;color:#a78bfa;font-weight:600;margin-bottom:8px;">📊 飞书多维表格</div>';
   html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">已连接飞书多维表格，发布后数据自动回传，追踪真实表现。</div>';
   html += '</div>';
-  
+
   html += '<div style="background:rgba(96,165,250,0.08);border:1px solid rgba(96,165,250,0.2);border-radius:12px;padding:16px;">';
   html += '<div style="font-size:13px;color:#60a5fa;font-weight:600;margin-bottom:8px;">📈 表现追踪</div>';
   html += '<div style="font-size:12px;color:#94a3b8;line-height:1.6;">发布后自动记录播放量、点赞、评论、转化，对比外部数据验证选题准确性。</div>';
   html += '</div>';
-  
+
   html += '</div>';
   html += '<div style="font-size:11px;color:#64748b;">* 在飞书多维表格中填写发布记录，系统自动关联分析</div>';
   html += '</div>';
@@ -1635,7 +1637,7 @@ loadCollectTrend();
 </script>
 <script>
   // Show archify card only for AI industry
-  setTimeout(function() {
+  TimerManager.setTimeout(function() {
     var params = new URLSearchParams(location.search);
     var ind = params.get('ind') || 'ai';
     if (ind !== 'ai' && ind !== '') return;
@@ -1766,7 +1768,7 @@ loadCollectTrend();
     document.querySelectorAll('body > .hero').forEach(function(h){ h.setAttribute('data-nav','overview'); });
 
     if(changed){
-      setTimeout(function(){
+      TimerManager.setTimeout(function(){
         if(!window.charts) return;
         Object.values(window.charts).forEach(function(chart){ safeChartResize(chart); });
       },100);
@@ -1778,7 +1780,7 @@ loadCollectTrend();
     var item=e.target.closest && e.target.closest('.sidebar-nav-item');
     if(!item) return;
     var page=item.dataset.page;
-    setTimeout(function(){
+    TimerManager.setTimeout(function(){
       // overview / settings 走原生
       if(page==='overview'||page==='settings'||page==='techradar'||page==='hotspots') return;
       document.querySelectorAll('body > .section').forEach(function(sec){
@@ -1788,7 +1790,7 @@ loadCollectTrend();
         sec.style.display = shouldShow ? '' : 'none';
       });
       window.scrollTo(0,0);
-      setTimeout(function(){
+      TimerManager.setTimeout(function(){
         if(window.echarts){ document.querySelectorAll('body > .section[style*="block"], body > .section:not([style*="none"])').forEach(function(s){
           s.querySelectorAll('[_echarts_instance_]').forEach(function(el){ var i=echarts.getInstanceByDom(el); if(i)try{i.resize();}catch(e){} });
         });}
@@ -1797,8 +1799,8 @@ loadCollectTrend();
   }, true);
 
   // 首次执行（等首渲染）
-  setTimeout(run, 1600);
-  setTimeout(run, 3500);
+  TimerManager.setTimeout(run, 1600);
+  TimerManager.setTimeout(run, 3500);
 })();
 </script>
 
@@ -1860,9 +1862,9 @@ loadCollectTrend();
     }
   }
   document.addEventListener('click', function(e){
-    if(e.target.closest&&e.target.closest('.sidebar-nav-item'))setTimeout(fill,900);
+    if(e.target.closest&&e.target.closest('.sidebar-nav-item'))TimerManager.setTimeout(fill,900);
   },true);
-  [2500,4500,7000].forEach(function(t){setTimeout(fill,t);});
+  [2500,4500,7000].forEach(function(t){TimerManager.setTimeout(fill,t);});
 })();
 </script>
 

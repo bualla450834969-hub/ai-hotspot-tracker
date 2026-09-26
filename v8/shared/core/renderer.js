@@ -78,7 +78,7 @@
         if (btnEl) {
           const orig = btnEl.textContent;
           btnEl.textContent = '✓ 已复制';
-          setTimeout(() => btnEl.textContent = orig, 1500);
+          TimerManager.setTimeout(() => btnEl.textContent = orig, 1500, 'button-feedback');
         }
       });
     },

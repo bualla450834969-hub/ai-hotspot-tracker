@@ -72,9 +72,9 @@
   function start() {
     safeRender();
     // Re-run after a delay to catch late-loading sections
-    setTimeout(safeRender, 1000);
+    TimerManager.setTimeout(safeRender, 1000, 'blue-ocean-render');
   }
-  
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start);
   } else {

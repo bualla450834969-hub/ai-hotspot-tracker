@@ -45,7 +45,7 @@
     ta.value = text; document.body.appendChild(ta); ta.select();
     document.execCommand('copy'); document.body.removeChild(ta);
     el.textContent = '✅ 已复制';
-    setTimeout(function(){ el.textContent = '📋 复制话术'; }, 2000);
+    TimerManager.setTimeout(function(){ el.textContent = '📋 复制话术'; }, 2000, 'button-feedback');
   }
 
   window.generateScript = generateScript;

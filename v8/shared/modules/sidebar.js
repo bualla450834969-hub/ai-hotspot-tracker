@@ -156,7 +156,7 @@
     if (carousel && slideLogo && slideText) {
       var currentSlide = 0;
       var slides = [slideLogo, slideText];
-      setInterval(function() {
+      TimerManager.setInterval(function() {
         slides[currentSlide].classList.remove('active');
         currentSlide = (currentSlide + 1) % slides.length;
         slides[currentSlide].classList.add('active');
@@ -204,7 +204,7 @@
     }
 
     // 进入工作台后自动体检（createSidebar 仅执行一次）
-    setTimeout(function(){
+    TimerManager.setTimeout(function(){
       if (typeof window.runFullAudit === 'function' && !window.__auditAutoDone) {
         window.__auditAutoDone = true;
         window.runFullAudit({auto:true});
@@ -269,7 +269,7 @@
     if (pageTitle) pageTitle.textContent = group.title + ' - 热点追踪工作台';
 
     // 延迟resize图表
-    setTimeout(function() {
+    TimerManager.setTimeout(function() {
       if (window.charts) {
         Object.values(window.charts).forEach(function(chart) {
           safeChartResize(chart);
@@ -281,7 +281,7 @@
     window.scrollTo(0, 0);
 
     // 强制anim元素完成动画（避免隐藏/显示后停留在初始状态）
-    setTimeout(function() {
+    TimerManager.setTimeout(function() {
       document.querySelectorAll('.anim').forEach(function(el) {
         el.style.opacity = '1';
         el.style.transform = 'none';
@@ -299,7 +299,7 @@
     if (isPastLogin()) {
       // 已滚过登录页，直接创建
       createSidebar();
-      setTimeout(function() { switchPage('overview'); }, 200);
+      TimerManager.setTimeout(function() { switchPage('overview'); }, 200);
     } else {
       // 等待滚动过登录页
       let created = false;
@@ -307,7 +307,7 @@
         if (!created && isPastLogin()) {
           created = true;
           createSidebar();
-          setTimeout(function() { switchPage('overview'); }, 200);
+          TimerManager.setTimeout(function() { switchPage('overview'); }, 200);
           window.removeEventListener('scroll', onScroll);
         }
       }

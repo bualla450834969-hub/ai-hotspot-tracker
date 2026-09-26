@@ -48,15 +48,15 @@
   // 初始化
   function init() {
     // 等所有模块都加载完
-    setTimeout(() => {
+    TimerManager.setTimeout(() => {
       if (!window.Module) return;
-      
+
       // 包裹所有模块
       const allMods = window.Module.all();
       allMods.forEach(mod => {
         wrapModule(mod.id);
       });
-      
+
       console.log('[AutoMigrate] 已包裹', allMods.length, '个模块');
     }, 1000);
   }

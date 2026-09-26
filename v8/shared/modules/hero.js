@@ -34,11 +34,11 @@
         <div class="hs-value orange" id="heroTopicsVal">${topics.length}</div>
         <div class="hs-sub">标题 + 钩子 + 形式</div><span class="export-btn" onclick="exportTopics()" style="margin-left:12px;">📋 导出选题</span>
       </div>`;
-    setTimeout(()=>{
+    TimerManager.setTimeout(()=>{
       animateNumber(document.getElementById('heroWorksVal'), works.length);
       animateNumber(document.getElementById('heroSurgingVal'), surging);
       animateNumber(document.getElementById('heroTopicsVal'), topics.length);
-    }, 300);
+    }, 300, 'hero-counter');
   }
 
   // renderActions

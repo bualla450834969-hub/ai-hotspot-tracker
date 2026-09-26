@@ -752,12 +752,14 @@ window.domainGuard = function(moduleId, renderFn) {
   const State = {
     get(key, def) {
       try {
-        const raw = localStorage.getItem(PREFIX + key);
+        const raw = StorageAdapter.getRaw(PREFIX + key, null);
         return raw ? JSON.parse(raw) : def;
       } catch (e) { return def; }
     },
     set(key, val) {
-      try { localStorage.setItem(PREFIX + key, JSON.stringify(val)); } catch (e) {}
+      try {
+        StorageAdapter.setJSON(PREFIX + key, val);
+      } catch (e) {}
     },
 
     // ===== 选题看板状态 =====
@@ -1319,7 +1321,7 @@ window.domainGuard = function(moduleId, renderFn) {
         if (btnEl) {
           const orig = btnEl.textContent;
           btnEl.textContent = '✓ 已复制';
-          setTimeout(() => btnEl.textContent = orig, 1500);
+          TimerManager.setTimeout(() => btnEl.textContent = orig, 1500, 'button-feedback');
         }
       });
     },
@@ -1577,8 +1579,13 @@ window.domainGuard = function(moduleId, renderFn) {
     // 页面标题
     document.title = config.display_name || '热点追踪工作台';
 
-    // 渲染所有模块
-    renderAll();
+    // 数据准备与渲染由统一生命周期收口；兼容旧页面时仍可直接 renderAll。
+    if (window.AppLifecycle) {
+      window.AppLifecycle.prepare(DATA);
+      window.AppLifecycle.render();
+    } else {
+      renderAll();
+    }
 
     // 滚动动画
     initScrollReveal();
@@ -1586,10 +1593,13 @@ window.domainGuard = function(moduleId, renderFn) {
     // 导航隐藏
     initNavHide();
 
-    // 延迟初始化
-    setTimeout(() => { if (typeof initSectionCollapse === 'function') initSectionCollapse(); }, 1500);
-    setTimeout(() => { if (typeof checkDataFreshness === 'function') checkDataFreshness(); }, 2000);
-    setTimeout(() => { if (typeof initCardGlow === 'function') initCardGlow(); }, 500);
+    // 表现层在 DOM 渲染后的下一帧初始化，不参与数据就绪判断。
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (typeof initSectionCollapse === 'function') initSectionCollapse();
+      if (typeof checkDataFreshness === 'function') checkDataFreshness();
+      if (window.EffectsManager) window.EffectsManager.initPage();
+      else if (typeof initCardGlow === 'function') initCardGlow();
+    }));
   }
 
   // ===== 滚动显现动画 =====
@@ -1605,6 +1615,7 @@ window.domainGuard = function(moduleId, renderFn) {
       el.classList.add('anim-item');
       observer.observe(el);
     });
+    if (window.EffectsManager) window.EffectsManager.register(() => observer.disconnect(), 'framework-reveal');
   }
 
   // ===== 导航栏滚动隐藏 =====
@@ -1612,11 +1623,13 @@ window.domainGuard = function(moduleId, renderFn) {
     let lastScroll = 0;
     const nav = document.querySelector('.top-nav');
     if (!nav) return;
-    window.addEventListener('scroll', () => {
+    const onScroll = () => {
       const cur = window.scrollY;
       nav.style.transform = cur > lastScroll && cur > 100 ? 'translateY(-100%)' : 'translateY(0)';
       lastScroll = cur;
-    });
+    };
+    if (window.EventManager) window.EventManager.on(window, 'scroll', onScroll, { passive: true }, 'effect');
+    else window.addEventListener('scroll', onScroll, { passive: true });
   }
 
   // ===== 全局搜索 =====
@@ -1712,24 +1725,33 @@ window.normalizeData(); } catch(e) {}
       breathPhase: Math.random() * Math.PI * 2
     };
 
-    card.addEventListener('mouseenter', () => {
+    const enter = () => {
       card._glowState.isHovering = true;
       activeCards.add(card);
-    });
+    };
 
-    card.addEventListener('mouseleave', () => {
+    const leave = () => {
       card._glowState.isHovering = false;
       card._glowState.targetX = 50;
       card._glowState.targetY = 50;
-    });
+    };
 
-    card.addEventListener('mousemove', (e) => {
+    const move = (e) => {
       const rect = card.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 100;
       const y = ((e.clientY - rect.top) / rect.height) * 100;
       card._glowState.targetX = Math.max(0, Math.min(100, x));
       card._glowState.targetY = Math.max(0, Math.min(100, y));
-    });
+    };
+    if (window.EventManager) {
+      window.EventManager.on(card, 'mouseenter', enter, false, 'effect');
+      window.EventManager.on(card, 'mouseleave', leave, false, 'effect');
+      window.EventManager.on(card, 'mousemove', move, false, 'effect');
+    } else {
+      card.addEventListener('mouseenter', enter);
+      card.addEventListener('mouseleave', leave);
+      card.addEventListener('mousemove', move);
+    }
   }
 
   /** 全局动画循环 — 所有卡片共享一个rAF */
@@ -1786,9 +1808,9 @@ window.normalizeData(); } catch(e) {}
 
   // DOM就绪后自动初始化（延迟等模块渲染完成）
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(initCardGlow, 800));
+    document.addEventListener('DOMContentLoaded', () => requestAnimationFrame(initCardGlow), { once: true });
   } else {
-    setTimeout(initCardGlow, 800);
+    requestAnimationFrame(initCardGlow);
   }
 
   // 监听DOM变化，自动给新元素绑定光晕
@@ -1802,9 +1824,17 @@ window.normalizeData(); } catch(e) {}
         }
       });
     });
-    if (needsRefresh) setTimeout(initCardGlow, 200);
+    if (needsRefresh) requestAnimationFrame(initCardGlow);
   });
   observer.observe(document.body, { childList: true, subtree: true });
+  if (window.EffectsManager) {
+    window.EffectsManager.register(() => {
+      observer.disconnect();
+      if (animationId) cancelAnimationFrame(animationId);
+      animationId = null;
+      activeCards.clear();
+    }, 'card-glow');
+  }
 })();
 
 
@@ -2208,7 +2238,7 @@ if (document.readyState === 'loading') {
       header.style.gap = '8px';
       header.appendChild(btn);
 
-      var isCollapsed = localStorage.getItem('sec_collapse_' + idx) === '1';
+      var isCollapsed = StorageAdapter.getRaw('sec_collapse_' + idx, '0') === '1';
       if (isCollapsed) {
         sec.classList.add('collapsed');
         btn.textContent = '展开';
@@ -2218,7 +2248,7 @@ if (document.readyState === 'loading') {
         e.stopPropagation();
         var collapsed = sec.classList.toggle('collapsed');
         btn.textContent = collapsed ? '展开' : '收起';
-        localStorage.setItem('sec_collapse_' + idx, collapsed ? '1' : '0');
+        StorageAdapter.setRaw('sec_collapse_' + idx, collapsed ? '1' : '0');
       });
     });
   }
@@ -2416,11 +2446,11 @@ if (document.readyState === 'loading') {
         <div class="hs-value orange" id="heroTopicsVal">${topics.length}</div>
         <div class="hs-sub">标题 + 钩子 + 形式</div><span class="export-btn" onclick="exportTopics()" style="margin-left:12px;">📋 导出选题</span>
       </div>`;
-    setTimeout(()=>{
+    TimerManager.setTimeout(()=>{
       animateNumber(document.getElementById('heroWorksVal'), works.length);
       animateNumber(document.getElementById('heroSurgingVal'), surging);
       animateNumber(document.getElementById('heroTopicsVal'), topics.length);
-    }, 300);
+    }, 300, 'hero-counter');
   }
 
   // renderActions
@@ -2824,7 +2854,7 @@ if (document.readyState === 'loading') {
     const m={}; hw.forEach(h=>{m[h.category]=(m[h.category]||0)+h.total;});
     const data=Object.entries(m).sort((a,b)=>b[1]-a[1]).map(([n,v])=>({name:n,value:v}));
     if (charts.category) { safeChartDispose(charts.category); charts.category = null; }
-    charts.category=echarts.init(document.getElementById('chartCategory'));
+    charts.category=ChartManager.create(document.getElementById('chartCategory'));
     charts.category.setOption({color:PALETTE,tooltip:{trigger:'item',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:'{b}<br/>{c} ({d}%)'},legend:{type:'scroll',orient:'vertical',right:5,top:'center',textStyle:{color:'rgba(255,255,255,0.6)',fontSize:10}},series:[{type:'pie',radius:['38%','65%'],center:['38%','50%'],data,label:{color:'rgba(255,255,255,0.6)',fontSize:10,formatter:'{d}%'},itemStyle:{borderColor:'rgba(10,10,18,0.6)',borderWidth:2},animationDuration:1200}]});
   }
 
@@ -2833,7 +2863,7 @@ if (document.readyState === 'loading') {
     if (!chartingReady()) return;
     const sorted=[...hw].sort((a,b)=>b.total-a.total).slice(0,15);
     if (charts.ranking) { safeChartDispose(charts.ranking); charts.ranking = null; }
-    charts.ranking=echarts.init(document.getElementById('chartRanking'));
+    charts.ranking=ChartManager.create(document.getElementById('chartRanking'));
     charts.ranking.setOption({color:PALETTE,grid:{left:90,right:50,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:11},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.total).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#0A84FF'},{offset:1,color:'#BF5AF2'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:p=>p.value>=10000?(p.value/10000).toFixed(1)+'万':p.value,fontSize:10,color:'rgba(255,255,255,0.6)'},animationDuration:1200,animationEasing:'cubicOut'}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}<br/>作品总数 ${p[0].value.toLocaleString()}`}});
   }
 
@@ -2842,7 +2872,7 @@ if (document.readyState === 'loading') {
     if (!chartingReady()) return;
     const hist = DATA.historical_trend || [];
     if (charts.hist) safeChartDispose(charts.hist);
-    charts.hist = echarts.init(document.getElementById('chartHistory'));
+    charts.hist = ChartManager.create(document.getElementById('chartHistory'));
     if (hist.length < 2) {
       charts.hist.setOption({title:{text:'数据积累中，跑满 2 天后显示趋势曲线',left:'center',top:'center',textStyle:{color:AXIS_COLOR,fontSize:13,fontWeight:'normal'}}});
       return;
@@ -3230,7 +3260,7 @@ if (document.readyState === 'loading') {
     const genes = DATA.viral_genes || {};
     const hooks = genes.hook_distribution || {};
     const topKws = (genes.top_title_keywords || []).map(k => k[0]);
-  
+
     const templates = [
       { type: '提问式', titles: [kw+'又更新了？这次的功能太离谱了', '为什么高手都在用'+kw+'？3个原因告诉你', kw+'到底怎么选？一篇讲透'] },
       { type: '数字清单', titles: ['3个'+kw+'隐藏技巧，90%的人不知道', '5个'+kw+'神器，最后一个绝了', kw+'入门必看的7个要点'] },
@@ -3239,7 +3269,7 @@ if (document.readyState === 'loading') {
       { type: '恐惧焦虑', titles: ['还不会'+kw+'？你已经落后了', kw+'踩坑指南，这些错误别再犯', '再不学'+kw+'就晚了'] },
       { type: '福利诱惑', titles: [kw+'全套资料整理好了，免费领', '花了3天整理的'+kw+'笔记，分享给你', kw+'资源合集，建议收藏'] },
     ];
-  
+
     const hookLines = {
       '提问式': '开头直接抛问题，3秒抓住好奇心',
       '数字清单': '用数字建立预期，清单体完播率高',
@@ -3248,14 +3278,14 @@ if (document.readyState === 'loading') {
       '恐惧焦虑': '戳中痛点，紧迫感驱动行动',
       '福利诱惑': '利益点前置，收藏率最高',
     };
-  
+
     // 取前5种类型各1个标题
     const result = templates.slice(0, 5).map(t => ({
       type: t.type,
       title: t.titles[Math.floor(Math.random() * t.titles.length)],
       hook: hookLines[t.type] || '',
     }));
-  
+
     const html = result.map(r => `
       <div class="gen-title-item">
         <div><b>[${r.type}]</b> ${r.title}</div>
@@ -3292,7 +3322,7 @@ if (document.readyState === 'loading') {
     const today = new Date();
     const publishTimes = ['08:00', '12:00', '19:00', '21:00'];
     const platforms = ['抖音', '小红书'];
-  
+
     let html = '<div class="schedule-grid">';
     for (let i = 0; i < 7; i++) {
       const d = new Date(today);
@@ -3300,7 +3330,7 @@ if (document.readyState === 'loading') {
       const dateStr = (d.getMonth()+1) + '/' + d.getDate();
       const topic1 = topics[i % topics.length];
       const topic2 = topics[(i + 3) % topics.length];
-    
+
       html += `<div class="schedule-day">
         <div class="day-name">${days[i]}</div>
         <div class="day-date">${dateStr}</div>
@@ -3323,7 +3353,7 @@ if (document.readyState === 'loading') {
   function renderCommentScripts() {
     const demands = DATA.comment_demands || [];
     const topics = DATA.topics || [];
-  
+
     // 高赞回复模式
     const replyPatterns = [
       { type: '补充干货型', text: '补充一个：用XX工具的XX功能效果更好，亲测有效！' },
@@ -3332,7 +3362,7 @@ if (document.readyState === 'loading') {
       { type: '反转惊喜型', text: '其实还有个隐藏功能，90%的人不知道，看我主页' },
       { type: '福利引导型', text: '整理了全套资料，需要的评论区扣"想要"' },
     ];
-  
+
     let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
     html += '<div>';
     html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">高赞回复模式（直接套用）</h4>';
@@ -3340,7 +3370,7 @@ if (document.readyState === 'loading') {
       html += '<div class="comment-tpl"><div class="ct-type">' + p.type + '</div><div class="ct-text">' + p.text + '</div></div>';
     });
     html += '</div>';
-  
+
     // 置顶评论话术（基于当前TOP选题）
     html += '<div>';
     html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">置顶评论引导话术</h4>';
@@ -3353,7 +3383,7 @@ if (document.readyState === 'loading') {
       html += '</div>';
     });
     html += '</div></div>';
-  
+
     // 评论区需求洞察
     if (demands.length) {
       html += '<div style="margin-top:16px"><h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">评论区高频需求（下期选题参考）</h4>';
@@ -3363,7 +3393,7 @@ if (document.readyState === 'loading') {
       });
       html += '</div></div>';
     }
-  
+
     document.getElementById('commentScriptsContent').innerHTML = html;
   }
 
@@ -3449,7 +3479,7 @@ if (document.readyState === 'loading') {
         var orig = btn.textContent;
         btn.textContent = '✅ 已复制';
         btn.style.background = 'rgba(16,185,129,0.2)';
-        setTimeout(function(){ btn.textContent = orig; btn.style.background = ''; }, 1500);
+        TimerManager.setTimeout(function(){ btn.textContent = orig; btn.style.background = ''; }, 1500, 'button-feedback');
       }
     } catch(e) { console.warn('[copy]', e); }
   }
@@ -3658,7 +3688,7 @@ if (document.readyState === 'loading') {
     if (!chartingReady()) return;
     const sorted=[...hw].filter(h=>h.collect_rate>0).sort((a,b)=>b.collect_rate-a.collect_rate).slice(0,10);
     if (charts.collect) { safeChartDispose(charts.collect); charts.collect = null; }
-    charts.collect=echarts.init(document.getElementById('chartCollect'));
+    charts.collect=ChartManager.create(document.getElementById('chartCollect'));
     charts.collect.setOption({color:PALETTE,grid:{left:75,right:30,top:10,bottom:20},xAxis:{type:'value',axisLabel:{color:AXIS_COLOR,formatter:'{value}%'},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{type:'category',data:sorted.map(d=>d.keyword).reverse(),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},series:[{type:'bar',data:sorted.map(d=>d.collect_rate).reverse(),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,1,0,[{offset:0,color:'#30D158'},{offset:1,color:'#64D2FF'}]),borderRadius:[0,4,4,0]},label:{show:true,position:'right',formatter:'{c}%',fontSize:10,color:'rgba(48,209,88,0.8)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:'rgba(48,209,88,0.3)',textStyle:{color:TOOLTIP_TEXT}}});
   }
 
@@ -3668,7 +3698,7 @@ if (document.readyState === 'loading') {
     const top=[...works].sort((a,b)=>(b.likeCount||0)-(a.likeCount||0)).slice(0,30);
     const data=top.map(w=>[w.likeCount||0,w.collectCount||0,w.title||'']);
     if (charts.scatter) { safeChartDispose(charts.scatter); charts.scatter = null; }
-    charts.scatter=echarts.init(document.getElementById('chartScatter'));
+    charts.scatter=ChartManager.create(document.getElementById('chartScatter'));
     charts.scatter.setOption({color:PALETTE,grid:{left:50,right:15,top:15,bottom:30},xAxis:{name:'点赞',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},yAxis:{name:'收藏',nameTextStyle:{color:AXIS_COLOR,fontSize:10},type:'value',axisLabel:{color:AXIS_COLOR,formatter:v=>v>=10000?(v/10000).toFixed(0)+'万':v},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'scatter',data,symbolSize:d=>Math.max(8,Math.min(28,Math.sqrt(d[0])/12)),itemStyle:{color:'rgba(10,132,255,0.5)',borderColor:'#64D2FF',borderWidth:1}}],tooltip:{backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${(p.data[2]||'').slice(0,25)}<br/>点赞 ${p.data[0].toLocaleString()}<br/>收藏 ${p.data[1].toLocaleString()}`}});
   }
 
@@ -3740,7 +3770,7 @@ if (document.readyState === 'loading') {
     const hs={}; works.forEach(w=>{const h=classifyHook(w.title||'');if(!hs[h])hs[h]={count:0,likes:0};hs[h].count++;hs[h].likes+=(w.likeCount||0);});
     const data=Object.entries(hs).map(([n,v])=>({name:n,value:Math.round(v.likes/v.count)}));
     if (charts.hook) { safeChartDispose(charts.hook); charts.hook = null; }
-    charts.hook=echarts.init(document.getElementById('chartHook'));
+    charts.hook=ChartManager.create(document.getElementById('chartHook'));
     charts.hook.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:data.map(d=>d.name),axisLabel:{color:'rgba(255,255,255,0.7)',fontSize:10},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:data.map(d=>d.value),itemStyle:{color:new echarts.graphic.LinearGradient(0,0,0,1,[{offset:0,color:'#FF9F0A'},{offset:1,color:'#FF453A'}]),borderRadius:[4,4,0,0]},label:{show:true,position:'top',fontSize:10,color:'rgba(255,255,255,0.5)'},animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>`${p[0].name}型<br/>平均点赞 ${p[0].value.toLocaleString()}`}});
   }
 
@@ -3773,7 +3803,7 @@ if (document.readyState === 'loading') {
       avg_likes: counts[i] > 0 ? Math.round(likes[i] / counts[i]) : 0
     }));
     if (charts.dur) safeChartDispose(charts.dur);
-    charts.dur = echarts.init(document.getElementById('chartDuration'));
+    charts.dur = ChartManager.create(document.getElementById('chartDuration'));
     charts.dur.setOption({color:PALETTE,grid:{left:45,right:15,top:15,bottom:25},xAxis:{type:'category',data:dist.map(d=>d.range),axisLabel:{color:AXIS_COLOR,fontSize:9,interval:0,rotate:15},axisLine:{lineStyle:{color:AXIS_LINE}}},yAxis:{type:'value',axisLabel:{color:AXIS_COLOR},splitLine:{lineStyle:{color:SPLIT_COLOR}}},series:[{type:'bar',data:dist.map(d=>({value:d.count,itemStyle:{color:d.avg_likes>5000?'#30D158':'#0A84FF'}})),label:{show:true,position:'top',fontSize:9,color:'rgba(255,255,255,0.5)',formatter:p=>`${p.value}条`},barWidth:'50%',animationDuration:1000}],tooltip:{trigger:'axis',backgroundColor:TOOLTIP_BG,borderColor:TOOLTIP_BORDER,textStyle:{color:TOOLTIP_TEXT},formatter:p=>{const d=dist[p[0].dataIndex];return `${d.range}<br/>作品数 ${d.count}<br/>平均点赞 ${d.avg_likes.toLocaleString()}`;}}});
   }
 
@@ -3802,7 +3832,7 @@ if (document.readyState === 'loading') {
       viral_rate: cnt > 0 ? Math.round(hourViral[h] / cnt * 100) : 0
     }));
     if (charts.pt) { safeChartDispose(charts.pt); charts.pt = null; }
-    charts.pt = echarts.init(document.getElementById('chartPublishTime'));
+    charts.pt = ChartManager.create(document.getElementById('chartPublishTime'));
     charts.pt.setOption({
       color: PALETTE,
       grid: { left: 40, right: 15, top: 25, bottom: 25 },
@@ -4234,7 +4264,7 @@ if (document.readyState === 'loading') {
       document.querySelectorAll('.gen-title-item').forEach(function(el) {
         if (el.querySelector('.gen-title-text').textContent === text) {
           el.querySelector('.gen-copy-btn').textContent = '已复制';
-          setTimeout(function(){ el.querySelector('.gen-copy-btn').textContent = '复制'; }, 1500);
+          TimerManager.setTimeout(function(){ el.querySelector('.gen-copy-btn').textContent = '复制'; }, 1500, 'button-feedback');
         }
       });
     });
@@ -4515,11 +4545,11 @@ if (document.readyState === 'loading') {
       document.getElementById('personaGrid').innerHTML = '<p style="color:var(--text-secondary)">暂无人群画像数据</p>';
       return;
     }
-  
+
     // 分布柱状图
     const chartDom = document.getElementById('audienceChart');
     if (chartDom && typeof echarts !== 'undefined') {
-      const chart = echarts.init(chartDom);
+      const chart = ChartManager.create(chartDom);
       chart.setOption({
         grid: { left: 80, right: 20, top: 10, bottom: 20 },
         xAxis: { type: 'value', axisLabel: { color: '#9ca3af', fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
@@ -4533,7 +4563,7 @@ if (document.readyState === 'loading') {
         }]
       });
     }
-  
+
     // 画像卡片
     const grid = document.getElementById('personaGrid');
     grid.innerHTML = personas.map(p => `
@@ -5019,7 +5049,7 @@ if (document.readyState === 'loading') {
     ta.value = text; document.body.appendChild(ta); ta.select();
     document.execCommand('copy'); document.body.removeChild(ta);
     el.textContent = '✅ 已复制';
-    setTimeout(function(){ el.textContent = '📋 复制话术'; }, 2000);
+    TimerManager.setTimeout(function(){ el.textContent = '📋 复制话术'; }, 2000, 'button-feedback');
   }
 
   window.generateScript = generateScript;
@@ -5238,7 +5268,7 @@ if (document.readyState === 'loading') {
     if (carousel && slideLogo && slideText) {
       var currentSlide = 0;
       var slides = [slideLogo, slideText];
-      setInterval(function() {
+      TimerManager.setInterval(function() {
         slides[currentSlide].classList.remove('active');
         currentSlide = (currentSlide + 1) % slides.length;
         slides[currentSlide].classList.add('active');
@@ -5286,7 +5316,7 @@ if (document.readyState === 'loading') {
     }
 
     // 进入工作台后自动体检（createSidebar 仅执行一次）
-    setTimeout(function(){
+    TimerManager.setTimeout(function(){
       if (typeof window.runFullAudit === 'function' && !window.__auditAutoDone) {
         window.__auditAutoDone = true;
         window.runFullAudit({auto:true});
@@ -5351,7 +5381,7 @@ if (document.readyState === 'loading') {
     if (pageTitle) pageTitle.textContent = group.title + ' - 热点追踪工作台';
 
     // 延迟resize图表
-    setTimeout(function() {
+    TimerManager.setTimeout(function() {
       if (window.charts) {
         Object.values(window.charts).forEach(function(chart) {
           safeChartResize(chart);
@@ -5363,7 +5393,7 @@ if (document.readyState === 'loading') {
     window.scrollTo(0, 0);
 
     // 强制anim元素完成动画（避免隐藏/显示后停留在初始状态）
-    setTimeout(function() {
+    TimerManager.setTimeout(function() {
       document.querySelectorAll('.anim').forEach(function(el) {
         el.style.opacity = '1';
         el.style.transform = 'none';
@@ -5381,7 +5411,7 @@ if (document.readyState === 'loading') {
     if (isPastLogin()) {
       // 已滚过登录页，直接创建
       createSidebar();
-      setTimeout(function() { switchPage('overview'); }, 200);
+      TimerManager.setTimeout(function() { switchPage('overview'); }, 200);
     } else {
       // 等待滚动过登录页
       let created = false;
@@ -5389,7 +5419,7 @@ if (document.readyState === 'loading') {
         if (!created && isPastLogin()) {
           created = true;
           createSidebar();
-          setTimeout(function() { switchPage('overview'); }, 200);
+          TimerManager.setTimeout(function() { switchPage('overview'); }, 200);
           window.removeEventListener('scroll', onScroll);
         }
       }
@@ -5485,9 +5515,9 @@ if (document.readyState === 'loading') {
   function start() {
     safeRender();
     // Re-run after a delay to catch late-loading sections
-    setTimeout(safeRender, 1000);
+    TimerManager.setTimeout(safeRender, 1000, 'blue-ocean-render');
   }
-  
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', start);
   } else {
@@ -5551,7 +5581,7 @@ if (document.readyState === 'loading') {
   }
 
   // ---------- 工具 ----------
-  function delay(ms){ return new Promise(function(res){ setTimeout(res,ms); }); }
+  function delay(ms){ return new Promise(function(res){ TimerManager.setTimeout(res,ms); }); }
   function getPages(){
     return Array.from(document.querySelectorAll('.sidebar-nav-item')).map(function(it){
       return { page:it.dataset.page, label:it.textContent.trim() };
@@ -5570,9 +5600,9 @@ if (document.readyState === 'loading') {
   }
   function toast(html){ ensureToast().innerHTML=html; toastEl.style.opacity='1'; toastEl.style.transform='translateY(0)'; }
   function dismissToast(ms){
-    setTimeout(function(){
+    TimerManager.setTimeout(function(){
       if(toastEl){ toastEl.style.opacity='0'; toastEl.style.transform='translateY(10px)';
-        setTimeout(function(){ if(toastEl&&toastEl.parentNode) toastEl.parentNode.removeChild(toastEl); toastEl=null; },350); }
+        TimerManager.setTimeout(function(){ if(toastEl&&toastEl.parentNode) toastEl.parentNode.removeChild(toastEl); toastEl=null; },350); }
     }, ms);
   }
 

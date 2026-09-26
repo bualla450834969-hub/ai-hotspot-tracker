@@ -60,13 +60,14 @@ npm run build
 
 > 环境要求：Node.js >= 12，无任何第三方依赖（`package.json` 中无 dependencies）。
 
-### 参与构建的源文件（32）
+### 参与构建的源文件（36）
 
 ```
 data/normalize.js
-core/domainConfig.js  core/globals.js  core/state.js  core/renderer.js  core/framework.js
+core/domainConfig.js  core/globals.js  core/state.js  core/evidence.js  core/renderer.js  core/framework.js
 effects/glow.js  effects/login.js
-modules/_helpers.js  hero.js  hotwords.js  works.js  topics.js  techradar.js
+modules/_helpers.js  hero.js  evidenceInsights.js  evidenceDrawer.js  homepageV82.js
+modules/hotwords.js  works.js  topics.js  techradar.js
 modules/breakdown.js  viralGenes.js  publishTime.js  titleFormulas.js  leadScripts.js
 modules/benchmarkExtras.js  launchOps.js  audience.js  engagement.js  topicPerf.js
 modules/kanban.js  favorites.js  credit.js  scriptGen.js  comparison.js
@@ -108,7 +109,10 @@ modules/advanced/crossPlatform.js  publishOptimization.js
 ## 五、调试模式
 
 在 URL 加 `?debug=1`（可与 `ind=` 并用），右上角显示：当前行业、works / charts 数量、
-render 次数、当前 requestId、采集状态、错误模块、最近错误。正常用户（无 debug）完全不可见。
+render 次数、当前 requestId、采集状态、错误模块、最近错误，以及受管的 Timer、Chart、Event、Effect 数量。正常用户（无 debug）完全不可见。
+
+V8.2 的运行时分层、行业生命周期和兼容约定见
+[`docs/v8.2-dynamic-industry-architecture.md`](docs/v8.2-dynamic-industry-architecture.md)。
 
 ## 六、部署（GitHub Pages）
 

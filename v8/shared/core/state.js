@@ -11,12 +11,14 @@
   const State = {
     get(key, def) {
       try {
-        const raw = localStorage.getItem(PREFIX + key);
+        const raw = StorageAdapter.getRaw(PREFIX + key, null);
         return raw ? JSON.parse(raw) : def;
       } catch (e) { return def; }
     },
     set(key, val) {
-      try { localStorage.setItem(PREFIX + key, JSON.stringify(val)); } catch (e) {}
+      try {
+        StorageAdapter.setJSON(PREFIX + key, val);
+      } catch (e) {}
     },
 
     // ===== 选题看板状态 =====

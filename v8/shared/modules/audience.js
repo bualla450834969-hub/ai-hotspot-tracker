@@ -14,11 +14,11 @@
       document.getElementById('personaGrid').innerHTML = '<p style="color:var(--text-secondary)">暂无人群画像数据</p>';
       return;
     }
-  
+
     // 分布柱状图
     const chartDom = document.getElementById('audienceChart');
     if (chartDom && typeof echarts !== 'undefined') {
-      const chart = echarts.init(chartDom);
+      const chart = ChartManager.create(chartDom);
       chart.setOption({
         grid: { left: 80, right: 20, top: 10, bottom: 20 },
         xAxis: { type: 'value', axisLabel: { color: '#9ca3af', fontSize: 11 }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
@@ -32,7 +32,7 @@
         }]
       });
     }
-  
+
     // 画像卡片
     const grid = document.getElementById('personaGrid');
     grid.innerHTML = personas.map(p => `

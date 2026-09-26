@@ -210,8 +210,13 @@
     // 页面标题
     document.title = config.display_name || '热点追踪工作台';
 
-    // 渲染所有模块
-    renderAll();
+    // 数据准备与渲染由统一生命周期收口；兼容旧页面时仍可直接 renderAll。
+    if (window.AppLifecycle) {
+      window.AppLifecycle.prepare(DATA);
+      window.AppLifecycle.render();
+    } else {
+      renderAll();
+    }
 
     // 滚动动画
     initScrollReveal();
@@ -219,10 +224,13 @@
     // 导航隐藏
     initNavHide();
 
-    // 延迟初始化
-    setTimeout(() => { if (typeof initSectionCollapse === 'function') initSectionCollapse(); }, 1500);
-    setTimeout(() => { if (typeof checkDataFreshness === 'function') checkDataFreshness(); }, 2000);
-    setTimeout(() => { if (typeof initCardGlow === 'function') initCardGlow(); }, 500);
+    // 表现层在 DOM 渲染后的下一帧初始化，不参与数据就绪判断。
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      if (typeof initSectionCollapse === 'function') initSectionCollapse();
+      if (typeof checkDataFreshness === 'function') checkDataFreshness();
+      if (window.EffectsManager) window.EffectsManager.initPage();
+      else if (typeof initCardGlow === 'function') initCardGlow();
+    }));
   }
 
   // ===== 滚动显现动画 =====
@@ -238,6 +246,7 @@
       el.classList.add('anim-item');
       observer.observe(el);
     });
+    if (window.EffectsManager) window.EffectsManager.register(() => observer.disconnect(), 'framework-reveal');
   }
 
   // ===== 导航栏滚动隐藏 =====
@@ -245,11 +254,13 @@
     let lastScroll = 0;
     const nav = document.querySelector('.top-nav');
     if (!nav) return;
-    window.addEventListener('scroll', () => {
+    const onScroll = () => {
       const cur = window.scrollY;
       nav.style.transform = cur > lastScroll && cur > 100 ? 'translateY(-100%)' : 'translateY(0)';
       lastScroll = cur;
-    });
+    };
+    if (window.EventManager) window.EventManager.on(window, 'scroll', onScroll, { passive: true }, 'effect');
+    else window.addEventListener('scroll', onScroll, { passive: true });
   }
 
   // ===== 全局搜索 =====
