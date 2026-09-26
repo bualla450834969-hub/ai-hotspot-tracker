@@ -2740,12 +2740,6 @@ if (document.readyState === 'loading') {
   var cachedData = null;
   var cachedAnalysis = null;
 
-  function escapeHTML(value) {
-    return String(value == null ? '' : value).replace(/[&<>"']/g, function(char) {
-      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char];
-    });
-  }
-
   function exposeStore(analysis) {
     if (!window.AppStore) return;
     var store = analysis.evidenceStore;
@@ -2767,44 +2761,9 @@ if (document.readyState === 'loading') {
     return cachedAnalysis;
   }
 
-  function ensureRoot() {
-    var root = document.getElementById('v82EvidenceInsights');
-    if (root) return root;
-    var insights = document.getElementById('insightsGrid');
-    if (!insights || !insights.parentNode) return null;
-    root = document.createElement('div');
-    root.id = 'v82EvidenceInsights';
-    root.className = 'v82-evidence-insights';
-    insights.parentNode.insertBefore(root, insights.nextSibling);
-    return root;
-  }
-
-  function strengthLabel(strength) {
-    var labels = { HIGH:'高', MEDIUM:'中', LOW:'低' };
-    return labels[strength && strength.level] || '低';
-  }
-
   function render(data) {
-    var analysis = ensureAnalysis(data);
-    if (document.body.classList.contains('v82-research')) return;
-    var root = ensureRoot();
-    if (!root || !window.V82Evidence) return;
-    var cards = analysis.insights.slice(0, 3).map(function(insight) {
-      return '<article class="v82-insight" data-insight-id="' + escapeHTML(insight.id) + '">' +
-        '<div class="v82-insight-head"><span class="v82-source">真实数据推导</span>' +
-        '<span class="v82-strength v82-strength-' + insight.evidenceStrength.level.toLowerCase() + '">依据强度 ' + strengthLabel(insight.evidenceStrength) + '</span></div>' +
-        '<h3>' + escapeHTML(insight.title) + '</h3>' +
-        '<p>' + escapeHTML(insight.description) + '</p>' +
-        '<div class="v82-insight-actions"><button type="button" data-v82-action="evidence" data-insight-id="' + escapeHTML(insight.id) + '">查看证据</button>' +
-        '<button type="button" data-v82-action="basis" data-insight-id="' + escapeHTML(insight.id) + '">查看依据</button></div></article>';
-    }).join('');
-    var insufficient = analysis.unsupportedInsights.map(function(item) {
-      var name = item.type === 'user_voice' ? '用户声音' : '趋势判断';
-      return '<div class="v82-insufficient"><strong>' + name + '</strong><span>数据不足</span><small>' + escapeHTML(item.reason) + '</small></div>';
-    }).join('');
-    root.innerHTML = '<div class="v82-section-head"><h2>有证据的内容模式</h2><span>每条结论均可回到原始样本</span></div>' +
-      (cards ? '<div class="v82-insight-grid">' + cards + '</div>' : '<div class="v82-empty">当前作品缺少可归组的采集关键词，暂不生成内容模式。</div>') +
-      (insufficient ? '<div class="v82-quality-gates">' + insufficient + '</div>' : '');
+    // 默认首页只保留分析能力和 AppStore 查询接口，不插入 Alpha 研究卡片。
+    ensureAnalysis(data);
   }
 
   if (window.Module && window.V82Evidence) {
@@ -2931,6 +2890,10 @@ if (document.readyState === 'loading') {
 /* ===== modules/homepageV82.js ===== */
 (function() {
   'use strict';
+
+  // Research Workspace 保留为显式预览，不再替代默认的原版工作台。
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('view') !== 'research') return;
 
   document.body.classList.add('v82-research');
 
@@ -5560,6 +5523,10 @@ if (document.readyState === 'loading') {
     if (!group) return;
 
     currentPage = pageId;
+
+    if (pageId === 'settings' && window.DynamicIndustryFlow) {
+      DynamicIndustryFlow.renderManager();
+    }
 
     // 确保登录页已隐藏（进入工作台后不再显示）
     const loginScreen = document.getElementById('loginScreen');

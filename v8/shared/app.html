@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <!-- V8.1 Stable 稳定核心：必须最先加载（唯一数据源/图表安全/错误隔离/定时器管理） -->
-<script src="../shared/stable-core.js?v=1790560000"></script>
+<script src="../shared/stable-core.js?v=1790571000"></script>
 <script>
 // Superpowers verification-before-completion: 全局错误兜底
 // 任何模块报错只影响自身，不拖垮整页
@@ -27,7 +27,7 @@ window.safeCall = function(fn, ctx) {
   <link rel="stylesheet" href="../shared/styles/components.css?v=1788677800">
   <link rel="stylesheet" href="../shared/styles/glass.css?v=1788677800">
   <link rel="stylesheet" href="../shared/styles/login.css?v=1788677800">
-  <link rel="stylesheet" href="../shared/styles/modules.css?v=1790560000">
+  <link rel="stylesheet" href="../shared/styles/modules.css?v=1790571000">
 <link rel="stylesheet" href="../shared/styles/sidebar.css?v=1788842270">
   <link rel="stylesheet" href="../shared/styles/advanced.css?v=1788757957">
   <!-- ECharts -->
@@ -794,11 +794,13 @@ window.safeCall = function(fn, ctx) {
         if (typeof buildDashboardData !== 'function' || !window.DASHBOARD_DATA || !window.DASHBOARD_DATA.works || !window.DASHBOARD_DATA.works.length){ console.log('[REAGG] skipped'); return; }
         try {
           var _indName = (window.DASHBOARD_DATA.summary && window.DASHBOARD_DATA.summary.industry) || cname;
+          var _oldTrend = {};
+          if (CTX.type === 'dynamic') {
+            (window.DASHBOARD_DATA.hotwords || []).forEach(function(h){ _oldTrend[h.keyword+'|'+(h.platform||'')] = h.trend; });
+          }
           var _fresh = buildDashboardData(window.DASHBOARD_DATA.works.slice(),
                                           (window.DASHBOARD_DATA.hotwords || []).slice(), _indName);
           if (CTX.type === 'dynamic') {
-            var _oldTrend = {};
-            (window.DASHBOARD_DATA.hotwords || []).forEach(function(h){ _oldTrend[h.keyword+'|'+(h.platform||'')] = h.trend; });
             _fresh.hotwords.forEach(function(h){ var t=_oldTrend[h.keyword+'|'+(h.platform||'')]; if(t) h.trend=t; });
             _fresh.history_available = !!window.DASHBOARD_DATA.history_available;
           }
@@ -969,7 +971,7 @@ window.safeCall = function(fn, ctx) {
 
 
 
-  <script src="../shared/bundle.js?v=1790560000"></script>
+  <script src="../shared/bundle.js?v=1790571000"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework(), { once: true });

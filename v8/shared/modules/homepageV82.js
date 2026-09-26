@@ -2,6 +2,10 @@
 (function() {
   'use strict';
 
+  // Research Workspace 保留为显式预览，不再替代默认的原版工作台。
+  var params = new URLSearchParams(window.location.search);
+  if (params.get('view') !== 'research') return;
+
   document.body.classList.add('v82-research');
 
   function esc(value) {

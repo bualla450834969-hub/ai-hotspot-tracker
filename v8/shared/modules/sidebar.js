@@ -219,6 +219,10 @@
 
     currentPage = pageId;
 
+    if (pageId === 'settings' && window.DynamicIndustryFlow) {
+      DynamicIndustryFlow.renderManager();
+    }
+
     // 确保登录页已隐藏（进入工作台后不再显示）
     const loginScreen = document.getElementById('loginScreen');
     if (loginScreen && loginScreen.style.display !== 'none') {
