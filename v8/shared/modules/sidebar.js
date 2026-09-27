@@ -118,12 +118,6 @@
 
     NAV_GROUPS.filter(function(g) {
       var mods = (window.DOMAIN_CONFIG||{}).modules||{};
-      if (g.id === 'techradar') {
-        // 技术雷达由数据自动驱动：config未关闭且该行业确有技术信号才显示
-        var ts = (window.DASHBOARD_DATA||{}).tech_signals;
-        var hasTR = !!(ts && ts.signals && ts.signals.length);
-        return mods['techradar'] !== false && hasTR;
-      }
       return mods[g.id] !== false;
     }).forEach(function(group) {
       const item = document.createElement('div');
@@ -270,7 +264,11 @@
 
     // 更新页面标题
     const pageTitle = document.getElementById('pageTitle');
-    if (pageTitle) pageTitle.textContent = group.title + ' - 热点追踪工作台';
+    if (pageTitle) {
+      var title = group.title;
+      if (pageId === 'techradar' && window.RadarProfileService) title = RadarProfileService.getCurrent().sources.github.enabled ? '技术雷达' : '行业雷达';
+      pageTitle.textContent = title + ' - 热点追踪工作台';
+    }
 
     // 延迟resize图表
     TimerManager.setTimeout(function() {

@@ -59,6 +59,7 @@
         language: 'zh',
         theme: { primary: '#8b5cf6' }
       });
+      if (window.RadarProfileService) RadarProfileService.ensure(record);
       return record;
     },
     create: function (name) {

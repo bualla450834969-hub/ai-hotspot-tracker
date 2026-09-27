@@ -216,7 +216,7 @@ window.DOMAIN_CONFIG = window.DOMAIN_CONFIG || {
 
 
   // ===== 领域专属模块（换领域时自动关闭）=====
-  domain_specific_modules: ['techradar', 'viralGenes', 'saturation'],
+  domain_specific_modules: ['viralGenes', 'saturation'],
 };
 
 /**

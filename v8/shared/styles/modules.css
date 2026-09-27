@@ -1611,6 +1611,9 @@ body[data-reveal="0"] section {
 .tech-summary-card.rise .num { color: #fbbf24; }
 .tech-summary-card.watch .num { color: #94a3b8; }
 .tech-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 14px; }
+.radar-group { grid-column: 1 / -1; }
+.radar-group > .tech-grid { margin-top: 12px; }
+.tech-summary-note { color: var(--text-secondary); font-size: 11px; line-height: 1.6; margin: 6px 0 12px; }
 .tech-card { padding: 18px; border-radius: 16px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); position: relative; overflow: hidden; transition: all 0.3s; }
 .tech-card:hover { border-color: rgba(255,255,255,0.18); transform: translateY(-2px); }
 .tech-card .tech-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }

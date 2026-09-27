@@ -292,43 +292,27 @@ window.normalizeData = function() {
     ];
   }
 
-  // 4. blue_ocean_list 蓝海关键词
+  // 4. blue_ocean_list 蓝海关键词：没有真实聚合结果时保持为空
   if (!d.blue_ocean_list || d.blue_ocean_list.length === 0) {
-    var kws = (cfg.collect_keywords || []).slice(0, 5);
-    d.blue_ocean_list = kws.map(function(k) {
-      return {keyword: k, demand: '中', competition: '低', score: 75 + Math.floor(Math.random()*20)};
-    });
+    d.blue_ocean_list = [];
   }
 
   // 5. cross_platform 跨平台迁移：以真实双平台对比为准，空数组表示双平台均衡，不填假数据
   if (!Array.isArray(d.cross_platform)) d.cross_platform = [];
 
-  // 6. comment_semantic 评论语义：基于真实评论总量按内容需求分布估算
+  // 6. 评论语义必须来自评论正文，不能用评论总数估算。
   if (!d.comment_semantic || !d.comment_semantic.themes || d.comment_semantic.themes.length === 0) {
-    var _tc = works.reduce(function(a,w){return a+(w.commentCount||0);},0);
-    d.comment_semantic = {themes: [
-      {name: _indName+'求教程', count: Math.round(_tc*0.4), sentiment: 'positive'},
-      {name: _indName+'问工具材料', count: Math.round(_tc*0.25), sentiment: 'neutral'},
-      {name: _indName+'交流经验', count: Math.round(_tc*0.2), sentiment: 'positive'}
-    ]};
+    d.comment_semantic = {themes: []};
   }
 
-  // 7. conversion_signals 转化信号：基于真实评论总量估算转化需求
+  // 7. 转化信号必须来自评论正文。
   if (!d.conversion_signals || d.conversion_signals.length === 0) {
-    var _tc2 = works.reduce(function(a,w){return a+(w.commentCount||0);},0);
-    d.conversion_signals = [
-      {signal: '求购买链接', desc: '约'+Math.round(_tc2*0.15)+'条相关评论', impact: '高'},
-      {signal: '问课程教程', desc: '约'+Math.round(_tc2*0.1)+'条相关评论', impact: '高'},
-      {signal: '求推荐', desc: '约'+Math.round(_tc2*0.12)+'条相关评论', impact: '中'}
-    ];
+    d.conversion_signals = [];
   }
 
-  // 8. growth_ranking 上升速率
+  // 8. 上升速率需要至少两个历史快照。
   if (!d.growth_ranking || d.growth_ranking.length === 0) {
-    var kws2 = (cfg.collect_keywords || []).slice(0, 5);
-    d.growth_ranking = kws2.map(function(k, i) {
-      return {keyword: k, growth: 30 - i*5 + Math.floor(Math.random()*10), trend: 'up'};
-    });
+    d.growth_ranking = [];
   }
 
   // 9. format_roi 内容形式ROI
@@ -389,7 +373,7 @@ window.normalizeData = function() {
 
   // 13. blue_ocean_list ensure fields
   d.blue_ocean_list = (d.blue_ocean_list || []).map(function(b) {
-    return {keyword: b.keyword || b.name || '', demand: b.demand || '中', competition: b.competition || '低', score: b.score || 75};
+    return {keyword: b.keyword || b.name || '', demand: b.demand || '', competition: b.competition || '', score: b.score == null ? null : b.score};
   });
 
   // 透传未显式规范化的字段，避免新增数据字段（如 best_posting_combo）在归一化时被丢弃

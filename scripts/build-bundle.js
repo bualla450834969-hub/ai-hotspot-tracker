@@ -27,6 +27,7 @@ const FILES = [
   'core/state.js',
   'core/evidence.js',         // V8.2 Evidence / Insight / Provenance / DataQuality
   'core/contentAI.js',        // V8.3 安全代理 AI 适配器（浏览器不保存 Provider Key）
+  'core/radar.js',            // V8.3.1 行业雷达配置、快照与数据适配
   'core/renderer.js',
   'core/framework.js',       // Module.register 框架 + renderAll 调度
   'effects/glow.js',

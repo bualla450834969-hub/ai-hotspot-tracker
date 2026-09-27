@@ -292,43 +292,27 @@ window.normalizeData = function() {
     ];
   }
 
-  // 4. blue_ocean_list 蓝海关键词
+  // 4. blue_ocean_list 蓝海关键词：没有真实聚合结果时保持为空
   if (!d.blue_ocean_list || d.blue_ocean_list.length === 0) {
-    var kws = (cfg.collect_keywords || []).slice(0, 5);
-    d.blue_ocean_list = kws.map(function(k) {
-      return {keyword: k, demand: '中', competition: '低', score: 75 + Math.floor(Math.random()*20)};
-    });
+    d.blue_ocean_list = [];
   }
 
   // 5. cross_platform 跨平台迁移：以真实双平台对比为准，空数组表示双平台均衡，不填假数据
   if (!Array.isArray(d.cross_platform)) d.cross_platform = [];
 
-  // 6. comment_semantic 评论语义：基于真实评论总量按内容需求分布估算
+  // 6. 评论语义必须来自评论正文，不能用评论总数估算。
   if (!d.comment_semantic || !d.comment_semantic.themes || d.comment_semantic.themes.length === 0) {
-    var _tc = works.reduce(function(a,w){return a+(w.commentCount||0);},0);
-    d.comment_semantic = {themes: [
-      {name: _indName+'求教程', count: Math.round(_tc*0.4), sentiment: 'positive'},
-      {name: _indName+'问工具材料', count: Math.round(_tc*0.25), sentiment: 'neutral'},
-      {name: _indName+'交流经验', count: Math.round(_tc*0.2), sentiment: 'positive'}
-    ]};
+    d.comment_semantic = {themes: []};
   }
 
-  // 7. conversion_signals 转化信号：基于真实评论总量估算转化需求
+  // 7. 转化信号必须来自评论正文。
   if (!d.conversion_signals || d.conversion_signals.length === 0) {
-    var _tc2 = works.reduce(function(a,w){return a+(w.commentCount||0);},0);
-    d.conversion_signals = [
-      {signal: '求购买链接', desc: '约'+Math.round(_tc2*0.15)+'条相关评论', impact: '高'},
-      {signal: '问课程教程', desc: '约'+Math.round(_tc2*0.1)+'条相关评论', impact: '高'},
-      {signal: '求推荐', desc: '约'+Math.round(_tc2*0.12)+'条相关评论', impact: '中'}
-    ];
+    d.conversion_signals = [];
   }
 
-  // 8. growth_ranking 上升速率
+  // 8. 上升速率需要至少两个历史快照。
   if (!d.growth_ranking || d.growth_ranking.length === 0) {
-    var kws2 = (cfg.collect_keywords || []).slice(0, 5);
-    d.growth_ranking = kws2.map(function(k, i) {
-      return {keyword: k, growth: 30 - i*5 + Math.floor(Math.random()*10), trend: 'up'};
-    });
+    d.growth_ranking = [];
   }
 
   // 9. format_roi 内容形式ROI
@@ -389,7 +373,7 @@ window.normalizeData = function() {
 
   // 13. blue_ocean_list ensure fields
   d.blue_ocean_list = (d.blue_ocean_list || []).map(function(b) {
-    return {keyword: b.keyword || b.name || '', demand: b.demand || '中', competition: b.competition || '低', score: b.score || 75};
+    return {keyword: b.keyword || b.name || '', demand: b.demand || '', competition: b.competition || '', score: b.score == null ? null : b.score};
   });
 
   // 透传未显式规范化的字段，避免新增数据字段（如 best_posting_combo）在归一化时被丢弃
@@ -620,7 +604,7 @@ window.DOMAIN_CONFIG = window.DOMAIN_CONFIG || {
 
 
   // ===== 领域专属模块（换领域时自动关闭）=====
-  domain_specific_modules: ['techradar', 'viralGenes', 'saturation'],
+  domain_specific_modules: ['viralGenes', 'saturation'],
 };
 
 /**
@@ -1291,6 +1275,25 @@ window.domainGuard = function(moduleId, renderFn) {
     _test:{cleanWork:cleanWork,workIdentity:workIdentity,analysisKey:analysisKey,scriptKey:scriptKey,validAnalysis:validAnalysis,validVariants:validVariants}
   };
   window.ContentAIAdapter=adapter;
+})();
+/* ===== core/radar.js ===== */
+(function(){
+  'use strict';
+  var PROFILE_PREFIX='radar_profile__',SNAPSHOT_PREFIX='radar_snapshots__';
+  function context(){return window.IndustryStore&&IndustryStore.getCurrent?IndustryStore.getCurrent():{id:window.CURRENT_INDUSTRY||'unknown',name:'当前行业'};}
+  function key(prefix,id){return prefix+encodeURIComponent(id);}
+  function day(){return new Date().toISOString().slice(0,10);}
+  function terms(ctx){var cfg=window.DOMAIN_CONFIG||{};return [ctx.name,cfg.name,cfg.display_name].concat(cfg.collect_keywords||[],cfg.keywords||[]).filter(Boolean);}
+  function infer(ctx){var list=terms(ctx),source=list.join(' '),developer=/AI|人工智能|大模型|LLM|Agent|编程|开发|代码|软件|开源|机器学习|MCP/i.test(source);return {industryId:ctx.id,industryName:ctx.name||source||'当前行业',type:developer?'developer':'general',sources:{social:{enabled:true,keywords:list.slice(0,12)},github:{enabled:developer,queries:developer?['AI agent','agent framework','AI skill','MCP','LLM agent']:[]}},updatedAt:new Date().toISOString()};}
+  var service={get:function(id){return StorageAdapter.getJSON(key(PROFILE_PREFIX,id),null);},getCurrent:function(){var ctx=context(),profile=this.get(ctx.id);if(!profile||!profile.sources){profile=infer(ctx);this.save(profile);}return profile;},save:function(profile){StorageAdapter.setJSON(key(PROFILE_PREFIX,profile.industryId),profile);return profile;},ensure:function(record){if(!record||!record.id)return null;return this.get(record.id)||this.save(infer(record));}};
+  function snapshots(id){return StorageAdapter.getJSON(key(SNAPSHOT_PREFIX,id),[])||[];}
+  function saveSnapshot(id,source,items){var list=snapshots(id),entry={timestamp:new Date().toISOString(),date:day(),source:source,items:items},index=list.findIndex(function(item){return item.date===entry.date&&item.source===source;});if(index>=0)list[index]=entry;else list.push(entry);list=list.slice(-60);StorageAdapter.setJSON(key(SNAPSHOT_PREFIX,id),list);return list;}
+  function previous(list,source){var same=list.filter(function(item){return item.source===source;});return same.length>1?same[same.length-2]:null;}
+  function githubSearch(query,since){return fetch('https://api.github.com/search/repositories?q='+encodeURIComponent(query+' created:>='+since)+'&sort=stars&order=desc&per_page=20',{headers:{Accept:'application/vnd.github+json'}}).then(function(response){if(!response.ok)throw new Error(response.status===403?'GitHub 公共接口额度暂时用尽。':'GitHub 数据加载失败。');return response.json();}).then(function(body){return body.items||[];});}
+  var GitHubRadarAdapter={load:function(profile){var since=new Date(Date.now()-7*86400000).toISOString().slice(0,10),queries=profile.sources.github.queries||[];return Promise.all(queries.map(function(query){return githubSearch(query,since);})).then(function(groups){var seen={},repos=[];groups.forEach(function(group){group.forEach(function(repo){if(!seen[repo.id]){seen[repo.id]=true;repos.push(repo);}});});var items=repos.map(function(repo){return {id:String(repo.id),name:repo.full_name,owner:repo.owner&&repo.owner.login||'',url:repo.html_url,description:repo.description||'',topics:repo.topics||[],language:repo.language||'',stars:repo.stargazers_count||0,starsGained7d:repo.stargazers_count||0,growthRate7d:null,forks:repo.forks_count||0,updatedAt:repo.updated_at,createdAt:repo.created_at};}).sort(function(a,b){return b.starsGained7d-a.starsGained7d;}).slice(0,20);saveSnapshot(profile.industryId,'github',items.map(function(item){return {id:item.id,stars:item.stars};}));return {kind:'github',title:'GitHub 本周上升项目',items:items,note:'来源：GitHub 官方公开 API。仅纳入最近 7 天创建的相关仓库，因此 +Stars 表示项目创建以来且不超过 7 天的累计增量；成熟仓库需后续快照差值。'};});}};
+  var SocialRadarAdapter={load:function(profile,data){var items=(data.hotwords||[]).map(function(item){return {id:item.keyword,name:item.keyword,works:Number(item.total||0),likes:Number(item.total_likes||item.likes||0),collects:Number(item.total_collects||item.collects||0),comments:Number(item.total_comments||item.comments||0),shares:Number(item.total_shares||item.shares||0),maxLike:Number(item.max_like||0),trend:'当前热门'};}).filter(function(item){return item.name;}).sort(function(a,b){return (b.maxLike+b.works)-(a.maxLike+a.works);}).slice(0,20),list=saveSnapshot(profile.industryId,'social',items.map(function(item){return {id:item.id,works:item.works,likes:item.likes,collects:item.collects,comments:item.comments,shares:item.shares,maxLike:item.maxLike};})),old=previous(list,'social');if(old){var oldMap={};old.items.forEach(function(item){oldMap[item.id]=item;});items.forEach(function(item){var before=oldMap[item.id],delta=before?(item.works-before.works)+(item.likes-before.likes):0;if(!before)item.trend='数据不足';else if(delta>100)item.trend='快速升温';else if(delta>0)item.trend='升温';else if(delta<0)item.trend='降温';else item.trend='稳定';});}return Promise.resolve({kind:'social',title:'行业本周升温关键词',items:items,note:old?'趋势基于当前行业两个最近真实采集快照的指标差值。':'当前只有一个真实采集快照，暂不判断上涨或爆发；继续采集后生成趋势。'});}};
+  window.RadarProfileService=service;
+  window.RadarAdapters={github:GitHubRadarAdapter,social:SocialRadarAdapter};
 })();
 /* ===== core/renderer.js ===== */
 /**
@@ -2522,6 +2525,7 @@ if (document.readyState === 'loading') {
         language: 'zh',
         theme: { primary: '#8b5cf6' }
       });
+      if (window.RadarProfileService) RadarProfileService.ensure(record);
       return record;
     },
     create: function (name) {
@@ -3698,50 +3702,11 @@ if (document.readyState === 'loading') {
 
   // renderCommentScripts
   function renderCommentScripts() {
-    const demands = DATA.comment_demands || [];
-    const topics = DATA.topics || [];
-
-    // 高赞回复模式
-    const replyPatterns = [
-      { type: '补充干货型', text: '补充一个：用XX工具的XX功能效果更好，亲测有效！' },
-      { type: '提问互动型', text: cfg('cta.question', '你们最想解决什么问题？评论区告诉我，下期安排！') },
-      { type: '共鸣认同型', text: '说到点子上了，我也是踩了无数坑才总结出来的' },
-      { type: '反转惊喜型', text: '其实还有个隐藏功能，90%的人不知道，看我主页' },
-      { type: '福利引导型', text: '整理了全套资料，需要的评论区扣"想要"' },
-    ];
-
-    let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
-    html += '<div>';
-    html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">高赞回复模式（直接套用）</h4>';
-    replyPatterns.forEach(p => {
-      html += '<div class="comment-tpl"><div class="ct-type">' + p.type + '</div><div class="ct-text">' + p.text + '</div></div>';
-    });
-    html += '</div>';
-
-    // 置顶评论话术（基于当前TOP选题）
-    html += '<div>';
-    html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">置顶评论引导话术</h4>';
-    const topTopics = topics.slice(0, 3);
-    topTopics.forEach(t => {
-      const kw = t.keyword || '';
-      html += '<div class="pinned-comment">';
-      html += '<div class="pc-label">选题：' + t.title.substring(0, 20) + '</div>';
-      html += '<div class="ct-text">想要' + kw + '全套教程的，评论区扣"1"，我整理好了发你！<br>觉得有用的点个赞，你的支持是我更新的动力</div>';
-      html += '</div>';
-    });
-    html += '</div></div>';
-
-    // 评论区需求洞察
-    if (demands.length) {
-      html += '<div style="margin-top:16px"><h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">评论区高频需求（下期选题参考）</h4>';
-      html += '<div class="kw-cloud">';
-      demands.slice(0, 10).forEach(d => {
-        html += '<span>' + (d.demand || d.keyword || d) + '</span>';
-      });
-      html += '</div></div>';
-    }
-
-    document.getElementById('commentScriptsContent').innerHTML = html;
+    const el=document.getElementById('commentScriptsContent');
+    const scripts=DATA.comment_scripts||[];
+    if(!el)return;
+    if(!scripts.length){el.innerHTML='<div class="empty-state"><strong>暂无可生成话术</strong><br>需要真实评论文本后，才能根据用户需求生成针对性引流话术。<br>当前评论文本：0 条</div>';return;}
+    el.innerHTML=scripts.map(function(s){return '<div class="comment-tpl"><div class="ct-type">'+s.type+'</div><div class="ct-text">'+s.text+'</div></div>';}).join('');
   }
 
   // CHECKLIST_ITEMS - 发布前自检清单
@@ -3862,83 +3827,19 @@ if (document.readyState === 'loading') {
 
 
 /* ===== modules/techradar.js ===== */
-/**
- * modules/techradar.js
- * 函数: renderTechRadar
- * 依赖: ['tech_signals']
- */
-(function() {
+(function(){
   'use strict';
-
-  // renderTechRadar
-  function renderTechRadar() {
-    var ts = window.DASHBOARD_DATA && window.DASHBOARD_DATA.tech_signals;
-    if (!ts || !ts.signals || ts.signals.length === 0) {
-      document.getElementById('techradar').parentElement.style.display = 'none';
-      return;
-    }
-    var summary = ts.summary || {};
-    var sumHtml = '';
-    sumHtml += '<div class="tech-summary-card blue"><div class="num">' + (summary.blue_ocean || 0) + '</div><div class="label">🔵 蓝海机会</div></div>';
-    sumHtml += '<div class="tech-summary-card fire"><div class="num">' + (summary.exploding || 0) + '</div><div class="label">🔥 正在爆发</div></div>';
-    sumHtml += '<div class="tech-summary-card rise"><div class="num">' + (summary.rising || 0) + '</div><div class="label">📈 上升期</div></div>';
-    sumHtml += '<div class="tech-summary-card watch"><div class="num">' + (summary.watching || 0) + '</div><div class="label">👀 观察中</div></div>';
-    document.getElementById('techSummary').innerHTML = sumHtml;
-
-    var grid = document.getElementById('techGrid');
-    var html = '';
-    ts.signals.slice(0, 12).forEach(function(sig) {
-      var a = sig.analysis || {};
-      var opp = a.opportunity || '';
-      var badgeClass = 'watch';
-      if (opp.indexOf('蓝海') >= 0) badgeClass = 'blue';
-      else if (opp.indexOf('爆发') >= 0) badgeClass = 'fire';
-      else if (opp.indexOf('上升') >= 0) badgeClass = 'rise';
-      var name = sig.name || '';
-      var shortName = name.indexOf('/') >= 0 ? name.split('/').pop() : name;
-      var meta = '';
-      if (sig.source === 'github') {
-        var daysOld = sig.days_old ? sig.days_old + '天前创建' : '';
-        meta = '<span>⭐ ' + (sig.stars || 0) + '</span><span>🍴 ' + (sig.forks || 0) + '</span><span>📈 ' + (sig.star_growth_per_day || 0) + '/天</span>' + (daysOld ? '<span>🕐 ' + daysOld + '</span>' : '');
-      } else if (sig.source === 'huggingface') {
-        meta = '<span>⬇️ ' + (sig.downloads || 0) + '</span><span>❤️ ' + (sig.likes || 0) + '</span><span>' + (sig.pipeline || '') + '</span>';
-      }
-      var newBadge = sig.is_new ? '<span class="new-badge">NEW</span>' : '';
-      var matchKw = (a.matched_hotwords || []).map(function(k) { return '<span class="match-kw">' + k + '</span>'; }).join('');
-      var techHeat = a.tech_heat || 0;
-      var socialHeat = a.social_heat || 0;
-      html += '<div class="tech-card">';
-      html += '<div class="tech-source">' + (sig.source === 'github' ? 'GitHub' : 'HuggingFace') + '</div>';
-      html += '<div class="tech-header"><div class="tech-name">' + newBadge + shortName + '</div><span class="tech-badge ' + badgeClass + '">' + opp + '</span></div>';
-      var descZh = sig.description_zh || sig.description || '暂无描述';
-      var descEn = sig.description_zh ? sig.description : '';
-      html += '<div class="tech-desc">' + descZh + '</div>';
-      if (descEn) html += '<div class="tech-desc-en">' + descEn + '</div>';
-      html += '<div class="tech-meta">' + meta + '</div>';
-      html += '<div class="tech-heat-bar"><div class="tech-fill t" style="width:' + techHeat + '%"></div></div>';
-      html += '<div class="tech-heat-labels"><span>技术热度 ' + techHeat + '</span><span>社媒热度 ' + socialHeat + '</span></div>';
-      html += '<div class="tech-heat-bar" style="margin-top:4px"><div class="tech-fill s" style="width:' + socialHeat + '%"></div></div>';
-      if (matchKw) html += '<div class="tech-match">关联热词: ' + matchKw + '</div>';
-      html += '<div class="tech-reason">' + (a.reason || '') + '</div>';
-      html += '</div>';
-    });
-    grid.innerHTML = html;
-  }
-
-  // 模块注册
-  if (window.Module) {
-    Module.register({
-      id: "techradar",
-      requiredFields: ['tech_signals'],
-      render: domainGuard("techradar", function(data) {
-        try { renderTechRadar(data); } catch(e) { console.error("[techradar]", e); }
-      })
-    });
-  }
-  window.renderTechRadar = renderTechRadar;
+  var loadVersion=0;
+  function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
+  function empty(title,text){return '<div class="empty-state"><strong>'+esc(title)+'</strong><br>'+esc(text)+'</div>';}
+  function currentId(){var ctx=IndustryStore.getCurrent();return ctx&&ctx.id;}
+  function card(item,kind){if(kind==='github'){var tags=(item.topics||[]).slice(0,4).map(function(tag){return '<span class="match-kw">'+esc(tag)+'</span>';}).join('');return '<article class="tech-card"><div class="tech-source">GitHub</div><div class="tech-header"><div class="tech-name">'+esc(item.name)+'</div><span class="tech-badge rise">+'+item.starsGained7d.toLocaleString()+' Stars / 7d</span></div><div class="tech-desc">'+esc(item.description||'暂无项目描述')+'</div><div class="tech-meta"><span>总 Stars '+item.stars.toLocaleString()+'</span><span>Forks '+item.forks.toLocaleString()+'</span><span>'+esc(item.language||'语言未知')+'</span><span>更新 '+esc(item.updatedAt.slice(0,10))+'</span></div>'+(tags?'<div class="tech-match">'+tags+'</div>':'')+'<a class="work-link" target="_blank" rel="noopener" href="'+esc(item.url)+'">查看 GitHub</a></article>';}
+    return '<article class="tech-card"><div class="tech-source">RedFox 快照</div><div class="tech-header"><div class="tech-name">'+esc(item.name)+'</div><span class="tech-badge watch">'+esc(item.trend)+'</span></div><div class="tech-meta"><span>作品 '+item.works.toLocaleString()+'</span><span>点赞 '+item.likes.toLocaleString()+'</span><span>收藏 '+item.collects.toLocaleString()+'</span><span>评论 '+item.comments.toLocaleString()+'</span><span>分享 '+item.shares.toLocaleString()+'</span></div></article>';}
+  function renderResult(profile,results){var title=document.querySelector('[data-section="techradar"]'),summary=document.getElementById('techSummary'),grid=document.getElementById('techGrid'),total=results.reduce(function(sum,result){return sum+result.items.length;},0);if(title)title.textContent=profile.sources.github.enabled?'技术雷达':'行业雷达';if(!grid||!summary)return;summary.innerHTML='<div class="tech-summary-card"><div class="num">'+total+'</div><div class="label">当前真实信号</div></div><div class="tech-summary-card"><div class="label">数据按行业隔离保存；趋势至少需要两个真实快照。</div></div>';if(!total){grid.innerHTML=empty('当前行业暂未形成足够趋势数据。','继续采集后，将根据 7 天变化自动生成雷达。');return;}grid.innerHTML=results.map(function(result){return '<div class="radar-group"><div class="card-head"><span class="ch-bar"></span><span class="ch-title">'+esc(result.title)+'</span></div><div class="tech-summary-note">'+esc(result.note)+'</div><div class="tech-grid">'+(result.items.length?result.items.map(function(item){return card(item,result.kind);}).join(''):empty('暂无数据','当前数据源暂未返回有效信号。'))+'</div></div>';}).join('');}
+  function renderTechRadar(data){var profile=RadarProfileService.getCurrent(),grid=document.getElementById('techGrid'),summary=document.getElementById('techSummary'),version=++loadVersion,industryId=currentId(),jobs=[];if(profile.sources.social.enabled)jobs.push(RadarAdapters.social.load(profile,data||window.DASHBOARD_DATA||{}));if(profile.sources.github.enabled)jobs.push(RadarAdapters.github.load(profile));if(summary)summary.innerHTML='';if(grid)grid.innerHTML=empty('雷达数据加载中...','正在读取当前行业的数据源。');Promise.all(jobs).then(function(results){if(version!==loadVersion||industryId!==currentId())return;renderResult(profile,results);}).catch(function(error){if(version!==loadVersion||industryId!==currentId()||!grid)return;grid.innerHTML=empty('模块加载失败，请重试',error&&error.message?error.message:'雷达数据暂时不可用。');});}
+  if(window.Module)Module.register({id:'techradar',render:function(data){renderTechRadar(data);}});
+  window.renderTechRadar=renderTechRadar;
 })();
-
-
 /* ===== modules/breakdown.js ===== */
 /**
  * modules/breakdown.js
@@ -4009,6 +3910,7 @@ if (document.readyState === 'loading') {
     if (!el) return;
     var data = DATA.comment_semantic || {};
     var themes = data.themes || [];
+    if (!themes.length) { el.innerHTML = '<div class="empty-state">当前缺少评论正文，暂无法进行评论语义分析。</div>'; return; }
     var html = '<div class="cs-grid">';
     themes.forEach(function(t) {
       html += '<div class="cs-item"><span class="cs-name">' + t.name + '</span><span class="cs-count">' + t.count + '</span></div>';
@@ -4022,6 +3924,7 @@ if (document.readyState === 'loading') {
     var el = document.getElementById('conversionSignalList');
     if (!el) return;
     var signals = DATA.conversion_signals || [];
+    if (!signals.length) { el.innerHTML = '<div class="empty-state">当前缺少评论正文，暂无法识别购买意向。</div>'; return; }
     var html = '<div class="cs-list">';
     signals.forEach(function(s) {
       html += '<div class="cs-item"><div class="cs-signal">' + s.signal + '</div><div class="cs-desc">' + s.desc + '</div><span class="cs-impact impact-' + (s.impact||'中') + '">' + (s.impact||'中') + '影响</span></div>';
@@ -4100,14 +4003,14 @@ if (document.readyState === 'loading') {
       html += d.needs.map(q=>`<span class="demand-tag">${q.demand}<span class="dc">${q.count}</span></span>`).join('');
       html += '</div></div>';
     }
-    el.innerHTML = html || '<div class="empty-state">暂无评论需求数据</div>';
+    el.innerHTML = html || '<div class="empty-state">当前评论样本不足，暂无法分析需求。</div>';
   }
 
   // renderCommentKw
   function renderCommentKw(works) {
     const kws = DATA.comment_keywords || [];
     const el = document.getElementById('commentKw');
-    if (!kws.length) { el.innerHTML='<div class="empty-state">暂无评论关键词数据</div>'; return; }
+    if (!kws.length) { el.innerHTML='<div class="empty-state">当前未采集到评论文本，暂无评论关键词数据。</div>'; return; }
     el.innerHTML = kws.slice(0,20).map((k,i)=>`<span class="kw-tag ${i<5?'hot':''}" style="font-size:${Math.max(11,16-i*0.4)}px;">${k.keyword} <span style="opacity:.5;font-size:10px;">${k.count}</span></span>`).join('');
   }
 
@@ -4220,13 +4123,27 @@ if (document.readyState === 'loading') {
     });
   }
 
+  function renderCompletionRate() {
+    var el=document.getElementById('completionRateChart'), list=DATA.completion_rate||[];
+    if(!el)return;
+    if(!list.length){el.innerHTML='<div class="empty-state">当前数据不包含真实完播率，暂无法分析不同时长的完播表现。</div>';return;}
+    el.innerHTML=list.map(function(r){return '<div class="sat-item"><div class="sat-name">'+r.duration+'</div><div class="sat-bar"><div class="sat-fill" style="width:'+Math.max(0,Math.min(100,r.rate))+'%"></div></div><div class="sat-val">'+r.rate+'%</div></div>';}).join('');
+  }
+
+  function renderBestPostingCombo() {
+    var el=document.getElementById('bestPostingComboContent'), combo=DATA.best_posting_combo;
+    if(!el)return;
+    if(!combo||!combo.time||!combo.platform||!combo.duration){el.innerHTML='<div class="empty-state">当前有效发布时间或时长样本不足，暂无法生成最佳发布组合。</div>';return;}
+    el.innerHTML='<div class="cs-grid"><div class="cs-item"><span class="cs-name">最佳时段</span><span class="cs-count">'+combo.time+'</span></div><div class="cs-item"><span class="cs-name">平台</span><span class="cs-count">'+combo.platform+'</span></div><div class="cs-item"><span class="cs-name">时长</span><span class="cs-count">'+combo.duration+'</span></div></div>';
+  }
+
   // 模块注册
   if (window.Module) {
     Module.register({
       id: "breakdown",
       requiredFields: ['works'],
       render: function(data) {
-        var steps = [renderBreakdowns, renderMatrix, renderFormulas, renderCommentSemantic, renderConversionSignals, function(){renderCollect(DATA.hotwords);}, function(){renderScatter(data);}, function(){renderSaturation(DATA.hotwords);}, renderCommentDemands, function(){renderCommentKw(data);}, function(){renderHook(data);}, function(){renderDuration(data);}, function(){renderPublishTime(data);}];
+        var steps = [renderBreakdowns, renderMatrix, renderFormulas, renderCommentSemantic, renderConversionSignals, renderCompletionRate, renderBestPostingCombo, function(){renderCollect(DATA.hotwords);}, function(){renderScatter(data);}, function(){renderSaturation(DATA.hotwords);}, renderCommentDemands, function(){renderCommentKw(data);}, function(){renderHook(data);}, function(){renderDuration(data);}, function(){renderPublishTime(data);}];
         steps.forEach(function(fn){ try { fn(); } catch(e) { console.error("[bd]", e.message); } });
       }
     });
@@ -4242,6 +4159,10 @@ if (document.readyState === 'loading') {
   window.renderHook = renderHook;
   window.renderDuration = renderDuration;
   window.renderPublishTime = renderPublishTime;
+  window.renderCommentSemantic = renderCommentSemantic;
+  window.renderConversionSignals = renderConversionSignals;
+  window.renderCompletionRate = renderCompletionRate;
+  window.renderBestPostingCombo = renderBestPostingCombo;
 })();
 
 
@@ -5577,12 +5498,6 @@ if (document.readyState === 'loading') {
 
     NAV_GROUPS.filter(function(g) {
       var mods = (window.DOMAIN_CONFIG||{}).modules||{};
-      if (g.id === 'techradar') {
-        // 技术雷达由数据自动驱动：config未关闭且该行业确有技术信号才显示
-        var ts = (window.DASHBOARD_DATA||{}).tech_signals;
-        var hasTR = !!(ts && ts.signals && ts.signals.length);
-        return mods['techradar'] !== false && hasTR;
-      }
       return mods[g.id] !== false;
     }).forEach(function(group) {
       const item = document.createElement('div');
@@ -5729,7 +5644,11 @@ if (document.readyState === 'loading') {
 
     // 更新页面标题
     const pageTitle = document.getElementById('pageTitle');
-    if (pageTitle) pageTitle.textContent = group.title + ' - 热点追踪工作台';
+    if (pageTitle) {
+      var title = group.title;
+      if (pageId === 'techradar' && window.RadarProfileService) title = RadarProfileService.getCurrent().sources.github.enabled ? '技术雷达' : '行业雷达';
+      pageTitle.textContent = title + ' - 热点追踪工作台';
+    }
 
     // 延迟resize图表
     TimerManager.setTimeout(function() {

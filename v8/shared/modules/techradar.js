@@ -1,78 +1,14 @@
 /* ===== modules/techradar.js ===== */
-/**
- * modules/techradar.js
- * 函数: renderTechRadar
- * 依赖: ['tech_signals']
- */
-(function() {
+(function(){
   'use strict';
-
-  // renderTechRadar
-  function renderTechRadar() {
-    var ts = window.DASHBOARD_DATA && window.DASHBOARD_DATA.tech_signals;
-    if (!ts || !ts.signals || ts.signals.length === 0) {
-      document.getElementById('techradar').parentElement.style.display = 'none';
-      return;
-    }
-    var summary = ts.summary || {};
-    var sumHtml = '';
-    sumHtml += '<div class="tech-summary-card blue"><div class="num">' + (summary.blue_ocean || 0) + '</div><div class="label">🔵 蓝海机会</div></div>';
-    sumHtml += '<div class="tech-summary-card fire"><div class="num">' + (summary.exploding || 0) + '</div><div class="label">🔥 正在爆发</div></div>';
-    sumHtml += '<div class="tech-summary-card rise"><div class="num">' + (summary.rising || 0) + '</div><div class="label">📈 上升期</div></div>';
-    sumHtml += '<div class="tech-summary-card watch"><div class="num">' + (summary.watching || 0) + '</div><div class="label">👀 观察中</div></div>';
-    document.getElementById('techSummary').innerHTML = sumHtml;
-
-    var grid = document.getElementById('techGrid');
-    var html = '';
-    ts.signals.slice(0, 12).forEach(function(sig) {
-      var a = sig.analysis || {};
-      var opp = a.opportunity || '';
-      var badgeClass = 'watch';
-      if (opp.indexOf('蓝海') >= 0) badgeClass = 'blue';
-      else if (opp.indexOf('爆发') >= 0) badgeClass = 'fire';
-      else if (opp.indexOf('上升') >= 0) badgeClass = 'rise';
-      var name = sig.name || '';
-      var shortName = name.indexOf('/') >= 0 ? name.split('/').pop() : name;
-      var meta = '';
-      if (sig.source === 'github') {
-        var daysOld = sig.days_old ? sig.days_old + '天前创建' : '';
-        meta = '<span>⭐ ' + (sig.stars || 0) + '</span><span>🍴 ' + (sig.forks || 0) + '</span><span>📈 ' + (sig.star_growth_per_day || 0) + '/天</span>' + (daysOld ? '<span>🕐 ' + daysOld + '</span>' : '');
-      } else if (sig.source === 'huggingface') {
-        meta = '<span>⬇️ ' + (sig.downloads || 0) + '</span><span>❤️ ' + (sig.likes || 0) + '</span><span>' + (sig.pipeline || '') + '</span>';
-      }
-      var newBadge = sig.is_new ? '<span class="new-badge">NEW</span>' : '';
-      var matchKw = (a.matched_hotwords || []).map(function(k) { return '<span class="match-kw">' + k + '</span>'; }).join('');
-      var techHeat = a.tech_heat || 0;
-      var socialHeat = a.social_heat || 0;
-      html += '<div class="tech-card">';
-      html += '<div class="tech-source">' + (sig.source === 'github' ? 'GitHub' : 'HuggingFace') + '</div>';
-      html += '<div class="tech-header"><div class="tech-name">' + newBadge + shortName + '</div><span class="tech-badge ' + badgeClass + '">' + opp + '</span></div>';
-      var descZh = sig.description_zh || sig.description || '暂无描述';
-      var descEn = sig.description_zh ? sig.description : '';
-      html += '<div class="tech-desc">' + descZh + '</div>';
-      if (descEn) html += '<div class="tech-desc-en">' + descEn + '</div>';
-      html += '<div class="tech-meta">' + meta + '</div>';
-      html += '<div class="tech-heat-bar"><div class="tech-fill t" style="width:' + techHeat + '%"></div></div>';
-      html += '<div class="tech-heat-labels"><span>技术热度 ' + techHeat + '</span><span>社媒热度 ' + socialHeat + '</span></div>';
-      html += '<div class="tech-heat-bar" style="margin-top:4px"><div class="tech-fill s" style="width:' + socialHeat + '%"></div></div>';
-      if (matchKw) html += '<div class="tech-match">关联热词: ' + matchKw + '</div>';
-      html += '<div class="tech-reason">' + (a.reason || '') + '</div>';
-      html += '</div>';
-    });
-    grid.innerHTML = html;
-  }
-
-  // 模块注册
-  if (window.Module) {
-    Module.register({
-      id: "techradar",
-      requiredFields: ['tech_signals'],
-      render: domainGuard("techradar", function(data) {
-        try { renderTechRadar(data); } catch(e) { console.error("[techradar]", e); }
-      })
-    });
-  }
-  window.renderTechRadar = renderTechRadar;
+  var loadVersion=0;
+  function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
+  function empty(title,text){return '<div class="empty-state"><strong>'+esc(title)+'</strong><br>'+esc(text)+'</div>';}
+  function currentId(){var ctx=IndustryStore.getCurrent();return ctx&&ctx.id;}
+  function card(item,kind){if(kind==='github'){var tags=(item.topics||[]).slice(0,4).map(function(tag){return '<span class="match-kw">'+esc(tag)+'</span>';}).join('');return '<article class="tech-card"><div class="tech-source">GitHub</div><div class="tech-header"><div class="tech-name">'+esc(item.name)+'</div><span class="tech-badge rise">+'+item.starsGained7d.toLocaleString()+' Stars / 7d</span></div><div class="tech-desc">'+esc(item.description||'暂无项目描述')+'</div><div class="tech-meta"><span>总 Stars '+item.stars.toLocaleString()+'</span><span>Forks '+item.forks.toLocaleString()+'</span><span>'+esc(item.language||'语言未知')+'</span><span>更新 '+esc(item.updatedAt.slice(0,10))+'</span></div>'+(tags?'<div class="tech-match">'+tags+'</div>':'')+'<a class="work-link" target="_blank" rel="noopener" href="'+esc(item.url)+'">查看 GitHub</a></article>';}
+    return '<article class="tech-card"><div class="tech-source">RedFox 快照</div><div class="tech-header"><div class="tech-name">'+esc(item.name)+'</div><span class="tech-badge watch">'+esc(item.trend)+'</span></div><div class="tech-meta"><span>作品 '+item.works.toLocaleString()+'</span><span>点赞 '+item.likes.toLocaleString()+'</span><span>收藏 '+item.collects.toLocaleString()+'</span><span>评论 '+item.comments.toLocaleString()+'</span><span>分享 '+item.shares.toLocaleString()+'</span></div></article>';}
+  function renderResult(profile,results){var title=document.querySelector('[data-section="techradar"]'),summary=document.getElementById('techSummary'),grid=document.getElementById('techGrid'),total=results.reduce(function(sum,result){return sum+result.items.length;},0);if(title)title.textContent=profile.sources.github.enabled?'技术雷达':'行业雷达';if(!grid||!summary)return;summary.innerHTML='<div class="tech-summary-card"><div class="num">'+total+'</div><div class="label">当前真实信号</div></div><div class="tech-summary-card"><div class="label">数据按行业隔离保存；趋势至少需要两个真实快照。</div></div>';if(!total){grid.innerHTML=empty('当前行业暂未形成足够趋势数据。','继续采集后，将根据 7 天变化自动生成雷达。');return;}grid.innerHTML=results.map(function(result){return '<div class="radar-group"><div class="card-head"><span class="ch-bar"></span><span class="ch-title">'+esc(result.title)+'</span></div><div class="tech-summary-note">'+esc(result.note)+'</div><div class="tech-grid">'+(result.items.length?result.items.map(function(item){return card(item,result.kind);}).join(''):empty('暂无数据','当前数据源暂未返回有效信号。'))+'</div></div>';}).join('');}
+  function renderTechRadar(data){var profile=RadarProfileService.getCurrent(),grid=document.getElementById('techGrid'),summary=document.getElementById('techSummary'),version=++loadVersion,industryId=currentId(),jobs=[];if(profile.sources.social.enabled)jobs.push(RadarAdapters.social.load(profile,data||window.DASHBOARD_DATA||{}));if(profile.sources.github.enabled)jobs.push(RadarAdapters.github.load(profile));if(summary)summary.innerHTML='';if(grid)grid.innerHTML=empty('雷达数据加载中...','正在读取当前行业的数据源。');Promise.all(jobs).then(function(results){if(version!==loadVersion||industryId!==currentId())return;renderResult(profile,results);}).catch(function(error){if(version!==loadVersion||industryId!==currentId()||!grid)return;grid.innerHTML=empty('模块加载失败，请重试',error&&error.message?error.message:'雷达数据暂时不可用。');});}
+  if(window.Module)Module.register({id:'techradar',render:function(data){renderTechRadar(data);}});
+  window.renderTechRadar=renderTechRadar;
 })();
-
-
