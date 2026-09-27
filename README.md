@@ -135,6 +135,15 @@ AI 请求通过 `ContentAIAdapter` 发往用户配置的安全代理。浏览器
 
 代理返回 `{ "ok": true, "data": ... }`。未配置代理时界面显示未配置状态，不提供模拟 AI 结果。
 
+统一 AI Proxy 位于 `worker/ai-proxy.js`，以 Cloudflare Worker 部署并只允许配置的站点来源：
+
+```bash
+npx wrangler secret put AI_API_KEY
+npx wrangler deploy
+```
+
+`AI_API_KEY` 只进入 Worker Secret。当前 Worker 默认使用小米 MiMo 的 `mimo-v2.5-pro` 与按量付费 API；Provider Key 不会传给前端。
+
 修改 `v8/shared/core/*.js` 或 `v8/shared/modules/*.js` 后运行：
 
 ```bash

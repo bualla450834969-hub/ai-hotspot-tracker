@@ -1,0 +1,27 @@
+'use strict';
+const assert=require('assert');
+const fs=require('fs');
+const path=require('path');
+const vm=require('vm');
+const source=fs.readFileSync(path.join(__dirname,'../worker/ai-proxy.js'),'utf8').replace('export default {fetch:handle};','globalThis.worker={fetch:handle};');
+let providerCalls=0;
+const analysis={topic:'主题',hook:'开头',angle:'角度',keyPoints:['要点'],structure:'结构',interactionReasons:['互动'],reusablePattern:'模式',limitations:'限制'};
+const context={Response,Request,AbortController,setTimeout,clearTimeout,console,fetch:async(url,opts)=>{providerCalls++;const req=JSON.parse(opts.body);assert(!JSON.stringify(req).includes('provider-secret'));return new Response(JSON.stringify({choices:[{message:{content:JSON.stringify(analysis)}}]}),{status:200});}};
+vm.createContext(context);vm.runInContext(source,context);
+const env={ALLOWED_ORIGINS:'https://example.test',AI_API_KEY:'provider-secret',AI_MODEL:'real-model',AI_BASE_URL:'https://provider.test/v1'};
+const makeRequest=()=>new Request('https://worker.test/api/ai',{method:'POST',headers:{Origin:'https://example.test','Content-Type':'application/json'},body:JSON.stringify({action:'analyzeContent',payload:{contentAvailable:true,work:{title:'真实标题'}}})});
+(async()=>{
+  const denied=await context.worker.fetch(new Request('https://worker.test/api/ai',{method:'POST',headers:{Origin:'https://evil.test'},body:'{}'}),env);assert.strictEqual(denied.status,403);
+  const request=makeRequest();
+  const response=await context.worker.fetch(request,env);assert.strictEqual(response.status,200);assert.strictEqual((await response.json()).data.topic,'主题');assert.strictEqual(providerCalls,1);
+  assert.strictEqual(JSON.stringify(context.durationRange(30)),JSON.stringify([70,110]));
+  assert.strictEqual(context.validVariants({variants:[{angle:'a',title:'t',coverTitle:'c',hook:'h',body:'正文',cta:'c',tags:'t',estimatedDuration:'30秒'}]},1),true);
+  assert(context.instructions('generateScript',{action:'shorter',duration:60,platform:'xiaohongshu',tone:'natural'}).includes('70%'));
+  const invalid=await context.worker.fetch(new Request('https://worker.test/api/ai',{method:'POST',headers:{Origin:'https://example.test','Content-Type':'application/json'},body:'{}'}),env);assert.strictEqual(invalid.status,400);
+  const missing=await context.worker.fetch(makeRequest(),Object.assign({},env,{AI_API_KEY:''}));assert.strictEqual(missing.status,503);
+  context.fetch=async()=>new Response('{}',{status:429});
+  const limited=await context.worker.fetch(makeRequest(),env);assert.strictEqual(limited.status,429);
+  context.fetch=async()=>{var error=new Error('aborted');error.name='AbortError';throw error;};
+  const timedOut=await context.worker.fetch(makeRequest(),env);assert.strictEqual(timedOut.status,504);
+  console.log('V8.3 AI proxy tests: PASS');
+})().catch(error=>{console.error(error);process.exit(1);});
