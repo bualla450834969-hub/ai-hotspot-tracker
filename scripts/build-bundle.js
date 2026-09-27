@@ -26,6 +26,7 @@ const FILES = [
   'core/globals.js',
   'core/state.js',
   'core/evidence.js',         // V8.2 Evidence / Insight / Provenance / DataQuality
+  'core/contentAI.js',        // V8.3 安全代理 AI 适配器（浏览器不保存 Provider Key）
   'core/renderer.js',
   'core/framework.js',       // Module.register 框架 + renderAll 调度
   'effects/glow.js',
@@ -38,6 +39,7 @@ const FILES = [
   'modules/homepageV82.js',      // V8.2研究工作台首页编排
   'modules/hotwords.js',
   'modules/works.js',
+  'modules/hotContent.js',    // V8.3 热点作品详情、AI 拆解与原创口播
   'modules/topics.js',
   'modules/techradar.js',
   'modules/breakdown.js',

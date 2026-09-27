@@ -123,3 +123,30 @@ V8.2 的运行时分层、行业生命周期和兼容约定见
 
 仓库已开启 GitHub Pages，根目录含 `.nojekyll`。推送到被 Pages 服务的分支后即自动发布；
 注意 `app.html` 引用 `stable-core.js` / `bundle.js` 时带 `?v=` 版本号，更新这些文件后需相应 bump 以绕过 CDN 缓存。
+# V8.3 Hot Content to Script
+
+V8.3 在原工作台上增加“热点 → 真实作品 → 内容详情 → AI 拆解 → 原创口播”流程。作品正文只来自标准化 Work；正文未采集时页面会明确提示信息不足，不会补写原文。
+
+AI 请求通过 `ContentAIAdapter` 发往用户配置的安全代理。浏览器只保存代理 URL，Provider 密钥必须由服务端代理持有，禁止写入源码、localStorage 或 `bundle.js`。代理接受：
+
+```json
+{"action":"analyzeContent | generateScript","payload":{},"client":{"feature":"hot-content-to-script","version":"v8.3-a1"}}
+```
+
+代理返回 `{ "ok": true, "data": ... }`。未配置代理时界面显示未配置状态，不提供模拟 AI 结果。
+
+统一 AI Proxy 位于 `worker/ai-proxy.js`，以 Cloudflare Worker 部署并只允许配置的站点来源：
+
+```bash
+npx wrangler secret put AI_API_KEY
+npx wrangler deploy
+```
+
+`AI_API_KEY` 只进入 Worker Secret。当前 Worker 默认使用小米 MiMo 的 `mimo-v2.5-pro` 与按量付费 API；Provider Key 不会传给前端。
+
+修改 `v8/shared/core/*.js` 或 `v8/shared/modules/*.js` 后运行：
+
+```bash
+npm run build
+npm run test:v83
+```

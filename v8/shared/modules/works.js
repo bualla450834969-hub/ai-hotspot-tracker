@@ -9,9 +9,10 @@
 
   // renderWorksTable
   function renderWorksTable(works) {
+    function esc(value) { return String(value == null ? '' : value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
     const sorted=[...works].sort((a,b)=>((b.likes||b.likeCount||0))-((a.likes||a.likeCount||0))).slice(0,20);
     document.querySelector('#worksTable tbody').innerHTML=sorted.map((w,i)=>`
-      <tr><td>${i+1}</td><td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><a href="${w.workUrl||'#'}" target="_blank" class="work-link" title="${w.title||''}">${w.title||''}</a></td><td>${w.accountName||''}</td><td>${(w.followerCount||0).toLocaleString()}</td><td class="like-num">${(w.likeCount||0).toLocaleString()}</td><td class="collect-num">${(w.collectCount||0).toLocaleString()}</td><td class="share-num">${(w.shareCount||0).toLocaleString()}</td><td>${w._keyword||''}</td><td><span class="tag medium">${classifyHook(w.title||'')}</span></td></tr>`).join('');
+      <tr><td>${i+1}</td><td style="max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><button type="button" class="work-link v83-work-link" data-v83-work-id="${esc(window.ContentAIAdapter?ContentAIAdapter._test.workIdentity(w):(w.workId||w.sourceId||''))}" title="${esc(w.title||'')}">${esc(w.title||'无标题')}</button></td><td>${esc(w.accountName||'')}</td><td>${(w.followerCount||0).toLocaleString()}</td><td class="like-num">${(w.likeCount||0).toLocaleString()}</td><td class="collect-num">${(w.collectCount||0).toLocaleString()}</td><td class="share-num">${(w.shareCount||0).toLocaleString()}</td><td>${esc(w._keyword||'')}</td><td><span class="tag medium">${classifyHook(w.title||'')}</span></td></tr>`).join('');
   }
 
   // renderSmallViral

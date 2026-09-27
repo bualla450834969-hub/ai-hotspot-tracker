@@ -507,6 +507,7 @@
    * 新页面由本核心重新初始化，确保旧行业 timer/异步不延续。 */
   function switchIndustryContext(industryId) {
     try { if (typeof window.closeEvidenceDrawer === 'function') window.closeEvidenceDrawer(); } catch (e) {}
+    try { if (window.V83HotContent && typeof V83HotContent.close === 'function') V83HotContent.close(); } catch (e) {}
     try { if (typeof window.abortCollectionTask === 'function') window.abortCollectionTask(); } catch (e) {}
     AppStore.nextRequest();      // 作废在途异步
     try { EffectsManager.destroyPage(); } catch (e) {}

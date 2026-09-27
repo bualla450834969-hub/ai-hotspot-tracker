@@ -1,0 +1,12 @@
+name = "ai-hotspot-content-ai"
+main = "worker/ai-proxy.js"
+compatibility_date = "2026-09-01"
+
+[vars]
+ALLOWED_ORIGINS = "https://bualla450834969-hub.github.io,http://127.0.0.1:8876,http://localhost:8876"
+AI_BASE_URL = "https://api.xiaomimimo.com/v1"
+AI_PROVIDER_LABEL = "xiaomi-mimo"
+AI_MODEL = "mimo-v2.5-pro"
+AI_TIMEOUT_MS = "80000"
+
+# Configure AI_API_KEY with `wrangler secret put`; never commit it.

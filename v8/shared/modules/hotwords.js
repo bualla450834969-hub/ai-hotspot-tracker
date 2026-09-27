@@ -13,11 +13,12 @@
 
   // renderHotwordTable
   function renderHotwordTable(hw) {
+    function esc(value) { return String(value == null ? '' : value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
     const sorted=[...hw].sort((a,b)=>b.total-a.total);
     const satMap = {};
     (DATA.saturation||[]).forEach(s=>satMap[s.keyword]=s.stage);
     document.querySelector('#hotwordTable tbody').innerHTML=sorted.map((h,i)=>`
-      <tr><td>${i+1}</td><td><b style="color:var(--text);cursor:pointer;text-decoration:underline dotted" onclick="showKeywordTrend('${h.keyword.replace(/'/g,"\\'")}')" title="点击查看趋势">${h.keyword}</b></td><td>${h.category}</td><td>${h.total.toLocaleString()}</td><td class="like-num">${h.max_like.toLocaleString()}</td><td class="collect-num">${h.collect_rate}%</td><td><span class="tag ${trendClass(h.trend)}">${h.trend||'稳定'}</span></td><td><span class="tag ${satMap[h.keyword]==='萌芽期'?'sprout':satMap[h.keyword]==='上升期'?'rise':satMap[h.keyword]==='爆发期'?'boom':'decline'}">${satMap[h.keyword]||'稳定期'}</span></td><td><span class="tag ${h.efficiency_tag==='蓝海'?'blue-ocean':h.efficiency_tag==='红海'?'red-ocean':'medium'}">${h.efficiency_tag||'适中'}</span></td></tr>`).join('');
+      <tr><td>${i+1}</td><td><b style="color:var(--text);cursor:pointer;text-decoration:underline dotted" onclick="showKeywordTrend('${h.keyword.replace(/'/g,"\\'")}')" title="点击查看趋势">${esc(h.keyword)}</b><button type="button" class="v83-inline-action" data-v83-hotword="${esc(h.keyword)}">热门内容</button></td><td>${esc(h.category)}</td><td>${h.total.toLocaleString()}</td><td class="like-num">${h.max_like.toLocaleString()}</td><td class="collect-num">${h.collect_rate}%</td><td><span class="tag ${trendClass(h.trend)}">${esc(h.trend||'稳定')}</span></td><td><span class="tag ${satMap[h.keyword]==='萌芽期'?'sprout':satMap[h.keyword]==='上升期'?'rise':satMap[h.keyword]==='爆发期'?'boom':'decline'}">${esc(satMap[h.keyword]||'稳定期')}</span></td><td><span class="tag ${h.efficiency_tag==='蓝海'?'blue-ocean':h.efficiency_tag==='红海'?'red-ocean':'medium'}">${esc(h.efficiency_tag||'适中')}</span></td></tr>`).join('');
   }
 
   // renderCategory
