@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <!-- V8.1 Stable 稳定核心：必须最先加载（唯一数据源/图表安全/错误隔离/定时器管理） -->
-<script src="../shared/stable-core.js?v=1790746000"></script>
+<script src="../shared/stable-core.js?v=1790753300"></script>
 <script>
 // Superpowers verification-before-completion: 全局错误兜底
 // 任何模块报错只影响自身，不拖垮整页
@@ -970,7 +970,7 @@ window.safeCall = function(fn, ctx) {
 
 
 
-  <script src="../shared/bundle.js?v=1832460000"></script>
+  <script src="../shared/bundle.js?v=1832547600"></script>
 <!-- 所有模块加载完毕后启动框架 -->
   <script>
     window.addEventListener('DOMContentLoaded', () => window.initFramework && window.initFramework(), { once: true });
@@ -1394,7 +1394,8 @@ async function startCollection(options){
       return _fetchWithRetry(p,k,job.pl,job.kw,2,task).then(function(data){
         if(!_collectionCurrent(task)) return;
         var list=data.list||[];
-        list.forEach(function(w){ var nw=normalizeWork(w,job.pl); nw._keyword=job.kw; allWorks.push(nw); });
+        list.forEach(function(w){ var nw=normalizeWork(w,job.pl); nw.sourceKeyword=job.kw; nw.sourceKeywords=[job.kw]; nw.keywordAttributionStatus='attributed'; nw._keyword=job.kw; allWorks.push(nw); });
+        if(new URLSearchParams(window.location.search).get('debug')==='1'&&window.console){console.info('[RADAR_QUERY]',{requestId:task.requestId,platform:job.pl,keyword:job.kw,resultCount:list.length,first3:list.slice(0,3).map(function(item,index){return normalizeWork(item,job.pl).workId||('row:'+index);})});}
         hotwords.push({keyword:job.kw,platform:job.pl,total:data.total||list.length,works:list.length,avg_like:list.length?Math.round(list.reduce(function(a,w){return a+(w.likeCount||w.workLikedCount||0);},0)/list.length):0});
         task.success++;
       },function(e){
@@ -1420,6 +1421,9 @@ async function startCollection(options){
 
   if(allWorks.length===0){ s.innerHTML='<span style="color:#f87171;">没有采到作品，请检查 Key / 中转地址 / 行业名是否正确</span>'; return; }
 
+  var mergedWorks={},mergedOrder=[];
+  allWorks.forEach(function(work,index){var id=String(work.workId||work.sourceId||work.noteId||[work.platform,work.workUrl,work.title,work.accountName,work.publishTime].filter(Boolean).join('|')||('row:'+index));if(!mergedWorks[id]){mergedWorks[id]=work;mergedOrder.push(id);return;}var existing=mergedWorks[id];(work.sourceKeywords||[]).forEach(function(keyword){if(existing.sourceKeywords.indexOf(keyword)<0)existing.sourceKeywords.push(keyword);});});
+  allWorks=mergedOrder.map(function(id){return mergedWorks[id];});
   var dashboard=buildDashboardData(allWorks,hotwords,i);
   var newIndustry=IndustryStore.resolve(industryId);
   var previousHistory=industryId.indexOf('ind_')===0&&window.DynamicIndustryService ? DynamicIndustryService.history(industryId) : [];

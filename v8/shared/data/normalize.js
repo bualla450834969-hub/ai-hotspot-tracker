@@ -26,6 +26,11 @@ window.normalizeData = function() {
       var shares = w.shares || w.shareCount || 0;
       var author = w.author || w.accountName || '';
       var url = w.url || w.workUrl || '';
+      var sourceKeywords = Array.isArray(w.sourceKeywords) ? w.sourceKeywords.slice() : [];
+      [w.sourceKeyword, w._collectedKeyword, w.queryKeyword, w._keyword, w.keyword].forEach(function(value) {
+        value = String(value || '').trim();
+        if (value && sourceKeywords.indexOf(value) < 0) sourceKeywords.push(value);
+      });
       return {
         workId: w.workId || w.sourceId || w.work_id || '',
         sourceId: w.sourceId || w.workId || w.work_id || '',
@@ -46,7 +51,9 @@ window.normalizeData = function() {
         followerCount: w.followerCount || w.followers || 0,
         duration: w.duration || 0,
         publishTime: normalizePublishTime(w.publishTime || w.published_at || w.releaseTime || ''),
-        _keyword: w._keyword || '',
+        sourceKeywords: sourceKeywords,
+        keywordAttributionStatus: sourceKeywords.length ? 'attributed' : 'unknown',
+        _keyword: sourceKeywords[0] || '',
         url: url,
         workUrl: url,
         cover: w.cover || w.coverUrl || ''

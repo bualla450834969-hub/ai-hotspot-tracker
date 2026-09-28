@@ -9,7 +9,8 @@
     "test:v82:runtime": "node tests/v82-runtime.test.js",
     "test:v82:industry": "node tests/v82-industry-creation.test.js",
     "test:v83": "node tests/v83-content.test.js && node tests/v83-ai-proxy.test.js",
-    "test:v831": "node tests/v831-ui-radar.test.js && node tests/v831-github-radar.test.js && node tests/v831-comment-insights.test.js"
+    "test:v831": "node tests/v831-ui-radar.test.js && node tests/v831-github-radar.test.js && node tests/v831-comment-insights.test.js",
+    "test:v832": "node tests/v832-social-radar.test.js"
   },
   "engines": {
     "node": ">=12"
