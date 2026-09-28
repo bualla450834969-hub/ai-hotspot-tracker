@@ -26,7 +26,8 @@ const FILES = [
   'core/globals.js',
   'core/state.js',
   'core/evidence.js',         // V8.2 Evidence / Insight / Provenance / DataQuality
-  'core/contentAI.js',        // V8.3 安全代理 AI 适配器（浏览器不保存 Provider Key）
+  'core/textAIProvider.js',   // V8.4 用户级文字模型 BYOK 配置与 OpenAI-Compatible 适配器
+  'core/contentAI.js',        // V8.3/V8.4 内容 AI 业务适配器
   'core/radar.js',            // V8.3.1 行业雷达配置、快照与数据适配
   'core/renderer.js',
   'core/framework.js',       // Module.register 框架 + renderAll 调度
@@ -34,6 +35,7 @@ const FILES = [
   'effects/login.js',
   'modules/_helpers.js',
   'modules/industryCreation.js', // V8.2动态行业创建/关键词确认/行业管理
+  'modules/textAISettings.js',   // V8.4 设置页文字模型 API
   'modules/hero.js',
   'modules/evidenceInsights.js', // V8.2可信洞察管线（复用一次性证据索引）
   'modules/evidenceDrawer.js',   // V8.2最小证据抽屉

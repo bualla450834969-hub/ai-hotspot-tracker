@@ -1243,6 +1243,100 @@ window.domainGuard = function(moduleId, renderFn) {
   };
   window.V82Evidence = api;
 })();
+/* ===== core/textAIProvider.js ===== */
+(function() {
+  'use strict';
+
+  var CONFIG_KEY='user_text_ai_config';
+  var TIMEOUT_MS=40000;
+  var PRESETS={
+    'xiaomi-mimo':{
+      id:'xiaomi-mimo',name:'Xiaomi MiMo',type:'openai-compatible',mode:'direct',
+      baseUrl:'https://api.xiaomimimo.com/v1',modelPlaceholder:'mimo-v2.5-pro',
+      homepage:'https://platform.xiaomimimo.com/',apiKeyGuide:'在 Xiaomi MiMo 开放平台创建 API Key。',modelGuide:'填写控制台中可用的模型 ID。'
+    },
+    'openai-compatible':{
+      id:'openai-compatible',name:'OpenAI-Compatible',type:'openai-compatible',mode:'direct',
+      baseUrl:'',modelPlaceholder:'填写服务商提供的 model id',homepage:'',
+      apiKeyGuide:'在你选择的模型服务商控制台创建 API Key。',modelGuide:'适用于支持 OpenAI Chat Completions 格式的模型服务。'
+    },
+    custom:{
+      id:'custom',name:'Custom',type:'openai-compatible',mode:'direct',
+      baseUrl:'',modelPlaceholder:'填写自定义 model id',homepage:'',
+      apiKeyGuide:'在服务商控制台创建 API Key。',modelGuide:'首期仅支持 OpenAI Chat Completions 格式。'
+    }
+  };
+
+  function clone(value){return value?JSON.parse(JSON.stringify(value)):value;}
+  function clean(value){return String(value==null?'':value).trim();}
+  function configValue(value){
+    value=value||{};
+    return {
+      providerId:clean(value.providerId||value.provider||'openai-compatible'),
+      providerType:'openai-compatible',baseUrl:clean(value.baseUrl).replace(/\/+$/,''),
+      apiKey:clean(value.apiKey),model:clean(value.model),createdAt:value.createdAt||'',updatedAt:value.updatedAt||'',
+      connection:value.connection&&typeof value.connection==='object'?value.connection:{status:'untested'}
+    };
+  }
+  function getCurrentConfig(){var value=StorageAdapter.getJSON(CONFIG_KEY,null);return value?configValue(value):null;}
+  function validate(value){
+    var config=configValue(value),missing=[];
+    if(!PRESETS[config.providerId])missing.push('Provider');
+    if(!config.baseUrl)missing.push('API Base URL');
+    if(!config.apiKey)missing.push('API Key');
+    if(!config.model)missing.push('Model');
+    return {valid:missing.length===0,missing:missing,config:config};
+  }
+  function saveConfig(value){
+    var previous=getCurrentConfig(),checked=validate(value);if(!checked.valid)return checked;
+    var now=new Date().toISOString(),config=checked.config;
+    config.createdAt=previous&&previous.createdAt||now;config.updatedAt=now;
+    if(!config.connection||config.connection.signature!==signature(config))config.connection={status:'untested'};
+    StorageAdapter.setJSON(CONFIG_KEY,config);return {valid:true,config:clone(config)};
+  }
+  function clearConfig(){StorageAdapter.remove(CONFIG_KEY);return true;}
+  function maskKey(key){key=clean(key);if(!key)return '未保存';return '****'+key.slice(-4);}
+  function signature(config){config=configValue(config);return [config.providerId,config.baseUrl,config.model,config.apiKey.slice(-8)].join('|');}
+  function setConnection(result){var config=getCurrentConfig();if(!config)return null;config.connection=Object.assign({status:'untested'},result||{}, {signature:signature(config),testedAt:new Date().toISOString()});config.updatedAt=new Date().toISOString();StorageAdapter.setJSON(CONFIG_KEY,config);return clone(config);}
+
+  window.PROVIDER_PRESETS=PRESETS;
+  window.TextAIProvider={
+    configKey:CONFIG_KEY,getPresets:function(){return clone(PRESETS);},getPreset:function(id){return clone(PRESETS[id]||null);},
+    getCurrentConfig:getCurrentConfig,saveConfig:saveConfig,clearConfig:clearConfig,validate:validate,maskKey:maskKey,setConnection:setConnection,
+    isConfigured:function(){return validate(getCurrentConfig()).valid;},_test:{configValue:configValue,signature:signature}
+  };
+
+  function providerError(code,message,status){var error=new Error(message);error.code=code;if(status)error.status=status;return error;}
+  var activeControllers=[];
+  function endpoint(baseUrl){baseUrl=clean(baseUrl).replace(/\/+$/,'');return /\/chat\/completions$/i.test(baseUrl)?baseUrl:baseUrl+'/chat/completions';}
+  function safeJson(text){text=clean(text).replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');try{return JSON.parse(text);}catch(e){var start=text.indexOf('{'),end=text.lastIndexOf('}');if(start>=0&&end>start)return JSON.parse(text.slice(start,end+1));throw providerError('INVALID_RESPONSE','模型返回格式不正确。');}}
+  function normalizeVariants(value){if(value&&Array.isArray(value.variants))value.variants=value.variants.map(function(item){item=item||{};if(Array.isArray(item.tags))item.tags=item.tags.join(' ');if(item.estimatedDuration!=null)item.estimatedDuration=String(item.estimatedDuration);return item;});return value;}
+  function durationRange(duration){duration=Number(duration||60);return duration<=30?[70,110]:(duration<=60?[120,190]:[190,290]);}
+  function instructions(action,payload){
+    var common='你是短视频内容策略助手。只能根据输入中的真实字段工作，不得虚构原视频画面、逐字稿或事实。不得复刻原文、逐句同义替换或保留独特原句。只返回严格 JSON，不要 Markdown。';
+    if(action==='analyzeContent')return common+' 分析主题、结构、表达策略和内容角度。返回 topic(string), hook(string), angle(string), keyPoints(string[]), structure(string), interactionReasons(string[]), reusablePattern(string), limitations(string)。'+(payload.contentAvailable?'正文存在，可以结合正文分析。':'没有完整正文，limitations 必须包含“当前仅基于标题和互动数据分析。”');
+    var rewrite=payload.action&&payload.action!=='generate',range=durationRange(payload.duration),rules={'new-opening':'只替换开场钩子，其余核心观点保持一致。',colloquial:'改成更自然的口语表达，事实和核心观点保持一致。',professional:'改成更专业、克制的表达，事实和核心观点保持一致。',shorter:'明显压缩当前脚本，body 字数不得超过当前 body 的 70%。','different-angle':'换一个不同的原创切入角度，不复用当前开场和论述顺序。'};
+    return common+(rewrite?'只改写当前这一版，返回 {"variants":[一个版本]}。'+(rules[payload.action]||''):'生成三个真正不同的原创版本，依次为知识解释型、痛点切入型、观点表达型，返回 {"variants":[三个版本]}。')+' 每个版本包含 angle,title,coverTitle,hook,body,cta,tags,estimatedDuration，均为非空字符串。'+(payload.action==='shorter'?'':('body 去除空白后目标为 '+range[0]+'-'+range[1]+' 个中文字符。'))+' 平台 '+payload.platform+'、语气 '+payload.tone+'。';
+  }
+  function mapFailure(status){
+    if(status===401||status===403)return providerError('AUTH_FAILED','认证失败，请检查 API Key。',status);
+    if(status===404)return providerError('MODEL_NOT_FOUND','模型或接口地址不存在，请检查 Model 和 Base URL。',status);
+    if(status===429)return providerError('RATE_LIMITED','请求过于频繁或额度不足（429）。',status);
+    return providerError('PROVIDER_REQUEST_FAILED','模型服务请求失败（HTTP '+status+'）。',status);
+  }
+  function chat(config,messages,options){
+    var checked=TextAIProvider.validate(config);if(!checked.valid)return Promise.reject(providerError('PROVIDER_NOT_CONFIGURED','请先在 设置 → 文字模型 API 中配置模型服务。'));
+    config=checked.config;var controller=typeof AbortController==='function'?new AbortController():null,start=Date.now(),timer=setTimeout(function(){if(controller)controller.abort();},(options&&options.timeoutMs)||TIMEOUT_MS);if(controller)activeControllers.push(controller);
+    return fetch(endpoint(config.baseUrl),{method:'POST',signal:controller?controller.signal:undefined,headers:{'Authorization':'Bearer '+config.apiKey,'Content-Type':'application/json'},body:JSON.stringify({model:config.model,messages:messages,temperature:options&&options.temperature!=null?options.temperature:0.3,max_tokens:options&&options.maxTokens||undefined})})
+      .then(function(response){if(!response.ok)throw mapFailure(response.status);return response.json();})
+      .then(function(body){var content=body&&body.choices&&body.choices[0]&&body.choices[0].message&&body.choices[0].message.content;if(typeof content!=='string')throw providerError('INVALID_RESPONSE','模型返回内容为空。');return {content:content,latency:Date.now()-start,provider:config.providerId,model:config.model};})
+      .catch(function(error){if(error&&error.name==='AbortError')throw providerError('TIMEOUT','连接超时，请检查网络或 Base URL。');if(error&&error.code)throw error;throw providerError('NETWORK_ERROR','网络失败或 Provider 不允许浏览器直连。该 Provider 可能需要代理模式。');})
+      .finally(function(){clearTimeout(timer);if(controller){var index=activeControllers.indexOf(controller);if(index>=0)activeControllers.splice(index,1);}});
+  }
+  function invoke(action,payload){var config=TextAIProvider.getCurrentConfig();return chat(config,[{role:'system',content:instructions(action,payload)},{role:'user',content:JSON.stringify(payload)}],{temperature:0.5}).then(function(result){return {data:normalizeVariants(safeJson(result.content)),meta:result};});}
+  function testConnection(config){return chat(config,[{role:'user',content:'Reply with OK.'}],{temperature:0,maxTokens:8,timeoutMs:15000}).then(function(result){return {ok:true,provider:result.provider,model:result.model,latency:result.latency};});}
+  window.TextAIProviderAdapter={testConnection:testConnection,analyzeContent:function(config,work){return invoke('analyzeContent',work);},generateScript:function(config,options){return invoke('generateScript',options);},rewriteScript:function(config,options){options=Object.assign({},options,{action:options.action||'rewrite'});return invoke('generateScript',options);},request:invoke,abortAll:function(){activeControllers.splice(0).forEach(function(controller){try{controller.abort();}catch(e){}});},_test:{endpoint:endpoint,safeJson:safeJson,instructions:instructions,mapFailure:mapFailure}};
+})();
 /* ===== core/contentAI.js ===== */
 (function() {
   'use strict';
@@ -1257,7 +1351,7 @@ window.domainGuard = function(moduleId, renderFn) {
   function makeError(code,message){var e=new Error(message);e.code=code;return e;}
   function proxyUrl(){return String(StorageAdapter.getRaw(PROXY_KEY,DEFAULT_PROXY_URL)||DEFAULT_PROXY_URL).trim();}
   function current(version,id){return version===requestVersion&&id===industryId();}
-  function request(action,payload,id){
+  function proxyRequest(action,payload,id){
     var url=proxyUrl();if(!url)return Promise.reject(makeError('PROVIDER_NOT_CONFIGURED','尚未配置安全 AI 代理。'));
     requestVersion+=1;var version=requestVersion;if(activeController)activeController.abort();activeController=typeof AbortController==='function'?new AbortController():null;
     var timeout=setTimeout(function(){if(activeController)activeController.abort();},90000);
@@ -1267,20 +1361,26 @@ window.domainGuard = function(moduleId, renderFn) {
       .catch(function(reason){if(reason&&reason.name==='AbortError')throw makeError(current(version,id)?'PROVIDER_TIMEOUT':'STALE_RESPONSE','AI 分析暂时失败，请重试。');throw reason;})
       .finally(function(){clearTimeout(timeout);});
   }
+  function providerRequest(action,payload,id){
+    if(!window.TextAIProvider)return proxyRequest(action,payload,id);
+    if(!TextAIProvider.isConfigured())return Promise.reject(makeError('PROVIDER_NOT_CONFIGURED','请先在 设置 → 文字模型 API 中配置模型服务。'));
+    requestVersion+=1;var version=requestVersion;
+    return TextAIProviderAdapter.request(action,payload).then(function(result){if(!current(version,id))throw makeError('STALE_RESPONSE','请求已失效。');return result&&result.data!==undefined?result.data:result;});
+  }
   function text(value){return typeof value==='string'&&!!value.trim();}
   function validAnalysis(v){return v&&['topic','hook','angle','structure','reusablePattern','limitations'].every(function(k){return text(v[k]);})&&Array.isArray(v.keyPoints)&&v.keyPoints.length>0&&v.keyPoints.every(text)&&Array.isArray(v.interactionReasons)&&v.interactionReasons.length>0&&v.interactionReasons.every(text);}
   function variantsFrom(v){if(v&&Array.isArray(v.variants))return v.variants;if(v&&v.variant&&typeof v.variant==='object')return [v.variant];return v;}
   function validVariants(v,count){var a=variantsFrom(v),keys=['angle','title','coverTitle','hook','body','cta','tags','estimatedDuration'];return Array.isArray(a)&&a.length===count&&a.every(function(item){return item&&keys.every(function(k){return text(item[k]);});});}
   function translationKey(item,id){return ['github_description_zh',encodeURIComponent(id||industryId()),encodeURIComponent(String(item.id||item.name||''))].join('__');}
-  function translateDescriptions(items){var id=industryId(),list=(items||[]).slice(0,20),pending=[];list.forEach(function(item){item.descriptionOriginal=item.description||'';if(/[\u3400-\u9fff]/.test(item.description||'')){item.descriptionZh=item.description;return;}var cached=StorageAdapter.getJSON(translationKey(item,id),null);if(cached&&cached.source===item.description&&text(cached.text)){item.descriptionZh=cached.text;return;}if(text(item.description))pending.push({id:String(item.id),text:item.description});});if(!pending.length)return Promise.resolve(list);return request('translateDescriptions',{industryId:id,items:pending},id).then(function(result){var rows=result&&result.translations;if(!Array.isArray(rows))throw makeError('PROVIDER_INVALID_RESPONSE','项目简介翻译暂时失败。');var map={};rows.forEach(function(row){if(row&&text(row.id)&&text(row.text))map[String(row.id)]=row.text;});list.forEach(function(item){var translated=map[String(item.id)];if(translated){item.descriptionZh=translated;StorageAdapter.setJSON(translationKey(item,id),{source:item.description,text:translated});}});return list;});}
+  function translateDescriptions(items){var id=industryId(),list=(items||[]).slice(0,20),pending=[];list.forEach(function(item){item.descriptionOriginal=item.description||'';if(/[\u3400-\u9fff]/.test(item.description||'')){item.descriptionZh=item.description;return;}var cached=StorageAdapter.getJSON(translationKey(item,id),null);if(cached&&cached.source===item.description&&text(cached.text)){item.descriptionZh=cached.text;return;}if(text(item.description))pending.push({id:String(item.id),text:item.description});});if(!pending.length)return Promise.resolve(list);return proxyRequest('translateDescriptions',{industryId:id,items:pending},id).then(function(result){var rows=result&&result.translations;if(!Array.isArray(rows))throw makeError('PROVIDER_INVALID_RESPONSE','项目简介翻译暂时失败。');var map={};rows.forEach(function(row){if(row&&text(row.id)&&text(row.text))map[String(row.id)]=row.text;});list.forEach(function(item){var translated=map[String(item.id)];if(translated){item.descriptionZh=translated;StorageAdapter.setJSON(translationKey(item,id),{source:item.description,text:translated});}});return list;});}
   var adapter={
     analysisVersion:ANALYSIS_VERSION,promptVersion:PROMPT_VERSION,getProxyUrl:proxyUrl,
     setProxyUrl:function(url){return StorageAdapter.setRaw(PROXY_KEY,String(url||'').trim());},
     getCachedAnalysis:function(work){return StorageAdapter.getJSON(analysisKey(work),null);},
     getCachedScripts:function(options){return StorageAdapter.getJSON(scriptKey(options),null);},
-    abortAll:function(){requestVersion+=1;if(activeController)activeController.abort();activeController=null;},
-    analyzeContent:function(work){var id=industryId(),cached=StorageAdapter.getJSON(analysisKey(work,id),null);if(validAnalysis(cached))return Promise.resolve({analysis:cached,cached:true});var clean=cleanWork(work);return request('analyzeContent',{industryId:id,work:clean,analysisVersion:ANALYSIS_VERSION,contentAvailable:!!clean.content},id).then(function(result){var analysis=result.analysis||result;if(!validAnalysis(analysis))throw makeError('PROVIDER_INVALID_RESPONSE','AI 分析暂时失败，请重试。');StorageAdapter.setJSON(analysisKey(work,id),analysis);return {analysis:analysis,cached:false};});},
-    generateScript:function(options){options=options||{};var id=industryId(),action=options.action||'generate',key=scriptKey(options,id),cached=action==='generate'&&!options.userInput?StorageAdapter.getJSON(key,null):null;if(validVariants(cached,3))return Promise.resolve({variants:cached,cached:true});var payload={industryId:id,work:cleanWork(options.work),analysis:options.analysis||null,duration:Number(options.duration||60),platform:options.platform||'douyin',tone:options.tone||'natural',userInput:String(options.userInput||''),action:action,currentScript:options.currentScript||null,promptVersion:PROMPT_VERSION};return request('generateScript',payload,id).then(function(result){var count=action==='generate'?3:1;if(!validVariants(result,count))throw makeError('PROVIDER_INVALID_RESPONSE','AI 分析暂时失败，请重试。');var variants=variantsFrom(result);if(action==='generate'&&!options.userInput)StorageAdapter.setJSON(key,variants);return {variants:variants,cached:false};});},
+    abortAll:function(){requestVersion+=1;if(activeController)activeController.abort();activeController=null;if(window.TextAIProviderAdapter)TextAIProviderAdapter.abortAll();},
+    analyzeContent:function(work){var id=industryId(),cached=StorageAdapter.getJSON(analysisKey(work,id),null);if(validAnalysis(cached))return Promise.resolve({analysis:cached,cached:true});var clean=cleanWork(work);return providerRequest('analyzeContent',{industryId:id,work:clean,analysisVersion:ANALYSIS_VERSION,contentAvailable:!!clean.content},id).then(function(result){var analysis=result.analysis||result;if(!validAnalysis(analysis))throw makeError('PROVIDER_INVALID_RESPONSE','AI 分析暂时失败，请重试。');StorageAdapter.setJSON(analysisKey(work,id),analysis);return {analysis:analysis,cached:false};});},
+    generateScript:function(options){options=options||{};var id=industryId(),action=options.action||'generate',key=scriptKey(options,id),cached=action==='generate'&&!options.userInput?StorageAdapter.getJSON(key,null):null;if(validVariants(cached,3))return Promise.resolve({variants:cached,cached:true});var payload={industryId:id,work:cleanWork(options.work),analysis:options.analysis||null,duration:Number(options.duration||60),platform:options.platform||'douyin',tone:options.tone||'natural',userInput:String(options.userInput||''),action:action,currentScript:options.currentScript||null,promptVersion:PROMPT_VERSION};return providerRequest('generateScript',payload,id).then(function(result){var count=action==='generate'?3:1;if(!validVariants(result,count))throw makeError('PROVIDER_INVALID_RESPONSE','AI 分析暂时失败，请重试。');var variants=variantsFrom(result);if(action==='generate'&&!options.userInput)StorageAdapter.setJSON(key,variants);return {variants:variants,cached:false};});},
     translateDescriptions:translateDescriptions,
     _test:{cleanWork:cleanWork,workIdentity:workIdentity,analysisKey:analysisKey,scriptKey:scriptKey,translationKey:translationKey,validAnalysis:validAnalysis,validVariants:validVariants}
   };
@@ -2723,6 +2823,43 @@ if (document.readyState === 'loading') {
   EventManager.on(document, 'click', handleClick, false, 'industry-flow');
   renderManager();
 })();
+/* ===== modules/textAISettings.js ===== */
+(function(){
+  'use strict';
+  var lastConnection=null;
+  function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function field(id){var element=document.getElementById(id);return element?String(element.value||'').trim():'';}
+  function currentForm(){var saved=TextAIProvider.getCurrentConfig();return {providerId:field('textAIProvider'),providerType:'openai-compatible',baseUrl:field('textAIBaseUrl'),apiKey:field('textAIKey')||(saved&&saved.apiKey)||'',model:field('textAIModel')};}
+  function statusHtml(config){
+    if(!config)return '<div class="text-ai-status is-empty"><strong>尚未配置文字模型</strong><span>配置后即可使用 AI 内容拆解、口播生成和快捷改写。</span></div>';
+    var connection=config.connection||{status:'untested'},label=connection.status==='success'?'测试成功':(connection.status==='failed'?'测试失败':'未测试'),tone=connection.status==='success'?'is-success':(connection.status==='failed'?'is-error':'is-pending');
+    return '<div class="text-ai-status '+tone+'"><strong>'+esc((PROVIDER_PRESETS[config.providerId]||{}).name||config.providerId)+' · '+esc(config.model)+'</strong><span>连接状态：'+label+' · Key：'+esc(TextAIProvider.maskKey(config.apiKey))+'</span></div>';
+  }
+  function render(){
+    var host=document.getElementById('textAISettings');if(!host||!window.TextAIProvider)return;
+    var config=TextAIProvider.getCurrentConfig(),provider=config&&config.providerId||'xiaomi-mimo',preset=PROVIDER_PRESETS[provider]||PROVIDER_PRESETS['openai-compatible'];
+    host.innerHTML='<div class="text-ai-heading"><div><h3>文字模型 API</h3><p>使用自己的 API，配置对所有行业生效。</p></div><span class="text-ai-mode">浏览器直连</span></div>'+statusHtml(config)+
+      '<div class="text-ai-form">'+
+      '<label>Provider<select id="textAIProvider" class="industry-flow-input"><option value="xiaomi-mimo">Xiaomi MiMo</option><option value="openai-compatible">OpenAI-Compatible</option><option value="custom">Custom</option></select></label>'+
+      '<label>API Base URL<input id="textAIBaseUrl" class="industry-flow-input" type="url" autocomplete="off" value="'+esc(config&&config.baseUrl||preset.baseUrl||'')+'" placeholder="https://provider.example/v1"></label>'+
+      '<label>API Key<div class="text-ai-key-row"><input id="textAIKey" class="industry-flow-input" type="password" autocomplete="new-password" placeholder="'+esc(config?TextAIProvider.maskKey(config.apiKey):'输入 API Key')+'"><button type="button" data-text-ai-action="toggle-key" aria-label="显示 API Key" title="显示或隐藏 API Key">显示</button></div></label>'+
+      '<label>Model<input id="textAIModel" class="industry-flow-input" type="text" autocomplete="off" value="'+esc(config&&config.model||'')+'" placeholder="'+esc(preset.modelPlaceholder||'model id')+'"></label>'+
+      '<p class="text-ai-provider-note" id="textAIProviderNote">'+esc(preset.modelGuide||'')+'</p><div class="text-ai-result" id="textAIResult" aria-live="polite"></div>'+
+      '<div class="text-ai-actions"><button type="button" data-text-ai-action="test">测试连接</button><button type="button" class="v82-primary" data-text-ai-action="save">保存配置</button><button type="button" class="is-danger" data-text-ai-action="clear">清除 API 配置</button></div></div>'+
+      '<p class="text-ai-security">API Key 仅保存在当前浏览器，用于调用你选择的模型服务。请勿在公共电脑保存长期有效的 API Key。</p>'+
+      '<details class="text-ai-guide"><summary>如何获取 API Key？</summary><ol><li>选择一个文字模型 Provider</li><li>前往 Provider 官网注册</li><li>创建 API Key</li><li>复制 API Key</li><li>返回本页面</li><li>填入 API Key 和 Model</li><li>点击测试连接</li></ol><p id="textAIGuideText">'+esc(preset.apiKeyGuide||'')+'</p></details>';
+    document.getElementById('textAIProvider').value=provider;
+  }
+  function updatePreset(){var id=field('textAIProvider'),preset=PROVIDER_PRESETS[id]||PROVIDER_PRESETS.custom,base=document.getElementById('textAIBaseUrl'),model=document.getElementById('textAIModel');if(base)base.value=preset.baseUrl||'';if(model){model.value='';model.placeholder=preset.modelPlaceholder||'model id';}var note=document.getElementById('textAIProviderNote'),guide=document.getElementById('textAIGuideText');if(note)note.textContent=preset.modelGuide||'';if(guide)guide.textContent=preset.apiKeyGuide||'';lastConnection=null;}
+  function result(message,type){var host=document.getElementById('textAIResult');if(host){host.className='text-ai-result '+(type||'');host.textContent=message;}}
+  function test(){var config=currentForm(),checked=TextAIProvider.validate(config);if(!checked.valid){result('请填写：'+checked.missing.join('、'),'is-error');return;}result('正在测试最小连接请求…','is-pending');TextAIProviderAdapter.testConnection(config).then(function(value){lastConnection={status:'success',provider:value.provider,model:value.model,latency:value.latency};result('连接成功 · Provider：'+value.provider+' · Model：'+value.model+' · Latency：'+value.latency+'ms','is-success');}).catch(function(error){lastConnection={status:'failed',code:error&&error.code||'UNKNOWN'};result(error&&error.message||'连接失败。','is-error');});}
+  function save(){var saved=TextAIProvider.saveConfig(currentForm());if(!saved.valid){result('请填写：'+saved.missing.join('、'),'is-error');return;}if(lastConnection)TextAIProvider.setConnection(lastConnection);render();result('配置已保存，仅存于当前浏览器。','is-success');}
+  function clear(){TextAIProvider.clearConfig();lastConnection=null;render();result('文字模型配置已清除。','is-success');}
+  document.addEventListener('click',function(event){var button=event.target.closest&&event.target.closest('[data-text-ai-action]');if(!button)return;var action=button.getAttribute('data-text-ai-action');if(action==='toggle-key'){var input=document.getElementById('textAIKey');if(input){input.type=input.type==='password'?'text':'password';button.textContent=input.type==='password'?'显示':'隐藏';button.setAttribute('aria-label',button.textContent+' API Key');}}else if(action==='test')test();else if(action==='save')save();else if(action==='clear')clear();});
+  document.addEventListener('change',function(event){if(event.target&&event.target.id==='textAIProvider')updatePreset();});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);else render();
+  window.TextAISettings={render:render};
+})();
 /* ===== modules/hero.js ===== */
 /**
  * modules/hero.js
@@ -3500,8 +3637,8 @@ if (document.readyState === 'loading') {
     return '<div class="v83-analysis">'+(cached?'<span class="v83-cache">已缓存</span>':'')+rows.map(function(x){return '<div><strong>'+x[0]+'</strong><p>'+esc(x[1])+'</p></div>';}).join('')+'<button type="button" class="v83-primary" data-v83-action="script-settings">生成原创口播</button></div>';
   }
   function providerState(error) {
-    var message=error&&error.code==='PROVIDER_NOT_CONFIGURED'?'尚未配置安全 AI 代理。':'AI 分析暂时失败，请重试。';
-    return '<div class="v83-provider-state"><strong>'+esc(message)+'</strong><p>请填写由你控制的安全代理地址。Provider 密钥只保存在服务端，不能进入浏览器或 bundle.js。</p><label>安全代理地址<input type="url" id="v83ProxyUrl" value="'+esc(ContentAIAdapter.getProxyUrl())+'" placeholder="https://your-worker.example/api/content-ai"></label><button type="button" data-v83-action="save-proxy">保存代理地址</button></div>';
+    var message=error&&error.message?error.message:'模型连接失败，请检查文字模型配置。';
+    return '<div class="v83-provider-state"><strong>'+esc(message)+'</strong><p>请先配置你自己的文字模型服务。配置属于用户级设置，切换行业后仍然有效。</p><button type="button" data-v83-action="go-settings">前往设置</button></div>';
   }
   function analyze() {
     var host=document.getElementById('v83Analysis'); if(!host||!state.work)return;
@@ -3532,7 +3669,7 @@ if (document.readyState === 'loading') {
     var tableWork=event.target.closest&&event.target.closest('[data-v83-work-id]'); if(tableWork){var work=findWork(tableWork.getAttribute('data-v83-work-id')); if(work)renderDetail(work);return;}
     var el=event.target.closest&&event.target.closest('[data-v83-action]'); if(!el)return; var action=el.getAttribute('data-v83-action');
     if(action==='close')close(); else if(action==='detail'){var w=findWork(el.getAttribute('data-work-id'));if(w)renderDetail(w);} else if(action==='analyze')analyze(); else if(action==='script-settings')renderSettings(); else if(action==='back-detail'&&state.work)renderDetail(state.work); else if(action==='generate')generate();
-    else if(action==='save-proxy'){var input=document.getElementById('v83ProxyUrl');ContentAIAdapter.setProxyUrl(input?input.value:''); if(state.work)analyze();}
+    else if(action==='go-settings'){close();if(window.switchPage)window.switchPage('settings');}
     else if(action==='refine'){var i=Number(el.getAttribute('data-script-index'));var area=document.querySelector('textarea[data-script-index="'+i+'"]');generate({action:el.getAttribute('data-refine'),currentScript:area?area.value:state.scripts[i],targetIndex:i});}
   });
   document.addEventListener('change',function(event){if(event.target&&event.target.getAttribute('data-v83-action')==='sort'){state.sort=event.target.value;renderList(state.keyword);}});
@@ -5654,6 +5791,9 @@ if (document.readyState === 'loading') {
 
     if (pageId === 'settings' && window.DynamicIndustryFlow) {
       DynamicIndustryFlow.renderManager();
+    }
+    if (pageId === 'settings' && window.TextAISettings) {
+      TextAISettings.render();
     }
 
     // 确保登录页已隐藏（进入工作台后不再显示）

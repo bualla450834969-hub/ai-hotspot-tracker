@@ -60,8 +60,8 @@
     return '<div class="v83-analysis">'+(cached?'<span class="v83-cache">已缓存</span>':'')+rows.map(function(x){return '<div><strong>'+x[0]+'</strong><p>'+esc(x[1])+'</p></div>';}).join('')+'<button type="button" class="v83-primary" data-v83-action="script-settings">生成原创口播</button></div>';
   }
   function providerState(error) {
-    var message=error&&error.code==='PROVIDER_NOT_CONFIGURED'?'尚未配置安全 AI 代理。':'AI 分析暂时失败，请重试。';
-    return '<div class="v83-provider-state"><strong>'+esc(message)+'</strong><p>请填写由你控制的安全代理地址。Provider 密钥只保存在服务端，不能进入浏览器或 bundle.js。</p><label>安全代理地址<input type="url" id="v83ProxyUrl" value="'+esc(ContentAIAdapter.getProxyUrl())+'" placeholder="https://your-worker.example/api/content-ai"></label><button type="button" data-v83-action="save-proxy">保存代理地址</button></div>';
+    var message=error&&error.message?error.message:'模型连接失败，请检查文字模型配置。';
+    return '<div class="v83-provider-state"><strong>'+esc(message)+'</strong><p>请先配置你自己的文字模型服务。配置属于用户级设置，切换行业后仍然有效。</p><button type="button" data-v83-action="go-settings">前往设置</button></div>';
   }
   function analyze() {
     var host=document.getElementById('v83Analysis'); if(!host||!state.work)return;
@@ -92,7 +92,7 @@
     var tableWork=event.target.closest&&event.target.closest('[data-v83-work-id]'); if(tableWork){var work=findWork(tableWork.getAttribute('data-v83-work-id')); if(work)renderDetail(work);return;}
     var el=event.target.closest&&event.target.closest('[data-v83-action]'); if(!el)return; var action=el.getAttribute('data-v83-action');
     if(action==='close')close(); else if(action==='detail'){var w=findWork(el.getAttribute('data-work-id'));if(w)renderDetail(w);} else if(action==='analyze')analyze(); else if(action==='script-settings')renderSettings(); else if(action==='back-detail'&&state.work)renderDetail(state.work); else if(action==='generate')generate();
-    else if(action==='save-proxy'){var input=document.getElementById('v83ProxyUrl');ContentAIAdapter.setProxyUrl(input?input.value:''); if(state.work)analyze();}
+    else if(action==='go-settings'){close();if(window.switchPage)window.switchPage('settings');}
     else if(action==='refine'){var i=Number(el.getAttribute('data-script-index'));var area=document.querySelector('textarea[data-script-index="'+i+'"]');generate({action:el.getAttribute('data-refine'),currentScript:area?area.value:state.scripts[i],targetIndex:i});}
   });
   document.addEventListener('change',function(event){if(event.target&&event.target.getAttribute('data-v83-action')==='sort'){state.sort=event.target.value;renderList(state.keyword);}});

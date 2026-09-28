@@ -216,6 +216,9 @@
     if (pageId === 'settings' && window.DynamicIndustryFlow) {
       DynamicIndustryFlow.renderManager();
     }
+    if (pageId === 'settings' && window.TextAISettings) {
+      TextAISettings.render();
+    }
 
     // 确保登录页已隐藏（进入工作台后不再显示）
     const loginScreen = document.getElementById('loginScreen');

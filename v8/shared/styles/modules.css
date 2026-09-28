@@ -1877,6 +1877,24 @@ body.v82-research .top-nav { justify-content:space-between; }
 .v83-quick { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }.v83-quick button { padding:6px 8px; border-color:#334155; background:transparent; color:#cbd5e1; }
 @media(max-width:600px){.v83-settings{grid-template-columns:1fr}.v83-settings .v83-full,.v83-settings .v83-primary{grid-column:auto}.v83-content-drawer .v82-drawer-body{padding:14px}.v83-quick button{min-height:38px}}
 
+/* V8.4 User AI Provider Settings */
+.text-ai-settings { margin-top:22px; padding-top:20px; border-top:1px solid rgba(255,255,255,.1); }
+.text-ai-heading { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; }
+.text-ai-heading h3 { margin:0; font-size:15px; }
+.text-ai-heading p { margin:5px 0 0; color:var(--text-secondary); font-size:11px; }
+.text-ai-mode { padding:4px 7px; border:1px solid rgba(103,232,249,.25); border-radius:5px; color:#67e8f9; font-size:9px; white-space:nowrap; }
+.text-ai-status { display:grid; gap:4px; margin:14px 0; padding:11px 12px; border-left:2px solid #64748b; background:rgba(255,255,255,.035); }
+.text-ai-status strong { font-size:11px; }.text-ai-status span { color:var(--text-secondary); font-size:10px; }
+.text-ai-status.is-success { border-color:#22c55e; }.text-ai-status.is-error { border-color:#ef4444; }.text-ai-status.is-pending { border-color:#f59e0b; }
+.text-ai-form { display:grid; gap:13px; }.text-ai-form>label { display:grid; gap:6px; color:#cbd5e1; font-size:11px; }
+.text-ai-key-row { display:grid; grid-template-columns:minmax(0,1fr) 58px; gap:7px; }
+.text-ai-key-row button,.text-ai-actions button { min-height:38px; border:1px solid rgba(255,255,255,.15); border-radius:6px; background:transparent; color:var(--text); cursor:pointer; font-size:11px; }
+.text-ai-actions { display:flex; flex-wrap:wrap; gap:8px; }.text-ai-actions button { padding:8px 12px; }.text-ai-actions .v82-primary { border-color:#0891b2; background:#0891b2; color:#fff; }.text-ai-actions .is-danger { margin-left:auto; border-color:rgba(239,68,68,.35); color:#fca5a5; }
+.text-ai-provider-note,.text-ai-security,.text-ai-guide { color:var(--text-secondary); font-size:10px; line-height:1.65; }.text-ai-provider-note { margin:0; }
+.text-ai-security { margin:14px 0 0; }.text-ai-guide { margin-top:12px; }.text-ai-guide summary { cursor:pointer; color:#cbd5e1; }.text-ai-guide ol { padding-left:20px; }
+.text-ai-result { min-height:17px; font-size:11px; line-height:1.55; }.text-ai-result.is-success { color:#86efac; }.text-ai-result.is-error { color:#fca5a5; }.text-ai-result.is-pending { color:#fcd34d; }
+@media(max-width:600px){.text-ai-heading{flex-direction:column}.text-ai-actions{display:grid;grid-template-columns:1fr}.text-ai-actions .is-danger{margin-left:0}.text-ai-key-row{grid-template-columns:minmax(0,1fr) 58px}#settingsPanel{padding:18px 14px!important;max-width:100%!important}#settingsPanel>.card{padding:20px 16px!important}}
+
 /* V8.2 Dynamic Industry Creation Flow */
 .my-industry-heading { display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:12px; }
 .my-industry-heading h3 { margin:0; font-size:15px; }
