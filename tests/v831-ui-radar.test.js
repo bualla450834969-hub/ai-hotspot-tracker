@@ -11,6 +11,8 @@ assert(!app.includes('findSectionByTitle'));
 assert(!app.includes('function move(id, targetSec)'));
 assert(!app.includes('fillExtraCards'));
 assert(!app.includes('TimerManager.setTimeout(run, 1600)'));
+assert(app.includes("topics:['topicsGrid','kanbanBoard','topicTracker','crossPlatform','topicPerfContent','saturationList','commentDemands','commentKw']"));
+assert(!app.includes("breakdown:['breakdownGrid','matrixGrid','viralGenes','saturationList','commentDemands','commentKw'"));
 assert(app.includes('var completionRate=[]'));
 assert(app.includes('var commentScripts=[]'));
 assert(!normalize.includes('Math.random()'));
