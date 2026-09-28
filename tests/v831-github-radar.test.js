@@ -68,9 +68,15 @@ const ranked = api.rankWeekly([
   {...repoA, ...api.githubMetrics('ai-agent', repoA, now)}
 ]);
 assert.deepStrictEqual(Array.from(ranked, item => item.id), ['A', 'B']);
+assert(api.repoRelevance({name:'owner/agent-skills',description:'Production skills for Codex',topics:['mcp']}) > api.repoRelevance({name:'owner/java-guide',description:'Java interview guide',topics:['java']}));
 
 assert(!source.includes("created:>='"));
 assert(source.includes('pushed:>='));
 assert(!source.includes('starsGained7d:repo.stargazers_count'));
+
+const view = fs.readFileSync('v8/shared/modules/techradar.js', 'utf8');
+assert(view.includes('GitHub 精准 Skill / 项目'));
+assert(view.includes('accumulating.map(accumulatingCard)'));
+assert(view.includes("a.kind==='github'?0:1"));
 
 console.log('V8.3.1 GitHub Radar snapshot tests: PASS');

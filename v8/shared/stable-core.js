@@ -579,6 +579,12 @@
             'insights: ' + (AppStore.v82 ? AppStore.v82.insights.length : 0) + '<br>' +
             'unsupported: ' + (AppStore.v82 ? AppStore.v82.unsupportedInsights.length : 0) + '<br>' +
             'quality: ' + (AppStore.v82 ? [AppStore.v82.dataQuality.worksCount, AppStore.v82.dataQuality.commentsCount, AppStore.v82.dataQuality.keywordsCount, AppStore.v82.dataQuality.platformsCount].join('/') : '0/0/0/0') + '<br>' +
+            'totalWorks: ' + (window.RadarAttributionMetrics ? window.RadarAttributionMetrics.totalWorks : 0) + '<br>' +
+            'attributed: ' + (window.RadarAttributionMetrics ? window.RadarAttributionMetrics.attributedWorks : 0) + '<br>' +
+            'unattributed: ' + (window.RadarAttributionMetrics ? window.RadarAttributionMetrics.unattributedWorks : 0) + '<br>' +
+            'keywordCoverage: ' + (window.RadarAttributionMetrics ? (window.RadarAttributionMetrics.keywordCoverage * 100).toFixed(1) + '%' : '0.0%') + '<br>' +
+            'RADAR_ATTRIBUTION_SUSPECT: ' + (window.RadarAttributionMetrics && window.RadarAttributionMetrics.attributionSuspect ? 1 : 0) + '<br>' +
+            'RADAR_ATTRIBUTION_ERROR: ' + (window.RadarAttributionMetrics ? window.RadarAttributionMetrics.attributionErrors : 0) + '<br>' +
             'errors: ' + errorLog.length +
             (lastErrs ? '<br>' + lastErrs : '');
         }

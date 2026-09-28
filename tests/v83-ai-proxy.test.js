@@ -14,6 +14,9 @@ const makeRequest=()=>new Request('https://worker.test/api/ai',{method:'POST',he
   const denied=await context.worker.fetch(new Request('https://worker.test/api/ai',{method:'POST',headers:{Origin:'https://evil.test'},body:'{}'}),env);assert.strictEqual(denied.status,403);
   const request=makeRequest();
   const response=await context.worker.fetch(request,env);assert.strictEqual(response.status,200);assert.strictEqual((await response.json()).data.topic,'主题');assert.strictEqual(providerCalls,1);
+  context.fetch=async(url,opts)=>{const req=JSON.parse(opts.body);assert.strictEqual(req.messages[1].content.includes('English description'),true);return new Response(JSON.stringify({choices:[{message:{content:JSON.stringify({translations:[{id:'repo-1',text:'中文简介'}]})}}]}),{status:200});};
+  const translated=await context.worker.fetch(new Request('https://worker.test/api/ai',{method:'POST',headers:{Origin:'https://example.test','Content-Type':'application/json'},body:JSON.stringify({action:'translateDescriptions',payload:{items:[{id:'repo-1',text:'English description'}]}})}),env);
+  assert.strictEqual(translated.status,200);assert.strictEqual((await translated.json()).data.translations[0].text,'中文简介');
   assert.strictEqual(JSON.stringify(context.durationRange(30)),JSON.stringify([70,110]));
   assert.strictEqual(context.validVariants({variants:[{angle:'a',title:'t',coverTitle:'c',hook:'h',body:'正文',cta:'c',tags:'t',estimatedDuration:'30秒'}]},1),true);
   const normalized=context.normalizeVariants(context.parseProviderJson('```json\n{"variants":[{"angle":"a","title":"t","coverTitle":"c","hook":"h","body":"正文","cta":"c","tags":["AI","教程"],"estimatedDuration":30}]}\n```'));
@@ -21,6 +24,7 @@ const makeRequest=()=>new Request('https://worker.test/api/ai',{method:'POST',he
   assert.strictEqual(normalized.variants[0].estimatedDuration,'30');
   assert.strictEqual(context.validVariants(normalized,1),true);
   assert(context.instructions('generateScript',{action:'shorter',duration:60,platform:'xiaohongshu',tone:'natural'}).includes('70%'));
+  assert(context.instructions('translateDescriptions',{}).includes('准确、简洁'));
   const invalid=await context.worker.fetch(new Request('https://worker.test/api/ai',{method:'POST',headers:{Origin:'https://example.test','Content-Type':'application/json'},body:'{}'}),env);assert.strictEqual(invalid.status,400);
   const missing=await context.worker.fetch(makeRequest(),Object.assign({},env,{AI_API_KEY:''}));assert.strictEqual(missing.status,503);
   context.fetch=async()=>new Response('{}',{status:429});

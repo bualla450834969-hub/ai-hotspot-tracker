@@ -1,5 +1,6 @@
 var ANALYSIS_KEYS=['topic','hook','angle','keyPoints','structure','interactionReasons','reusablePattern','limitations'];
 var VARIANT_KEYS=['angle','title','coverTitle','hook','body','cta','tags','estimatedDuration'];
+function validTranslations(value){return value&&Array.isArray(value.translations)&&value.translations.length>0&&value.translations.length<=20&&value.translations.every(function(item){return item&&filled(item.id)&&filled(item.text);});}
 function respond(data,status,origin){return new Response(JSON.stringify(data),{status:status||200,headers:{'Content-Type':'application/json; charset=utf-8','Access-Control-Allow-Origin':origin,'Vary':'Origin'}});}
 function originFor(request,env){var origin=request.headers.get('Origin')||'',allowed=String(env.ALLOWED_ORIGINS||'').split(',').map(function(x){return x.trim();}).filter(Boolean);return allowed.indexOf(origin)>=0?origin:'';}
 function filled(value){return typeof value==='string'&&!!value.trim();}
@@ -21,6 +22,7 @@ function normalizeVariants(value){
   return value;
 }
 function instructions(action,payload){
+  if(action==='translateDescriptions')return '你是技术项目简介翻译助手。把输入中的英文 GitHub 项目简介准确、简洁地翻译成自然中文，保留产品名、技术名、缩写和事实，不扩写、不评价。只返回严格 JSON：{"translations":[{"id":"原始 id","text":"中文翻译"}]}。每个输入 id 必须且只能返回一次，不要 Markdown。';
   var common='你是短视频内容策略助手。只能根据输入中的真实字段工作，不得虚构原视频画面、逐字稿或事实。不得复刻原文、逐句同义替换或保留独特原句。只返回严格 JSON，不要 Markdown。';
   if(action==='analyzeContent')return common+' 分析主题、结构、表达策略和内容角度。返回 topic(string), hook(string), angle(string), keyPoints(string[]), structure(string), interactionReasons(string[]), reusablePattern(string), limitations(string)。'+(payload.contentAvailable?'正文存在，可以结合正文分析。':'没有完整正文，limitations 必须包含“当前仅基于标题和互动数据分析。”');
   var rewrite=payload.action&&payload.action!=='generate';
@@ -52,11 +54,12 @@ async function handle(request,env){
   if(request.method!=='POST')return respond({ok:false,error:'Method not allowed'},405,origin);
   if(!env.AI_API_KEY||!env.AI_MODEL)return respond({ok:false,error:'AI provider is not configured'},503,origin);
   var body;try{body=await request.json();}catch(e){return respond({ok:false,error:'Invalid JSON'},400,origin);}
-  if(!body||['analyzeContent','generateScript'].indexOf(body.action)<0||!body.payload)return respond({ok:false,error:'Invalid request'},400,origin);
+  if(!body||['analyzeContent','generateScript','translateDescriptions'].indexOf(body.action)<0||!body.payload)return respond({ok:false,error:'Invalid request'},400,origin);
+  if(body.action==='translateDescriptions'&&(!Array.isArray(body.payload.items)||!body.payload.items.length||body.payload.items.length>20))return respond({ok:false,error:'Invalid translation batch'},400,origin);
   var expected=body.action==='analyzeContent'?0:(body.payload.action==='generate'||!body.payload.action?3:1);
   for(var attempt=0;attempt<2;attempt++){
     try{
-      var result=await providerCall(env,body.action,body.payload,attempt===1),valid=body.action==='analyzeContent'?validAnalysis(result):validVariants(result,expected);
+      var result=await providerCall(env,body.action,body.payload,attempt===1),valid=body.action==='analyzeContent'?validAnalysis(result):(body.action==='translateDescriptions'?validTranslations(result):validVariants(result,expected));
       if(valid)return respond({ok:true,data:result,meta:{provider:env.AI_PROVIDER_LABEL||'configured-provider',model:env.AI_MODEL}},200,origin);
       if(attempt===1)return respond({ok:false,error:'Provider returned invalid structure'},502,origin);
     }catch(error){

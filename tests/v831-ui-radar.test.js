@@ -45,9 +45,9 @@ assert.strictEqual(github.sources.github.enabled, true);
 const socialData = {hotwords:[{keyword:'CMF', total:12, max_like:500}], works:[{workId:'cmf-1', _keyword:'CMF', likeCount:20}]};
 context.RadarAdapters.social.load(social, socialData).then(first => {
   assert.strictEqual(first.items[0].trend, '当前样本');
-  const snapshotKey = [...values.keys()].find(key => key.startsWith('radar_social_v2__'));
+  const snapshotKey = [...values.keys()].find(key => key.startsWith('radar_social_v3__'));
   const list = values.get(snapshotKey);
-  list.unshift({schemaVersion:2,timestamp:'2026-09-26T00:00:00.000Z',date:'2026-09-26',source:'social',items:[{id:'CMF',sampleWorks:1,likes:10,collects:0,comments:0,shares:0,maxLike:10,searchTotal:12}]});
+  list.unshift({schemaVersion:3,timestamp:'2026-09-26T00:00:00.000Z',date:'2026-09-26',source:'social',items:[{id:'CMF',sampleWorks:1,likes:10,collects:0,comments:0,shares:0,maxLike:10,searchTotal:12}]});
   values.set(snapshotKey, list);
   return context.RadarAdapters.social.load(social, socialData);
 }).then(second => {
