@@ -139,13 +139,13 @@ window.normalizeData = function() {
   }
   if (d.comment_semantic && Array.isArray(d.comment_semantic.themes)) {
     d.comment_semantic.themes = d.comment_semantic.themes.map(function(t) {
-      return {name: t.name || t.theme || '', count: t.count || 0, sentiment: t.sentiment || 'neutral'};
+      return {name: t.name || t.theme || '', count: t.count || 0, description: t.description || t.desc || '', sentiment: t.sentiment || 'neutral'};
     });
   }
   if (Array.isArray(d.conversion_signals)) {
     d.conversion_signals = d.conversion_signals.map(function(s) {
       var desc = s.desc || (s.count != null ? (s.count + '条相关评论') : '');
-      return {signal: s.signal || '', desc: desc, impact: s.impact || s.intent || ''};
+      return {signal: s.signal || '', desc: desc, impact: s.impact || s.intent || '', evidenceCount: s.evidenceCount != null ? s.evidenceCount : s.count, sourceType: s.sourceType || s.source || ''};
     });
   }
 

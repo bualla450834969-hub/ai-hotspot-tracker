@@ -139,13 +139,13 @@ window.normalizeData = function() {
   }
   if (d.comment_semantic && Array.isArray(d.comment_semantic.themes)) {
     d.comment_semantic.themes = d.comment_semantic.themes.map(function(t) {
-      return {name: t.name || t.theme || '', count: t.count || 0, sentiment: t.sentiment || 'neutral'};
+      return {name: t.name || t.theme || '', count: t.count || 0, description: t.description || t.desc || '', sentiment: t.sentiment || 'neutral'};
     });
   }
   if (Array.isArray(d.conversion_signals)) {
     d.conversion_signals = d.conversion_signals.map(function(s) {
       var desc = s.desc || (s.count != null ? (s.count + '条相关评论') : '');
-      return {signal: s.signal || '', desc: desc, impact: s.impact || s.intent || ''};
+      return {signal: s.signal || '', desc: desc, impact: s.impact || s.intent || '', evidenceCount: s.evidenceCount != null ? s.evidenceCount : s.count, sourceType: s.sourceType || s.source || ''};
     });
   }
 
@@ -3922,15 +3922,21 @@ if (document.readyState === 'loading') {
   }
 
   // renderCommentSemantic
+  function isRealCommentSource(data) {
+    var source = String(data && (data.sourceType || data.source || (data.provenance && data.provenance.sourceType)) || '').toUpperCase();
+    var count = Number(data && (data.commentTextCount != null ? data.commentTextCount : data.sampleSize) || 0);
+    return count > 0 && (source === 'REAL' || source === 'DERIVED_REAL' || source === 'COMMENT_TEXT_DERIVED');
+  }
+
   function renderCommentSemantic() {
     var el = document.getElementById('commentSemanticContent');
     if (!el) return;
     var data = DATA.comment_semantic || {};
-    var themes = data.themes || [];
-    if (!themes.length) { el.innerHTML = '<div class="empty-state">当前缺少评论正文，暂无法进行评论语义分析。</div>'; return; }
-    var html = '<div class="cs-grid">';
+    var themes = isRealCommentSource(data) ? (data.themes || []) : [];
+    if (!themes.length) { el.innerHTML = '<div class="insight-empty"><strong>当前缺少评论正文</strong><span>暂无法可靠提取用户痛点、提问与讨论主题。</span></div>'; return; }
+    var html = '<div class="insight-rows">';
     themes.forEach(function(t) {
-      html += '<div class="cs-item"><span class="cs-name">' + t.name + '</span><span class="cs-count">' + t.count + '</span></div>';
+      html += '<div class="insight-row"><div class="insight-row-copy"><span class="insight-row-name">' + t.name + '</span>' + (t.description ? '<span class="insight-row-desc">' + t.description + '</span>' : '') + '</div><span class="insight-count">' + Number(t.count || 0).toLocaleString() + '</span></div>';
     });
     html += '</div>';
     el.innerHTML = html;
@@ -3940,11 +3946,15 @@ if (document.readyState === 'loading') {
   function renderConversionSignals() {
     var el = document.getElementById('conversionSignalList');
     if (!el) return;
-    var signals = DATA.conversion_signals || [];
-    if (!signals.length) { el.innerHTML = '<div class="empty-state">当前缺少评论正文，暂无法识别购买意向。</div>'; return; }
-    var html = '<div class="cs-list">';
+    var meta = DATA.conversion_signal_meta || {};
+    var signals = (DATA.conversion_signals || []).filter(function(s) { return isRealCommentSource({sourceType:s.sourceType || meta.sourceType, commentTextCount:s.commentTextCount != null ? s.commentTextCount : meta.commentTextCount, sampleSize:s.sampleSize != null ? s.sampleSize : meta.sampleSize}); });
+    if (!signals.length) { el.innerHTML = '<div class="insight-empty"><strong>当前缺少评论正文</strong><span>暂无法识别购买、咨询与推荐意向。</span></div>'; return; }
+    var html = '<div class="insight-rows">';
     signals.forEach(function(s) {
-      html += '<div class="cs-item"><div class="cs-signal">' + s.signal + '</div><div class="cs-desc">' + s.desc + '</div><span class="cs-impact impact-' + (s.impact||'中') + '">' + (s.impact||'中') + '影响</span></div>';
+      var impact = s.impact || '低';
+      var cls = impact === '高' ? 'high' : impact === '中' ? 'medium' : 'low';
+      var count = s.evidenceCount != null ? s.evidenceCount : s.count;
+      html += '<div class="insight-row"><div class="insight-row-copy"><span class="insight-row-name">' + s.signal + '</span>' + (s.desc ? '<span class="insight-row-desc">' + s.desc + '</span>' : '') + '</div><div class="insight-row-meta">' + (count != null ? '<span class="insight-count">' + Number(count).toLocaleString() + '</span>' : '') + '<span class="tag ' + cls + '">' + impact + '影响</span></div></div>';
     });
     html += '</div>';
     el.innerHTML = html;
