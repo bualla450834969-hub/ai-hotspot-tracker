@@ -677,13 +677,13 @@ window.safeCall = function(fn, ctx) {
   </div>
 
   <!-- 评论语义挖掘 -->
-  <div id="commentSemantic" class="section">
+  <div id="commentSemantic" class="section insight-card comment-semantic-card">
     <h2 class="section-title">💬 评论语义挖掘 <span class="section-sub">用户痛点/提问/购买意向</span></h2>
     <div id="commentSemanticContent"></div>
   </div>
 
   <!-- 转化信号 -->
-  <div id="conversionSignals" class="section">
+  <div id="conversionSignals" class="section insight-card conversion-signals-card">
     <h2 class="section-title">💰 转化信号识别 <span class="section-sub">评论中含购买意向的作品</span></h2>
     <div id="conversionSignalList"></div>
   </div>
@@ -811,7 +811,6 @@ window.safeCall = function(fn, ctx) {
           StorageAdapter.saveIndustryData(CTX, _fresh);
           if (window.AppLifecycle) { AppLifecycle.prepare(_fresh); AppLifecycle.render(); }
           else { if (window.normalizeData) window.normalizeData(); if (window.renderAll) window.renderAll(); }
-          if (window.fillExtraCards) window.fillExtraCards();
           console.log('[REAGG] done works='+_fresh.works.length+' cr='+(_fresh.completion_rate?'yes':'no')+' crossLen='+_fresh.cross_platform.length);
         } catch(e) { console.warn('[REAGG] FAIL:', e); }
       }
@@ -980,13 +979,9 @@ window.safeCall = function(fn, ctx) {
       if (window.renderBlueOcean) renderBlueOcean();
       if (window.renderCrossPlatform) renderCrossPlatform();
       if (window.renderTitleGenes) renderTitleGenes();
-      if (window.renderCommentSemantic) renderCommentSemantic();
-      if (window.renderConversionSignals) renderConversionSignals();
-      if (window.renderCompletionRate) renderCompletionRate();
       if (window.renderGrowthRanking) renderGrowthRanking();
       if (window.renderFormatROI) renderFormatROI();
       if (window.renderCompetitorStrategy) renderCompetitorStrategy();
-      if (window.renderBestPostingCombo) renderBestPostingCombo();
       if (window.renderPostingReminder) renderPostingReminder();
       if (window.renderAnomalyDetection) renderAnomalyDetection();
       if (window.renderOwnPerformance) renderOwnPerformance();
@@ -1009,42 +1004,6 @@ window.safeCall = function(fn, ctx) {
 
 
 
-
-  <script>
-  function fillExtraCards() {
-    var D = window.DASHBOARD_DATA || {};
-    var cs = document.getElementById('commentScriptsContent');
-    if (cs) {
-      cs.innerHTML = (D.comment_scripts || []).map(function(s) {
-        return '<div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.03);margin-bottom:8px;"><div style="font-weight:600;color:#a78bfa;font-size:13px;margin-bottom:4px;">' + s.type + '</div><div style="font-size:13px;color:#cbd5e1;line-height:1.5;">' + s.text + '</div></div>';
-      }).join('');
-    }
-    var tg = document.getElementById('titleGeneList');
-    if (tg) {
-      tg.innerHTML = (D.title_genes || []).map(function(g) {
-        return '<div style="padding:12px;border-radius:8px;background:rgba(255,255,255,0.03);margin-bottom:8px;"><div style="font-weight:600;color:#a78bfa;font-size:13px;">' + g.gene + '</div><div style="font-size:12px;color:#94a3b8;margin-top:4px;">出现' + g.count + '次</div></div>';
-      }).join('');
-    }
-    var cr = document.getElementById('completionRateChart');
-    if (cr) {
-      cr.innerHTML = (D.completion_rate || []).map(function(r) {
-        return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;"><div style="width:70px;font-size:12px;color:#94a3b8;">' + r.duration + '</div><div style="flex:1;height:20px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;"><div style="width:' + r.rate + '%;height:100%;background:linear-gradient(90deg,#8b5cf6,#6366f1);border-radius:4px;"></div></div><div style="width:36px;text-align:right;font-size:12px;color:#a78bfa;">' + r.rate + '%</div><div style="width:52px;font-size:11px;color:#67e8f9;">' + (r.count!=null?r.count+'条':'') + '</div></div>';
-      }).join('') + '<div style="font-size:11px;color:var(--text-secondary);margin-top:4px;">基于' + (D.completion_rate||[]).reduce(function(s,r){return s+(r.count||0);},0) + '条抖音作品真实时长分布，完播率为平台经验衰减估算</div>';
-    }
-    var bp = document.getElementById('bestPostingComboContent');
-    if (bp) {
-      var combo = D.best_posting_combo || {};
-      bp.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">' +
-        '<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);"><div style="font-size:11px;color:#94a3b8;">最佳时段</div><div style="font-weight:600;color:#a78bfa;margin-top:2px;">' + (combo.time||'-') + '</div></div>' +
-        '<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);"><div style="font-size:11px;color:#94a3b8;">平台</div><div style="font-weight:600;color:#a78bfa;margin-top:2px;">' + (combo.platform||'-') + '</div></div>' +
-        '<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);"><div style="font-size:11px;color:#94a3b8;">时长</div><div style="font-weight:600;color:#a78bfa;margin-top:2px;">' + (combo.duration||'-') + '</div></div>' +
-        '<div style="padding:10px;border-radius:8px;background:rgba(255,255,255,0.03);"><div style="font-size:11px;color:#94a3b8;">评分</div><div style="font-weight:600;color:#34d399;margin-top:2px;">' + (combo.score||'-') + '</div></div>' +
-        '</div>';
-    }
-  }
-  window.fillExtraCards = fillExtraCards;
-  TimerManager.setTimeout(fillExtraCards, 1200);
-  </script>
 
 <!-- 设置面板 -->
 <section class="section" id="settingsPanel" style="display:none;padding:40px;max-width:600px;margin:0 auto;">
@@ -1269,12 +1228,9 @@ function buildDashboardData(works, hotwords, industryName){
     return {keyword:k,xhs_like:o.xhs,dy_like:o.dy,gap:(o.xhs>3000&&o.xhs>o.dy*2)};
   }).filter(function(x){return x.gap;}).sort(function(a,b){return b.xhs_like-a.xhs_like;}).slice(0,5);
 
-  // 完播率：基于抖音真实时长分布 + 平台经验衰减模型
-  var bands=[['0-15秒',0,15,65],['15-30秒',15,30,55],['30-60秒',30,60,45],['1-3分钟',60,180,30],['3分钟+',180,999999,18]];
+  // 完播率只能使用真实字段；当前 RedFox 作品数据不提供该指标。
   var dyWorks=works.filter(function(w){return w.platform==='douyin';});
-  var completionRate=bands.map(function(b){
-    return {duration:b[0],rate:b[3],count:dyWorks.filter(function(w){return w.duration>=b[1]&&w.duration<b[2];}).length};
-  });
+  var completionRate=[];
 
   // ===== 人群画像 / 评论语义 / 转化信号：基于真实作品分类与互动计数建模 =====
   function _catOf(t){
@@ -1298,36 +1254,20 @@ function buildDashboardData(works, hotwords, industryName){
   }).filter(function(p,i){return pcnt[i]>0;});
   if(!audiencePersonas.length)audiencePersonas=[{name:industryName+'关注者',category:'泛人群',proportion:100,age:'各年龄段',gender:'不限',traits:['关注'+industryName],needs:['优质内容'],content_pref:'教程与作品',active_time:'晚间',monetization:'内容带货',pain_points:['信息分散']}];
 
-  var totalComments=works.reduce(function(a,w){return a+(w.commentCount||w.comments||0);},0);
-  var totalCollects=works.reduce(function(a,w){return a+(w.collectCount||w.collects||0);},0);
-  var themeNames=['求教程/入门','问效果/成品','求技巧/避坑','交流/经营'];
-  var commentSemantic={themes:pcnt.map(function(c,i){
-    return {name:industryName+themeNames[i],count:Math.round(totalComments*safeDivide(c,n))};
-  }).filter(function(t,i){return pcnt[i]>0;})};
-  if(!commentSemantic.themes.length)commentSemantic.themes=[{name:industryName+'综合讨论',count:totalComments}];
-
-  var conversionSignals=[
-    {signal:'求教程/方法',desc:'约'+Math.round(totalComments*safeDivide(pcnt[0],n))+'条相关评论',impact:(safeDivide(pcnt[0],n)>0.2)?'高':'中'},
-    {signal:'求资料/链接',desc:'累计收藏 '+(totalCollects||0).toLocaleString()+'，资料需求强',impact:(totalCollects>totalLike*0.3)?'高':'中'},
-    {signal:'问效果/推荐',desc:'约'+Math.round(totalComments*safeDivide(pcnt[1],n))+'条效果咨询',impact:(safeDivide(pcnt[1],n)>0.2)?'高':'中'}
-  ];
-
-  // 私域引流话术（行业名动态，全行业通用）
-  var commentScripts=[
-    {type:'新手提问',text:'刚入门'+industryName+'，有没有避坑清单可以发我？'},
-    {type:'求推荐',text:'求推荐靠谱的'+industryName+'入门工具/课程，谢谢！'},
-    {type:'购买意向',text:'这个'+industryName+'作品用的什么材料/设备？求链接'},
-    {type:'互动引流',text:'我整理了一份'+industryName+'新手资料包，需要的扣1'}
-  ];
+  // 评论语义、转化和话术必须来自评论正文，不能用互动计数或模板伪造。
+  var commentSemantic={themes:[]};
+  var conversionSignals=[];
+  var commentScripts=[];
   // 最佳发布组合（基于真实发布时间分布与作品时长）
   var _bestPt=publishTimeDist.slice().sort(function(a,b){return (b.count||0)-(a.count||0);})[0]||{};
   var _hasLong=dyWorks.some(function(w){return w.duration>60;});
-  var bestPostingCombo={
-    time:(_bestPt.hour!=null?_bestPt.hour+':00':'18:00'),
-    platform:works.some(function(w){return w.platform==='douyin';})?'抖音':'小红书',
-    duration:_hasLong?'1-3分钟':'30-60秒',
-    score:'A'
-  };
+  var _timed=works.filter(function(w){return !!w.publishTime;});
+  var _durationWorks=works.filter(function(w){return Number(w.duration)>0;});
+  var bestPostingCombo=(_timed.length>=5&&_durationWorks.length>=5)?{
+    time:_bestPt.hour+':00',
+    platform:works.filter(function(w){return w.platform==='douyin';}).length>=works.length/2?'抖音':'小红书',
+    duration:_hasLong?'1-3分钟':'30-60秒'
+  }:null;
 
   return {
     last_update: new Date().toLocaleString('zh-CN'),
@@ -1706,66 +1646,14 @@ loadCollectTrend();
   'use strict';
   if (window.__domNormalized) return;
 
-  function disposeChartsIn(el){
-    if(!el || !window.echarts) return;
-    el.querySelectorAll('[_echarts_instance_],canvas').forEach(function(c){
-      var host = c.closest('[_echarts_instance_]') || c;
-      var inst = echarts.getInstanceByDom ? echarts.getInstanceByDom(host) : null;
-      if(inst){ try{ inst.dispose(); }catch(e){} }
-    });
-  }
-
-  // 找“包含某标题文字”的顶层 section
-  function findSectionByTitle(txt){
-    var arr = document.querySelectorAll('body > .section');
-    for(var i=0;i<arr.length;i++){
-      var h=arr[i].querySelector('.section-title,h2,h3');
-      if(h && h.textContent.replace(/\s+/g,'').indexOf(txt)>=0) return arr[i];
-    }
-    return null;
-  }
-
-  function move(id, targetSec){
-    var el=document.getElementById(id);
-    if(!el || !targetSec) return false;
-    var cur=el; while(cur.parentElement!==document.body) cur=cur.parentElement;
-    if(cur===targetSec) return false;
-    disposeChartsIn(el);
-    targetSec.appendChild(el);
-    el.style.display='';
-    return true;
-  }
-
   function run(){
     if(window.__domNormalized) return;
-    var changed=false;
-    var secBreakdown = findSectionByTitle('爆款结构拆解');
-    var secGenes     = findSectionByTitle('爆款基因库');
-    var secTopicSug  = findSectionByTitle('选题建议');
-    var secBench     = findSectionByTitle('对标与评论');
-    var secAudience  = findSectionByTitle('人群画像');
-
-    // 1) 爆款拆解：把 breakdownGrid/matrixGrid 移到“爆款结构拆解”
-    if(secBreakdown){
-      changed |= move('breakdownGrid', secBreakdown);
-      changed |= move('matrixGrid', secBreakdown);
-      changed |= move('saturationList', secGenes||secBreakdown);
-      changed |= move('commentDemands', secGenes||secBreakdown);
-      changed |= move('commentKw', secGenes||secBreakdown);
-      // 腾空原占位（选题网格移走）
-      var tg=document.getElementById('topicsGrid');
-      if(tg){ var tp=tg; while(tp.parentElement!==document.body)tp=tp.parentElement;
-        if(tp===secBreakdown && secTopicSug){ changed |= move('topicsGrid', secTopicSug); changed |= move('topicTracker', secTopicSug); } }
-    }
-    // 2) 人群：highCommentList 移到人群画像
-    if(secAudience) changed |= move('highCommentList', secAudience);
-
     window.__domNormalized=true;
 
     // 3) 给每个顶层 section 打 data-nav（按其包含的关键容器判定）
     var MAP={
-      breakdown:['breakdownGrid','matrixGrid','viralGenes','saturationList','commentDemands','commentKw','commentSemantic','conversionSignals'],
-      topics:['topicsGrid','kanbanBoard','topicTracker','crossPlatform','topicPerfContent'],
+      breakdown:['breakdownGrid','matrixGrid','viralGenes','commentSemantic','conversionSignals'],
+      topics:['topicsGrid','kanbanBoard','topicTracker','crossPlatform','topicPerfContent','saturationList','commentDemands','commentKw'],
       content:['titleGen','formulaGrid','scriptContainer','ptChart','titleGenes','bestPostingCombo','completionRate'],
       launch:['launchBanner','healthScore','coreKwCloud','ratioBar','launchTasks','pitfallList'],
       audience:['audienceChart','personaGrid','highCommentList'],
@@ -1793,12 +1681,6 @@ loadCollectTrend();
     // hero 归 overview
     document.querySelectorAll('body > .hero').forEach(function(h){ h.setAttribute('data-nav','overview'); });
 
-    if(changed){
-      TimerManager.setTimeout(function(){
-        if(!window.charts) return;
-        Object.values(window.charts).forEach(function(chart){ safeChartResize(chart); });
-      },100);
-    }
   }
 
   // 渲染后纠正：拦截侧边栏点击，按 data-nav 精确显隐
@@ -1824,9 +1706,7 @@ loadCollectTrend();
     }, 60);
   }, true);
 
-  // 首次执行（等首渲染）
-  TimerManager.setTimeout(run, 1600);
-  TimerManager.setTimeout(run, 3500);
+  run();
 })();
 </script>
 
@@ -1836,63 +1716,6 @@ loadCollectTrend();
 
 
 
-
-<script>
-/* ===== 真实数据卡填充v3（完播率/跨平台/标题基因，读真实字段） ===== */
-(function(){
-  'use strict';
-  function fmt(v){ v=v||0; return v>=10000?(v/10000).toFixed(1)+'万':v.toLocaleString(); }
-  function bodyText(el){ if(!el)return''; var c=el.cloneNode(true);
-    c.querySelectorAll('.section-header,.section-title,h2,h3').forEach(function(h){h.remove();});
-    return c.textContent.replace(/\s+/g,'').trim(); }
-  function isEmpty(id){ var el=document.getElementById(id); if(!el)return true;
-    var t=bodyText(el); return t.length<10||/采集中|暂无数据/.test(t); }
-  function keepHeader(el){ var h=el.querySelector('.section-header'); return h?h.outerHTML:''; }
-
-  function fill(){
-    var D=window.DASHBOARD_DATA||{};
-
-    // 完播率（真实时长分布）
-    if(isEmpty('completionRate') && (D.completion_rate||[]).length){
-      var cr=document.getElementById('completionRate');
-      var total=D.completion_rate.reduce(function(s,r){return s+(r.count||0);},0);
-      cr.innerHTML=keepHeader(cr)+'<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;padding:10px;">'+
-        D.completion_rate.map(function(r){
-          return '<div style="background:rgba(255,255,255,0.03);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:12px;color:var(--text-secondary)">'+r.duration+'</div><div style="font-size:24px;font-weight:700;color:#a78bfa;margin-top:4px">'+r.rate+'%</div><div style="font-size:10px;color:var(--text-secondary);margin-top:4px">本行业'+r.count+'条作品</div></div>';
-        }).join('')+'</div><div style="font-size:11px;color:var(--text-secondary);padding:0 12px 10px;">基于本行业 '+total+' 条抖音作品真实时长分布，结合平台完播衰减模型估算</div>';
-    }
-
-    // 跨平台迁移（真实双平台对比）
-    if(isEmpty('crossPlatform')){
-      var cp=document.getElementById('crossPlatform');
-      var data=D.cross_platform||[];
-      if(data.length){
-        cp.innerHTML=keepHeader(cp)+'<div style="padding:14px;"><div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px;">小红书已爆、抖音尚未爆发，迁移翻拍有先发红利</div><div style="display:grid;gap:8px;">'+
-          data.map(function(r){
-            return '<div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:10px;"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:600;"><span>'+r.keyword+'</span><span style="color:#34d399;">待抖音翻拍</span></div><div style="display:flex;gap:14px;font-size:11px;color:var(--text-secondary);margin-top:6px;"><span>小红书最高 '+fmt(r.xhs_like)+'</span><span>抖音最高 '+fmt(r.dy_like)+'</span></div></div>';
-          }).join('')+'</div></div>';
-      } else {
-        cp.innerHTML=keepHeader(cp)+'<div style="padding:20px;text-align:center;font-size:12px;color:var(--text-secondary);">双平台热度较均衡，暂无明显迁移红利</div>';
-      }
-    }
-
-    // 标题基因库（真实标题高频词，处理 [[词,次数]] 格式）
-    if(isEmpty('titleGenes')){
-      var tg=document.getElementById('titleGenes');
-      var raw=(D.viral_genes&&D.viral_genes.top_title_keywords)||[];
-      var kw=raw.map(function(k){ return Array.isArray(k)?k[0]:(k.keyword||k.word||(typeof k==='string'?k:null)); })
-        .filter(Boolean).slice(0,12);
-      if(!kw.length)kw=['入门','教程','推荐','怎么选','避坑','排行榜','测评','新手'];
-      tg.innerHTML=keepHeader(tg)+'<div style="display:flex;flex-wrap:wrap;gap:8px;padding:12px;">'+
-        kw.map(function(k,i){return '<span style="padding:6px 12px;border-radius:16px;background:'+(i<4?'linear-gradient(90deg,rgba(139,92,246,0.25),rgba(236,72,153,0.25))':'rgba(255,255,255,0.05)')+';font-size:13px;">'+k+'</span>';}).join('')+'</div>';
-    }
-  }
-  document.addEventListener('click', function(e){
-    if(e.target.closest&&e.target.closest('.sidebar-nav-item'))TimerManager.setTimeout(fill,900);
-  },true);
-  [2500,4500,7000].forEach(function(t){TimerManager.setTimeout(fill,t);});
-})();
-</script>
 
 </body>
 </html>

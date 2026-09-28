@@ -63,14 +63,21 @@
   }
 
   // renderCommentSemantic
+  function isRealCommentSource(data) {
+    var source = String(data && (data.sourceType || data.source || (data.provenance && data.provenance.sourceType)) || '').toUpperCase();
+    var count = Number(data && (data.commentTextCount != null ? data.commentTextCount : data.sampleSize) || 0);
+    return count > 0 && (source === 'REAL' || source === 'DERIVED_REAL' || source === 'COMMENT_TEXT_DERIVED');
+  }
+
   function renderCommentSemantic() {
     var el = document.getElementById('commentSemanticContent');
     if (!el) return;
     var data = DATA.comment_semantic || {};
-    var themes = data.themes || [];
-    var html = '<div class="cs-grid">';
+    var themes = isRealCommentSource(data) ? (data.themes || []) : [];
+    if (!themes.length) { el.innerHTML = '<div class="insight-empty"><strong>当前缺少评论正文</strong><span>暂无法可靠提取用户痛点、提问与讨论主题。</span></div>'; return; }
+    var html = '<div class="insight-rows">';
     themes.forEach(function(t) {
-      html += '<div class="cs-item"><span class="cs-name">' + t.name + '</span><span class="cs-count">' + t.count + '</span></div>';
+      html += '<div class="insight-row"><div class="insight-row-copy"><span class="insight-row-name">' + t.name + '</span>' + (t.description ? '<span class="insight-row-desc">' + t.description + '</span>' : '') + '</div><span class="insight-count">' + Number(t.count || 0).toLocaleString() + '</span></div>';
     });
     html += '</div>';
     el.innerHTML = html;
@@ -80,10 +87,15 @@
   function renderConversionSignals() {
     var el = document.getElementById('conversionSignalList');
     if (!el) return;
-    var signals = DATA.conversion_signals || [];
-    var html = '<div class="cs-list">';
+    var meta = DATA.conversion_signal_meta || {};
+    var signals = (DATA.conversion_signals || []).filter(function(s) { return isRealCommentSource({sourceType:s.sourceType || meta.sourceType, commentTextCount:s.commentTextCount != null ? s.commentTextCount : meta.commentTextCount, sampleSize:s.sampleSize != null ? s.sampleSize : meta.sampleSize}); });
+    if (!signals.length) { el.innerHTML = '<div class="insight-empty"><strong>当前缺少评论正文</strong><span>暂无法识别购买、咨询与推荐意向。</span></div>'; return; }
+    var html = '<div class="insight-rows">';
     signals.forEach(function(s) {
-      html += '<div class="cs-item"><div class="cs-signal">' + s.signal + '</div><div class="cs-desc">' + s.desc + '</div><span class="cs-impact impact-' + (s.impact||'中') + '">' + (s.impact||'中') + '影响</span></div>';
+      var impact = s.impact || '低';
+      var cls = impact === '高' ? 'high' : impact === '中' ? 'medium' : 'low';
+      var count = s.evidenceCount != null ? s.evidenceCount : s.count;
+      html += '<div class="insight-row"><div class="insight-row-copy"><span class="insight-row-name">' + s.signal + '</span>' + (s.desc ? '<span class="insight-row-desc">' + s.desc + '</span>' : '') + '</div><div class="insight-row-meta">' + (count != null ? '<span class="insight-count">' + Number(count).toLocaleString() + '</span>' : '') + '<span class="tag ' + cls + '">' + impact + '影响</span></div></div>';
     });
     html += '</div>';
     el.innerHTML = html;
@@ -159,14 +171,14 @@
       html += d.needs.map(q=>`<span class="demand-tag">${q.demand}<span class="dc">${q.count}</span></span>`).join('');
       html += '</div></div>';
     }
-    el.innerHTML = html || '<div class="empty-state">暂无评论需求数据</div>';
+    el.innerHTML = html || '<div class="empty-state">当前评论样本不足，暂无法分析需求。</div>';
   }
 
   // renderCommentKw
   function renderCommentKw(works) {
     const kws = DATA.comment_keywords || [];
     const el = document.getElementById('commentKw');
-    if (!kws.length) { el.innerHTML='<div class="empty-state">暂无评论关键词数据</div>'; return; }
+    if (!kws.length) { el.innerHTML='<div class="empty-state">当前未采集到评论文本，暂无评论关键词数据。</div>'; return; }
     el.innerHTML = kws.slice(0,20).map((k,i)=>`<span class="kw-tag ${i<5?'hot':''}" style="font-size:${Math.max(11,16-i*0.4)}px;">${k.keyword} <span style="opacity:.5;font-size:10px;">${k.count}</span></span>`).join('');
   }
 
@@ -279,13 +291,27 @@
     });
   }
 
+  function renderCompletionRate() {
+    var el=document.getElementById('completionRateChart'), list=DATA.completion_rate||[];
+    if(!el)return;
+    if(!list.length){el.innerHTML='<div class="empty-state">当前数据不包含真实完播率，暂无法分析不同时长的完播表现。</div>';return;}
+    el.innerHTML=list.map(function(r){return '<div class="sat-item"><div class="sat-name">'+r.duration+'</div><div class="sat-bar"><div class="sat-fill" style="width:'+Math.max(0,Math.min(100,r.rate))+'%"></div></div><div class="sat-val">'+r.rate+'%</div></div>';}).join('');
+  }
+
+  function renderBestPostingCombo() {
+    var el=document.getElementById('bestPostingComboContent'), combo=DATA.best_posting_combo;
+    if(!el)return;
+    if(!combo||!combo.time||!combo.platform||!combo.duration){el.innerHTML='<div class="empty-state">当前有效发布时间或时长样本不足，暂无法生成最佳发布组合。</div>';return;}
+    el.innerHTML='<div class="cs-grid"><div class="cs-item"><span class="cs-name">最佳时段</span><span class="cs-count">'+combo.time+'</span></div><div class="cs-item"><span class="cs-name">平台</span><span class="cs-count">'+combo.platform+'</span></div><div class="cs-item"><span class="cs-name">时长</span><span class="cs-count">'+combo.duration+'</span></div></div>';
+  }
+
   // 模块注册
   if (window.Module) {
     Module.register({
       id: "breakdown",
       requiredFields: ['works'],
       render: function(data) {
-        var steps = [renderBreakdowns, renderMatrix, renderFormulas, renderCommentSemantic, renderConversionSignals, function(){renderCollect(DATA.hotwords);}, function(){renderScatter(data);}, function(){renderSaturation(DATA.hotwords);}, renderCommentDemands, function(){renderCommentKw(data);}, function(){renderHook(data);}, function(){renderDuration(data);}, function(){renderPublishTime(data);}];
+        var steps = [renderBreakdowns, renderMatrix, renderFormulas, renderCommentSemantic, renderConversionSignals, renderCompletionRate, renderBestPostingCombo, function(){renderCollect(DATA.hotwords);}, function(){renderScatter(data);}, function(){renderSaturation(DATA.hotwords);}, renderCommentDemands, function(){renderCommentKw(data);}, function(){renderHook(data);}, function(){renderDuration(data);}, function(){renderPublishTime(data);}];
         steps.forEach(function(fn){ try { fn(); } catch(e) { console.error("[bd]", e.message); } });
       }
     });
@@ -301,6 +327,10 @@
   window.renderHook = renderHook;
   window.renderDuration = renderDuration;
   window.renderPublishTime = renderPublishTime;
+  window.renderCommentSemantic = renderCommentSemantic;
+  window.renderConversionSignals = renderConversionSignals;
+  window.renderCompletionRate = renderCompletionRate;
+  window.renderBestPostingCombo = renderBestPostingCombo;
 })();
 
 

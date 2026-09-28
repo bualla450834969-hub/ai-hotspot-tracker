@@ -195,50 +195,11 @@
 
   // renderCommentScripts
   function renderCommentScripts() {
-    const demands = DATA.comment_demands || [];
-    const topics = DATA.topics || [];
-
-    // 高赞回复模式
-    const replyPatterns = [
-      { type: '补充干货型', text: '补充一个：用XX工具的XX功能效果更好，亲测有效！' },
-      { type: '提问互动型', text: cfg('cta.question', '你们最想解决什么问题？评论区告诉我，下期安排！') },
-      { type: '共鸣认同型', text: '说到点子上了，我也是踩了无数坑才总结出来的' },
-      { type: '反转惊喜型', text: '其实还有个隐藏功能，90%的人不知道，看我主页' },
-      { type: '福利引导型', text: '整理了全套资料，需要的评论区扣"想要"' },
-    ];
-
-    let html = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">';
-    html += '<div>';
-    html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">高赞回复模式（直接套用）</h4>';
-    replyPatterns.forEach(p => {
-      html += '<div class="comment-tpl"><div class="ct-type">' + p.type + '</div><div class="ct-text">' + p.text + '</div></div>';
-    });
-    html += '</div>';
-
-    // 置顶评论话术（基于当前TOP选题）
-    html += '<div>';
-    html += '<h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:10px">置顶评论引导话术</h4>';
-    const topTopics = topics.slice(0, 3);
-    topTopics.forEach(t => {
-      const kw = t.keyword || '';
-      html += '<div class="pinned-comment">';
-      html += '<div class="pc-label">选题：' + t.title.substring(0, 20) + '</div>';
-      html += '<div class="ct-text">想要' + kw + '全套教程的，评论区扣"1"，我整理好了发你！<br>觉得有用的点个赞，你的支持是我更新的动力</div>';
-      html += '</div>';
-    });
-    html += '</div></div>';
-
-    // 评论区需求洞察
-    if (demands.length) {
-      html += '<div style="margin-top:16px"><h4 style="color:var(--text-secondary);font-size:13px;margin-bottom:8px">评论区高频需求（下期选题参考）</h4>';
-      html += '<div class="kw-cloud">';
-      demands.slice(0, 10).forEach(d => {
-        html += '<span>' + (d.demand || d.keyword || d) + '</span>';
-      });
-      html += '</div></div>';
-    }
-
-    document.getElementById('commentScriptsContent').innerHTML = html;
+    const el=document.getElementById('commentScriptsContent');
+    const scripts=DATA.comment_scripts||[];
+    if(!el)return;
+    if(!scripts.length){el.innerHTML='<div class="empty-state"><strong>暂无可生成话术</strong><br>需要真实评论文本后，才能根据用户需求生成针对性引流话术。<br>当前评论文本：0 条</div>';return;}
+    el.innerHTML=scripts.map(function(s){return '<div class="comment-tpl"><div class="ct-type">'+s.type+'</div><div class="ct-text">'+s.text+'</div></div>';}).join('');
   }
 
   // CHECKLIST_ITEMS - 发布前自检清单
