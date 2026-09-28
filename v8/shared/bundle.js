@@ -3928,6 +3928,13 @@ if (document.readyState === 'loading') {
     return count > 0 && (source === 'REAL' || source === 'DERIVED_REAL' || source === 'COMMENT_TEXT_DERIVED');
   }
 
+  function hasRealCommentEvidence(meta) {
+    if (isRealCommentSource(meta)) return true;
+    return Array.isArray(DATA.comments) && DATA.comments.some(function(comment) {
+      return !!String(comment && (comment.text || comment.content || comment.body || comment.comment) || '').trim();
+    });
+  }
+
   function renderCommentSemantic() {
     var el = document.getElementById('commentSemanticContent');
     if (!el) return;
@@ -4014,6 +4021,8 @@ if (document.readyState === 'loading') {
   function renderCommentDemands() {
     const d = DATA.comment_demands || {};
     const el = document.getElementById('commentDemands');
+    const meta = DATA.comment_demands_meta || d;
+    if (!hasRealCommentEvidence(meta)) { el.innerHTML = '<div class="empty-state">当前评论样本不足，暂无法分析需求。</div>'; return; }
     let html = '';
     if (d.questions && d.questions.length) {
       html += '<div class="demand-section"><div class="demand-label q">用户在问</div><div class="demand-tags">';
@@ -4037,7 +4046,8 @@ if (document.readyState === 'loading') {
   function renderCommentKw(works) {
     const kws = DATA.comment_keywords || [];
     const el = document.getElementById('commentKw');
-    if (!kws.length) { el.innerHTML='<div class="empty-state">当前未采集到评论文本，暂无评论关键词数据。</div>'; return; }
+    const meta = DATA.comment_keywords_meta || {};
+    if (!hasRealCommentEvidence(meta) || !kws.length) { el.innerHTML='<div class="empty-state">当前未采集到评论文本，暂无评论关键词数据。</div>'; return; }
     el.innerHTML = kws.slice(0,20).map((k,i)=>`<span class="kw-tag ${i<5?'hot':''}" style="font-size:${Math.max(11,16-i*0.4)}px;">${k.keyword} <span style="opacity:.5;font-size:10px;">${k.count}</span></span>`).join('');
   }
 

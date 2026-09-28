@@ -5,7 +5,9 @@ const vm = require('vm');
 const source = fs.readFileSync(process.cwd() + '/v8/shared/modules/breakdown.js', 'utf8');
 const elements = {
   commentSemanticContent: {innerHTML: ''},
-  conversionSignalList: {innerHTML: ''}
+  conversionSignalList: {innerHTML: ''},
+  commentDemands: {innerHTML: ''},
+  commentKw: {innerHTML: ''}
 };
 const context = {
   window: {},
@@ -26,6 +28,22 @@ context.DATA.conversion_signals = [];
 context.renderConversionSignals();
 assert(elements.conversionSignalList.innerHTML.includes('当前缺少评论正文'));
 assert(!elements.conversionSignalList.innerHTML.includes('insight-row'));
+
+context.DATA.comments = [];
+context.DATA.comment_keywords = [{keyword: '固定关键词', count: 39}];
+context.DATA.comment_demands = {questions: [{demand: '固定需求', count: 1}]};
+context.renderCommentKw();
+context.renderCommentDemands();
+assert(elements.commentKw.innerHTML.includes('当前未采集到评论文本'));
+assert(!elements.commentKw.innerHTML.includes('固定关键词'));
+assert(elements.commentDemands.innerHTML.includes('当前评论样本不足'));
+assert(!elements.commentDemands.innerHTML.includes('固定需求'));
+
+context.DATA.comments = [{text: '请问在哪里可以买到这个工具？'}];
+context.renderCommentKw();
+context.renderCommentDemands();
+assert(elements.commentKw.innerHTML.includes('固定关键词'));
+assert(elements.commentDemands.innerHTML.includes('固定需求'));
 
 context.DATA.comment_semantic = {themes: [{name: '固定痛点', count: 63672}]};
 context.renderCommentSemantic();
