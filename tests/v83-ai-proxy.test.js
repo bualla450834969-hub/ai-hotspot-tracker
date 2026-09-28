@@ -16,6 +16,10 @@ const makeRequest=()=>new Request('https://worker.test/api/ai',{method:'POST',he
   const response=await context.worker.fetch(request,env);assert.strictEqual(response.status,200);assert.strictEqual((await response.json()).data.topic,'主题');assert.strictEqual(providerCalls,1);
   assert.strictEqual(JSON.stringify(context.durationRange(30)),JSON.stringify([70,110]));
   assert.strictEqual(context.validVariants({variants:[{angle:'a',title:'t',coverTitle:'c',hook:'h',body:'正文',cta:'c',tags:'t',estimatedDuration:'30秒'}]},1),true);
+  const normalized=context.normalizeVariants(context.parseProviderJson('```json\n{"variants":[{"angle":"a","title":"t","coverTitle":"c","hook":"h","body":"正文","cta":"c","tags":["AI","教程"],"estimatedDuration":30}]}\n```'));
+  assert.strictEqual(normalized.variants[0].tags,'AI 教程');
+  assert.strictEqual(normalized.variants[0].estimatedDuration,'30');
+  assert.strictEqual(context.validVariants(normalized,1),true);
   assert(context.instructions('generateScript',{action:'shorter',duration:60,platform:'xiaohongshu',tone:'natural'}).includes('70%'));
   const invalid=await context.worker.fetch(new Request('https://worker.test/api/ai',{method:'POST',headers:{Origin:'https://example.test','Content-Type':'application/json'},body:'{}'}),env);assert.strictEqual(invalid.status,400);
   const missing=await context.worker.fetch(makeRequest(),Object.assign({},env,{AI_API_KEY:''}));assert.strictEqual(missing.status,503);

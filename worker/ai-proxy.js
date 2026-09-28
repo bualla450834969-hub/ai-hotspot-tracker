@@ -6,6 +6,20 @@ function filled(value){return typeof value==='string'&&!!value.trim();}
 function validAnalysis(value){return value&&ANALYSIS_KEYS.every(function(key){return Array.isArray(value[key])?value[key].length>0&&value[key].every(filled):filled(value[key]);});}
 function durationRange(duration){var seconds=Number(duration||60);if(seconds<=30)return [70,110];if(seconds<=60)return [120,190];return [190,290];}
 function validVariants(value,count){return value&&Array.isArray(value.variants)&&value.variants.length===count&&value.variants.every(function(item){return VARIANT_KEYS.every(function(key){return filled(item[key]);});});}
+function parseProviderJson(content){
+  var text=String(content||'').trim().replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');
+  try{return JSON.parse(text);}catch(error){var start=text.indexOf('{'),end=text.lastIndexOf('}');if(start>=0&&end>start)return JSON.parse(text.slice(start,end+1));throw error;}
+}
+function normalizeVariants(value){
+  if(!value||!Array.isArray(value.variants))return value;
+  value.variants=value.variants.map(function(item){
+    item=item||{};
+    if(Array.isArray(item.tags))item.tags=item.tags.join(' ');
+    if(item.estimatedDuration!=null)item.estimatedDuration=String(item.estimatedDuration);
+    return item;
+  });
+  return value;
+}
 function instructions(action,payload){
   var common='你是短视频内容策略助手。只能根据输入中的真实字段工作，不得虚构原视频画面、逐字稿或事实。不得复刻原文、逐句同义替换或保留独特原句。只返回严格 JSON，不要 Markdown。';
   if(action==='analyzeContent')return common+' 分析主题、结构、表达策略和内容角度。返回 topic(string), hook(string), angle(string), keyPoints(string[]), structure(string), interactionReasons(string[]), reusablePattern(string), limitations(string)。'+(payload.contentAvailable?'正文存在，可以结合正文分析。':'没有完整正文，limitations 必须包含“当前仅基于标题和互动数据分析。”');
@@ -29,7 +43,7 @@ async function providerCall(env,action,payload,repair){
     if(!response.ok){var issue=new Error('Provider HTTP '+response.status);issue.status=response.status;throw issue;}
     var body=await response.json(),content=body&&body.choices&&body.choices[0]&&body.choices[0].message&&body.choices[0].message.content;
     if(typeof content!=='string')throw new Error('Provider response missing content');
-    return JSON.parse(content);
+    return normalizeVariants(parseProviderJson(content));
   }finally{clearTimeout(timer);}
 }
 async function handle(request,env){
