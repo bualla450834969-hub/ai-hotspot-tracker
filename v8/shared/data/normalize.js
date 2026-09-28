@@ -46,7 +46,7 @@ window.normalizeData = function() {
         followerCount: w.followerCount || w.followers || 0,
         duration: w.duration || 0,
         publishTime: normalizePublishTime(w.publishTime || w.published_at || w.releaseTime || ''),
-        _keyword: w._keyword || '',
+        _keyword: w._keyword || w.keyword || '',
         url: url,
         workUrl: url,
         cover: w.cover || w.coverUrl || ''
