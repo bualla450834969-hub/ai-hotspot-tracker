@@ -1244,98 +1244,40 @@ window.domainGuard = function(moduleId, renderFn) {
   window.V82Evidence = api;
 })();
 /* ===== core/textAIProvider.js ===== */
-(function() {
+(function(){
   'use strict';
-
-  var CONFIG_KEY='user_text_ai_config';
-  var TIMEOUT_MS=40000;
+  var STORE_KEY='user_text_ai_configs',LEGACY_KEY='user_text_ai_config',TIMEOUT_MS=40000;
   var PRESETS={
-    'xiaomi-mimo':{
-      id:'xiaomi-mimo',name:'Xiaomi MiMo',type:'openai-compatible',mode:'direct',
-      baseUrl:'https://api.xiaomimimo.com/v1',modelPlaceholder:'mimo-v2.5-pro',
-      homepage:'https://platform.xiaomimimo.com/',apiKeyGuide:'在 Xiaomi MiMo 开放平台创建 API Key。',modelGuide:'填写控制台中可用的模型 ID。'
-    },
-    'openai-compatible':{
-      id:'openai-compatible',name:'OpenAI-Compatible',type:'openai-compatible',mode:'direct',
-      baseUrl:'',modelPlaceholder:'填写服务商提供的 model id',homepage:'',
-      apiKeyGuide:'在你选择的模型服务商控制台创建 API Key。',modelGuide:'适用于支持 OpenAI Chat Completions 格式的模型服务。'
-    },
-    custom:{
-      id:'custom',name:'Custom',type:'openai-compatible',mode:'direct',
-      baseUrl:'',modelPlaceholder:'填写自定义 model id',homepage:'',
-      apiKeyGuide:'在服务商控制台创建 API Key。',modelGuide:'首期仅支持 OpenAI Chat Completions 格式。'
-    }
+    openai:{id:'openai',name:'OpenAI',baseUrl:'https://api.openai.com/v1',authType:'bearer',adapter:'openai-compatible',recommendedModels:['gpt-5.4','gpt-5.4-mini','gpt-5.4-nano'],apiKeyGuideUrl:'https://platform.openai.com/api-keys',homepage:'https://platform.openai.com/',supportsDirectBrowser:true},
+    claude:{id:'claude',name:'Claude',baseUrl:'https://api.anthropic.com/v1',authType:'x-api-key',adapter:'anthropic',recommendedModels:['claude-sonnet-4-6','claude-opus-4-6','claude-haiku-4-5'],apiKeyGuideUrl:'https://console.anthropic.com/settings/keys',homepage:'https://console.anthropic.com/',supportsDirectBrowser:true},
+    gemini:{id:'gemini',name:'Gemini',baseUrl:'https://generativelanguage.googleapis.com/v1beta',authType:'x-goog-api-key',adapter:'gemini',recommendedModels:['gemini-3.8-flash','gemini-3.5-flash','gemini-3.5-pro'],apiKeyGuideUrl:'https://aistudio.google.com/app/apikey',homepage:'https://aistudio.google.com/',supportsDirectBrowser:true},
+    deepseek:{id:'deepseek',name:'DeepSeek',baseUrl:'https://api.deepseek.com',authType:'bearer',adapter:'openai-compatible',recommendedModels:['deepseek-chat','deepseek-reasoner'],apiKeyGuideUrl:'https://platform.deepseek.com/api_keys',homepage:'https://platform.deepseek.com/',supportsDirectBrowser:true},
+    qwen:{id:'qwen',name:'通义千问',baseUrl:'https://dashscope.aliyuncs.com/compatible-mode/v1',authType:'bearer',adapter:'openai-compatible',recommendedModels:['qwen-plus','qwen-turbo','qwen-max'],apiKeyGuideUrl:'https://bailian.console.aliyun.com/',homepage:'https://bailian.console.aliyun.com/',supportsDirectBrowser:true},
+    doubao:{id:'doubao',name:'豆包',baseUrl:'https://ark.cn-beijing.volces.com/api/v3',authType:'bearer',adapter:'openai-compatible',modelLabel:'Model / Endpoint ID',recommendedModels:['doubao-seed-2-1-pro-260915','doubao-seed-2-1-lite-260915','doubao-seed-2-1-turbo-260628'],apiKeyGuideUrl:'https://console.volcengine.com/ark/region:ark+cn-beijing/apiKey',homepage:'https://console.volcengine.com/ark/',supportsDirectBrowser:true},
+    'xiaomi-mimo':{id:'xiaomi-mimo',name:'小米 MiMo',baseUrl:'https://api.xiaomimimo.com/v1',authType:'bearer',adapter:'openai-compatible',recommendedModels:['mimo-v2.5-pro'],apiKeyGuideUrl:'https://platform.xiaomimimo.com/',homepage:'https://platform.xiaomimimo.com/',supportsDirectBrowser:true},
+    'openai-compatible':{id:'openai-compatible',name:'OpenAI 兼容服务',baseUrl:'',authType:'bearer',adapter:'openai-compatible',recommendedModels:[],apiKeyGuideUrl:'',homepage:'',supportsDirectBrowser:true,showBaseUrl:true},
+    custom:{id:'custom',name:'自定义',baseUrl:'',authType:'bearer',adapter:'openai-compatible',recommendedModels:[],apiKeyGuideUrl:'',homepage:'',supportsDirectBrowser:true,showBaseUrl:true}
   };
-
-  function clone(value){return value?JSON.parse(JSON.stringify(value)):value;}
-  function clean(value){return String(value==null?'':value).trim();}
-  function configValue(value){
-    value=value||{};
-    return {
-      providerId:clean(value.providerId||value.provider||'openai-compatible'),
-      providerType:'openai-compatible',baseUrl:clean(value.baseUrl).replace(/\/+$/,''),
-      apiKey:clean(value.apiKey),model:clean(value.model),createdAt:value.createdAt||'',updatedAt:value.updatedAt||'',
-      connection:value.connection&&typeof value.connection==='object'?value.connection:{status:'untested'}
-    };
-  }
-  function getCurrentConfig(){var value=StorageAdapter.getJSON(CONFIG_KEY,null);return value?configValue(value):null;}
-  function validate(value){
-    var config=configValue(value),missing=[];
-    if(!PRESETS[config.providerId])missing.push('Provider');
-    if(!config.baseUrl)missing.push('API Base URL');
-    if(!config.apiKey)missing.push('API Key');
-    if(!config.model)missing.push('Model');
-    return {valid:missing.length===0,missing:missing,config:config};
-  }
-  function saveConfig(value){
-    var previous=getCurrentConfig(),checked=validate(value);if(!checked.valid)return checked;
-    var now=new Date().toISOString(),config=checked.config;
-    config.createdAt=previous&&previous.createdAt||now;config.updatedAt=now;
-    if(!config.connection||config.connection.signature!==signature(config))config.connection={status:'untested'};
-    StorageAdapter.setJSON(CONFIG_KEY,config);return {valid:true,config:clone(config)};
-  }
-  function clearConfig(){StorageAdapter.remove(CONFIG_KEY);return true;}
-  function maskKey(key){key=clean(key);if(!key)return '未保存';return '****'+key.slice(-4);}
-  function signature(config){config=configValue(config);return [config.providerId,config.baseUrl,config.model,config.apiKey.slice(-8)].join('|');}
-  function setConnection(result){var config=getCurrentConfig();if(!config)return null;config.connection=Object.assign({status:'untested'},result||{}, {signature:signature(config),testedAt:new Date().toISOString()});config.updatedAt=new Date().toISOString();StorageAdapter.setJSON(CONFIG_KEY,config);return clone(config);}
-
-  window.PROVIDER_PRESETS=PRESETS;
-  window.TextAIProvider={
-    configKey:CONFIG_KEY,getPresets:function(){return clone(PRESETS);},getPreset:function(id){return clone(PRESETS[id]||null);},
-    getCurrentConfig:getCurrentConfig,saveConfig:saveConfig,clearConfig:clearConfig,validate:validate,maskKey:maskKey,setConnection:setConnection,
-    isConfigured:function(){return validate(getCurrentConfig()).valid;},_test:{configValue:configValue,signature:signature}
-  };
-
-  function providerError(code,message,status){var error=new Error(message);error.code=code;if(status)error.status=status;return error;}
-  var activeControllers=[];
-  function endpoint(baseUrl){baseUrl=clean(baseUrl).replace(/\/+$/,'');return /\/chat\/completions$/i.test(baseUrl)?baseUrl:baseUrl+'/chat/completions';}
-  function safeJson(text){text=clean(text).replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');try{return JSON.parse(text);}catch(e){var start=text.indexOf('{'),end=text.lastIndexOf('}');if(start>=0&&end>start)return JSON.parse(text.slice(start,end+1));throw providerError('INVALID_RESPONSE','模型返回格式不正确。');}}
-  function normalizeVariants(value){if(value&&Array.isArray(value.variants))value.variants=value.variants.map(function(item){item=item||{};if(Array.isArray(item.tags))item.tags=item.tags.join(' ');if(item.estimatedDuration!=null)item.estimatedDuration=String(item.estimatedDuration);return item;});return value;}
-  function durationRange(duration){duration=Number(duration||60);return duration<=30?[70,110]:(duration<=60?[120,190]:[190,290]);}
-  function instructions(action,payload){
-    var common='你是短视频内容策略助手。只能根据输入中的真实字段工作，不得虚构原视频画面、逐字稿或事实。不得复刻原文、逐句同义替换或保留独特原句。只返回严格 JSON，不要 Markdown。';
-    if(action==='analyzeContent')return common+' 分析主题、结构、表达策略和内容角度。返回 topic(string), hook(string), angle(string), keyPoints(string[]), structure(string), interactionReasons(string[]), reusablePattern(string), limitations(string)。'+(payload.contentAvailable?'正文存在，可以结合正文分析。':'没有完整正文，limitations 必须包含“当前仅基于标题和互动数据分析。”');
-    var rewrite=payload.action&&payload.action!=='generate',range=durationRange(payload.duration),rules={'new-opening':'只替换开场钩子，其余核心观点保持一致。',colloquial:'改成更自然的口语表达，事实和核心观点保持一致。',professional:'改成更专业、克制的表达，事实和核心观点保持一致。',shorter:'明显压缩当前脚本，body 字数不得超过当前 body 的 70%。','different-angle':'换一个不同的原创切入角度，不复用当前开场和论述顺序。'};
-    return common+(rewrite?'只改写当前这一版，返回 {"variants":[一个版本]}。'+(rules[payload.action]||''):'生成三个真正不同的原创版本，依次为知识解释型、痛点切入型、观点表达型，返回 {"variants":[三个版本]}。')+' 每个版本包含 angle,title,coverTitle,hook,body,cta,tags,estimatedDuration，均为非空字符串。'+(payload.action==='shorter'?'':('body 去除空白后目标为 '+range[0]+'-'+range[1]+' 个中文字符。'))+' 平台 '+payload.platform+'、语气 '+payload.tone+'。';
-  }
-  function mapFailure(status){
-    if(status===401||status===403)return providerError('AUTH_FAILED','认证失败，请检查 API Key。',status);
-    if(status===404)return providerError('MODEL_NOT_FOUND','模型或接口地址不存在，请检查 Model 和 Base URL。',status);
-    if(status===429)return providerError('RATE_LIMITED','请求过于频繁或额度不足（429）。',status);
-    return providerError('PROVIDER_REQUEST_FAILED','模型服务请求失败（HTTP '+status+'）。',status);
-  }
-  function chat(config,messages,options){
-    var checked=TextAIProvider.validate(config);if(!checked.valid)return Promise.reject(providerError('PROVIDER_NOT_CONFIGURED','请先在 设置 → 文字模型 API 中配置模型服务。'));
-    config=checked.config;var controller=typeof AbortController==='function'?new AbortController():null,start=Date.now(),timer=setTimeout(function(){if(controller)controller.abort();},(options&&options.timeoutMs)||TIMEOUT_MS);if(controller)activeControllers.push(controller);
-    return fetch(endpoint(config.baseUrl),{method:'POST',signal:controller?controller.signal:undefined,headers:{'Authorization':'Bearer '+config.apiKey,'Content-Type':'application/json'},body:JSON.stringify({model:config.model,messages:messages,temperature:options&&options.temperature!=null?options.temperature:0.3,max_tokens:options&&options.maxTokens||undefined})})
-      .then(function(response){if(!response.ok)throw mapFailure(response.status);return response.json();})
-      .then(function(body){var content=body&&body.choices&&body.choices[0]&&body.choices[0].message&&body.choices[0].message.content;if(typeof content!=='string')throw providerError('INVALID_RESPONSE','模型返回内容为空。');return {content:content,latency:Date.now()-start,provider:config.providerId,model:config.model};})
-      .catch(function(error){if(error&&error.name==='AbortError')throw providerError('TIMEOUT','连接超时，请检查网络或 Base URL。');if(error&&error.code)throw error;throw providerError('NETWORK_ERROR','网络失败或 Provider 不允许浏览器直连。该 Provider 可能需要代理模式。');})
-      .finally(function(){clearTimeout(timer);if(controller){var index=activeControllers.indexOf(controller);if(index>=0)activeControllers.splice(index,1);}});
-  }
-  function invoke(action,payload){var config=TextAIProvider.getCurrentConfig();return chat(config,[{role:'system',content:instructions(action,payload)},{role:'user',content:JSON.stringify(payload)}],{temperature:0.5}).then(function(result){return {data:normalizeVariants(safeJson(result.content)),meta:result};});}
-  function testConnection(config){return chat(config,[{role:'user',content:'Reply with OK.'}],{temperature:0,maxTokens:8,timeoutMs:15000}).then(function(result){return {ok:true,provider:result.provider,model:result.model,latency:result.latency};});}
-  window.TextAIProviderAdapter={testConnection:testConnection,analyzeContent:function(config,work){return invoke('analyzeContent',work);},generateScript:function(config,options){return invoke('generateScript',options);},rewriteScript:function(config,options){options=Object.assign({},options,{action:options.action||'rewrite'});return invoke('generateScript',options);},request:invoke,abortAll:function(){activeControllers.splice(0).forEach(function(controller){try{controller.abort();}catch(e){}});},_test:{endpoint:endpoint,safeJson:safeJson,instructions:instructions,mapFailure:mapFailure}};
+  function clean(v){return String(v==null?'':v).trim();} function clone(v){return v?JSON.parse(JSON.stringify(v)):v;}
+  function emptyStore(){return {currentProviderId:'openai',providers:{}};}
+  function configValue(v,id){v=v||{};id=clean(id||v.providerId||v.provider||'openai');var p=PRESETS[id]||PRESETS.openai;return {providerId:id,providerType:p.adapter,baseUrl:clean(v.baseUrl||p.baseUrl).replace(/\/+$/,''),apiKey:clean(v.apiKey),model:clean(v.model),createdAt:v.createdAt||'',updatedAt:v.updatedAt||'',connection:v.connection&&typeof v.connection==='object'?v.connection:{status:'untested'}};}
+  function loadStore(){var s=StorageAdapter.getJSON(STORE_KEY,null);if(s&&s.providers)return s;s=emptyStore();var legacy=StorageAdapter.getJSON(LEGACY_KEY,null);if(legacy&&legacy.apiKey){var id=legacy.providerId||'xiaomi-mimo';s.currentProviderId=id;s.providers[id]=configValue(legacy,id);StorageAdapter.setJSON(STORE_KEY,s);}return s;}
+  function saveStore(s){StorageAdapter.setJSON(STORE_KEY,s);return s;} function getConfig(id){var s=loadStore();id=id||s.currentProviderId;return s.providers[id]?configValue(s.providers[id],id):null;} function getCurrentConfig(){var s=loadStore();return getConfig(s.currentProviderId);}
+  function selectProvider(id){if(!PRESETS[id])return null;var s=loadStore();s.currentProviderId=id;saveStore(s);return getConfig(id);} function validate(v){var c=configValue(v),m=[];if(!PRESETS[c.providerId])m.push('Provider');if(!c.baseUrl)m.push('API Base URL');if(!c.apiKey)m.push('API Key');if(!c.model)m.push('Model');return {valid:!m.length,missing:m,config:c};}
+  function signature(c){c=configValue(c);return [c.providerId,c.baseUrl,c.model,c.apiKey.slice(-8)].join('|');} function saveConfig(v){var x=validate(v);if(!x.valid)return x;var s=loadStore(),old=s.providers[x.config.providerId],now=new Date().toISOString(),c=x.config;c.createdAt=old&&old.createdAt||now;c.updatedAt=now;if(!c.connection||c.connection.signature!==signature(c))c.connection={status:'untested'};s.currentProviderId=c.providerId;s.providers[c.providerId]=c;saveStore(s);return {valid:true,config:clone(c)};}
+  function setConnection(r){var s=loadStore(),id=s.currentProviderId,c=s.providers[id];if(!c)return null;c=configValue(c,id);c.connection=Object.assign({status:'untested'},r||{},{signature:signature(c),testedAt:new Date().toISOString()});c.updatedAt=new Date().toISOString();s.providers[id]=c;saveStore(s);return clone(c);} function clearConfig(id){var s=loadStore();id=id||s.currentProviderId;delete s.providers[id];saveStore(s);return true;} function maskKey(k){k=clean(k);return k?'****'+k.slice(-4):'未保存';}
+  window.TEXT_PROVIDER_PRESETS=PRESETS;window.PROVIDER_PRESETS=PRESETS;window.TextAIProvider={storeKey:STORE_KEY,getPresets:function(){return clone(PRESETS);},getPreset:function(id){return clone(PRESETS[id]||null);},getCurrentProviderId:function(){return loadStore().currentProviderId;},selectProvider:selectProvider,getConfig:getConfig,getCurrentConfig:getCurrentConfig,saveConfig:saveConfig,clearConfig:clearConfig,validate:validate,maskKey:maskKey,setConnection:setConnection,isConfigured:function(){return validate(getCurrentConfig()).valid;},_test:{configValue:configValue,signature:signature,loadStore:loadStore}};
+  function providerError(code,msg,status){var e=new Error(msg);e.code=code;if(status)e.status=status;return e;} function endpoint(base){base=clean(base).replace(/\/+$/,'');return /\/chat\/completions$/i.test(base)?base:base+'/chat/completions';}
+  function safeJson(text){text=clean(text).replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'');try{return JSON.parse(text);}catch(e){var s=text.indexOf('{'),n=text.lastIndexOf('}');if(s>=0&&n>s)return JSON.parse(text.slice(s,n+1));throw providerError('INVALID_RESPONSE','模型返回格式不正确。');}}
+  function mapFailure(s){if(s===401||s===403)return providerError('AUTH_FAILED','API Key 无效。',s);if(s===404)return providerError('MODEL_NOT_FOUND','模型不存在或接口地址错误。',s);if(s===402)return providerError('QUOTA_EXCEEDED','余额或额度不足。',s);if(s===429)return providerError('RATE_LIMITED','请求过于频繁或额度不足。',s);return providerError('PROVIDER_REQUEST_FAILED','模型服务请求失败（HTTP '+s+'）。',s);}
+  function durationRange(d){d=Number(d||60);return d<=30?[70,110]:(d<=60?[120,190]:[190,290]);} function instructions(a,p){var common='你是短视频内容策略助手。只能根据输入中的真实字段工作，不得虚构事实。只返回严格 JSON，不要 Markdown。';if(a==='analyzeContent')return common+' 返回 topic,hook,angle,keyPoints(string[]),structure,interactionReasons(string[]),reusablePattern,limitations。'+(p.contentAvailable?'可以结合正文分析。':'limitations 必须说明当前仅基于标题和互动数据分析。');var rewrite=p.action&&p.action!=='generate',range=durationRange(p.duration),rules={'new-opening':'只替换开场钩子。',colloquial:'改成更自然的口语表达。',professional:'改成更专业克制的表达。',shorter:'body 不超过当前版本的 70%。','different-angle':'换一个不同的原创切入角度。'};return common+(rewrite?'返回 {"variants":[一个版本]}。'+(rules[p.action]||''):'生成三个不同原创版本，返回 {"variants":[三个版本]}。')+' 每个版本包含 angle,title,coverTitle,hook,body,cta,tags,estimatedDuration。'+(p.action==='shorter'?'':('body 目标 '+range[0]+'-'+range[1]+' 个中文字符。'));}
+  var controllers=[];function fetchJson(url,o,t){var c=new AbortController(),timer=setTimeout(function(){c.abort();},t||TIMEOUT_MS);controllers.push(c);o.signal=c.signal;return fetch(url,o).then(function(r){if(!r.ok)throw mapFailure(r.status);return r.json();}).catch(function(e){if(e&&e.name==='AbortError')throw providerError('TIMEOUT','连接超时。');if(e&&e.code)throw e;throw providerError('NETWORK_ERROR','网络异常。该 Provider 可能不支持浏览器直连，需要代理模式。');}).finally(function(){clearTimeout(timer);var i=controllers.indexOf(c);if(i>=0)controllers.splice(i,1);});}
+  function openAI(c,system,user,test){return fetchJson(endpoint(c.baseUrl),{method:'POST',headers:{Authorization:'Bearer '+c.apiKey,'Content-Type':'application/json'},body:JSON.stringify({model:c.model,messages:test?[{role:'user',content:'Reply with OK.'}]:[{role:'system',content:system},{role:'user',content:user}],temperature:test?0:0.5,max_tokens:test?8:undefined})},test?15000:TIMEOUT_MS).then(function(b){return b&&b.choices&&b.choices[0]&&b.choices[0].message&&b.choices[0].message.content;});}
+  function anthropic(c,system,user,test){return fetchJson(c.baseUrl.replace(/\/$/,'')+'/messages',{method:'POST',headers:{'x-api-key':c.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true','Content-Type':'application/json'},body:JSON.stringify({model:c.model,max_tokens:test?8:4096,system:test?'':system,messages:[{role:'user',content:test?'Reply with OK.':user}]})},test?15000:TIMEOUT_MS).then(function(b){return b&&b.content&&b.content[0]&&b.content[0].text;});}
+  function gemini(c,system,user,test){return fetchJson(c.baseUrl.replace(/\/$/,'')+'/models/'+encodeURIComponent(c.model)+':generateContent',{method:'POST',headers:{'x-goog-api-key':c.apiKey,'Content-Type':'application/json'},body:JSON.stringify({systemInstruction:test?undefined:{parts:[{text:system}]},contents:[{role:'user',parts:[{text:test?'Reply with OK.':user}]}],generationConfig:{temperature:test?0:0.5,maxOutputTokens:test?8:4096}})},test?15000:TIMEOUT_MS).then(function(b){return b&&b.candidates&&b.candidates[0]&&b.candidates[0].content&&b.candidates[0].content.parts&&b.candidates[0].content.parts[0]&&b.candidates[0].content.parts[0].text;});}
+  function call(c,system,user,test){var p=PRESETS[c.providerId];if(!p||p.supportsDirectBrowser===false)return Promise.reject(providerError('DIRECT_UNSUPPORTED','该 Provider 不支持浏览器直连，需要代理模式。'));var start=Date.now(),promise=p.adapter==='anthropic'?anthropic(c,system,user,test):(p.adapter==='gemini'?gemini(c,system,user,test):openAI(c,system,user,test));return promise.then(function(content){if(typeof content!=='string')throw providerError('INVALID_RESPONSE','模型返回内容为空。');return {content:content,latency:Date.now()-start,provider:c.providerId,model:c.model};});}
+  function invoke(a,payload){var x=validate(getCurrentConfig());if(!x.valid)return Promise.reject(providerError('PROVIDER_NOT_CONFIGURED','请先配置文字模型 API。'));return call(x.config,instructions(a,payload),JSON.stringify(payload),false).then(function(r){var data=safeJson(r.content);if(data&&Array.isArray(data.variants))data.variants=data.variants.map(function(x){if(Array.isArray(x.tags))x.tags=x.tags.join(' ');if(x.estimatedDuration!=null)x.estimatedDuration=String(x.estimatedDuration);return x;});return {data:data,meta:r};});}
+  window.TextAIProviderAdapter={testConnection:function(c){var x=validate(c);if(!x.valid)return Promise.reject(providerError('PROVIDER_NOT_CONFIGURED','请完整填写配置。'));return call(x.config,'','',true).then(function(r){return {ok:true,provider:r.provider,model:r.model,latency:r.latency};});},analyzeContent:function(c,w){return invoke('analyzeContent',w);},generateScript:function(c,o){return invoke('generateScript',o);},rewriteScript:function(c,o){return invoke('generateScript',Object.assign({},o,{action:o.action||'rewrite'}));},request:invoke,abortAll:function(){controllers.splice(0).forEach(function(c){try{c.abort();}catch(e){}});},_test:{endpoint:endpoint,safeJson:safeJson,instructions:instructions,mapFailure:mapFailure}};
 })();
 /* ===== core/contentAI.js ===== */
 (function() {
@@ -2827,38 +2769,31 @@ if (document.readyState === 'loading') {
 (function(){
   'use strict';
   var lastConnection=null;
-  function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
-  function field(id){var element=document.getElementById(id);return element?String(element.value||'').trim():'';}
-  function currentForm(){var saved=TextAIProvider.getCurrentConfig();return {providerId:field('textAIProvider'),providerType:'openai-compatible',baseUrl:field('textAIBaseUrl'),apiKey:field('textAIKey')||(saved&&saved.apiKey)||'',model:field('textAIModel')};}
-  function statusHtml(config){
-    if(!config)return '<div class="text-ai-status is-empty"><strong>尚未配置文字模型</strong><span>配置后即可使用 AI 内容拆解、口播生成和快捷改写。</span></div>';
-    var connection=config.connection||{status:'untested'},label=connection.status==='success'?'测试成功':(connection.status==='failed'?'测试失败':'未测试'),tone=connection.status==='success'?'is-success':(connection.status==='failed'?'is-error':'is-pending');
-    return '<div class="text-ai-status '+tone+'"><strong>'+esc((PROVIDER_PRESETS[config.providerId]||{}).name||config.providerId)+' · '+esc(config.model)+'</strong><span>连接状态：'+label+' · Key：'+esc(TextAIProvider.maskKey(config.apiKey))+'</span></div>';
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function field(id){var e=document.getElementById(id);return e?String(e.value||'').trim():'';}
+  function currentForm(){var id=field('textAIProvider'),saved=TextAIProvider.getConfig(id),preset=TEXT_PROVIDER_PRESETS[id],manual=document.getElementById('textAIManualModelWrap');return {providerId:id,providerType:preset.adapter,baseUrl:preset.showBaseUrl?field('textAIBaseUrl'):preset.baseUrl,apiKey:field('textAIKey')||(saved&&saved.apiKey)||'',model:manual&&manual.hidden?field('textAIModelSelect'):field('textAIModelManual')};}
+  function statusHtml(c){if(!c)return '<div class="text-ai-status is-empty"><strong>尚未配置文字模型</strong><span>配置后即可使用 AI 内容拆解、口播生成和快捷改写。</span></div>';var x=c.connection||{},label=x.status==='success'?'已连接':(x.status==='failed'?'连接失败':'未测试'),tone=x.status==='success'?'is-success':(x.status==='failed'?'is-error':'is-pending');return '<div class="text-ai-status '+tone+'"><strong>'+esc(TEXT_PROVIDER_PRESETS[c.providerId].name)+' · '+esc(c.model)+'</strong><span>'+label+' · Key：'+esc(TextAIProvider.maskKey(c.apiKey))+'</span></div>';}
+  function providerOptions(id){return Object.keys(TEXT_PROVIDER_PRESETS).map(function(key){var p=TEXT_PROVIDER_PRESETS[key];return '<option value="'+key+'"'+(key===id?' selected':'')+'>'+esc(p.name)+'</option>';}).join('');}
+  function modelOptions(p,model){var models=(p.recommendedModels||[]).slice();if(model&&models.indexOf(model)<0)models.push(model);return models.map(function(x){return '<option value="'+esc(x)+'"'+(x===model?' selected':'')+'>'+esc(x)+'</option>';}).join('')+'<option value="__manual__">手动输入模型 ID</option>';}
+  function render(){var host=document.getElementById('textAISettings');if(!host)return;var id=TextAIProvider.getCurrentProviderId(),p=TEXT_PROVIDER_PRESETS[id]||TEXT_PROVIDER_PRESETS.openai,c=TextAIProvider.getConfig(id),model=c&&c.model||p.recommendedModels[0]||'',manual=!(p.recommendedModels||[]).length||!!model&&(p.recommendedModels||[]).indexOf(model)<0;
+    host.innerHTML='<div class="text-ai-heading"><div><h3>文字模型 API</h3><p>选择服务商，填写 API Key，即可使用 AI 功能。</p></div><span class="text-ai-mode">浏览器直连</span></div>'+statusHtml(c)+'<div class="text-ai-form">'+
+      '<label>Provider<select id="textAIProvider" class="industry-flow-input">'+providerOptions(id)+'</select></label>'+
+      '<label>API Key<div class="text-ai-key-row"><input id="textAIKey" class="industry-flow-input" type="password" autocomplete="new-password" placeholder="'+esc(c?TextAIProvider.maskKey(c.apiKey):'输入 API Key')+'"><button type="button" data-text-ai-action="toggle-key" aria-label="显示 API Key">显示</button></div></label>'+
+      '<label>'+(p.modelLabel||'Model')+'<select id="textAIModelSelect" class="industry-flow-input">'+modelOptions(p,model)+'</select></label>'+
+      '<label id="textAIManualModelWrap"'+(manual?'':' hidden')+'>手动输入模型 ID<input id="textAIModelManual" class="industry-flow-input" type="text" value="'+esc(manual?model:'')+'" placeholder="model id"></label>'+
+      '<label id="textAIBaseUrlWrap"'+(p.showBaseUrl?'':' hidden')+'>API Base URL<input id="textAIBaseUrl" class="industry-flow-input" type="url" value="'+esc(c&&c.baseUrl||p.baseUrl||'')+'" placeholder="https://provider.example/v1"></label>'+
+      '<div class="text-ai-result" id="textAIResult" aria-live="polite"></div><div class="text-ai-actions"><button type="button" data-text-ai-action="test">测试连接</button><button type="button" class="v82-primary" data-text-ai-action="save">保存配置</button><button type="button" class="is-danger" data-text-ai-action="clear">清除当前配置</button></div></div>'+
+      '<p class="text-ai-security">API Key 仅保存在当前浏览器。请勿在公共电脑保存长期有效的 API Key。</p><details class="text-ai-guide"><summary>如何获取 API Key？</summary><ol><li>注册 '+esc(p.name)+'</li><li>创建并复制 API Key</li><li>返回本页填写</li><li>选择模型并测试连接</li></ol>'+(p.apiKeyGuideUrl?'<a href="'+esc(p.apiKeyGuideUrl)+'" target="_blank" rel="noopener noreferrer">打开官方 API Key 页面</a>':'')+'</details>';
+    if(manual)document.getElementById('textAIModelSelect').value='__manual__';
   }
-  function render(){
-    var host=document.getElementById('textAISettings');if(!host||!window.TextAIProvider)return;
-    var config=TextAIProvider.getCurrentConfig(),provider=config&&config.providerId||'xiaomi-mimo',preset=PROVIDER_PRESETS[provider]||PROVIDER_PRESETS['openai-compatible'];
-    host.innerHTML='<div class="text-ai-heading"><div><h3>文字模型 API</h3><p>使用自己的 API，配置对所有行业生效。</p></div><span class="text-ai-mode">浏览器直连</span></div>'+statusHtml(config)+
-      '<div class="text-ai-form">'+
-      '<label>Provider<select id="textAIProvider" class="industry-flow-input"><option value="xiaomi-mimo">Xiaomi MiMo</option><option value="openai-compatible">OpenAI-Compatible</option><option value="custom">Custom</option></select></label>'+
-      '<label>API Base URL<input id="textAIBaseUrl" class="industry-flow-input" type="url" autocomplete="off" value="'+esc(config&&config.baseUrl||preset.baseUrl||'')+'" placeholder="https://provider.example/v1"></label>'+
-      '<label>API Key<div class="text-ai-key-row"><input id="textAIKey" class="industry-flow-input" type="password" autocomplete="new-password" placeholder="'+esc(config?TextAIProvider.maskKey(config.apiKey):'输入 API Key')+'"><button type="button" data-text-ai-action="toggle-key" aria-label="显示 API Key" title="显示或隐藏 API Key">显示</button></div></label>'+
-      '<label>Model<input id="textAIModel" class="industry-flow-input" type="text" autocomplete="off" value="'+esc(config&&config.model||'')+'" placeholder="'+esc(preset.modelPlaceholder||'model id')+'"></label>'+
-      '<p class="text-ai-provider-note" id="textAIProviderNote">'+esc(preset.modelGuide||'')+'</p><div class="text-ai-result" id="textAIResult" aria-live="polite"></div>'+
-      '<div class="text-ai-actions"><button type="button" data-text-ai-action="test">测试连接</button><button type="button" class="v82-primary" data-text-ai-action="save">保存配置</button><button type="button" class="is-danger" data-text-ai-action="clear">清除 API 配置</button></div></div>'+
-      '<p class="text-ai-security">API Key 仅保存在当前浏览器，用于调用你选择的模型服务。请勿在公共电脑保存长期有效的 API Key。</p>'+
-      '<details class="text-ai-guide"><summary>如何获取 API Key？</summary><ol><li>选择一个文字模型 Provider</li><li>前往 Provider 官网注册</li><li>创建 API Key</li><li>复制 API Key</li><li>返回本页面</li><li>填入 API Key 和 Model</li><li>点击测试连接</li></ol><p id="textAIGuideText">'+esc(preset.apiKeyGuide||'')+'</p></details>';
-    document.getElementById('textAIProvider').value=provider;
-  }
-  function updatePreset(){var id=field('textAIProvider'),preset=PROVIDER_PRESETS[id]||PROVIDER_PRESETS.custom,base=document.getElementById('textAIBaseUrl'),model=document.getElementById('textAIModel');if(base)base.value=preset.baseUrl||'';if(model){model.value='';model.placeholder=preset.modelPlaceholder||'model id';}var note=document.getElementById('textAIProviderNote'),guide=document.getElementById('textAIGuideText');if(note)note.textContent=preset.modelGuide||'';if(guide)guide.textContent=preset.apiKeyGuide||'';lastConnection=null;}
-  function result(message,type){var host=document.getElementById('textAIResult');if(host){host.className='text-ai-result '+(type||'');host.textContent=message;}}
-  function test(){var config=currentForm(),checked=TextAIProvider.validate(config);if(!checked.valid){result('请填写：'+checked.missing.join('、'),'is-error');return;}result('正在测试最小连接请求…','is-pending');TextAIProviderAdapter.testConnection(config).then(function(value){lastConnection={status:'success',provider:value.provider,model:value.model,latency:value.latency};result('连接成功 · Provider：'+value.provider+' · Model：'+value.model+' · Latency：'+value.latency+'ms','is-success');}).catch(function(error){lastConnection={status:'failed',code:error&&error.code||'UNKNOWN'};result(error&&error.message||'连接失败。','is-error');});}
-  function save(){var saved=TextAIProvider.saveConfig(currentForm());if(!saved.valid){result('请填写：'+saved.missing.join('、'),'is-error');return;}if(lastConnection)TextAIProvider.setConnection(lastConnection);render();result('配置已保存，仅存于当前浏览器。','is-success');}
-  function clear(){TextAIProvider.clearConfig();lastConnection=null;render();result('文字模型配置已清除。','is-success');}
-  document.addEventListener('click',function(event){var button=event.target.closest&&event.target.closest('[data-text-ai-action]');if(!button)return;var action=button.getAttribute('data-text-ai-action');if(action==='toggle-key'){var input=document.getElementById('textAIKey');if(input){input.type=input.type==='password'?'text':'password';button.textContent=input.type==='password'?'显示':'隐藏';button.setAttribute('aria-label',button.textContent+' API Key');}}else if(action==='test')test();else if(action==='save')save();else if(action==='clear')clear();});
-  document.addEventListener('change',function(event){if(event.target&&event.target.id==='textAIProvider')updatePreset();});
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);else render();
-  window.TextAISettings={render:render};
+  function result(msg,type){var h=document.getElementById('textAIResult');if(h){h.className='text-ai-result '+(type||'');h.textContent=msg;}}
+  function switchProvider(id){TextAIProvider.selectProvider(id);lastConnection=null;render();}
+  function test(){var c=currentForm(),x=TextAIProvider.validate(c);if(!x.valid){result('请填写：'+x.missing.join('、'),'is-error');return;}result('正在测试最小文本请求…','is-pending');TextAIProviderAdapter.testConnection(c).then(function(v){lastConnection={status:'success',provider:v.provider,model:v.model,latency:v.latency};result('连接成功 · '+TEXT_PROVIDER_PRESETS[v.provider].name+' · '+v.model+' · '+v.latency+'ms','is-success');}).catch(function(e){lastConnection={status:'failed',code:e&&e.code||'UNKNOWN'};result(e&&e.message||'连接失败。','is-error');});}
+  function save(){var x=TextAIProvider.saveConfig(currentForm());if(!x.valid){result('请填写：'+x.missing.join('、'),'is-error');return;}if(lastConnection)TextAIProvider.setConnection(lastConnection);render();result('配置已保存。','is-success');}
+  function clear(){TextAIProvider.clearConfig();lastConnection=null;render();result('当前 Provider 配置已清除。','is-success');}
+  document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-text-ai-action]');if(!b)return;var a=b.getAttribute('data-text-ai-action');if(a==='toggle-key'){var i=document.getElementById('textAIKey');i.type=i.type==='password'?'text':'password';b.textContent=i.type==='password'?'显示':'隐藏';}else if(a==='test')test();else if(a==='save')save();else if(a==='clear')clear();});
+  document.addEventListener('change',function(e){if(e.target.id==='textAIProvider')switchProvider(e.target.value);if(e.target.id==='textAIModelSelect'){var wrap=document.getElementById('textAIManualModelWrap');wrap.hidden=e.target.value!=='__manual__';if(!wrap.hidden)document.getElementById('textAIModelManual').focus();}});
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',render);else render();window.TextAISettings={render:render};
 })();
 /* ===== modules/hero.js ===== */
 /**

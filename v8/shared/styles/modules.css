@@ -1887,6 +1887,7 @@ body.v82-research .top-nav { justify-content:space-between; }
 .text-ai-status strong { font-size:11px; }.text-ai-status span { color:var(--text-secondary); font-size:10px; }
 .text-ai-status.is-success { border-color:#22c55e; }.text-ai-status.is-error { border-color:#ef4444; }.text-ai-status.is-pending { border-color:#f59e0b; }
 .text-ai-form { display:grid; gap:13px; }.text-ai-form>label { display:grid; gap:6px; color:#cbd5e1; font-size:11px; }
+.text-ai-form [hidden] { display:none !important; }
 .text-ai-key-row { display:grid; grid-template-columns:minmax(0,1fr) 58px; gap:7px; }
 .text-ai-key-row button,.text-ai-actions button { min-height:38px; border:1px solid rgba(255,255,255,.15); border-radius:6px; background:transparent; color:var(--text); cursor:pointer; font-size:11px; }
 .text-ai-actions { display:flex; flex-wrap:wrap; gap:8px; }.text-ai-actions button { padding:8px 12px; }.text-ai-actions .v82-primary { border-color:#0891b2; background:#0891b2; color:#fff; }.text-ai-actions .is-danger { margin-left:auto; border-color:rgba(239,68,68,.35); color:#fca5a5; }
