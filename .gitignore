@@ -1,0 +1,11 @@
+# Cloudflare Wrangler 本地状态与缓存
+.wrangler/
+worker/.wrangler/
+
+# 依赖
+node_modules/
+
+# 系统 / 编辑器 / 日志
+.DS_Store
+Thumbs.db
+*.log

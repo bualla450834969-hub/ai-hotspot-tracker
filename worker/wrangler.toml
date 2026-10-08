@@ -1,0 +1,13 @@
+name = "round-hat-8c12"
+main = "worker.js"
+compatibility_date = "2026-10-08"
+
+# KV：存储定时采集快照。
+# id 在 worker/ 目录执行 `npx wrangler kv namespace create REDFOX_KV` 后，把返回的 id 填入。
+[[kv_namespaces]]
+binding = "REDFOX_KV"
+id = "a82d9334963a4446a47699d78ae0b8b0"
+
+# 定时触发（UTC）：00:00 / 06:00 = 香港时间（HKT）08:00 / 14:00
+[triggers]
+crons = ["0 0 * * *", "0 6 * * *"]

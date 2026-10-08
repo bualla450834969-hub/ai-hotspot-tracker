@@ -1866,5 +1866,141 @@ loadCollectTrend();
 })();
 </script>
 
+<!-- ===== V8.1 云端快照加载器：读取 Worker 定时采集结果，打开即最新 ===== -->
+<script>
+(function(){
+  'use strict';
+  var DEFAULT_WORKER='https://round-hat-8c12.bualla450834969.workers.dev/';
+  // builtin 行业 id → 云端快照 id（仅配置了定时采集的行业；书法等未配置则不自动刷新）
+  var CLOUD_MAP={ ai:'ai' };
+
+  // 作品去重（与 startCollection 同口径，抽为全局可复用）
+  window.dedupeWorks=function(allWorks){
+    var merged={},order=[];
+    (allWorks||[]).forEach(function(w,index){
+      var id=String(w.workId||w.sourceId||w.noteId||
+        [w.platform,w.workUrl,w.title,w.accountName,w.publishTime].filter(Boolean).join('|')||('row:'+index));
+      if(!merged[id]){merged[id]=w;order.push(id);return;}
+      var ex=merged[id];
+      (w.sourceKeywords||[]).forEach(function(k){
+        ex.sourceKeywords=ex.sourceKeywords||[];
+        if(ex.sourceKeywords.indexOf(k)<0)ex.sourceKeywords.push(k);
+      });
+    });
+    return order.map(function(id){return merged[id];});
+  };
+
+  window.getWorkerBase=function(){
+    var p=(localStorage.getItem('redfox_proxy_url')||'').trim();
+    if(p){try{return new URL(p).origin+'/';}catch(e){}}
+    return DEFAULT_WORKER;
+  };
+
+  // 拉取云端快照；返回 snapshot 对象，无快照时为 {code:4040}
+  window.fetchCloudSnapshot=async function(cloudId){
+    var base=window.getWorkerBase();
+    var url=base+(base.indexOf('?')>=0?'&':'?')+'action=snapshot&industry='+encodeURIComponent(cloudId);
+    var rid=window.AppStore?AppStore.nextRequest():0;
+    var resp=await fetch(url);
+    var j=await resp.json();
+    if(rid&&window.AppStore&&!AppStore.isCurrent(rid))return null; // 旧批次丢弃，防切换污染
+    return j;
+  };
+
+  // 用云端快照聚合出完整 dashboard 并写入唯一数据源、重新渲染
+  window.applyCloudSnapshot=function(snap,displayName){
+    var allWorks=[];
+    (snap.entries||[]).forEach(function(e){
+      (e.rows||[]).forEach(function(row){
+        var nw=window.normalizeWork(row,e.platform);
+        var kws=(row._kws&&row._kws.length)?row._kws.slice():[e.keyword];
+        nw.sourceKeywords=kws;
+        nw.sourceKeyword=kws[kws.length-1];
+        nw.keywordAttributionStatus='attributed';nw._keyword=kws[kws.length-1];
+        allWorks.push(nw);
+      });
+    });
+    allWorks=window.dedupeWorks(allWorks);
+    var hotwords=(snap.keywordStats||[]).map(function(h){
+      var x={keyword:h.keyword,platform:h.platform,total:h.total,works:h.works,avg_like:h.avg_like};
+      if(h.error)x.error=h.error;return x;
+    });
+    var dashboard=window.buildDashboardData(allWorks,hotwords,displayName);
+    dashboard.last_update=snap.collectedAtHK||snap.collectedAt;
+    dashboard.data_source='cloud';
+    dashboard.cloud_snapshot={industry:snap.industry,collectedAt:snap.collectedAt,
+      collectedAtHK:snap.collectedAtHK,failedKws:snap.failedKws||[],
+      counts:snap.counts||{rows:allWorks.length}};
+    if(window.AppStore)AppStore.data=dashboard;
+    if(window.normalizeDataContract)normalizeDataContract();
+    if(window.normalizeData)normalizeData();
+    if(window.renderAll)renderAll();
+    return dashboard;
+  };
+
+  // 手动加载某行业云端快照
+  window.loadCloudIndustry=async function(cloudId,opts){
+    opts=opts||{};
+    try{
+      var snap=await window.fetchCloudSnapshot(cloudId);
+      if(!snap)return null;
+      if(snap.code===4040||!snap.entries){if(opts.onMissing)opts.onMissing();return null;}
+      var name=opts.name||(window.AppStore&&AppStore.industry&&AppStore.industry.name)||snap.industryName||cloudId;
+      var d=window.applyCloudSnapshot(snap,name);
+      showCloudBadge(snap,'updated');
+      return d;
+    }catch(e){if(window.AppErrorHandler)AppErrorHandler.handle(e,'cloud.load');else console.error(e);return null;}
+  };
+
+  function showCloudBadge(snap,state){
+    var bar=document.getElementById('cloudBar');
+    if(!bar){
+      bar=document.createElement('div');bar.id='cloudBar';
+      bar.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99990;background:rgba(17,24,39,.92);color:#e5e7eb;font:12px/1.5 system-ui;padding:8px 14px;border:1px solid rgba(125,211,252,.35);border-radius:999px;display:flex;gap:8px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.4);max-width:94vw;flex-wrap:wrap;justify-content:center;';
+      document.body.appendChild(bar);
+    }
+    var n=(snap.counts&&snap.counts.rows)||0;
+    var fail=(snap.failedKws||[]).length;
+    var stateTxt=state==='updated'?'<span style="color:#34d399;">已更新为云端最新</span>':'<span style="color:#7dd3fc;">已是云端最新</span>';
+    bar.innerHTML='<span>☁ 云端采集 '+(snap.collectedAtHK||'')+' · '+n+' 条</span> · '+stateTxt+
+      (fail?' · <span style="color:#fbbf24;">'+fail+' 关键词失败</span>':'')+
+      '<button id="cloudRefreshBtn" style="margin-left:4px;border:1px solid rgba(125,211,252,.4);background:transparent;color:#7dd3fc;border-radius:999px;padding:2px 10px;font-size:11px;cursor:pointer;">刷新</button>'+
+      '<span id="cloudClose" style="cursor:pointer;color:#9ca3af;padding:0 4px;">×</span>';
+    var rb=document.getElementById('cloudRefreshBtn');
+    if(rb)rb.onclick=function(){window.loadCloudIndustry(snap.industry);};
+    var cx=document.getElementById('cloudClose');
+    if(cx)cx.onclick=function(){bar.style.display='none';};
+  }
+
+  function shouldAutoCloud(){
+    var ctx=window.AppStore?AppStore.industry:null;
+    if(!ctx||ctx.type!=='builtin')return null;
+    return CLOUD_MAP[ctx.id]||null;
+  }
+
+  // 首屏完成后静默检测：云端更新则自动替换，否则保留内置兜底
+  async function autoRefresh(){
+    var cloudId=shouldAutoCloud();
+    if(!cloudId)return;
+    try{
+      var snap=await window.fetchCloudSnapshot(cloudId);
+      if(!snap||snap.code===4040||!snap.entries)return;
+      var cur=(window.AppStore&&AppStore.data)||{};
+      var curDate=cur.last_update?Date.parse(String(cur.last_update).replace(' ','T')):0;
+      var newDate=Date.parse(snap.collectedAt);
+      if(!(newDate>curDate)){showCloudBadge(snap,'current');return;}
+      var name=(window.AppStore&&AppStore.industry&&AppStore.industry.name)||snap.industryName||cloudId;
+      window.applyCloudSnapshot(snap,name);
+      showCloudBadge(snap,'updated');
+    }catch(e){if(window.AppErrorHandler)AppErrorHandler.handle(e,'cloud.auto');}
+  }
+
+  window.addEventListener('load',function(){
+    if(window.TimerManager)TimerManager.setTimeout(autoRefresh,3200);
+    else setTimeout(autoRefresh,3200);
+  });
+})();
+</script>
+
 </body>
 </html>

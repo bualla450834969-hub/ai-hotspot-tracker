@@ -1,0 +1,359 @@
+/**
+ * RedFox Hub Worker（V8.1 自动采集版）
+ * 三大职责：
+ *   1. fetch POST ：保留原“采集中转透传”，解决浏览器 CORS（手动采集，key 由前端带；
+ *                   前端未带 key 时回退到 Worker 配置的 secret）。
+ *   2. scheduled ：按 cron（HKT 每天 08:00 / 14:00）自动采集配置好的行业，原始结果写 KV。
+ *   3. fetch GET ?action=snapshot&industry=<id>：读取 KV 最新快照，供前端“打开即最新”。
+ *
+ * 关键设计：Worker 只负责“定时采集 + 存原始 RedFox rows”，不做字段映射 / 去重 / 聚合；
+ *          normalizeWork / buildDashboardData 全部仍在前端，保持单一实现，避免双份逻辑不同步。
+ */
+
+const ALLOWED_ORIGINS = [
+  'https://bualla450834969-hub.github.io',
+  'http://localhost:8080',
+  'http://127.0.0.1:8080',
+];
+
+const REDFOX_BASE = 'https://redfox.hk/story/api';
+const PLATFORM_PREFIX = { douyin: 'dyData', xiaohongshu: 'xhsUser' };
+
+// 定时采集的行业清单（要支持更多行业时，照此追加即可）
+const SCHEDULED_INDUSTRIES = [
+  {
+    id: 'ai',
+    name: 'AI',
+    platforms: ['douyin', 'xiaohongshu'],
+    keywords: ['AI', 'AI教程', 'AI推荐', 'AI怎么选', 'AI避坑', 'AI排行榜'],
+  },
+];
+
+const SEARCH_TIMEOUT_MS = 15000;
+const RETRIES = 2;
+const CONCURRENCY = 3;
+const HISTORY_CAP = 30;
+const LIB_MAX_PER_PLATFORM = 800; // 每平台累积作品上限（超出保留最新）
+
+export default {
+  async fetch(request, env) {
+    const origin = request.headers.get('Origin') || '';
+    if (request.method === 'OPTIONS') {
+      return new Response(null, { status: 204, headers: corsHeaders(origin) });
+    }
+
+    const url = new URL(request.url);
+
+    // ① 手动触发采集：GET ?action=collect&key=<RedFox key>（鉴权防盗刷配额）
+    if (request.method === 'GET' && url.searchParams.get('action') === 'collect') {
+      const provided = url.searchParams.get('key') || request.headers.get('x-admin-key');
+      if (!env.REDFOX_API_KEY || provided !== env.REDFOX_API_KEY)
+        return json({ code: 4030, msg: 'forbidden: key mismatch' }, origin, 403);
+      try {
+        const wantInd = url.searchParams.get('industry') || 'ai';
+        const targetInd = SCHEDULED_INDUSTRIES.find((x) => x.id === wantInd) || SCHEDULED_INDUSTRIES[0];
+        const r = await collectIndustry(env, targetInd);
+        return json({ code: 2000, msg: 'collect done', data: { collectedAtHK: r.collectedAtHK, counts: r.counts, failedKws: r.failedKws } }, origin, 200);
+      } catch (e) {
+        return json({ code: 5000, msg: 'collect failed: ' + e }, origin, 500);
+      }
+    }
+    // ② 读取云端快照：GET ?action=snapshot&industry=ai
+    if (request.method === 'GET' && url.searchParams.get('action') === 'snapshot') {
+      const industry = (url.searchParams.get('industry') || '').trim();
+      if (!industry) return json({ code: -1, msg: '缺少 industry' }, origin, 400);
+      try {
+        const raw = await env.REDFOX_KV.get('snapshot:' + industry);
+        if (!raw) return json({ code: 4040, msg: '暂无云端快照', data: null }, origin, 200);
+        return new Response(raw, {
+          status: 200,
+          headers: { 'Content-Type': 'application/json; charset=utf-8', ...corsHeaders(origin) },
+        });
+      } catch (e) {
+        return json({ code: -1, msg: '读取快照失败: ' + (e.message || String(e)) }, origin, 502);
+      }
+    }
+
+    // ② 手动采集透传：POST
+    if (request.method !== 'POST') {
+      return new Response('POST only', { status: 405, headers: corsHeaders(origin) });
+    }
+
+    let body;
+    try {
+      body = await request.json();
+    } catch (e) {
+      return json({ code: -1, msg: '请求体不是 JSON' }, origin, 400);
+    }
+
+    const platform = body.platform; // "douyin" | "xiaohongshu"
+    const keyword = (body.keyword || '').trim();
+    const apiKey = (body.apiKey || '').trim() || (env.REDFOX_API_KEY || '');
+    const offset = body.offset || 0;
+
+    if (!apiKey) return json({ code: -1, msg: '缺少 RedFox API Key' }, origin, 400);
+    if (!keyword) return json({ code: -1, msg: '缺少关键词' }, origin, 400);
+    if (!PLATFORM_PREFIX[platform]) {
+      return json({ code: -1, msg: 'platform 只能是 douyin / xiaohongshu' }, origin, 400);
+    }
+
+    try {
+      const data = await redfoxSearch(apiKey, platform, keyword, offset);
+      // 还原 RedFox 原始结构 {code:2000, data:{list,total}}，前端 searchOnce 据此判定
+      return json({ code: 2000, data }, origin, 200);
+    } catch (e) {
+      return json({ code: -1, msg: String(e.message || e) }, origin, 502);
+    }
+  },
+
+  // ③ 定时触发
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil(
+      (async () => {
+        for (const ind of SCHEDULED_INDUSTRIES) {
+          try {
+            await collectIndustry(env, ind);
+          } catch (e) {
+            console.error('[SCHEDULED] industry failed', ind.id, e);
+          }
+        }
+      })()
+    );
+  },
+};
+
+/** 采集单个行业：平台×关键词（有限并发 + 重试 + 超时），原始 rows 写 KV */
+async function collectIndustry(env, ind) {
+  const apiKey = env.REDFOX_API_KEY;
+  if (!apiKey) throw new Error('未配置 REDFOX_API_KEY secret');
+
+  const jobs = [];
+  ind.platforms.forEach((pl) => ind.keywords.forEach((kw) => jobs.push({ pl, kw })));
+
+  const entries = [];
+  const keywordStats = [];
+  const failedKws = [];
+  let cursor = 0;
+
+  async function redfoxWithRetry(pl, kw) {
+    let attempt = 0;
+    let lastErr;
+    while (attempt <= RETRIES) {
+      try {
+        return await redfoxSearch(apiKey, pl, kw, 0); // {list,total}
+      } catch (e) {
+        lastErr = e;
+        attempt++;
+        if (attempt > RETRIES) break;
+        const msg = String((e && e.message) || e);
+        const isRate = /429|rate|limit|too many|频繁|频/i.test(msg);
+        const wait = isRate ? Math.min(800 * Math.pow(2, attempt - 1), 6000) : 400 * attempt;
+        await new Promise((r) => setTimeout(r, wait));
+      }
+    }
+    throw lastErr || new Error('采集失败：' + kw);
+  }
+
+  async function worker() {
+    while (cursor < jobs.length) {
+      const job = jobs[cursor++];
+      try {
+        const data = await redfoxWithRetry(job.pl, job.kw);
+        const rows = data.list || [];
+        entries.push({ platform: job.pl, keyword: job.kw, rows });
+        const avgLike = rows.length
+          ? Math.round(rows.reduce((a, w) => a + (w.likeCount || w.workLikedCount || 0), 0) / rows.length)
+          : 0;
+        keywordStats.push({
+          keyword: job.kw,
+          platform: job.pl,
+          total: data.total || rows.length,
+          works: rows.length,
+          avg_like: avgLike,
+        });
+      } catch (e) {
+        keywordStats.push({ keyword: job.kw, platform: job.pl, total: 0, works: 0, error: String(e.message || e) });
+        if (failedKws.indexOf(job.kw) < 0) failedKws.push(job.kw);
+      }
+    }
+  }
+
+  const pool = [];
+  for (let i = 0; i < Math.min(CONCURRENCY, jobs.length); i++) pool.push(worker());
+  await Promise.all(pool);
+
+  const now = new Date();
+  const nowIso = now.toISOString();
+  const freshRows = entries.reduce((a, e) => a + e.rows.length, 0);
+
+  // ===== 累积库：读取 → 合并本次（去重 + 记录命中关键词）→ 截断 → 写回 =====
+  const libKey = 'lib:' + ind.id;
+  let lib = {};
+  try { lib = JSON.parse((await env.REDFOX_KV.get(libKey)) || '{}'); } catch (e) { lib = {}; }
+
+  entries.forEach((e) => {
+    const bucket = lib[e.platform] || (lib[e.platform] = {});
+    e.rows.forEach((raw) => {
+      const rid = rowIdOf(e.platform, raw);
+      if (!rid) return;
+      const picked = pickRow(e.platform, raw);
+      if (bucket[rid]) {
+        const ex = bucket[rid];
+        ex.r = picked; // 用最新数据（点赞/评论会增长）
+        ex.s = nowIso;
+        if (ex.k.indexOf(e.keyword) < 0) ex.k.push(e.keyword);
+      } else {
+        bucket[rid] = { r: picked, k: [e.keyword], t: picked.publishTime || picked.workPublishTime || picked.createTime || '', s: nowIso };
+      }
+    });
+  });
+
+  // 每平台按发布/采集时间截断，保留最新 LIB_MAX_PER_PLATFORM 条
+  Object.keys(lib).forEach((pl) => {
+    const arr = Object.keys(lib[pl]).map((id) => [id, lib[pl][id]]);
+    arr.sort((a, b) => {
+      const ta = Date.parse(a[1].t || a[1].s) || 0;
+      const tb = Date.parse(b[1].t || b[1].s) || 0;
+      return tb - ta;
+    });
+    const nb = {};
+    arr.slice(0, LIB_MAX_PER_PLATFORM).forEach((x) => { nb[x[0]] = x[1]; });
+    lib[pl] = nb;
+  });
+
+  await env.REDFOX_KV.put(libKey, JSON.stringify(lib));
+
+  // ===== 生成给前端的 snapshot.entries：按 平台×最近关键词 分组，每条 row 附 _kws =====
+  const groupMap = {};
+  const groupOrder = [];
+  let libRows = 0;
+  Object.keys(lib).forEach((pl) => {
+    Object.keys(lib[pl]).forEach((rid) => {
+      const item = lib[pl][rid];
+      const recentKw = item.k[item.k.length - 1];
+      const gk = pl + '|' + recentKw;
+      if (!groupMap[gk]) { groupMap[gk] = { platform: pl, keyword: recentKw, rows: [] }; groupOrder.push(gk); }
+      groupMap[gk].rows.push(Object.assign({ _kws: item.k.slice() }, item.r));
+      libRows++;
+    });
+  });
+
+  const snapshot = {
+    industry: ind.id,
+    industryName: ind.name,
+    collectedAt: nowIso,
+    collectedAtHK: formatHKT(now),
+    entries: groupOrder.map((gk) => groupMap[gk]),
+    keywordStats,
+    failedKws,
+    counts: { jobs: jobs.length, freshRows, libRows, failedJobs: keywordStats.filter((k) => k.error).length },
+  };
+  await env.REDFOX_KV.put('snapshot:' + ind.id, JSON.stringify(snapshot));
+
+  // 轻量采集历史（不含 rows），供前端趋势图
+  try {
+    const histKey = 'snapshot:' + ind.id + ':history';
+    const hist = JSON.parse((await env.REDFOX_KV.get(histKey)) || '[]');
+    hist.push({
+      collectedAt: nowIso,
+      collectedAtHK: snapshot.collectedAtHK,
+      rows: libRows,
+      freshRows,
+      failedKws: failedKws.slice(),
+      keywordMetrics: keywordStats.reduce((a, k) => { a[k.keyword] = k.total || 0; return a; }, {}),
+    });
+    while (hist.length > HISTORY_CAP) hist.shift();
+    await env.REDFOX_KV.put(histKey, JSON.stringify(hist));
+  } catch (e) {
+    console.error('[SCHEDULED] history write failed', ind.id, e);
+  }
+
+  console.log('[SCHEDULED]', ind.id, snapshot.collectedAtHK, 'fresh=' + freshRows, 'lib=' + libRows, 'failed=' + failedKws.length);
+  return snapshot;
+}
+
+/** 原始 row 唯一 id（累积去重用，row 层不做字段映射） */
+function rowIdOf(platform, w) {
+  return String(w.workId || w.awemeId || '');
+}
+
+/** 只保留前端 normalizeWork 所需字段以控制 KV 体积（字段名保持 RedFox 原样） */
+function pickRow(platform, w) {
+  if (platform === 'xiaohongshu') {
+    return {
+      workId: w.workId, workTitle: w.workTitle, workDesc: w.workDesc,
+      accountNickname: w.accountNickname, workLikedCount: w.workLikedCount,
+      workCollectedCount: w.workCollectedCount, workSharedCount: w.workSharedCount,
+      workCommentsCount: w.workCommentsCount, workPublishTime: w.workPublishTime,
+      workUrl: w.workUrl, coverUrl: w.coverUrl,
+    };
+  }
+  return {
+    workId: w.workId, awemeId: w.awemeId, title: w.title, desc: w.desc,
+    accountName: w.accountName, nickname: w.nickname, likeCount: w.likeCount,
+    diggCount: w.diggCount, collectCount: w.collectCount, shareCount: w.shareCount,
+    commentCount: w.commentCount, publishTime: w.publishTime, createTime: w.createTime,
+    workUrl: w.workUrl, coverUrl: w.coverUrl, cover: w.cover, duration: w.duration,
+  };
+}
+
+/** 直连 RedFox 单次搜索；成功返回 data（{list,total}），否则抛错 */
+async function redfoxSearch(apiKey, platform, keyword, offset) {
+  const prefix = PLATFORM_PREFIX[platform];
+  if (!prefix) throw new Error('未知平台: ' + platform);
+  const target = `${REDFOX_BASE}/${prefix}/searchArticle`;
+
+  const resp = await fetch(target, {
+    method: 'POST',
+    headers: { REDFOX_API_KEY: apiKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ keyword, offset, sortType: '_0' }),
+    signal: AbortSignal.timeout(SEARCH_TIMEOUT_MS),
+  });
+
+  let j;
+  try {
+    j = await resp.json();
+  } catch (e) {
+    throw new Error('RedFox 返回非 JSON（HTTP ' + resp.status + '）');
+  }
+
+  if (j.code === 2000) return j.data || {};
+  throw new Error(j.msg || 'RedFox code=' + j.code);
+}
+
+/** 把时间格式化为香港时间（HKT, UTC+8）字符串 */
+function formatHKT(date) {
+  const parts = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Hong_Kong',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  })
+    .formatToParts(date)
+    .reduce((a, p) => {
+      a[p.type] = p.value;
+      return a;
+    }, {});
+  return `${parts.year}-${parts.month}-${parts.day} ${parts.hour}:${parts.minute}:${parts.second}`;
+}
+
+function corsHeaders(origin) {
+  const allowOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : '*';
+  return {
+    'Access-Control-Allow-Origin': allowOrigin,
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Max-Age': '86400',
+  };
+}
+
+function json(obj, origin, status = 200) {
+  return new Response(JSON.stringify(obj), {
+    status,
+    headers: { 'Content-Type': 'application/json; charset=utf-8', ...corsHeaders(origin) },
+  });
+}
