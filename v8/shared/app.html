@@ -1935,6 +1935,19 @@ loadCollectTrend();
     if(window.normalizeDataContract)normalizeDataContract();
     if(window.normalizeData)normalizeData();
     if(window.renderAll)renderAll();
+    // 云端快照在首屏 init() 之后才到达，需手动刷新“更新时间”（init 只执行一次）
+    (function(){
+      var ut=document.getElementById('updateTime');
+      if(ut&&dashboard.last_update){
+        var hours=(Date.now()-new Date(dashboard.last_update.replace(/-/g,'/')).getTime())/3600000;
+        if(hours<=1)ut.innerHTML=dashboard.last_update+' <span class="freshness-tag fresh">最新</span>';
+        else if(hours<=6)ut.innerHTML=dashboard.last_update+' <span class="freshness-tag">'+Math.floor(hours)+'小时前</span>';
+        else if(hours<=24)ut.innerHTML=dashboard.last_update+' <span class="freshness-tag stale">'+Math.floor(hours)+'小时前</span>';
+        else ut.innerHTML=dashboard.last_update+' <span style="color:#f87171;font-size:11px;">⚠️ 数据超过24小时未更新</span>';
+      }
+      var sb=document.getElementById('sbUpdateTime');
+      if(sb&&dashboard.last_update)sb.textContent=dashboard.last_update;
+    })();
     return dashboard;
   };
 
