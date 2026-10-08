@@ -1959,7 +1959,7 @@ loadCollectTrend();
       bar.style.cssText='position:fixed;top:8px;left:50%;transform:translateX(-50%);z-index:99990;background:rgba(17,24,39,.92);color:#e5e7eb;font:12px/1.5 system-ui;padding:8px 14px;border:1px solid rgba(125,211,252,.35);border-radius:999px;display:flex;gap:8px;align-items:center;box-shadow:0 6px 24px rgba(0,0,0,.4);max-width:94vw;flex-wrap:wrap;justify-content:center;';
       document.body.appendChild(bar);
     }
-    var n=(snap.counts&&snap.counts.rows)||0;
+    var n=(snap.counts&&(snap.counts.libRows||snap.counts.rows))||0;
     var fail=(snap.failedKws||[]).length;
     var stateTxt=state==='updated'?'<span style="color:#34d399;">已更新为云端最新</span>':'<span style="color:#7dd3fc;">已是云端最新</span>';
     bar.innerHTML='<span>☁ 云端采集 '+(snap.collectedAtHK||'')+' · '+n+' 条</span> · '+stateTxt+
