@@ -129,8 +129,8 @@ async function fetchGitHubTechSignals(env, ind, allTitles) {
   try {
     const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString().slice(0, 10);
     const url = 'https://api.github.com/search/repositories?q=' +
-      encodeURIComponent('topic:llm topic:agent pushed:>' + weekAgo) +
-      '&sort=stars&order=desc&per_page=30';
+      encodeURIComponent('topic:ai pushed:>' + weekAgo) +
+      '&sort=stars&order=desc&per_page=50';
     const headers = { 'User-Agent': 'ai-hotspot-tracker', 'Accept': 'application/vnd.github+json' };
     if (env.GITHUB_TOKEN) headers['Authorization'] = 'Bearer ' + env.GITHUB_TOKEN;
     const resp = await fetch(url, { headers });
