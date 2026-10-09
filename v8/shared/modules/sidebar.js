@@ -119,10 +119,8 @@
     NAV_GROUPS.filter(function(g) {
       var mods = (window.DOMAIN_CONFIG||{}).modules||{};
       if (g.id === 'techradar') {
-        // 技术雷达由数据自动驱动：config未关闭且该行业确有技术信号才显示
-        var ts = (window.DASHBOARD_DATA||{}).tech_signals;
-        var hasTR = !!(ts && ts.signals && ts.signals.length);
-        return mods['techradar'] !== false && hasTR;
+        // 技术雷达导航常显（AI 行业有 GitHub 信号；其他行业点入显示空状态）
+        return mods['techradar'] !== false;
       }
       return mods[g.id] !== false;
     }).forEach(function(group) {
