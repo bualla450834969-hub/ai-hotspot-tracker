@@ -68,9 +68,22 @@ window.normalizeData = function() {
   // 无 hot_breakdowns 时，基于真实作品通用生成爆款拆解（任何行业通用）
   if (!Array.isArray(d.hot_breakdowns) || !d.hot_breakdowns.length) {
     var _ind0 = (d.summary && d.summary.industry) || '该领域';
-    // 按关键词分组，每个类别取最高赞 1 条，形成"关键词→爆款"链条，避免全是同一类
+    // 时效性优先：只取一周内发布的视频；若不足8条才回退到全部
+    var _now = Date.now();
+    var _weekMs = 7*24*3600*1000;
+    function _withinWeek(w){
+      var t = w.publishTime || w.createTime || '';
+      if (!t) return false;
+      var d = new Date(t);
+      if (isNaN(d.getTime())) return false;
+      return (_now - d.getTime()) < _weekMs;
+    }
+    var _all = d.works || [];
+    var _recent = _all.filter(_withinWeek);
+    var _pool = _recent.length >= 8 ? _recent : _all;
+    // 按关键词分组，每个类别取最高赞 1 条，形成"关键词→爆款"链条
     var _byKw = {};
-    (d.works || []).forEach(function(w){
+    _pool.forEach(function(w){
       var k = w._keyword || '综合';
       if (!_byKw[k] || (w.likeCount||0) > (_byKw[k].likeCount||0)) _byKw[k] = w;
     });
