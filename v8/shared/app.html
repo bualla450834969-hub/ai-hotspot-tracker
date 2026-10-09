@@ -1925,6 +1925,23 @@ loadCollectTrend();
       var x={keyword:h.keyword,platform:h.platform,total:h.total,works:h.works,avg_like:h.avg_like};
       if(h.error)x.error=h.error;return x;
     });
+    // 按关键词名合并跨平台同名词条：抖音/小红书命中同一关键词时聚合为一条，避免热榜重复
+    var _kwAgg={};
+    hotwords.forEach(function(h){
+      var k=(h.keyword||'').trim();
+      if(!k)return;
+      if(!_kwAgg[k]){_kwAgg[k]={keyword:k,total:0,works:0,_likeW:0};}
+      var a=_kwAgg[k];
+      a.total+=(h.total||0);
+      a.works+=(h.works||0);
+      a._likeW+=(h.avg_like||0)*(h.works||0);
+    });
+    hotwords=Object.keys(_kwAgg).map(function(k){
+      var a=_kwAgg[k];
+      a.avg_like=a.works?Math.round(a._likeW/a.works):0;
+      delete a._likeW;
+      return a;
+    });
     var dashboard=window.buildDashboardData(allWorks,hotwords,displayName);
     dashboard.last_update=snap.collectedAtHK||snap.collectedAt;
     dashboard.data_source='cloud';
