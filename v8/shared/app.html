@@ -1899,7 +1899,7 @@ loadCollectTrend();
   // 拉取云端快照；返回 snapshot 对象，无快照时为 {code:4040}
   window.fetchCloudSnapshot=async function(cloudId){
     var base=window.getWorkerBase();
-    var url=base+(base.indexOf('?')>=0?'&':'?')+'action=snapshot&industry='+encodeURIComponent(cloudId);
+    var url=base+(base.indexOf('?')>=0?'&':'?')+'action=snapshot&industry='+encodeURIComponent(cloudId)+'&_t='+Date.now();
     var rid=window.AppStore?AppStore.nextRequest():0;
     var resp=await fetch(url);
     var j=await resp.json();
