@@ -19,7 +19,7 @@
     el.innerHTML = list.map((b,i)=>`
       <div class="breakdown-card">
         <div class="bd-header">
-          <div class="bd-title">${i+1}. ${b.title}</div>
+          <div class="bd-title">${i+1}. ${b.keyword ? '<span style="display:inline-block;padding:1px 7px;border-radius:6px;background:rgba(34,211,238,0.15);color:#22d3ee;font-size:11px;font-weight:600;margin-right:6px;">'+b.keyword+'</span>' : ''}${b.title}</div>
           <div style="display:flex;align-items:center;gap:6px;"><button class="fav-btn ${isFavorite(i) ? 'active' : ''}" onclick="toggleFavorite(${i})" title="收藏">${isFavorite(i) ? '⭐' : '☆'}</button><div class="bd-likes">${(b.likes/10000).toFixed(1)}万</div></div>
         </div>
         <div class="bd-row"><span class="bd-label">钩子</span><span class="bd-val">${b.hook}型</span></div>
