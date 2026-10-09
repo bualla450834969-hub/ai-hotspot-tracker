@@ -8,6 +8,7 @@
 // ===== 数据适配层：统一不同行业的数据字段 =====
 window.normalizeData = function() {
   var d = window.DATA;
+  if (!d || typeof d !== 'object') return; // 数据未加载时跳过，不抛错
   // works 字段映射：统一标准字段（likes/comments/collects/shares），
   // 同时保留 likeCount 等兼容别名，供历史渲染函数读取（适配层是唯一契约边界）
   if (d.works && d.works.length > 0) {
