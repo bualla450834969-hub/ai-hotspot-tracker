@@ -1365,7 +1365,7 @@ function buildDashboardData(works, hotwords, industryName){
     daily_actions: dailyActions,
     blue_ocean_list: hotwords.filter(function(h){return h.efficiency_tag==='蓝海';}).map(function(h){return {keyword:h.keyword,total:h.total,max_like:h.max_like};}),
     growth_ranking: hotwords.filter(function(h){return h.trend==='飙升';}).map(function(h){return {keyword:h.keyword, growth:'+'+Math.round(h.max_like/1000)+'K'};}),
-    tech_signals: [],
+    tech_signals: window._loadedTechSignals || {signals: [], summary: {}},
     audience_personas: audiencePersonas,
     comment_semantic: commentSemantic,
     conversion_signals: conversionSignals,
@@ -1949,8 +1949,12 @@ loadCollectTrend();
       collectedAtHK:snap.collectedAtHK,failedKws:snap.failedKws||[],
       counts:snap.counts||{rows:allWorks.length}};
     // 透传 GitHub 技术雷达数据（techradar 模块期望 {signals, summary} 结构）
+    // 存到全局持久化，避免后续 buildDashboardData 重复执行时被硬编码空数组覆盖
     if (snap.tech_signals && snap.tech_signals.length) {
-      dashboard.tech_signals = { signals: snap.tech_signals, summary: snap.tech_summary || {} };
+      window._loadedTechSignals = { signals: snap.tech_signals, summary: snap.tech_summary || {} };
+      dashboard.tech_signals = window._loadedTechSignals;
+    } else {
+      window._loadedTechSignals = { signals: [], summary: {} };
     }
     if(window.AppStore)AppStore.data=dashboard;
     if(window.normalizeDataContract)normalizeDataContract();
