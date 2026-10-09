@@ -8,6 +8,10 @@ compatibility_date = "2026-10-08"
 binding = "REDFOX_KV"
 id = "a82d9334963a4446a47699d78ae0b8b0"
 
+# Workers AI：用于项目描述英译中
+[ai]
+binding = "AI"
+
 # 定时触发（UTC）：00:00 / 06:00 = 香港时间（HKT）08:00 / 14:00
 [triggers]
 crons = ["0 0 * * *", "0 6 * * *"]

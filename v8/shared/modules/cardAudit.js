@@ -41,6 +41,13 @@
         var meaningful = bodyText.replace(/[-–—\s0-9.%:：]/g,'');
         if (meaningful.length<5 && bodyText.length<40 && contentNodes>0) issues.push('占位符无数据');
       }
+      if (hasCanvas) {
+        var emptyCv = false;
+        sec.querySelectorAll('canvas').forEach(function(cv){
+          if (cv.width < 10 || cv.height < 10) emptyCv = true;
+        });
+        if (emptyCv) issues.push('图表未渲染(空canvas)');
+      }
       if (bodyText.indexOf('function')>=0 || /setTimeout|querySelector/.test(bodyText)) {
         if (bodyText.length<400) issues.push('代码泄漏');
       }

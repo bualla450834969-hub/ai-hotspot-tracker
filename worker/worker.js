@@ -122,14 +122,28 @@ export default {
   },
 };
 
+/** 英译中：Cloudflare Workers AI 翻译模型（免费额度大、不依赖外部服务） */
+async function translateText(env, text) {
+  if (!text || !env.AI) return '';
+  try {
+    const resp = await env.AI.run('@cf/meta/m2m100-1.2b', {
+      text: text,
+      source_lang: 'en',
+      target_lang: 'zh'
+    });
+    return (resp && resp.translated_text) || '';
+  } catch (e) { return ''; }
+}
+
 /** 从 GitHub Search 采集 AI 热门开源项目，关联已采集社媒作品，生成 tech_signals */
 async function fetchGitHubTechSignals(env, ind, allTitles) {
   // 只有需要技术雷达的行业（当前为 ai）才采集 GitHub
   if (ind.id !== 'ai') return { signals: [], summary: { blue_ocean: 0, exploding: 0, rising: 0, watching: 0 } };
   try {
     const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+    // 一周内新建的 AI 项目，按星数降序 = 新爆发最快的（而非老的高星项目）
     const url = 'https://api.github.com/search/repositories?q=' +
-      encodeURIComponent('topic:ai pushed:>' + weekAgo) +
+      encodeURIComponent('topic:ai created:>' + weekAgo) +
       '&sort=stars&order=desc&per_page=50';
     const headers = { 'User-Agent': 'ai-hotspot-tracker', 'Accept': 'application/vnd.github+json' };
     if (env.GITHUB_TOKEN) headers['Authorization'] = 'Bearer ' + env.GITHUB_TOKEN;
@@ -145,9 +159,10 @@ async function fetchGitHubTechSignals(env, ind, allTitles) {
       let matched = 0;
       allTitles.forEach(function (t) { if (t && t.toLowerCase().indexOf(lowerName) >= 0) matched++; });
       let opp = '观察中';
-      if (daysOld < 30 && stars > 1000) opp = '蓝海机会';
-      else if (stars > 20000) opp = '正在爆发';
-      else if (stars > 5000) opp = '上升期';
+      // 都是一周内新建的项目：按星数判断爆发阶段
+      if (stars > 2000) opp = '正在爆发';
+      else if (stars > 500) opp = '蓝海机会';
+      else if (stars > 100) opp = '上升期';
       return {
         name: repo.full_name,
         source: 'github',
@@ -166,6 +181,12 @@ async function fetchGitHubTechSignals(env, ind, allTitles) {
         },
       };
     });
+    // 并行把英文描述翻译成中文（前端优先显示 description_zh）
+    await Promise.all(signals.map(async function (s) {
+      if (s.description) {
+        s.description_zh = await translateText(env, s.description);
+      }
+    }));
     const summary = { blue_ocean: 0, exploding: 0, rising: 0, watching: 0 };
     signals.forEach(function (s) {
       const o = s.analysis.opportunity;
