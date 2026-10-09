@@ -1948,6 +1948,10 @@ loadCollectTrend();
     dashboard.cloud_snapshot={industry:snap.industry,collectedAt:snap.collectedAt,
       collectedAtHK:snap.collectedAtHK,failedKws:snap.failedKws||[],
       counts:snap.counts||{rows:allWorks.length}};
+    // 透传 GitHub 技术雷达数据（techradar 模块期望 {signals, summary} 结构）
+    if (snap.tech_signals && snap.tech_signals.length) {
+      dashboard.tech_signals = { signals: snap.tech_signals, summary: snap.tech_summary || {} };
+    }
     if(window.AppStore)AppStore.data=dashboard;
     if(window.normalizeDataContract)normalizeDataContract();
     if(window.normalizeData)normalizeData();

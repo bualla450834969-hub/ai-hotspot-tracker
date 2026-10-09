@@ -122,6 +122,65 @@ export default {
   },
 };
 
+/** 从 GitHub Search 采集 AI 热门开源项目，关联已采集社媒作品，生成 tech_signals */
+async function fetchGitHubTechSignals(env, ind, allTitles) {
+  // 只有需要技术雷达的行业（当前为 ai）才采集 GitHub
+  if (ind.id !== 'ai') return { signals: [], summary: { blue_ocean: 0, exploding: 0, rising: 0, watching: 0 } };
+  try {
+    const weekAgo = new Date(Date.now() - 7 * 24 * 3600 * 1000).toISOString().slice(0, 10);
+    const url = 'https://api.github.com/search/repositories?q=' +
+      encodeURIComponent('topic:llm topic:agent pushed:>' + weekAgo) +
+      '&sort=stars&order=desc&per_page=12';
+    const headers = { 'User-Agent': 'ai-hotspot-tracker', 'Accept': 'application/vnd.github+json' };
+    if (env.GITHUB_TOKEN) headers['Authorization'] = 'Bearer ' + env.GITHUB_TOKEN;
+    const resp = await fetch(url, { headers });
+    if (!resp.ok) throw new Error('GitHub ' + resp.status);
+    const j = await resp.json();
+    const signals = (j.items || []).map(function (repo) {
+      const created = new Date(repo.created_at);
+      const daysOld = Math.max(1, Math.round((Date.now() - created.getTime()) / 86400000));
+      const stars = repo.stargazers_count || 0;
+      const name = repo.name || '';
+      const lowerName = name.toLowerCase();
+      let matched = 0;
+      allTitles.forEach(function (t) { if (t && t.toLowerCase().indexOf(lowerName) >= 0) matched++; });
+      let opp = '观察中';
+      if (daysOld < 30 && stars > 1000) opp = '蓝海机会';
+      else if (stars > 20000) opp = '正在爆发';
+      else if (stars > 5000) opp = '上升期';
+      return {
+        name: repo.full_name,
+        source: 'github',
+        stars: stars,
+        forks: repo.forks_count || 0,
+        description: repo.description || '',
+        days_old: daysOld,
+        star_growth_per_day: Math.round(stars / daysOld),
+        is_new: daysOld < 30,
+        analysis: {
+          opportunity: opp,
+          matched_hotwords: matched > 0 ? [name] : [],
+          tech_heat: Math.min(100, Math.round(stars / 1000)),
+          social_heat: Math.min(100, matched * 10),
+          reason: name + ' 共 ' + stars + ' 星、' + (repo.forks_count || 0) + ' fork，创建 ' + daysOld + ' 天；社媒采集到 ' + matched + ' 条相关作品',
+        },
+      };
+    });
+    const summary = { blue_ocean: 0, exploding: 0, rising: 0, watching: 0 };
+    signals.forEach(function (s) {
+      const o = s.analysis.opportunity;
+      if (o.indexOf('蓝海') >= 0) summary.blue_ocean++;
+      else if (o.indexOf('爆发') >= 0) summary.exploding++;
+      else if (o.indexOf('上升') >= 0) summary.rising++;
+      else summary.watching++;
+    });
+    return { signals, summary };
+  } catch (e) {
+    console.error('[GITHUB] tech signals failed', e.message || e);
+    return { signals: [], summary: { blue_ocean: 0, exploding: 0, rising: 0, watching: 0 } };
+  }
+}
+
 /** 采集单个行业：平台×关键词（有限并发 + 重试 + 超时），原始 rows 写 KV */
 async function collectIndustry(env, ind) {
   const apiKey = env.REDFOX_API_KEY;
@@ -238,6 +297,16 @@ async function collectIndustry(env, ind) {
     });
   });
 
+  // GitHub 技术信号（仅AI行业）：关联已采集社媒作品标题，生成技术雷达数据
+  const allTitles = [];
+  Object.keys(lib).forEach((pl) => {
+    Object.keys(lib[pl]).forEach((rid) => {
+      const it = lib[pl][rid].r || {};
+      allTitles.push((it.title || '') + ' ' + (it.desc || ''));
+    });
+  });
+  const gh = await fetchGitHubTechSignals(env, ind, allTitles);
+
   const snapshot = {
     industry: ind.id,
     industryName: ind.name,
@@ -245,8 +314,10 @@ async function collectIndustry(env, ind) {
     collectedAtHK: formatHKT(now),
     entries: groupOrder.map((gk) => groupMap[gk]),
     keywordStats,
+    tech_signals: gh.signals,
+    tech_summary: gh.summary,
     failedKws,
-    counts: { jobs: jobs.length, freshRows, libRows, failedJobs: keywordStats.filter((k) => k.error).length },
+    counts: { jobs: jobs.length, freshRows, libRows, failedJobs: keywordStats.filter((k) => k.error).length, githubSignals: gh.signals.length },
   };
   await env.REDFOX_KV.put('snapshot:' + ind.id, JSON.stringify(snapshot));
 
