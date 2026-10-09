@@ -25,7 +25,7 @@ const SCHEDULED_INDUSTRIES = [
     id: 'ai',
     name: 'AI',
     platforms: ['douyin', 'xiaohongshu'],
-    keywords: ['AI', 'AI工具', 'AI教程', 'AI提示词', 'AI绘画', 'AI视频', 'AI写作', 'AI编程', 'AI智能体', 'AI副业', 'AI避坑', 'AI推荐', 'AI怎么选', 'AI排行榜', 'AI数字人', 'AI PPT', 'ChatGPT', 'AIGC', '大模型'],
+    keywords: ['AI工具', 'AI教程', 'AI提示词', 'AI视频', 'AI写作', 'AI编程', 'AI智能体', 'AI Agent', 'AI副业', 'AI避坑', 'AI推荐', 'AI数字人', 'AI PPT', 'ChatGPT', 'AIGC', '大模型', 'LLM', 'RAG', '开源模型'],
   },
 ];
 
