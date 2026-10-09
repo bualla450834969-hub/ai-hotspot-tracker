@@ -2763,7 +2763,7 @@ if (document.readyState === 'loading') {
 
     var grid = document.getElementById('techGrid');
     var html = '';
-    ts.signals.slice(0, 12).forEach(function(sig) {
+    ts.signals.slice(0, 30).forEach(function(sig) {
       var a = sig.analysis || {};
       var opp = a.opportunity || '';
       var badgeClass = 'watch';
