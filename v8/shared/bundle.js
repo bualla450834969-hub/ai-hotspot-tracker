@@ -346,6 +346,25 @@ window.normalizeData = function() {
     ];
   }
 
+  // 7b. saturation 饱和度与生命周期：基于各关键词作品数+平均赞估算
+  if (!d.saturation || !d.saturation.length) {
+    var _satMap = {};
+    works.forEach(function(w){
+      var k = w._keyword || '';
+      if (!k) return;
+      if (!_satMap[k]) _satMap[k] = {n:0, likes:0};
+      _satMap[k].n++;
+      _satMap[k].likes += (w.likeCount||0);
+    });
+    d.saturation = Object.keys(_satMap).map(function(k){
+      var s = _satMap[k];
+      var avgLike = s.n > 0 ? Math.round(s.likes/s.n) : 0;
+      var sat = Math.round(s.n * avgLike / 500);
+      var stage = sat<50 ? '萌芽期' : sat<150 ? '上升期' : sat<300 ? '爆发期' : '衰退期';
+      return {keyword: k, saturation: sat, stage: stage};
+    });
+  }
+
   // 8. growth_ranking 上升速率
   if (!d.growth_ranking || d.growth_ranking.length === 0) {
     var kws2 = (cfg.collect_keywords || []).slice(0, 5);
