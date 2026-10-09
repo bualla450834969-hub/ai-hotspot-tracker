@@ -1,8 +1,9 @@
 /**
  * 领域配置 — 换领域时唯一需要修改的文件
  * 所有业务文案、关键词、模块开关、配色都从这里读取
+ * 注意：window.DATA / DASHBOARD_DATA 由 stable-core.js 定义为 AppStore.data 的访问器，
+ * 这里不要再覆盖，否则云端数据写进 AppStore 后 normalize 读到的还是旧对象。
  */
-window.DATA = window.DASHBOARD_DATA || {};
 
 // ===== 数据适配层：统一不同行业的数据字段 =====
 window.normalizeData = function() {
